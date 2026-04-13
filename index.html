@@ -1,0 +1,2085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Private Mentorship — One Assistant. Three Roles. Built Around Your Life.</title>
+  <meta name="description" content="Private Mentorship gives families their own dedicated personal assistant — handling education, life skills, and daily support across Canada." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #F8FAFC;
+      --white:      #FFFFFF;
+      --ink:        #0F172A;
+      --sub:        #64748B;
+      --hint:       #94A3B8;
+      --blue:       #2563EB;
+      --blue-light: #EFF6FF;
+      --blue-mid:   #3B82F6;
+      --green:      #059669;
+      --green-light:#ECFDF5;
+      --amber:      #D97706;
+      --amber-light:#FFFBEB;
+      --border:     #E4ECFC;
+      --border-glass: rgba(255,255,255,0.18);
+      --radius-sm:  10px;
+      --radius-md:  18px;
+      --radius-lg:  28px;
+      --radius-xl:  40px;
+      --shadow-sm:  0 2px 12px rgba(37,99,235,0.06);
+      --shadow-md:  0 8px 40px rgba(37,99,235,0.10);
+      --shadow-lg:  0 24px 80px rgba(37,99,235,0.13);
+      --shadow-glass: 0 8px 32px rgba(0,0,0,0.10);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Quicksand', 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ── ANIMATED MESH BACKGROUND ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: -1;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 0%, rgba(37,99,235,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(5,150,105,0.05) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 60% at 60% 40%, rgba(217,119,6,0.04) 0%, transparent 50%),
+        #F8FAFC;
+      pointer-events: none;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%; height: 68px;
+      background: rgba(248,250,252,0.75);
+      backdrop-filter: blur(24px) saturate(200%);
+      -webkit-backdrop-filter: blur(24px) saturate(200%);
+      border-bottom: 1px solid rgba(228,236,252,0.6);
+      transition: background 0.3s;
+    }
+    nav.scrolled {
+      background: rgba(248,250,252,0.92);
+      box-shadow: 0 4px 24px rgba(37,99,235,0.08);
+    }
+    .nav-logo { display: flex; align-items: center; text-decoration: none; }
+    .nav-logo img { height: 38px; width: auto; }
+    .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+    .nav-links a { font-size: 14px; font-weight: 600; color: var(--sub); text-decoration: none; transition: color .2s; }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-cta {
+      background: var(--blue) !important; color: #fff !important;
+      padding: 9px 20px; border-radius: 980px;
+      font-size: 14px !important; font-weight: 700 !important;
+      box-shadow: 0 4px 14px rgba(37,99,235,0.3);
+      transition: filter .2s, transform .15s, box-shadow .2s !important;
+    }
+    .nav-cta:hover { filter: brightness(1.1); transform: scale(1.04); box-shadow: 0 6px 20px rgba(37,99,235,0.4); }
+
+    /* ── COMET BUTTON ── */
+    @property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+    @keyframes orbit { to { --angle: 360deg; } }
+
+    .comet-wrap {
+      position: relative; display: inline-block;
+      border-radius: 980px; padding: 2px;
+      background: conic-gradient(
+        from var(--angle),
+        transparent 0%, transparent 58%,
+        #93C5FD 70%, #ffffff 78%, #93C5FD 86%, transparent 100%
+      );
+      animation: orbit 2.6s linear infinite;
+    }
+    .comet-wrap::after {
+      content: ''; position: absolute; inset: 2px;
+      border-radius: 980px; background: var(--blue); z-index: 0;
+    }
+    .comet-btn {
+      position: relative; z-index: 1;
+      display: inline-flex; align-items: center; gap: 9px;
+      background: var(--blue); color: #fff;
+      padding: 14px 28px; border-radius: 980px;
+      font-size: 15px; font-weight: 700; text-decoration: none;
+      transition: transform .15s, filter .15s;
+      box-shadow: 0 4px 20px rgba(37,99,235,0.35);
+      white-space: nowrap;
+    }
+    .comet-btn:hover { transform: scale(1.04); filter: brightness(1.08); }
+
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.1); color: #fff;
+      padding: 14px 28px; border-radius: 980px;
+      font-size: 15px; font-weight: 600; text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.24);
+      backdrop-filter: blur(10px);
+      transition: background .2s, transform .15s;
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.2); transform: scale(1.03); }
+
+    /* ── GLASS CARD ── */
+    .glass {
+      background: rgba(255,255,255,0.65);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255,255,255,0.7);
+      box-shadow: var(--shadow-glass);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; overflow: hidden;
+      padding: 120px 5% 80px;
+    }
+    .hero-video {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; object-fit: cover; z-index: 0;
+      transform: scale(0.82); transform-origin: center center;
+    }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(160deg, rgba(10,15,44,.47) 0%, rgba(0,60,180,.30) 50%, rgba(10,15,44,.49) 100%);
+      z-index: 1;
+      transform: scale(0.82); transform-origin: center center;
+    }
+    /* animated gradient shimmer over video */
+    .hero-shimmer {
+      position: absolute; inset: 0; z-index: 2;
+      transform: scale(0.82); transform-origin: center center;
+      background: linear-gradient(
+        105deg,
+        transparent 0%,
+        rgba(59,130,246,0.08) 30%,
+        rgba(139,92,246,0.06) 60%,
+        transparent 100%
+      );
+      animation: shimmer 8s ease-in-out infinite alternate;
+    }
+    @keyframes shimmer {
+      from { transform: translateX(-10%) skewX(-3deg); }
+      to   { transform: translateX(10%) skewX(3deg); }
+    }
+    .hero-content { position: relative; z-index: 3; max-width: 880px; margin: 0 auto; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.22);
+      backdrop-filter: blur(12px);
+      border-radius: 980px; padding: 7px 16px;
+      font-size: 11px; font-weight: 700;
+      color: rgba(255,255,255,.85); letter-spacing: .8px;
+      text-transform: uppercase; margin-bottom: 32px;
+    }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #34D399; animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.75)} }
+    .hero h1 {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(40px, 7vw, 84px); font-weight: 900;
+      letter-spacing: -3px; line-height: 1.02;
+      color: #fff; margin-bottom: 26px;
+    }
+    .hero h1 .hl {
+      background: linear-gradient(90deg, #60A5FA 0%, #A78BFA 50%, #34D399 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      background-size: 200% auto;
+      animation: gradientShift 5s ease infinite;
+    }
+    @keyframes gradientShift { 0%{background-position:0%} 50%{background-position:100%} 100%{background-position:0%} }
+    .hero-sub {
+      font-size: clamp(16px,2vw,20px); color: rgba(255,255,255,.65);
+      max-width: 600px; margin: 0 auto 48px; line-height: 1.75; font-weight: 500;
+    }
+    .hero-actions { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 5%;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+    }
+    .stat-item {
+      padding: 32px 24px; text-align: center;
+      border-right: 1px solid var(--border);
+      position: relative;
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-item::after {
+      content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 0; height: 2px; background: var(--blue);
+      transition: width .4s ease;
+    }
+    .stat-item:hover::after { width: 60%; }
+    .stat-num {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(28px,3vw,42px); font-weight: 900;
+      color: var(--blue); letter-spacing: -1.5px; line-height: 1;
+      display: block;
+    }
+    .stat-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; color: var(--sub); margin-top: 6px; }
+
+    /* ── THREE ROLES ── */
+    .roles-strip {
+      padding: 80px 5%;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    }
+    .role-card {
+      border-radius: var(--radius-lg); padding: 40px 36px;
+      position: relative; overflow: hidden;
+      transition: transform .3s, box-shadow .3s;
+      cursor: default;
+    }
+    .role-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+    .role-card::before {
+      content: ''; position: absolute; inset: 0; border-radius: inherit;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%);
+      z-index: 0;
+    }
+    .role-card > * { position: relative; z-index: 1; }
+    .role-card.card-blue { background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); border: 1px solid #BFDBFE; }
+    .role-card.card-green { background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%); border: 1px solid #A7F3D0; }
+    .role-card.card-amber { background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); border: 1px solid #FDE68A; }
+    .role-num { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; }
+    .role-card.card-blue .role-num { color: var(--blue); }
+    .role-card.card-green .role-num { color: var(--green); }
+    .role-card.card-amber .role-num { color: var(--amber); }
+    .role-icon-wrap {
+      width: 52px; height: 52px; border-radius: 16px;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
+    }
+    .role-card.card-blue .role-icon-wrap { background: rgba(37,99,235,0.12); }
+    .role-card.card-green .role-icon-wrap { background: rgba(5,150,105,0.12); }
+    .role-card.card-amber .role-icon-wrap { background: rgba(217,119,6,0.12); }
+    .role-card h3 { font-size: 20px; font-weight: 700; color: var(--ink); letter-spacing: -.3px; margin-bottom: 12px; }
+    .role-card p { font-size: 14px; color: var(--sub); line-height: 1.8; font-weight: 500; }
+
+    /* ── PHOTO SECTION ── */
+    .photo-section { background: var(--white); padding: 100px 5%; }
+    .photo-layout {
+      display: grid; grid-template-columns: 1.1fr 1fr;
+      grid-template-rows: 1fr 1fr; gap: 16px; margin-top: 56px; height: 520px;
+    }
+    .photo-main { grid-row: 1/3; border-radius: var(--radius-lg); overflow: hidden; position: relative; }
+    .photo-main img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s; }
+    .photo-main:hover img { transform: scale(1.03); }
+    .photo-sm { border-radius: var(--radius-md); overflow: hidden; position: relative; }
+    .photo-sm img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s; }
+    .photo-sm:hover img { transform: scale(1.04); }
+    .photo-caption {
+      position: absolute; bottom: 0; left: 0; right: 0; padding: 24px;
+      background: linear-gradient(to top, rgba(10,15,44,.8) 0%, transparent 100%);
+    }
+    .photo-caption p { color: #fff; font-size: 14px; font-weight: 600; }
+
+    /* ── FEATURES ── */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 56px;
+    }
+    .feat-card {
+      border-radius: var(--radius-lg); padding: 32px 28px;
+      border: 1px solid var(--border);
+      transition: transform .25s, box-shadow .25s, border-color .25s;
+      cursor: default;
+    }
+    .feat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(37,99,235,0.12);
+      border-color: rgba(37,99,235,0.2);
+    }
+    .feat-icon {
+      width: 48px; height: 48px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 18px;
+      transition: transform .3s;
+    }
+    .feat-card:hover .feat-icon { transform: scale(1.1) rotate(-3deg); }
+    .feat-card h3 { font-size: 17px; font-weight: 700; color: var(--ink); letter-spacing: -.3px; margin-bottom: 8px; }
+    .feat-card p { font-size: 14px; color: var(--sub); line-height: 1.75; font-weight: 500; }
+
+    /* ── SOCIAL PROOF / TESTIMONIALS ── */
+    .testimonials-section { background: var(--ink); padding: 100px 5%; margin-bottom: 80px; }
+    .testimonials-section .section-label { color: rgba(255,255,255,.35); }
+    .testimonials-section .section-title { color: #fff; }
+    .testimonials-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 56px;
+    }
+    .testi-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-lg); padding: 32px 28px;
+      backdrop-filter: blur(10px);
+      transition: transform .25s, background .25s;
+    }
+    .testi-card:hover { transform: translateY(-4px); background: rgba(255,255,255,0.09); }
+    .stars { display: flex; gap: 3px; margin-bottom: 18px; }
+    .star { width: 16px; height: 16px; color: #FBBF24; fill: #FBBF24; }
+    .testi-text {
+      font-size: 15px; color: rgba(255,255,255,.78); line-height: 1.8;
+      font-style: italic; margin-bottom: 24px; font-weight: 500;
+    }
+    .testi-author { display: flex; align-items: center; gap: 12px; }
+    .testi-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue) 0%, #8B5CF6 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 800; color: #fff; flex-shrink: 0;
+    }
+    .testi-name { font-size: 14px; font-weight: 700; color: #fff; }
+    .testi-role { font-size: 12px; color: rgba(255,255,255,.4); margin-top: 2px; }
+
+    /* ── WHO WE SERVE ── */
+    .serve-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 56px;
+    }
+    .serve-card {
+      border-radius: var(--radius-md); padding: 28px 24px;
+      border: 1px solid var(--border); text-align: center;
+      background: var(--white);
+      transition: transform .25s, box-shadow .25s, border-color .25s;
+    }
+    .serve-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: rgba(37,99,235,0.2); }
+    .serve-icon {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--blue-light); display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px; transition: transform .3s;
+    }
+    .serve-card:hover .serve-icon { transform: scale(1.1); }
+    .serve-card h3 { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+    .serve-card p { font-size: 13px; color: var(--sub); line-height: 1.65; font-weight: 500; }
+
+    /* ── HOW IT WORKS ── */
+    .how-outer { padding: 0 5% 100px; }
+    .how-inner {
+      background: linear-gradient(135deg, #0F172A 0%, #1e3a8a 50%, #0F172A 100%);
+      border-radius: var(--radius-xl); padding: 88px 72px;
+      position: relative; overflow: hidden;
+    }
+    .how-inner::before {
+      content: ''; position: absolute; top: -100px; right: -100px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(59,130,246,.15) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .how-inner::after {
+      content: ''; position: absolute; bottom: -100px; left: -100px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(139,92,246,.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .how-inner .section-label { color: rgba(255,255,255,.3); }
+    .how-inner .section-title { color: #fff; }
+    .how-inner .section-sub { color: rgba(255,255,255,.45); }
+    .steps {
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 0; margin-top: 64px;
+      position: relative;
+    }
+    .steps::before {
+      content: ''; position: absolute;
+      top: 28px; left: 10%; right: 10%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.15), rgba(255,255,255,.15), transparent);
+    }
+    .step { padding: 0 16px; position: relative; z-index: 1; }
+    .step-dot {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 24px; backdrop-filter: blur(10px);
+      transition: background .3s;
+    }
+    .step:hover .step-dot { background: rgba(37,99,235,0.3); }
+    .step-num { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,.25); margin-bottom: 10px; }
+    .step h3 { font-size: 17px; font-weight: 700; color: #fff; letter-spacing: -.3px; margin-bottom: 10px; }
+    .step p { font-size: 13px; color: rgba(255,255,255,.44); line-height: 1.75; font-weight: 500; }
+
+    /* ── PLANS ── */
+    .plans-section { background: var(--white); padding: 100px 5%; }
+    .plans-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 56px;
+    }
+    .plan-card {
+      background: var(--bg); border-radius: var(--radius-lg); padding: 36px 26px;
+      border: 1.5px solid var(--border);
+      transition: transform .25s, box-shadow .25s, border-color .25s;
+    }
+    .plan-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
+    .plan-card.featured {
+      background: linear-gradient(145deg, var(--blue) 0%, #1D4ED8 100%);
+      border-color: transparent;
+      box-shadow: 0 16px 56px rgba(37,99,235,0.32);
+    }
+    .plan-card.featured:hover { transform: translateY(-7px); box-shadow: 0 24px 64px rgba(37,99,235,0.4); }
+    .plan-badge {
+      display: inline-block; background: rgba(255,255,255,.18);
+      color: #fff; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .8px;
+      padding: 4px 12px; border-radius: 980px; margin-bottom: 20px;
+    }
+    .plan-name { font-size: 19px; font-weight: 700; letter-spacing: -.3px; margin-bottom: 4px; }
+    .plan-card:not(.featured) .plan-name { color: var(--ink); }
+    .plan-card.featured .plan-name { color: #fff; }
+    .plan-hours { font-size: 13px; font-weight: 600; margin-bottom: 24px; }
+    .plan-card:not(.featured) .plan-hours { color: var(--sub); }
+    .plan-card.featured .plan-hours { color: rgba(255,255,255,.6); }
+    .plan-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
+    .plan-features li { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; font-weight: 500; }
+    .plan-card:not(.featured) .plan-features li { color: var(--ink); }
+    .plan-card.featured .plan-features li { color: rgba(255,255,255,.85); }
+    .pcheck {
+      width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; margin-top: 1px;
+    }
+    .plan-card:not(.featured) .pcheck { background: var(--blue-light); }
+    .plan-card.featured .pcheck { background: rgba(255,255,255,.18); }
+    .plan-cta {
+      display: block; text-align: center; padding: 13px; border-radius: 980px;
+      font-size: 14px; font-weight: 700; text-decoration: none;
+      transition: transform .15s, filter .15s, box-shadow .15s;
+    }
+    .plan-card:not(.featured) .plan-cta {
+      background: var(--ink); color: #fff;
+      box-shadow: 0 4px 14px rgba(15,23,42,0.2);
+    }
+    .plan-card.featured .plan-cta {
+      background: #fff; color: var(--blue);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .plan-cta:hover { transform: scale(1.03); filter: brightness(1.06); }
+
+    /* ── STORIES ── */
+    .stories { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 56px; }
+    .story { border-radius: var(--radius-lg); overflow: hidden; position: relative; }
+    .story img { width: 100%; height: 340px; object-fit: cover; display: block; transition: transform .5s; }
+    .story:hover img { transform: scale(1.05); }
+    .story-over {
+      position: absolute; bottom: 0; left: 0; right: 0; padding: 28px 24px 24px;
+      background: linear-gradient(to top, rgba(10,15,44,.84) 0%, transparent 100%);
+    }
+    .story-tag {
+      display: inline-block; background: var(--blue); color: #fff;
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .8px; padding: 4px 11px; border-radius: 980px; margin-bottom: 9px;
+    }
+    .story-title { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.4; }
+
+    /* ── CTA ── */
+    .cta-section { padding: 0 5% 100px; }
+    .cta-inner {
+      background: linear-gradient(135deg, #0F172A 0%, #1e3a8a 40%, #0F172A 100%);
+      border-radius: var(--radius-xl); padding: 96px 60px;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .cta-inner::before {
+      content: ''; position: absolute; top: -150px; right: -150px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(59,130,246,.20) 0%, transparent 60%);
+    }
+    .cta-inner::after {
+      content: ''; position: absolute; bottom: -150px; left: -150px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(139,92,246,.15) 0%, transparent 60%);
+    }
+    .cta-inner h2 {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(30px,4.5vw,54px); font-weight: 900;
+      color: #fff; letter-spacing: -2px; margin-bottom: 16px; position: relative; z-index: 1;
+    }
+    .cta-inner p {
+      font-size: 17px; color: rgba(255,255,255,.48);
+      max-width: 460px; margin: 0 auto 40px; line-height: 1.7;
+      position: relative; z-index: 1; font-weight: 500;
+    }
+    .cta-inner .comet-wrap { position: relative; z-index: 1; }
+
+    /* ── FOOTER ── */
+    footer { padding: 72px 5% 40px; border-top: 1px solid var(--border); background: var(--white); }
+    .footer-top { display: grid; grid-template-columns: 1.6fr repeat(3,1fr); gap: 48px; margin-bottom: 60px; }
+    .footer-brand p { font-size: 14px; color: var(--sub); margin-top: 14px; line-height: 1.75; max-width: 260px; font-weight: 500; }
+    .footer-brand img { height: 40px; }
+    .footer-col h4 { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 18px; text-transform: uppercase; letter-spacing: .8px; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .footer-col ul li a { font-size: 14px; color: var(--sub); text-decoration: none; transition: color .2s; font-weight: 500; }
+    .footer-col ul li a:hover { color: var(--blue); }
+    .footer-bottom {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px; padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+    .footer-bottom p { font-size: 12px; color: var(--hint); }
+
+    /* ── SHARED ── */
+    section { padding: 100px 5%; }
+    .section-label {
+      display: inline-block; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--blue); margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(28px,4vw,52px); font-weight: 900;
+      letter-spacing: -1.8px; color: var(--ink); line-height: 1.08;
+    }
+    .section-sub {
+      font-size: 17px; color: var(--sub); margin-top: 18px;
+      line-height: 1.75; font-weight: 500;
+    }
+
+    /* ── REVEAL ANIMATIONS ── */
+    .reveal { opacity: 0; transform: translateY(32px); transition: opacity .65s ease, transform .65s ease; }
+    .reveal.from-left { transform: translateX(-32px); }
+    .reveal.from-right { transform: translateX(32px); }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .plans-grid { grid-template-columns: repeat(2, 1fr); }
+      .steps { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+      .steps::before { display: none; }
+    }
+    @media (max-width: 900px) {
+      .roles-strip { grid-template-columns: 1fr; }
+      .stats-bar { grid-template-columns: repeat(2,1fr); }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .stories { grid-template-columns: 1fr 1fr; }
+      .serve-grid { grid-template-columns: repeat(2,1fr); }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+      .how-inner { padding: 60px 32px; }
+      .features-grid { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .photo-layout { display: flex; flex-direction: column; height: auto; }
+      .photo-main img, .photo-sm img { height: 260px; }
+      .steps { grid-template-columns: 1fr; }
+      .stories { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr; }
+      .how-outer { padding: 0 0 80px; }
+      .how-inner { border-radius: 0; padding: 60px 24px; }
+      .cta-inner { padding: 60px 24px; border-radius: var(--radius-lg); }
+      .features-grid { grid-template-columns: 1fr; }
+      .plans-grid { grid-template-columns: 1fr; }
+      .serve-grid { grid-template-columns: 1fr 1fr; }
+      .stats-bar { grid-template-columns: 1fr 1fr; }
+      /* age group responsive handled in .agi-card */
+    }
+
+    /* ── AGE GROUPS SECTION — APPLE INTERACTIVE ── */
+    .agi-card {
+      max-width: 1200px; margin: 0 auto; display: flex;
+      background: #FFFFFF; border-radius: 24px; overflow: hidden;
+      box-shadow: 0 2px 28px rgba(0,0,0,0.08); min-height: 580px;
+    }
+    .agi-list {
+      flex: 0 0 260px; padding: 36px 16px 36px 24px;
+      border-right: 1px solid #EFEFEF; overflow-y: auto;
+    }
+    .agi-section-lbl {
+      font-size: 9px; font-weight: 700; letter-spacing: .14em;
+      text-transform: uppercase; color: rgba(0,0,0,0.3);
+      padding: 0 10px 10px; display: block;
+    }
+    .agi-item {
+      display: flex; align-items: center; gap: 11px;
+      width: 100%; padding: 10px 10px; background: none;
+      border: none; border-radius: 10px; cursor: pointer;
+      text-align: left; transition: background 0.15s;
+    }
+    .agi-item:hover:not(.agi-item-on) { background: rgba(0,0,0,0.03); }
+    .agi-item-on { background: rgba(0,0,0,0.055); }
+    .agi-circle {
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 1.5px solid rgba(0,0,0,0.2);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: all 0.2s, box-shadow 0.25s;
+      font-size: 15px; color: rgba(0,0,0,0.35); line-height: 1;
+      font-weight: 300;
+    }
+    .agi-item:hover .agi-circle {
+      border-color: rgba(37,99,235,0.45);
+      color: #2563EB;
+      box-shadow: 0 0 0 5px rgba(37,99,235,0.10), 0 0 14px rgba(37,99,235,0.14);
+    }
+    .agi-item-on .agi-circle {
+      background: #0F172A; border-color: #0F172A; color: #fff;
+      font-size: 18px; font-weight: 200;
+      box-shadow: 0 0 0 5px rgba(15,23,42,0.08), 0 2px 8px rgba(15,23,42,0.18);
+    }
+    .agi-lbl {
+      font-size: 13.5px; font-weight: 500; color: rgba(0,0,0,0.55);
+      transition: color 0.2s; line-height: 1.3;
+    }
+    .agi-item-on .agi-lbl { color: #0F172A; font-weight: 600; }
+    .agi-divider { height: 1px; background: #EFEFEF; margin: 14px 10px; }
+    .agi-content {
+      flex: 1; padding: 48px 56px; background: #FAFAFA; overflow-y: auto; max-height: 720px;
+    }
+    .agi-panel { display: none; }
+    .agi-panel-on { display: block; animation: agiPageTurn 0.42s cubic-bezier(0.22,0.8,0.44,1) forwards; }
+    @keyframes agiPageTurn {
+      0%   { clip-path: inset(0 100% 0 0); transform: perspective(900px) rotateY(-10deg) translateX(12px); opacity: 0.3; }
+      35%  { opacity: 1; }
+      100% { clip-path: inset(0 0% 0 0); transform: perspective(900px) rotateY(0deg) translateX(0); opacity: 1; }
+    }
+    /* Role chain strip */
+    .agi-chain {
+      display: flex; align-items: center; gap: 0;
+      margin-bottom: 32px; padding-bottom: 28px;
+      border-bottom: 1px solid #EBEBEB;
+    }
+    .agi-chain-node {
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+      opacity: 0.22; transition: opacity 0.25s;
+    }
+    .agi-chain-node-on { opacity: 1; }
+    .agi-chain-node-half { opacity: 0.5; }
+    .agi-chain-dot {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 1.5px solid #D1D5DB;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.25s; color: #9CA3AF;
+    }
+    .agi-chain-node-on .agi-chain-dot {
+      background: #0F172A; border-color: #0F172A; color: #fff;
+    }
+    .agi-chain-node-half .agi-chain-dot { border-color: #9CA3AF; color: #6B7280; }
+    .agi-chain-num {
+      font-size: 9px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: #0F172A;
+    }
+    .agi-chain-name { font-size: 10px; font-weight: 600; color: #374151; }
+    .agi-chain-mid {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 3px; margin-bottom: 24px; opacity: 0.35;
+    }
+    .agi-chain-line { flex: 1; height: 1px; background: #D1D5DB; width: 100%; }
+    .agi-chain-bridge {
+      font-size: 8.5px; font-weight: 600; letter-spacing: .08em;
+      text-transform: uppercase; color: #9CA3AF; white-space: nowrap;
+      padding: 0 6px;
+    }
+    /* Content typography */
+    .agi-eyebrow {
+      font-size: 10px; font-weight: 700; letter-spacing: .14em;
+      text-transform: uppercase; color: rgba(0,0,0,0.35); margin-bottom: 10px;
+    }
+    .agi-title {
+      font-family: 'Inter', sans-serif; font-size: clamp(24px, 2.8vw, 34px);
+      font-weight: 900; color: #0F172A; letter-spacing: -0.025em;
+      line-height: 1.1; margin: 0 0 18px;
+    }
+    .agi-body {
+      font-size: 14.5px; color: #64748B; line-height: 1.82;
+      margin-bottom: 28px; max-width: 560px;
+    }
+    .agi-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+    .agi-tag {
+      font-size: 11px; font-weight: 600; letter-spacing: .03em;
+      color: rgba(0,0,0,0.45); padding: 6px 13px;
+      border: 1px solid #E5E7EB; border-radius: 6px;
+      background: #FFFFFF;
+    }
+    @media (max-width: 700px) {
+      .agi-card { flex-direction: column; }
+      .agi-list { flex: none; width: 100%; border-right: none; border-bottom: 1px solid #EFEFEF; padding: 20px 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+      .agi-section-lbl { width: 100%; }
+      .agi-content { padding: 28px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav id="nav">
+    <a href="#" class="nav-logo"><img src="pm-logo.png" alt="Private Mentorship" /></a>
+    <ul class="nav-links">
+      <li><a href="#roles">What We Do</a></li>
+      <li><a href="#ages">By Age</a></li>
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="#plans">Plans</a></li>
+      <li><a href="#contact" class="nav-cta">Apply Now</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <video class="hero-video" autoplay muted loop playsinline>
+      <source src="background_hero.mp4" type="video/mp4" />
+    </video>
+    <div class="hero-overlay"></div>
+    <div class="hero-shimmer"></div>
+    <div class="hero-content">
+      <div class="hero-badge"><span class="live-dot"></span>Now enrolling across Canada</div>
+      <h1>One assistant.<br /><span class="hl">Three roles.</span><br />Built around your life.</h1>
+      <p class="hero-sub">Private Mentorship gives families their own dedicated personal assistant — covering education, life skills, and day-to-day support through one seamless platform.</p>
+      <div class="hero-actions">
+        <div class="comet-wrap">
+          <a href="#contact" class="comet-btn">
+            Apply for a Spot
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+        <a href="#roles" class="btn-ghost">See How It Works</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-num" data-target="3">0</span>
+      <div class="stat-label">Roles in one assistant</div>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num" data-target="1">0</span>
+      <div class="stat-label">Dedicated person per family</div>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num" data-suffix="%">100</span>
+      <div class="stat-label">Private, dedicated support</div>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num" data-text="Canada">—</span>
+      <div class="stat-label">Available nationwide</div>
+    </div>
+  </div>
+
+  <!-- THREE ROLES -->
+  <section id="roles" style="background:var(--bg);">
+    <div style="text-align:center;margin-bottom:0;">
+      <span class="section-label">What your assistant does</span>
+      <h2 class="section-title" style="margin:0 auto;text-align:center;">One person.<br />Three ways to show up.</h2>
+      <p class="section-sub" style="margin:16px auto 0;text-align:center;max-width:540px;">Your assistant isn't just a tutor or a helper — they're a full-spectrum support system built around your family's real life.</p>
+    </div>
+    <div class="roles-strip" style="padding:56px 0 0;">
+      <div class="role-card card-blue reveal from-left">
+        <div class="role-num">Role 01</div>
+        <div class="role-icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 11h12M4 16h14" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <h3>Education</h3>
+        <p>Your assistant works as a private teacher — covering homework, school subjects, tutoring sessions, and building lasting study habits tailored to each person's unique learning style.</p>
+      </div>
+      <div class="role-card card-green reveal">
+        <div class="role-num">Role 02</div>
+        <div class="role-icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#059669" stroke-width="2"/><path d="M5 20c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="#059669" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <h3>Life Skills & Mentorship</h3>
+        <p>Think Big Brother / Big Sister — for all ages. Your assistant builds a real relationship, guiding confidence, social skills, community involvement, and personal growth over time.</p>
+      </div>
+      <div class="role-card card-amber reveal from-right">
+        <div class="role-num">Role 03</div>
+        <div class="role-icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="3" stroke="#D97706" stroke-width="2"/><path d="M3 9h18M8 4v5M16 4v5" stroke="#D97706" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <h3>Daily Personal Support</h3>
+        <p>A true personal assistant — booking appointments, taking notes, sending emails, coordinating with schools and organizations, and handling whatever the day brings your family.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL PHOTOS -->
+  <section class="photo-section reveal" id="about">
+    <span class="section-label">Real families. Real assistants.</span>
+    <h2 class="section-title">This is what Private<br />Mentorship looks like.</h2>
+    <p class="section-sub" style="max-width:500px;">From learning sessions in beautiful homes to adventures out in the city — your assistant is a trusted, consistent presence in your family's everyday life.</p>
+    <div class="photo-layout">
+      <div class="photo-main">
+        <img src="t1.jpg" alt="Assistant one-on-one with client at home" />
+        <div class="photo-caption"><p>Building real connections through consistent, one-on-one time</p></div>
+      </div>
+      <div class="photo-sm"><img src="t2.jpg" alt="Homework and study sessions" style="object-position:top;" /></div>
+      <div class="photo-sm"><img src="t3.jpg" alt="Out in the community together" /></div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" style="background:var(--white);">
+    <span class="section-label">The platform</span>
+    <h2 class="section-title">Everything managed.<br />Nothing missed.</h2>
+    <p class="section-sub" style="max-width:500px;">Your assistant and your family stay connected through a private app built for how real support actually works.</p>
+
+    <div style="margin:48px 0 64px; border-radius:20px; overflow:hidden; box-shadow:0 8px 48px rgba(37,99,235,0.10), 0 2px 16px rgba(0,0,0,0.06); max-width:960px; margin-left:auto; margin-right:auto; margin-top:48px; margin-bottom:64px;">
+      <video autoplay muted loop playsinline style="width:100%; display:block;">
+        <source src="PrivateMentorshipAPPVIDEO.mp4" type="video/mp4">
+      </video>
+    </div>
+
+    <div class="features-grid">
+      <div class="feat-card glass reveal">
+        <div class="feat-icon" style="background:#EFF6FF;">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 6h14M4 11h10M4 16h12" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <h3>Task & Homework Tracking</h3>
+        <p>Every assignment, to-do, and goal assigned, tracked, and reviewed inside the app. Nothing slips through.</p>
+      </div>
+      <div class="feat-card glass reveal">
+        <div class="feat-icon" style="background:#ECFDF5;">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="4" width="16" height="16" rx="3" stroke="#059669" stroke-width="1.8"/><path d="M3 9h16M8 4v5" stroke="#059669" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <h3>Session Scheduling</h3>
+        <p>Sessions booked, confirmed, and logged directly in the platform. Rescheduling and reminders built in.</p>
+      </div>
+      <div class="feat-card glass reveal">
+        <div class="feat-icon" style="background:#F5F3FF;">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 5h14v9a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" stroke="#7C3AED" stroke-width="1.8"/><path d="M8 18h6M11 16v2" stroke="#7C3AED" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <h3>Direct Messaging</h3>
+        <p>Stay connected with your assistant anytime. Files, updates, and real-time communication in one thread.</p>
+      </div>
+      <div class="feat-card glass reveal">
+        <div class="feat-icon" style="background:#FFFBEB;">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 3v18M3 11h18" stroke="#D97706" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <h3>Progress Reports</h3>
+        <p>Detailed session logs, hours tracking, and milestone updates give families full visibility at every step.</p>
+      </div>
+      <div class="feat-card glass reveal">
+        <div class="feat-icon" style="background:#FFF1F2;">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M5 4h12a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z" stroke="#E11D48" stroke-width="1.8"/><path d="M7 9h8M7 13h5" stroke="#E11D48" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <h3>Documents & Portfolio</h3>
+        <p>Every resource, report, and material organized in a private Google Drive folder for your family.</p>
+      </div>
+      <div class="feat-card glass reveal">
+        <div class="feat-icon" style="background:#EFF6FF;">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="8" cy="8" r="3" stroke="#2563EB" stroke-width="1.8"/><circle cx="15" cy="8" r="3" stroke="#2563EB" stroke-width="1.8"/><path d="M2 18c0-2.761 2.687-5 6-5h6c3.313 0 6 2.239 6 5" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <h3>Family Profiles</h3>
+        <p>Multiple people in one account. Each family member gets personalized care with their own dedicated assistant.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO WE SERVE -->
+  <section id="who" style="background:var(--bg);">
+    <div style="text-align:center;">
+      <span class="section-label">For everyone</span>
+      <h2 class="section-title" style="margin:0 auto;text-align:center;">Not just for kids.</h2>
+      <p class="section-sub" style="margin:16px auto 0;text-align:center;max-width:520px;">We serve families of all kinds — from young children building their foundations to adults and seniors navigating life's next chapter.</p>
+    </div>
+    <div class="serve-grid">
+      <div class="serve-card reveal">
+        <div class="serve-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#2563EB" stroke-width="1.8"/><path d="M5 20c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3>Children</h3>
+        <p>School support, homework, life skills, and guided activities with a role model they look forward to seeing.</p>
+      </div>
+      <div class="serve-card reveal">
+        <div class="serve-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#2563EB" stroke-width="1.8"/><path d="M5 20c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3>Teens & Young Adults</h3>
+        <p>Navigating education, career prep, job searching, and independence — with consistent guidance.</p>
+      </div>
+      <div class="serve-card reveal">
+        <div class="serve-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#2563EB" stroke-width="1.8"/><path d="M5 20c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3>Adults</h3>
+        <p>Scheduling, appointment coordination, email management, and daily life support — a trusted right hand.</p>
+      </div>
+      <div class="serve-card reveal">
+        <div class="serve-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#2563EB" stroke-width="1.8"/><path d="M5 20c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3>Seniors & Elderly</h3>
+        <p>Companionship, errands, appointments, and staying connected to community and family.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPOTLIGHTS -->
+  <section id="spotlights" style="background:#fff;padding:100px 5% 110px;">
+
+    <div style="margin-bottom:48px;">
+      <span style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#2563EB;display:block;margin-bottom:14px;">Real Sessions. Real Results.</span>
+      <h2 style="font-family:'Inter',sans-serif;font-size:clamp(30px,4vw,50px);font-weight:900;color:#0F172A;line-height:1.08;letter-spacing:-0.025em;margin:0 0 14px;">See mentorship<br/>in action.</h2>
+      <p style="font-size:16px;font-weight:400;color:#64748B;line-height:1.6;max-width:480px;margin:0;">Every video is a real session with a real family — different kids, different lessons, different environments.</p>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-bottom:44px;">
+      <button id="tab-student" onclick="switchTab('student')" style="padding:10px 24px;border-radius:980px;font-size:14px;font-weight:600;border:none;cursor:pointer;background:#2563EB;color:#fff;box-shadow:0 4px 14px rgba(37,99,235,0.3);transition:all .2s;">Student Spotlight</button>
+      <button id="tab-mentorship" onclick="switchTab('mentorship')" style="padding:10px 24px;border-radius:980px;font-size:14px;font-weight:600;border:none;cursor:pointer;background:#F1F5F9;color:#64748B;transition:all .2s;">Mentorship Spotlight</button>
+    </div>
+
+    <div id="spot-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:28px;"></div>
+
+    <div style="text-align:center;margin-top:44px;">
+      <button id="spot-expand" onclick="expandGrid()" style="display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:980px;font-size:14px;font-weight:700;border:1.5px solid #E4ECFC;background:#fff;color:#2563EB;cursor:pointer;transition:all .2s;box-shadow:0 2px 12px rgba(37,99,235,0.07);">See all videos &#8594;</button>
+    </div>
+
+  </section>
+
+  <style>
+    .spot-card{background:#fff;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);box-shadow:0 2px 16px rgba(37,99,235,0.06);transition:transform .25s ease,box-shadow .25s ease;cursor:pointer;text-decoration:none;display:block;}
+    .spot-card:hover{transform:translateY(-6px);box-shadow:0 16px 48px rgba(37,99,235,0.13);}
+    .spot-thumb{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:#E4ECFC;}
+    .spot-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease;display:block;}
+    .spot-card:hover .spot-thumb img{transform:scale(1.04);}
+    .spot-play-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0);transition:background .25s ease;}
+    .spot-card:hover .spot-play-overlay{background:rgba(0,0,0,0.28);}
+    .spot-play-btn{width:52px;height:52px;background:rgba(255,255,255,0.95);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(0.8);transition:opacity .25s ease,transform .25s ease;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
+    .spot-card:hover .spot-play-btn{opacity:1;transform:scale(1);}
+    .spot-play-btn svg{width:18px;height:18px;fill:#2563EB;margin-left:3px;}
+    .spot-info{padding:18px 20px 22px;}
+    .spot-cat{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#2563EB;display:block;margin-bottom:6px;}
+    .spot-title{font-size:15px;font-weight:700;color:white;line-height:1.4;}
+    .spot-hidden{display:none!important;}
+  </style>
+
+  <script>
+  (function(){
+    var mentorship=[
+      {title:'Mind Over Matter:\nGrouse Mountain Hike',id:'F4nP_hi3SJ0'},
+      {title:'Entrepreneurial Day:\nKids Business',id:'m-AhVBqke3Q'},
+      {title:'Mentor & Mentee\nBirthday Milestones',id:'0KpO0BEIVkI'},
+      {title:'Developing Stage:\nConfidence & Independence',id:'JCVzflJPfzI'},
+      {title:'Mentorship For Adults:\nDeveloping New Habits',id:'NbLlkNrEVfw'},
+      {title:'Mentor & Mentee\nPolice Museum',id:'2nliK8iLRtI'},
+      {title:'Mentor & Mentee\nLansdowne Fair',id:'IZFNi2bPN5o'},
+      {title:'Mentor & Mentee\nVancouver Art Gallery',id:'xlIZDl_8Ztk'},
+      {title:'Mentor & Mentee\nBurnaby Mountain',id:'w0SJS1zy7h4'},
+    ];
+    var student=[
+      {title:'Zoom Lesson:\nBusiness Vocabulary',id:'l0g8dvZREaU'},
+      {title:'VOOV Lesson:\nIELTS Preparation',id:'vSv69Y1ImVk'},
+      {title:'Zoom Lesson:\nBusiness Vocabulary',id:'WNe7NPnA9L0'},
+      {title:'A True IELTS Love Story:\nLearning For Love!',id:'UBJkuHbA4sY'},
+      {title:'English Lesson:\nTest Preparation',id:'I4Yl0ViKc0Q'},
+      {title:'English Lesson:\nSentence Structure',id:'G2OwHexphto'},
+      {title:'English Lesson:\nVocabulary Exercise',id:'Oh9DjPsBzxI'},
+      {title:'Mother & Son',id:'08ADsXruLGU'},
+      {title:'Figurative Language Lesson',id:'4PjbdwWWC2w'},
+      {title:'English Lesson:\nGrocery Store Vocabulary',id:'NbLlkNrEVfw'},
+      {title:'Business English:\nProfessional Email Writing',id:'YwwZ129sFFw'},
+      {title:'English Lesson:\nLearning Tenses',id:'wgB8HtK87Tk'},
+      {title:'English Lesson:\nLearning Tenses',id:'veIet217DMc'},
+      {title:'English Lesson:\nBuddy Up, Level Up',id:'rJ_tsxpBfJQ'},
+      {title:'Parent & Child:\nNew To Canada',id:'tVQ-4RDmFrA'},
+      {title:'English Presentation:\n\u201cMedicine River\u201d',id:'i9sQmA0O4do'},
+      {title:'English Presentation:\n\u201cThere There\u201d',id:'Tju-z5zKiEU'},
+      {title:'Decode, Design, Deliver:\n\u201cThe Spy\u201d Analysis',id:'LNJuwfjQNwM'},
+    ];
+    var current='mentorship',expanded=false;
+    function makeCard(item,cat){
+      var lines=item.title.split('\n');
+      var a=document.createElement('a');
+      a.className='spot-card';
+      a.href='https://youtu.be/'+item.id;
+      a.target='_blank';a.rel='noopener';
+      a.innerHTML='<div class="spot-thumb"><img src="https://img.youtube.com/vi/'+item.id+'/hqdefault.jpg" alt="'+lines[0]+'" loading="lazy"/><div class="spot-play-overlay"><div class="spot-play-btn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div></div><div class="spot-info"><span class="spot-cat">'+cat+'</span><div class="spot-title">'+lines.join('<br/>')+'</div></div>';
+      return a;
+    }
+    function renderGrid(tab,expand){
+      var grid=document.getElementById('spot-grid');
+      var btn=document.getElementById('spot-expand');
+      grid.innerHTML='';
+      var data=tab==='mentorship'?mentorship:student;
+      var cat=tab==='mentorship'?'Mentorship Spotlight':'Student Spotlight';
+      for(var i=0;i<data.length;i++){
+        var card=makeCard(data[i],cat);
+        if(!expand&&i>=3)card.classList.add('spot-hidden');
+        grid.appendChild(card);
+      }
+      btn.style.display=(data.length<=3||expand)?'none':'inline-flex';
+      if(data.length>3&&!expand)btn.textContent='See all '+data.length+' videos  \u2192';
+    }
+    window.switchTab=function(tab){
+      current=tab;expanded=false;
+      var on='background:#2563EB;color:#fff;box-shadow:0 4px 14px rgba(37,99,235,0.3);padding:10px 24px;border-radius:980px;font-size:14px;font-weight:600;border:none;cursor:pointer;transition:all .2s;';
+      var off='background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.45);box-shadow:none;padding:10px 24px;border-radius:980px;font-size:14px;font-weight:600;border:none;cursor:pointer;transition:all .2s;';
+      document.getElementById('tab-mentorship').style.cssText=tab==='mentorship'?on:off;
+      document.getElementById('tab-student').style.cssText=tab==='student'?on:off;
+      renderGrid(tab,false);
+    };
+    window.expandGrid=function(){expanded=true;renderGrid(current,true);};
+    renderGrid('student',false);
+  })();
+  </script>
+
+    <!-- HOW IT WORKS -->
+  <section id="how" class="how-outer">
+    <div class="how-inner">
+      <span class="section-label">The process</span>
+      <h2 class="section-title">Up and running fast.<br />Built to last.</h2>
+      <p class="section-sub">From first contact to first session — onboarding is simple and everything is handled for you.</p>
+      <div class="steps">
+        <div class="step reveal">
+          <div class="step-num">Step 01</div>
+          <div class="step-dot"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 7h14M4 11h10M4 15h12" stroke="rgba(255,255,255,0.6)" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <h3>Apply</h3>
+          <p>Complete a short application so we understand your family's goals, schedules, and what you need most.</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">Step 02</div>
+          <div class="step-dot"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="9" r="4" stroke="rgba(255,255,255,0.6)" stroke-width="1.8"/><path d="M4 20c0-3.314 3.134-6 7-6s7 2.686 7 6" stroke="rgba(255,255,255,0.6)" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <h3>Get Matched</h3>
+          <p>We hand-select the right assistant for your family — based on personality, expertise, and your life.</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">Step 03</div>
+          <div class="step-dot"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 11l4 4 10-9" stroke="rgba(255,255,255,0.6)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Sign & Onboard</h3>
+          <p>Review your contract, complete onboarding, and get access to your private app within days.</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">Step 04</div>
+          <div class="step-dot"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="rgba(255,255,255,0.6)" stroke-width="1.8"/><path d="M11 4v7l4 4" stroke="rgba(255,255,255,0.6)" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <h3>Your Assistant Begins</h3>
+          <p>From day one, your assistant is active — scheduling, supporting, and showing up consistently.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AGE GROUPS -->
+  <section id="ages" style="background:#F5F5F7; padding:80px 0 100px; width:100%;">
+
+    <div style="text-align:center; max-width:600px; margin:0 auto 52px; padding:0 5%;">
+      <span class="section-label">For every age &amp; stage</span>
+      <h2 style="font-family:'Inter',sans-serif;font-size:clamp(32px,4.5vw,52px);font-weight:900;color:#0F172A;line-height:1.08;letter-spacing:-0.025em;margin:16px 0 16px;">One assistant.<br>Every stage of life.</h2>
+      <p style="font-size:17px;color:#64748B;line-height:1.7;max-width:480px;margin:0 auto;">Three roles that compound over time. Four age groups that all benefit. One private assistant your entire family can trust.</p>
+    </div>
+
+    <div style="padding:0 4%;">
+    <div class="agi-card">
+
+      <!-- LEFT: Item list -->
+      <div class="agi-list">
+        <span class="agi-section-lbl">The Three Roles</span>
+        <button class="agi-item agi-item-on" onclick="selectAGI(0)">
+          <div class="agi-circle">&#8722;</div>
+          <span class="agi-lbl">Education</span>
+        </button>
+        <button class="agi-item" onclick="selectAGI(1)">
+          <div class="agi-circle">+</div>
+          <span class="agi-lbl">Life Skills</span>
+        </button>
+        <button class="agi-item" onclick="selectAGI(2)">
+          <div class="agi-circle">+</div>
+          <span class="agi-lbl">Personal Support</span>
+        </button>
+        <div class="agi-divider"></div>
+        <span class="agi-section-lbl">By Age Group</span>
+        <button class="agi-item" onclick="selectAGI(3)">
+          <div class="agi-circle">+</div>
+          <span class="agi-lbl">Children &amp; Pre-Teens</span>
+        </button>
+        <button class="agi-item" onclick="selectAGI(4)">
+          <div class="agi-circle">+</div>
+          <span class="agi-lbl">Teenagers &amp; Young Adults</span>
+        </button>
+        <button class="agi-item" onclick="selectAGI(5)">
+          <div class="agi-circle">+</div>
+          <span class="agi-lbl">Adults &amp; Seniors</span>
+        </button>
+        <button class="agi-item" onclick="selectAGI(6)">
+          <div class="agi-circle">+</div>
+          <span class="agi-lbl">Special Needs &amp; Disability</span>
+        </button>
+      </div>
+
+      <!-- RIGHT: Content panels -->
+      <div class="agi-content">
+
+        <!-- Chain helper macro (defined once in JS, rendered per panel) -->
+
+        <!-- ── PANEL 0: Education ── -->
+        <div class="agi-panel agi-panel-on" data-agi="0">
+          <img src="ages_01.jpg" alt="Private Mentorship session" style="width:100%;height:210px;object-fit:cover;border-radius:14px;margin-bottom:28px;display:block;">
+          <div class="agi-chain">
+            <div class="agi-chain-node agi-chain-node-on">
+              <div class="agi-chain-dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2.2"/></svg></div>
+              <div class="agi-chain-num">01</div>
+              <div class="agi-chain-name">Education</div>
+            </div>
+            <div class="agi-chain-mid"><div class="agi-chain-line"></div><div class="agi-chain-bridge">trust transfers</div><div class="agi-chain-line"></div></div>
+            <div class="agi-chain-node">
+              <div class="agi-chain-dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2.2"/></svg></div>
+              <div class="agi-chain-num">02</div>
+              <div class="agi-chain-name">Life Skills</div>
+            </div>
+            <div class="agi-chain-mid"><div class="agi-chain-line"></div><div class="agi-chain-bridge">respect deepens</div><div class="agi-chain-line"></div></div>
+            <div class="agi-chain-node">
+              <div class="agi-chain-dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2.2"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2.2"/></svg></div>
+              <div class="agi-chain-num">03</div>
+              <div class="agi-chain-name">Personal Support</div>
+            </div>
+          </div>
+          <div class="agi-eyebrow">Role 01 &mdash; The Foundation</div>
+          <h3 class="agi-title">Education</h3>
+          <p class="agi-body">Every relationship starts here. During structured weekly sessions, your assistant becomes a trusted teacher — English, math, coursework, or any subject your family member needs. But this isn&rsquo;t just tutoring.<br><br>Week after week, in the same private setting, the client builds something no classroom can replicate: genuine trust with someone who shows up consistently, knows them personally, and cares about their progress. That trust is the ingredient that makes everything else possible.</p>
+          <div class="agi-tags">
+            <span class="agi-tag">1-on-1 Private Lessons</span>
+            <span class="agi-tag">Homework &amp; Test Support</span>
+            <span class="agi-tag">Academic Coaching</span>
+            <span class="agi-tag">Career Coursework</span>
+            <span class="agi-tag">Job Skills Training</span>
+            <span class="agi-tag">English &amp; Language</span>
+          </div>
+        </div>
+
+        <!-- ── PANEL 1: Life Skills ── -->
+        <div class="agi-panel" data-agi="1">
+          <img src="ages_02.jpg" alt="Private Mentorship session" style="width:100%;height:210px;object-fit:cover;border-radius:14px;margin-bottom:28px;display:block;">
+          <div class="agi-chain">
+            <div class="agi-chain-node agi-chain-node-half">
+              <div class="agi-chain-dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2.2"/></svg></div>
+              <div class="agi-chain-num">01</div>
+              <div class="agi-chain-name">Education</div>
+            </div>
+            <div class="agi-chain-mid"><div class="agi-chain-line"></div><div class="agi-chain-bridge">trust transfers</div><div class="agi-chain-line"></div></div>
+            <div class="agi-chain-node agi-chain-node-on">
+              <div class="agi-chain-dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2.2"/></svg></div>
+              <div class="agi-chain-num">02</div>
+              <div class="agi-chain-name">Life Skills</div>
+            </div>
+            <div class="agi-chain-mid"><div class="agi-chain-line"></div><div class="agi-chain-bridge">respect deepens</div><div class="agi-chain-line"></div></div>
+            <div class="agi-chain-node">
+              <div class="agi-chain-dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2.2"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2.2"/></svg></div>
+              <div class="agi-chain-num">03</div>
+              <div class="agi-chain-name">Personal Support</div>
+            </div>
+          </div>
+          <div class="agi-eyebrow">Role 02 &mdash; The Bridge</div>
+          <h3 class="agi-title">Life Skills</h3>
+          <p class="agi-body">The trust earned in education becomes power in the real world. Because the client already respects their assistant as a teacher, that same person now becomes a mentor &mdash; a big brother or big sister.<br><br>In life skills sessions, they&rsquo;re not in a classroom. They&rsquo;re at a community event, on a hike, in a real conversation about relationships and confidence. The client listens differently when it&rsquo;s someone they already trust. That&rsquo;s the difference between instruction and transformation.</p>
+          <div class="agi-tags">
+            <span class="agi-tag">Social Communication</span>
+            <span class="agi-tag">Community Outings</span>
+            <span class="agi-tag">Confidence Building</span>
+            <span class="agi-tag">Friendship &amp; Relationships</span>
+            <span class="agi-tag">Independence Training</span>
+            <span class="agi-tag">Identity &amp; Purpose</span>
+          </div>
+        </div>
+
+        <!-- ── PANEL 2: Personal Support ── -->
+        <div class="agi-panel" data-agi="2">
+          <img src="ages_03.jpg" alt="Private Mentorship session" style="width:100%;height:210px;object-fit:cover;border-radius:14px;margin-bottom:28px;display:block;">
+          <div class="agi-chain">
+            <div class="agi-chain-node agi-chain-node-half">
+              <div class="agi-chain-dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2.2"/></svg></div>
+              <div class="agi-chain-num">01</div>
+              <div class="agi-chain-name">Education</div>
+            </div>
+            <div class="agi-chain-mid"><div class="agi-chain-line"></div><div class="agi-chain-bridge">trust transfers</div><div class="agi-chain-line"></div></div>
+            <div class="agi-chain-node agi-chain-node-half">
+              <div class="agi-chain-dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2.2"/></svg></div>
+              <div class="agi-chain-num">02</div>
+              <div class="agi-chain-name">Life Skills</div>
+            </div>
+            <div class="agi-chain-mid"><div class="agi-chain-line"></div><div class="agi-chain-bridge">respect deepens</div><div class="agi-chain-line"></div></div>
+            <div class="agi-chain-node agi-chain-node-on">
+              <div class="agi-chain-dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2.2"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2.2"/></svg></div>
+              <div class="agi-chain-num">03</div>
+              <div class="agi-chain-name">Personal Support</div>
+            </div>
+          </div>
+          <div class="agi-eyebrow">Role 03 &mdash; The Anchor</div>
+          <h3 class="agi-title">Personal Support</h3>
+          <p class="agi-body">By now, the client has watched their assistant handle the most important parts of life &mdash; and they&rsquo;ve been taking notes.<br><br>The assistant books doctors and dentists, attends job interviews alongside the client, fights for their position if an employer terminates them, sits in job skills training taking notes, navigates WorkBC and government funding, handles government paperwork, coordinates school and parent-teacher conferences. The family doesn&rsquo;t just receive help &mdash; they watch someone model what it looks like to handle life with competence and dignity. That&rsquo;s priceless role modelling you cannot buy anywhere else.</p>
+          <div class="agi-tags">
+            <span class="agi-tag">Medical &amp; Government Appointments</span>
+            <span class="agi-tag">Job Interview Support</span>
+            <span class="agi-tag">WorkBC &amp; Funding Navigation</span>
+            <span class="agi-tag">School Coordination</span>
+            <span class="agi-tag">Business &amp; Email Support</span>
+            <span class="agi-tag">Elder Companionship</span>
+          </div>
+        </div>
+
+        <!-- ── PANEL 3: Ages 6–13 ── -->
+        <div class="agi-panel" data-agi="3">
+          <img src="ages_01.jpg" alt="Private Mentorship session" style="width:100%;height:210px;object-fit:cover;border-radius:14px;margin-bottom:28px;display:block;">
+          <div class="agi-chain">
+            <div class="agi-chain-node agi-chain-node-on">
+              <div class="agi-chain-dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2.2"/></svg></div>
+              <div class="agi-chain-num">01</div>
+              <div class="agi-chain-name">Education</div>
+            </div>
+            <div class="agi-chain-mid"><div class="agi-chain-line"></div><div class="agi-chain-bridge">trust transfers</div><div class="agi-chain-line"></div></div>
+            <div class="agi-chain-node agi-chain-node-half">
+              <div class="agi-chain-dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2.2"/></svg></div>
+              <div class="agi-chain-num">02</div>
+              <div class="agi-chain-name">Life Skills</div>
+            </div>
+            <div class="agi-chain-mid"><div class="agi-chain-line"></div><div class="agi-chain-bridge">developing</div><div class="agi-chain-line"></div></div>
+            <div class="agi-chain-node">
+              <div class="agi-chain-dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2.2"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2.2"/></svg></div>
+              <div class="agi-chain-num">03</div>
+              <div class="agi-chain-name">Personal Support</div>
+            </div>
+          </div>
+          <div class="agi-eyebrow">Ages 6&ndash;13 &mdash; Children &amp; Pre-Teens</div>
+          <h3 class="agi-title">Academic Foundation &amp; a Trusted Adult</h3>
+          <p class="agi-body">Parents of young children have one priority: consistent, positive academic support. The assistant enters as an educator &mdash; private lessons, homework, school coordination. Week after week, something natural happens: the child begins to look forward to their sessions.<br><br>They trust this adult. And that trust opens the door to social confidence and communication skills no classroom can teach. The assistant also handles pick-up, drop-off, lunch prep, and parent-teacher conferences &mdash; so parents never have to leave work early or miss something important again.</p>
+          <div class="agi-tags">
+            <span class="agi-tag">Private Lessons</span>
+            <span class="agi-tag">Homework Support</span>
+            <span class="agi-tag">Pick-Up &amp; Drop-Off</span>
+            <span class="agi-tag">Communication Skills</span>
+            <span class="agi-tag">Community Outings</span>
+            <span class="agi-tag">School Coordination</span>
+          </div>
+        </div>
+
+        <!-- ── PANEL 4: Ages 14–19 ── -->
+        <div class="agi-panel" data-agi="4">
+          <img src="ages_02.jpg" alt="Private Mentorship session" style="width:100%;height:210px;object-fit:cover;border-radius:14px;margin-bottom:28px;display:block;">
+          <div class="agi-chain">
+            <div class="agi-chain-node agi-chain-node-on">
+              <div class="agi-chain-dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2.2"/></svg></div>
+              <div class="agi-chain-num">01</div>
+              <div class="agi-chain-name">Education</div>
+            </div>
+            <div class="agi-chain-mid"><div class="agi-chain-line"></div><div class="agi-chain-bridge">trust transfers</div><div class="agi-chain-line"></div></div>
+            <div class="agi-chain-node agi-chain-node-on">
+              <div class="agi-chain-dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2.2"/></svg></div>
+              <div class="agi-chain-num">02</div>
+              <div class="agi-chain-name">Life Skills</div>
+            </div>
+            <div class="agi-chain-mid"><div class="agi-chain-line"></div><div class="agi-chain-bridge">respect deepens</div><div class="agi-chain-line"></div></div>
+            <div class="agi-chain-node">
+              <div class="agi-chain-dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2.2"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2.2"/></svg></div>
+              <div class="agi-chain-num">03</div>
+              <div class="agi-chain-name">Personal Support</div>
+            </div>
+          </div>
+          <div class="agi-eyebrow">Ages 14&ndash;19 &mdash; Teenagers &amp; Young Adults</div>
+          <h3 class="agi-title">Identity, Academics &amp; the Big Brother Effect</h3>
+          <p class="agi-body">Teenagers are at a crossroads &mdash; academics matter, but so does who they&rsquo;re becoming. This is where the compounding effect is most visible.<br><br>The trust built through education makes teens genuinely open to conversations about identity, relationships, and purpose. The assistant becomes a Big Brother or Big Sister &mdash; someone who shows them how to carry themselves in the world, not just in the classroom. Career prep, resume writing, college applications, real outings, real conversations. Someone who actually gets them.</p>
+          <div class="agi-tags">
+            <span class="agi-tag">Academic Coaching</span>
+            <span class="agi-tag">Career Prep &amp; Resume</span>
+            <span class="agi-tag">Social Skills Training</span>
+            <span class="agi-tag">College Preparation</span>
+            <span class="agi-tag">Real-World Outings</span>
+            <span class="agi-tag">Identity &amp; Confidence</span>
+          </div>
+        </div>
+
+        <!-- ── PANEL 5: Ages 20–65+ ── -->
+        <div class="agi-panel" data-agi="5">
+          <img src="ages_03.jpg" alt="Private Mentorship session" style="width:100%;height:210px;object-fit:cover;border-radius:14px;margin-bottom:28px;display:block;">
+          <div class="agi-chain">
+            <div class="agi-chain-node agi-chain-node-on">
+              <div class="agi-chain-dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2.2"/></svg></div>
+              <div class="agi-chain-num">01</div>
+              <div class="agi-chain-name">Education</div>
+            </div>
+            <div class="agi-chain-mid"><div class="agi-chain-line"></div><div class="agi-chain-bridge">trust transfers</div><div class="agi-chain-line"></div></div>
+            <div class="agi-chain-node agi-chain-node-on">
+              <div class="agi-chain-dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2.2"/></svg></div>
+              <div class="agi-chain-num">02</div>
+              <div class="agi-chain-name">Life Skills</div>
+            </div>
+            <div class="agi-chain-mid"><div class="agi-chain-line"></div><div class="agi-chain-bridge">respect deepens</div><div class="agi-chain-line"></div></div>
+            <div class="agi-chain-node agi-chain-node-on">
+              <div class="agi-chain-dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2.2"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2.2"/></svg></div>
+              <div class="agi-chain-num">03</div>
+              <div class="agi-chain-name">Personal Support</div>
+            </div>
+          </div>
+          <div class="agi-eyebrow">Ages 20&ndash;65+ &mdash; Adults &amp; Seniors</div>
+          <h3 class="agi-title">All Three Roles. Fully Active.</h3>
+          <p class="agi-body">Adults and seniors carry the most complexity &mdash; job transitions, language barriers, government paperwork, medical appointments, social isolation. The assistant steps into all of it, side by side.<br><br>New immigrants find someone who speaks for them and helps them integrate. Seniors find genuine companionship, routine, and an advocate. Adults find someone who attends job interviews with them, navigates WorkBC, secures government funding, and fights for their opportunities. This isn&rsquo;t support. This is a partner in your corner.</p>
+          <div class="agi-tags">
+            <span class="agi-tag">Job Skills Training</span>
+            <span class="agi-tag">WorkBC &amp; Government Funding</span>
+            <span class="agi-tag">Medical Appointments</span>
+            <span class="agi-tag">Elder Companionship</span>
+            <span class="agi-tag">Immigration Support</span>
+            <span class="agi-tag">Business Coordination</span>
+          </div>
+        </div>
+
+        <!-- ── PANEL 6: Special Needs ── -->
+        <div class="agi-panel" data-agi="6">
+          <img src="ages_01.jpg" alt="Private Mentorship session" style="width:100%;height:210px;object-fit:cover;border-radius:14px;margin-bottom:28px;display:block;">
+          <div class="agi-chain">
+            <div class="agi-chain-node agi-chain-node-on">
+              <div class="agi-chain-dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="2.2"/></svg></div>
+              <div class="agi-chain-num">01</div>
+              <div class="agi-chain-name">Education</div>
+            </div>
+            <div class="agi-chain-mid"><div class="agi-chain-line"></div><div class="agi-chain-bridge">trust transfers</div><div class="agi-chain-line"></div></div>
+            <div class="agi-chain-node agi-chain-node-on">
+              <div class="agi-chain-dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2.2"/></svg></div>
+              <div class="agi-chain-num">02</div>
+              <div class="agi-chain-name">Life Skills</div>
+            </div>
+            <div class="agi-chain-mid"><div class="agi-chain-line"></div><div class="agi-chain-bridge">respect deepens</div><div class="agi-chain-line"></div></div>
+            <div class="agi-chain-node agi-chain-node-on">
+              <div class="agi-chain-dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2.2"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2.2"/></svg></div>
+              <div class="agi-chain-num">03</div>
+              <div class="agi-chain-name">Personal Support</div>
+            </div>
+          </div>
+          <div class="agi-eyebrow">Any Age &mdash; Intensive 1-on-1 Support</div>
+          <h3 class="agi-title">Special Needs &amp; Disability</h3>
+          <p class="agi-body">For individuals with special needs or on disability &mdash; whether a child, teen, or adult &mdash; the Private Family Assistant provides intensive, consistent, deeply personal support across all three roles simultaneously.<br><br>The assistant becomes more than a support worker. They become an anchor. Someone who genuinely knows your family member, advocates for them in every room, fights for disability funding, attends CLBC meetings, and helps them access a life not defined or limited by their diagnosis. The family finally has someone who truly shows up.</p>
+          <div class="agi-tags">
+            <span class="agi-tag">Adaptive Education</span>
+            <span class="agi-tag">Social Integration</span>
+            <span class="agi-tag">CLBC &amp; WorkBC Navigation</span>
+            <span class="agi-tag">Government Advocacy</span>
+            <span class="agi-tag">Disability Funding</span>
+            <span class="agi-tag">1-on-1 Companionship</span>
+          </div>
+        </div>
+
+      </div><!-- /agi-content -->
+    </div><!-- /agi-card -->
+    </div><!-- /padding wrapper -->
+
+  </section>argin:16px auto 0;text-align:center;max-width:500px;">Every plan includes a dedicated assistant, full app access, and all three roles.</p>
+    </div>
+    <div class="plans-grid">
+      <div class="plan-card reveal">
+        <div class="plan-name">Starter</div>
+        <div class="plan-hours">1 Month · 24 Hours</div>
+        <ul class="plan-features">
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Dedicated personal assistant</li>
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>24 hours of support</li>
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>All three roles included</li>
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Full app access</li>
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Session scheduling</li>
+        </ul>
+        <a href="#contact" class="plan-cta">Apply Now</a>
+      </div>
+      <div class="plan-card featured reveal">
+        <div class="plan-badge">Most Popular</div>
+        <div class="plan-name">Intensive</div>
+        <div class="plan-hours">1 Month · 40 Hours</div>
+        <ul class="plan-features">
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Dedicated personal assistant</li>
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>40 hours of support</li>
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>All three roles included</li>
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Full app access</li>
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Session scheduling</li>
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Google Drive portfolio</li>
+        </ul>
+        <a href="#contact" class="plan-cta">Apply Now</a>
+      </div>
+      <div class="plan-card reveal">
+        <div class="plan-name">Extended</div>
+        <div class="plan-hours">2 Months · 24 hrs/mo</div>
+        <ul class="plan-features">
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Dedicated personal assistant</li>
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>48 total hours of support</li>
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>All three roles included</li>
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Full app access</li>
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Session scheduling</li>
+        </ul>
+        <a href="#contact" class="plan-cta">Apply Now</a>
+      </div>
+      <div class="plan-card reveal">
+        <div class="plan-name">Premium</div>
+        <div class="plan-hours">2 Months · 40 hrs/mo</div>
+        <ul class="plan-features">
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Dedicated personal assistant</li>
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>80 total hours of support</li>
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>All three roles included</li>
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Full app access</li>
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Session scheduling</li>
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Google Drive portfolio</li>
+          <li><span class="pcheck"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Priority support</li>
+        </ul>
+        <a href="#contact" class="plan-cta">Apply Now</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- IN ACTION -->
+  <section style="background:var(--bg);">
+    <span class="section-label">In action</span>
+    <h2 class="section-title">See what an assistant<br />actually does.</h2>
+    <p class="section-sub" style="max-width:480px;">Every day looks different. That's the point — your assistant adapts to whatever your family needs most.</p>
+    <div class="stories">
+      <div class="story reveal"><img src="slide1.jpg" alt="Education session" /><div class="story-over"><span class="story-tag">Education</span><div class="story-title">One-on-one learning, every session</div></div></div>
+      <div class="story reveal"><img src="t3.jpg" alt="Out in the community" /><div class="story-over"><span class="story-tag">Life Skills</span><div class="story-title">Getting out, building confidence, living fully</div></div></div>
+      <div class="story reveal"><img src="slide2.jpg" alt="Family adventures together" /><div class="story-over"><span class="story-tag">Daily Support</span><div class="story-title">Part of the family, woven into daily life</div></div></div>
+    </div>
+  </section>
+
+  <!-- SPOTLIGHT EXPERIENCES SECTION -->
+  <style>
+    #sp-photo-wrap:hover #sp-img-a,
+    #sp-photo-wrap:hover #sp-img-b { filter: grayscale(0%) !important; }
+    #sp-prev:focus, #sp-next:focus, #sp-sound-btn:focus { outline:none; }
+  </style>
+  <section id="spotlight" style="background:#F5EDE0; position:relative;">
+    <div id="sp-space" style="position:relative;">
+      <div id="sp-sticky" style="position:sticky;top:72px;height:calc(100vh - 72px);overflow:hidden;display:flex;flex-direction:column;background:#F5EDE0;">
+
+        <!-- Top mini-header -->
+        <div style="flex:0 0 auto;padding:14px 60px 10px;display:flex;align-items:center;gap:14px;border-bottom:1px solid rgba(0,0,0,0.06);">
+          <span style="font-size:9px;font-family:'Inter',sans-serif;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:rgba(0,0,0,0.3);">The Experience</span>
+          <span style="display:inline-block;width:1px;height:10px;background:rgba(0,0,0,0.15);"></span>
+          <span style="font-size:14px;font-family:'Inter',sans-serif;font-weight:600;color:rgba(0,0,0,0.6);">Real Moments. Real Growth.</span>
+        </div>
+
+        <!-- Main content row -->
+        <div style="flex:1 1 0;display:flex;min-height:0;padding:0 30px 0 60px;gap:44px;align-items:center;">
+
+          <!-- Left: photo -->
+          <div style="flex:0 0 auto;display:flex;align-items:center;">
+            <div id="sp-photo-wrap" style="border-radius:14px;overflow:hidden;position:relative;width:380px;height:520px;cursor:default;">
+              <img id="sp-img-a" src="p1.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 0.6s ease,filter 0.45s ease;filter:grayscale(100%);" />
+              <img id="sp-img-b" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.6s ease,filter 0.45s ease;filter:grayscale(100%);" />
+            </div>
+          </div>
+
+          <!-- Middle: info -->
+          <div id="sp-info" style="flex:1 1 0;min-width:0;display:flex;flex-direction:column;justify-content:center;transition:opacity 0.22s ease,transform 0.22s ease;">
+            <div id="sp-cat" style="font-size:9px;font-family:'Inter',sans-serif;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:rgba(0,0,0,0.32);margin-bottom:10px;"></div>
+            <h3 id="sp-title" style="font-size:26px;font-family:'Inter',sans-serif;font-weight:700;color:#1a1a1a;margin:0 0 12px;line-height:1.25;"></h3>
+            <p id="sp-desc" style="font-size:13.5px;font-family:'Inter',sans-serif;color:rgba(0,0,0,0.48);line-height:1.75;margin:0 0 18px;max-width:400px;"></p>
+            <div style="margin-bottom:22px;">
+              <span style="font-size:12px;font-family:'Inter',sans-serif;color:rgba(0,0,0,0.35);cursor:pointer;border-bottom:1px solid rgba(0,0,0,0.18);padding-bottom:1px;">Show More</span>
+            </div>
+            <div style="border-top:1px solid rgba(0,0,0,0.1);padding-top:16px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:14px;">
+              <div>
+                <div style="font-size:7.5px;font-family:'Inter',sans-serif;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:rgba(0,0,0,0.28);margin-bottom:5px;">Date</div>
+                <div id="sp-date" style="font-size:12px;font-family:'Inter',sans-serif;font-weight:500;color:#1a1a1a;"></div>
+              </div>
+              <div>
+                <div style="font-size:7.5px;font-family:'Inter',sans-serif;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:rgba(0,0,0,0.28);margin-bottom:5px;">Client</div>
+                <div id="sp-client" style="font-size:12px;font-family:'Inter',sans-serif;font-weight:500;color:#1a1a1a;"></div>
+              </div>
+              <div>
+                <div style="font-size:7.5px;font-family:'Inter',sans-serif;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:rgba(0,0,0,0.28);margin-bottom:5px;">Category</div>
+                <div id="sp-category" style="font-size:12px;font-family:'Inter',sans-serif;font-weight:500;color:#1a1a1a;"></div>
+              </div>
+              <div>
+                <div style="font-size:7.5px;font-family:'Inter',sans-serif;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:rgba(0,0,0,0.28);margin-bottom:5px;">Duration</div>
+                <div id="sp-duration" style="font-size:12px;font-family:'Inter',sans-serif;font-weight:500;color:#1a1a1a;"></div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:7.5px;font-family:'Inter',sans-serif;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:rgba(0,0,0,0.28);">Milestone</span>
+              <span style="display:inline-block;width:1px;height:10px;background:rgba(0,0,0,0.12);"></span>
+              <span id="sp-milestone" style="font-size:12px;font-family:'Inter',sans-serif;color:rgba(0,0,0,0.5);"></span>
+            </div>
+          </div>
+
+          <!-- Right: thumbnail strip -->
+          <div style="flex:0 0 104px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <div id="sp-strip-win" style="height:420px;overflow:hidden;position:relative;width:104px;">
+              <div id="sp-strip-list" style="position:absolute;width:100%;will-change:transform;"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Bottom bar -->
+        <div style="flex:0 0 auto;padding:12px 60px 16px;display:flex;align-items:center;gap:4px;">
+          <button id="sp-prev" style="width:30px;height:30px;border:none;border-radius:50%;background:rgba(0,0,0,0.07);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:background 0.18s;">
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M8 10L4 6l4-4" stroke="#444" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div id="sp-counter" style="font-size:11px;font-family:'Inter',sans-serif;font-weight:500;color:rgba(0,0,0,0.42);min-width:52px;text-align:center;">01 / 12</div>
+          <button id="sp-next" style="width:30px;height:30px;border:none;border-radius:50%;background:rgba(0,0,0,0.07);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:background 0.18s;">
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="#444" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div style="flex:1;"></div>
+          <button id="sp-sound-btn" title="Toggle click sound" style="width:30px;height:30px;border:none;border-radius:50%;background:rgba(0,0,0,0.07);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:background 0.18s;">
+            <svg id="sp-sound-icon" width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path d="M11 5L6 9H2v6h4l5 4V5z" fill="#555"/>
+              <path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07" stroke="#555" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <span style="font-size:10px;font-family:'Inter',sans-serif;color:rgba(0,0,0,0.25);margin-left:10px;letter-spacing:0.04em;">Scroll to explore &middot; 42 stories</span>
+        </div>
+
+        <!-- Skip button — appears after slide 4 -->
+        <button id="sp-skip" onclick="spSkipGallery()" style="position:absolute;bottom:68px;right:24px;display:flex;align-items:center;gap:7px;padding:9px 18px 9px 16px;border:1px solid rgba(0,0,0,0.13);border-radius:980px;background:rgba(255,255,255,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-size:12px;font-family:'Inter',sans-serif;font-weight:600;color:rgba(0,0,0,0.55);cursor:pointer;opacity:0;pointer-events:none;transition:opacity 0.4s ease,background 0.2s;">
+          <span id="sp-skip-label">Skip gallery</span>
+          <svg id="sp-skip-icon" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+
+      </div>
+    </div>
+  </section>
+  <script>
+  (function() {
+    "use strict";
+    var DATA = [
+      { src:"sp_02.jpg", cat:"Community",    title:"A Day at the Fair",               desc:"Winning prizes, riding rides, navigating crowds — it takes real confidence to thrive at a busy carnival. Days like this build social skills and show clients they can handle anything the world throws at them.",               date:"Summer 2024",   client:"Kay",        category:"Community",    duration:"8 Months",   milestone:"First Crowded Event Alone" },
+      { src:"sp_03.jpg", cat:"Community",    title:"Big Win, Bigger Smile",           desc:"That look after winning something you worked for. The fair was loud, crowded, and unpredictable — the best kind of classroom. Real-world confidence comes from real-world wins.",           date:"Summer 2024",   client:"Kay",        category:"Community",    duration:"8 Months",   milestone:"Navigated Full Fair Independently" },
+      { src:"sp_08.jpg", cat:"Community",    title:"Hitting the Trail Together",      desc:"Some of the best conversations happen when you are moving. A group hike builds physical stamina, trust, and teamwork all at once. Nobody gets left behind.",      date:"Summer 2024",   client:"Jayde",      category:"Community",    duration:"14 Months",  milestone:"Completed First 5km Hike" },
+      { src:"sp_11.jpg", cat:"Community",    title:"Leading the Way",                 desc:"On the trail, there are no shortcuts and no excuses. Pointing out the path ahead, encouraging each other, and pushing through discomfort together — this is what growth looks like in nature.",                 date:"Summer 2024",   client:"Jayde",      category:"Community",    duration:"14 Months",  milestone:"Led Group on Trail for First Time" },
+      { src:"sp_12.jpg", cat:"Community",    title:"The Climb is the Point",          desc:"It is not about the destination. Every step up the trail is a lesson in persistence, pacing, and believing in yourself. Side by side the whole way.",          date:"Summer 2024",   client:"Jayde",      category:"Community",    duration:"14 Months",  milestone:"Hiked Without Breaks" },
+      { src:"sp_13.jpg", cat:"Community",    title:"Off the Beaten Path",             desc:"Climbing over roots, ducking under branches, exploring what is not on the map. Building a sense of adventure and physical courage in the real world.",             date:"Summer 2024",   client:"Jayde",      category:"Community",    duration:"14 Months",  milestone:"Explored Unstructured Trail Alone" },
+      { src:"sp_16.jpg", cat:"Life Skills",  title:"Open for Business",               desc:"They wrote the menu, set the prices, and set everything up themselves. Running a lemonade stand is a full business lesson, math, customer service, money handling, and entrepreneurial pride.",               date:"Summer 2023",   client:"Nathan",     category:"Life Skills",  duration:"22 Months",  milestone:"First Earned Dollar" },
+      { src:"sp_17.jpg", cat:"Life Skills",  title:"The Real Entrepreneurs",          desc:"Two kids at a lemonade stand, making their own money for the first time. The skills practiced here, pricing, making change, talking to strangers, are the same ones that shape a future.",          date:"Summer 2023",   client:"Nathan",     category:"Life Skills",  duration:"22 Months",  milestone:"Sold Out in One Afternoon" },
+      { src:"sp_18.jpg", cat:"Life Skills",  title:"Physical Goals, Real Progress",   desc:"Monkey bars in the sun. Setting a physical goal, showing up, and grinding until you get there. Physical confidence translates directly into confidence everywhere else.",   date:"Fall 2024",     client:"Nathan",     category:"Life Skills",  duration:"22 Months",  milestone:"10 Bars Without Stopping" },
+      { src:"sp_19.jpg", cat:"Mentorship",   title:"A Bond Built on Respect",         desc:"The handshake that means something. Two years of showing up, being consistent, and genuinely caring about someone's growth creates a relationship that goes far beyond assistant and client.",         date:"Fall 2024",     client:"Nathan",     category:"Mentorship",   duration:"22 Months",  milestone:"Trusted Fully and Completely" },
+      { src:"sp_20.jpg", cat:"Life Skills",  title:"Pushing Past the Limit",          desc:"Push-ups in the park. No gym required. Teaching discipline, physical health, and the mindset that you can always do one more. Setting the bar high and clearing it.",          date:"Fall 2024",     client:"Nathan",     category:"Life Skills",  duration:"22 Months",  milestone:"30 Push-Ups Unbroken" },
+      { src:"sp_21.jpg", cat:"Life Skills",  title:"Form, Focus, Follow Through",     desc:"Every rep done right matters more than ten done wrong. Teaching proper form and personal accountability so that good habits carry over long after sessions end.",     date:"Fall 2024",     client:"Nathan",     category:"Life Skills",  duration:"22 Months",  milestone:"Built 3x Weekly Fitness Habit" },
+      { src:"sp_23.jpg", cat:"Life Skills",  title:"First Day at the Gym",            desc:"Walking into a gym for the first time can feel intimidating. Having someone beside you who knows what they are doing makes all the difference. This was the first of many sessions.",            date:"March 2025",    client:"Hao",        category:"Life Skills",  duration:"16 Months",  milestone:"Gym Membership Activated" },
+      { src:"sp_26.jpg", cat:"Life Skills",  title:"Building Strength, Week by Week", desc:"Consistency is the whole game. Showing up to the gym three times a week and tracking real progress builds both a stronger body and a stronger sense of self-discipline.",date:"April 2025",    client:"Hao",        category:"Life Skills",  duration:"16 Months",  milestone:"Increased Weight Every Month" },
+      { src:"sp_27.jpg", cat:"Life Skills",  title:"The Work Speaks for Itself",      desc:"Lunges, squats, and a full fitness routine. What started as a basic introduction to the gym turned into a genuine commitment to personal health and physical independence.",      date:"April 2025",    client:"Hao",        category:"Life Skills",  duration:"16 Months",  milestone:"Full Workout Done Independently" },
+      { src:"sp_28.jpg", cat:"Life Skills",  title:"Arm Day, Every Week",             desc:"Progress is visible. What you put in is exactly what you get out. Watching a client go from not knowing how to hold a bar to hitting personal records is one of the best parts of this work.",             date:"May 2025",      client:"Hao",        category:"Life Skills",  duration:"16 Months",  milestone:"First Personal Best" },
+      { src:"sp_30.jpg", cat:"Life Skills",  title:"Bench Press Milestone",           desc:"Lying back, loading the bar, and lifting more than you thought possible. Every plate added is proof that the work is paying off. Strength training changes how you carry yourself in the world.",           date:"May 2025",      client:"Hao",        category:"Life Skills",  duration:"16 Months",  milestone:"Lifted Body Weight on Bench" },
+      { src:"sp_32.jpg", cat:"Mentorship",   title:"Leading by Example",              desc:"Your mentor is doing the work right beside you. Not standing at the sidelines and coaching from a distance, but grinding through the same session, rep for rep.",              date:"June 2025",     client:"Hao",        category:"Mentorship",   duration:"16 Months",  milestone:"Mentor Trained Alongside Client" },
+      { src:"sp_24.jpg", cat:"Community",    title:"Breathing Room",                  desc:"Sometimes the most important thing is just being somewhere calm and open. A quiet park, fresh air, and space to reflect — these moments are part of the growth too.",                  date:"September 2024",client:"Nathan",     category:"Community",    duration:"22 Months",  milestone:"Initiated Outdoor Time Independently" },
+      { src:"sp_25.jpg", cat:"Community",    title:"Belonging in the World",          desc:"Sitting comfortably in a public space, relaxed, and at ease. This is what years of community outings builds — the feeling that you belong wherever you go.",          date:"September 2024",client:"Nathan",     category:"Community",    duration:"22 Months",  milestone:"Went to Park Alone for First Time" },
+      { src:"sp_01.jpg", cat:"Community",    title:"Exploring Vancouver Together",    desc:"The Vancouver Police Museum is one stop on a long list of places explored together. Cultural outings build curiosity, vocabulary, and a genuine connection to the city they live in.",    date:"Fall 2024",     client:"Kay",        category:"Community",    duration:"8 Months",   milestone:"Visited 10 New Places" },
+      { src:"sp_04.jpg", cat:"Community",    title:"Art Gallery Afternoon",           desc:"Standing in front of large-scale architectural art and actually thinking about it. Outings like this expand perspective and build the vocabulary to talk about the world around you.",           date:"Winter 2024",   client:"Jayde",      category:"Community",    duration:"14 Months",  milestone:"First Art Gallery Visit" },
+      { src:"sp_05.jpg", cat:"Community",    title:"Culture as a Classroom",          desc:"A textile sculpture exhibit at a Vancouver gallery. Every cultural outing is a lesson in observation, discussion, and being present in a space that feels unfamiliar.",          date:"Winter 2024",   client:"Jayde",      category:"Community",    duration:"14 Months",  milestone:"Asked First Question at a Gallery" },
+      { src:"sp_06.jpg", cat:"Community",    title:"Seeing the World Differently",    desc:"Standing in front of a large abstract painting and letting it speak. Building the habit of paying attention — to art, to people, to the world — is a life skill that never stops paying off.",    date:"Winter 2024",   client:"Jayde",      category:"Community",    duration:"14 Months",  milestone:"Expressed Opinion About Art" },
+      { src:"sp_07.jpg", cat:"Daily Support",title:"Sunday Brunch with a View",       desc:"A proper meal, a great view, and genuine conversation. Being present with a client during the everyday moments — not just the structured sessions — is what builds a real mentorship relationship.",       date:"Spring 2024",   client:"Hao",        category:"Daily Support",duration:"16 Months",  milestone:"First Independently Hosted Meal" },
+      { src:"sp_09.jpg", cat:"Life Skills",  title:"Labelling the Kitchen",           desc:"A simple but powerful exercise. Labelling everything in the kitchen builds vocabulary, independence, and confidence in daily routines. Real life skills start with knowing your environment.",           date:"Spring 2023",   client:"Kay",        category:"Life Skills",  duration:"8 Months",   milestone:"Named All Kitchen Items Independently" },
+      { src:"sp_10.jpg", cat:"Life Skills",  title:"Learning Through Labelling",      desc:"A glass teapot, labelled and understood. Breaking down the kitchen into simple, named parts gives clients the language and confidence to navigate daily life on their own terms.",      date:"Spring 2023",   client:"Kay",        category:"Life Skills",  duration:"8 Months",   milestone:"Used Kitchen Independently" },
+      { src:"sp_14.jpg", cat:"Education",    title:"Working Through It Together",     desc:"Side by side at the board, figuring it out in real time. The mentor does not just give answers — they work through problems together so the client builds the thinking skills, not just the answer.",     date:"Fall 2023",     client:"Kay",        category:"Education",    duration:"8 Months",   milestone:"Solved Problem Without Help" },
+      { src:"sp_15.jpg", cat:"Education",    title:"Late Night Study Session",        desc:"After dinner, textbooks open, working hard. Being there for a client means being there whenever they need support, including the long evenings before important tests and deadlines.",        date:"Winter 2023",   client:"Jayde",      category:"Education",    duration:"14 Months",  milestone:"Passed End of Term Exam" },
+      { src:"sp_35.jpg", cat:"Education",    title:"Focus Time at Home",              desc:"A child at the dining table, laptop open, pencil in hand. Building a real study routine at home is one of the most important habits a mentor can help establish.",              date:"Spring 2024",   client:"Emma",       category:"Education",    duration:"6 Months",   milestone:"30-Minute Daily Study Habit Built" },
+      { src:"sp_36.jpg", cat:"Education",    title:"Brothers Learning Side by Side",  desc:"Two siblings at the same table, both focused. When the whole family gets involved in a routine, the results multiply. A positive study environment changes everything.",  date:"Spring 2024",   client:"Emma",       category:"Education",    duration:"6 Months",   milestone:"Homework Done Before Screen Time" },
+      { src:"sp_33.jpg", cat:"Education",    title:"Connected Across the Distance",   desc:"Not all sessions are in person. Virtual check-ins make the mentorship consistent no matter where the client is in the world. The relationship does not pause because of geography.",   date:"January 2025",  client:"Hao",        category:"Education",    duration:"16 Months",  milestone:"First Virtual Session Completed" },
+      { src:"sp_34.jpg", cat:"Education",    title:"Online, On Time, On Point",       desc:"Evening virtual sessions have become part of the weekly rhythm. Showing up on screen with the same energy and consistency as in person. The client knows their mentor is always there.",       date:"February 2025", client:"Jayde",      category:"Education",    duration:"14 Months",  milestone:"Consistent Virtual Attendance" },
+      { src:"sp_37.jpg", cat:"Education",    title:"A Session Worth Smiling About",   desc:"That genuine smile at the start of a call. When a client actually looks forward to their sessions, that is when you know the relationship is working. Trust and joy are the foundation.",   date:"April 2024",    client:"Li",         category:"Education",    duration:"12 Months",  milestone:"Said She Looks Forward to Sessions" },
+      { src:"sp_39.jpg", cat:"Mentorship",   title:"Joy Across the Screen",           desc:"Pure joy captured in a single frame. This is what a real mentorship relationship looks like after months of consistent, caring, and genuine support. Results you can feel.",           date:"April 2024",    client:"Li",         category:"Mentorship",   duration:"12 Months",  milestone:"Client Expressed Deep Gratitude" },
+      { src:"sp_38.jpg", cat:"Community",    title:"Matching Energy",                 desc:"Shopping trip, matching shirts, and a mirror selfie that sums up the whole relationship. Real mentorship includes the fun moments, the errands, the laughs, and the ordinary days that build something extraordinary.",                 date:"Summer 2024",   client:"Nathan",     category:"Community",    duration:"22 Months",  milestone:"Client Initiated an Outing" },
+      { src:"sp_29.jpg", cat:"Life Skills",  title:"Reps and Responsibility",         desc:"Every gym session is a lesson in showing up and doing the work even when you do not feel like it. The discipline built here transfers directly into every other area of life.",         date:"June 2025",     client:"Hao",        category:"Life Skills",  duration:"16 Months",  milestone:"Never Missed a Scheduled Session" },
+      { src:"sp_31.jpg", cat:"Life Skills",  title:"Cable Work, Core Focus",          desc:"Advanced gym programming for a client who started with zero experience. This is what eighteen months of consistent effort produces, confidence, technique, and a genuine love of training.",          date:"July 2025",     client:"Hao",        category:"Life Skills",  duration:"16 Months",  milestone:"Training Independently 3x Per Week" },
+      { src:"sp_40.jpg", cat:"Community",    title:"Open Sky, Open Mind",             desc:"Standing in a wide open field under a big sky. Some of the most important moments in a mentorship happen in quiet, open spaces where there is nothing to do but be present and talk.",             date:"August 2025",   client:"Nathan",     category:"Community",    duration:"22 Months",  milestone:"Started Journaling Outdoors" },
+      { src:"sp_22.jpg", cat:"Mentorship",   title:"Your Mentor Does the Work Too",   desc:"Leading by example means actually doing the work, not just directing others. When your mentor drops down and does the push-ups beside you, the message is clear: we are in this together.",   date:"Fall 2024",     client:"Nathan",     category:"Mentorship",   duration:"22 Months",  milestone:"Mentor and Client Same Fitness Level" },
+      { src:"sp_41.jpg", cat:"Community",    title:"Finding Their Place",             desc:"Outdoors, relaxed, and genuinely at ease. After months of outings and guided experiences, a client who once felt anxious in the world starts to carry themselves like they belong everywhere.",             date:"August 2025",   client:"Nathan",     category:"Community",    duration:"22 Months",  milestone:"Requested Solo Outdoor Time" },
+      { src:"sp_42.jpg", cat:"Community",    title:"History Makes You Think",         desc:"A stained glass window, a 100-year-old story, and a meaningful conversation about legacy. These are the moments that open a young person up to the world beyond their immediate experience.",         date:"Fall 2024",     client:"Kay",        category:"Community",    duration:"8 Months",   milestone:"Asked Mentor a Deep Question Unprompted" }
+    ];
+
+    var N         = DATA.length;
+    var NAV_H     = 72;
+    var PPP       = 700;
+
+    var space     = document.getElementById("sp-space");
+    var stickyEl  = document.getElementById("sp-sticky");
+    var imgA      = document.getElementById("sp-img-a");
+    var imgB      = document.getElementById("sp-img-b");
+    var photoWrap = document.getElementById("sp-photo-wrap");
+    var infoEl    = document.getElementById("sp-info");
+    var catEl     = document.getElementById("sp-cat");
+    var titleEl   = document.getElementById("sp-title");
+    var descEl    = document.getElementById("sp-desc");
+    var dateEl    = document.getElementById("sp-date");
+    var clientEl  = document.getElementById("sp-client");
+    var catgEl    = document.getElementById("sp-category");
+    var durEl     = document.getElementById("sp-duration");
+    var mileEl    = document.getElementById("sp-milestone");
+    var stripList = document.getElementById("sp-strip-list");
+    var counterEl = document.getElementById("sp-counter");
+    var prevBtn   = document.getElementById("sp-prev");
+    var nextBtn   = document.getElementById("sp-next");
+    var soundBtn  = document.getElementById("sp-sound-btn");
+    var skipBtn       = document.getElementById("sp-skip");
+    var skipLabel     = document.getElementById("sp-skip-label");
+    var skipIcon      = document.getElementById("sp-skip-icon");
+    var lastIdx       = 0;
+    var scrollingDown = true;
+
+    var THUMB_H   = 82;
+    var THUMB_GAP = 10;
+    var ITEM_H    = THUMB_H + THUMB_GAP;
+    var STRIP_VIS = 460;
+
+    var thumbEls   = [];
+    var currentRaw = 0;
+    var targetRaw  = 0;
+    var activeIdx  = 0;
+    var activeLayer= "a";
+    var soundOn    = true;
+    var audioCtx   = null;
+
+    function detectNavH() {
+      var candidates = document.querySelectorAll("nav, header");
+      for (var i = 0; i < candidates.length; i++) {
+        var cs = window.getComputedStyle(candidates[i]);
+        if (cs.position === "fixed" || cs.position === "sticky") {
+          return candidates[i].offsetHeight || NAV_H;
+        }
+      }
+      return NAV_H;
+    }
+
+    function playClick() {
+      if (!soundOn) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        var sr  = audioCtx.sampleRate;
+        var len = Math.floor(sr * 0.038);
+        var buf = audioCtx.createBuffer(1, len, sr);
+        var d   = buf.getChannelData(0);
+        for (var i = 0; i < len; i++) {
+          d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 6) * 0.32;
+        }
+        var src  = audioCtx.createBufferSource();
+        src.buffer = buf;
+        var filt = audioCtx.createBiquadFilter();
+        filt.type = "bandpass";
+        filt.frequency.value = 2600;
+        filt.Q.value = 0.9;
+        src.connect(filt);
+        filt.connect(audioCtx.destination);
+        src.start();
+      } catch(e) {}
+    }
+
+    function init() {
+      NAV_H = detectNavH();
+      stickyEl.style.top    = NAV_H + "px";
+      stickyEl.style.height = "calc(100vh - " + NAV_H + "px)";
+
+      STRIP_VIS = 420;
+      space.style.height = ((N - 1) * PPP + window.innerHeight - NAV_H) + "px";
+
+      DATA.forEach(function(d) {
+        var wrap = document.createElement("div");
+        wrap.style.cssText = "width:100%;height:" + THUMB_H + "px;border-radius:9px;overflow:hidden;margin-bottom:" + THUMB_GAP + "px;";
+        var img = document.createElement("img");
+        img.src = d.src;
+        img.alt = d.title;
+        img.style.cssText = "width:100%;height:100%;object-fit:cover;display:block;";
+        wrap.appendChild(img);
+        stripList.appendChild(wrap);
+        thumbEls.push(wrap);
+      });
+
+      loadContent(0, true);
+      updateStrip(0);
+
+      window.addEventListener("scroll", onScroll, { passive: true });
+      requestAnimationFrame(tick);
+
+      prevBtn.addEventListener("click", function() { goTo(activeIdx - 1); });
+      nextBtn.addEventListener("click", function() { goTo(activeIdx + 1); });
+
+      window.spSkipGallery = function() {
+        if (scrollingDown) {
+          var spaceBottom = space.getBoundingClientRect().bottom + window.scrollY;
+          window.scrollTo({ top: spaceBottom, behavior: "smooth" });
+        } else {
+          var spaceTop = space.getBoundingClientRect().top + window.scrollY - NAV_H - 40;
+          window.scrollTo({ top: spaceTop, behavior: "smooth" });
+        }
+      };
+
+      soundBtn.addEventListener("click", function() {
+        soundOn = !soundOn;
+        soundBtn.style.opacity = soundOn ? "1" : "0.3";
+        if (soundOn && !audioCtx) {
+          try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+        }
+      });
+
+      photoWrap.addEventListener("mouseenter", function() {
+        imgA.style.filter = "grayscale(0%)";
+        imgB.style.filter = "grayscale(0%)";
+      });
+      photoWrap.addEventListener("mouseleave", function() {
+        imgA.style.filter = "grayscale(100%)";
+        imgB.style.filter = "grayscale(100%)";
+      });
+    }
+
+    function onScroll() {
+      var spaceTop     = space.getBoundingClientRect().top + window.scrollY;
+      var stickyStart  = spaceTop - NAV_H;
+      var scrolled     = Math.max(0, window.scrollY - stickyStart);
+      var scrollRange  = Math.max(1, (N - 1) * PPP);
+      targetRaw        = Math.min(N - 1, (scrolled / scrollRange) * (N - 1));
+    }
+
+    function tick() {
+      currentRaw += (targetRaw - currentRaw) * 0.09;
+      var newIdx = Math.min(N - 1, Math.max(0, Math.round(currentRaw)));
+      if (newIdx !== activeIdx) {
+        activeIdx = newIdx;
+        loadContent(activeIdx, false);
+        playClick();
+      }
+      updateStrip(currentRaw);
+      requestAnimationFrame(tick);
+    }
+
+    function loadContent(idx, instant) {
+      var d = DATA[idx];
+      counterEl.textContent = String(idx + 1).padStart(2, "0") + " / " + N;
+      if (skipBtn) {
+        scrollingDown = idx >= lastIdx;
+        lastIdx = idx;
+        var show = idx >= 3;
+        skipBtn.style.opacity = show ? "1" : "0";
+        skipBtn.style.pointerEvents = show ? "auto" : "none";
+        if (show) {
+          if (scrollingDown) {
+            skipLabel.textContent = "Skip gallery";
+            skipIcon.innerHTML = '<path d="M6 2v8M2 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>';
+          } else {
+            skipLabel.textContent = "Skip back up";
+            skipIcon.innerHTML = '<path d="M6 10V2M2 6l4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>';
+          }
+        }
+      }
+      var hovered = photoWrap.matches(":hover");
+      var gs = hovered ? "grayscale(0%)" : "grayscale(100%)";
+      if (activeLayer === "a") {
+        imgB.src = d.src;
+        imgB.style.filter  = gs;
+        imgB.style.opacity = "1";
+        imgA.style.opacity = "0";
+        activeLayer = "b";
+      } else {
+        imgA.src = d.src;
+        imgA.style.filter  = gs;
+        imgA.style.opacity = "1";
+        imgB.style.opacity = "0";
+        activeLayer = "a";
+      }
+      if (instant) {
+        setInfo(d);
+      } else {
+        infoEl.style.opacity   = "0";
+        infoEl.style.transform = "translateY(7px)";
+        setTimeout(function() {
+          setInfo(d);
+          infoEl.style.opacity   = "1";
+          infoEl.style.transform = "translateY(0)";
+        }, 200);
+      }
+    }
+
+    function setInfo(d) {
+      catEl.textContent    = d.cat;
+      titleEl.textContent  = d.title;
+      descEl.textContent   = d.desc;
+      dateEl.textContent   = d.date;
+      clientEl.textContent = d.client;
+      catgEl.textContent   = d.category;
+      durEl.textContent    = d.duration;
+      mileEl.textContent   = d.milestone;
+    }
+
+    function updateStrip(raw) {
+      var ty = STRIP_VIS / 2 - ITEM_H / 2 - raw * ITEM_H;
+      stripList.style.transform = "translateY(" + ty.toFixed(2) + "px)";
+      thumbEls.forEach(function(el, i) {
+        var dist    = Math.abs(i - raw);
+        var scale   = Math.max(0.46, 1 - dist * 0.15);
+        var opacity = Math.max(0.11, 1 - dist * 0.28);
+        var gs      = Math.min(100, dist * 72);
+        el.style.transform  = "scale(" + scale.toFixed(3) + ")";
+        el.style.opacity    = opacity.toFixed(3);
+        el.style.filter     = "grayscale(" + Math.round(gs) + "%)";
+        el.style.transition = "transform 0.14s, opacity 0.14s, filter 0.14s";
+      });
+    }
+
+    function goTo(idx) {
+      if (idx < 0) idx = 0;
+      if (idx >= N) idx = N - 1;
+      var spaceTop    = space.getBoundingClientRect().top + window.scrollY;
+      var stickyStart = spaceTop - NAV_H;
+      var scrollRange = (N - 1) * PPP;
+      var scrollTarget = stickyStart + (idx / (N - 1)) * scrollRange;
+      window.scrollTo({ top: scrollTarget, behavior: "smooth" });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  })();
+  </script>
+
+
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials-section" id="testimonials">
+    <div style="text-align:center;">
+      <span class="section-label">What families say</span>
+      <h2 class="section-title" style="margin:0 auto;text-align:center;">Real results for<br />real families.</h2>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testi-card reveal">
+        <div class="stars">
+          <svg class="star" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="star" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="star" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="star" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="star" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        </div>
+        <p class="testi-text">"Within the first two weeks, our son's grades improved dramatically. The structure and consistency his assistant brought was exactly what he needed — and they actually enjoy spending time together."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">S</div>
+          <div><div class="testi-name">Sarah M.</div><div class="testi-role">Parent — Toronto, ON</div></div>
+        </div>
+      </div>
+      <div class="testi-card reveal">
+        <div class="stars">
+          <svg class="star" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="star" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="star" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="star" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="star" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        </div>
+        <p class="testi-text">"The app makes everything so transparent. I can see exactly what my daughter worked on, how long, and what's coming next. No more guessing — just consistent, visible progress."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">J</div>
+          <div><div class="testi-name">James T.</div><div class="testi-role">Parent — Vancouver, BC</div></div>
+        </div>
+      </div>
+      <div class="testi-card reveal">
+        <div class="stars">
+          <svg class="star" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="star" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="star" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="star" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="star" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        </div>
+        <p class="testi-text">"Having a single dedicated assistant who knows our family's goals made all the difference. It's not tutoring — it's someone who actually becomes part of how your family functions."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">P</div>
+          <div><div class="testi-name">Priya K.</div><div class="testi-role">Parent — Calgary, AB</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA VIDEO -->
+  <section style="background:#F8FAFC; padding:80px 5%;">
+    <div style="max-width:600px; margin:0 auto; text-align:center;">
+      <div style="border-radius:18px; overflow:hidden; box-shadow:0 8px 40px rgba(0,0,0,0.12);">
+        <video autoplay muted loop playsinline style="width:100%; display:block;">
+          <source src="PrivateMentorshipPreview.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section" id="contact">
+    <div class="cta-inner reveal">
+      <h2>Your family deserves<br />dedicated support.</h2>
+      <p>Spaces are limited. Apply today and we'll find the right assistant for your family within days.</p>
+      <div class="comet-wrap">
+        <a href="mailto:caleb@private-mentorship.com" class="comet-btn" style="font-size:16px;padding:16px 36px;">
+          Apply for a Spot
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" style="background:rgba(255,255,255,0.04);padding:100px 0 120px;">
+    <div style="width:100%;">
+      <div style="padding:0 5%;margin-bottom:64px;">
+        <span style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);display:block;margin-bottom:14px;">FAQ</span>
+        <h2 style="font-family:'Inter',sans-serif;font-size:clamp(30px,4vw,48px);font-weight:900;color:var(--ink);line-height:1.08;letter-spacing:-0.025em;margin:0;">Frequently Asked Questions.</h2>
+      </div>
+      <div id="faq-list" style="border-top:1.5px solid var(--border);"></div>
+    </div>
+  </section>
+
+  <style>
+    .faq-row { border-bottom:1.5px solid var(--border); }
+    .faq-btn {
+      width:100%; background:none; border:none; cursor:pointer;
+      padding:26px 5%; display:flex; align-items:center; gap:20px;
+      text-align:left; outline:none; -webkit-tap-highlight-color:transparent;
+      box-sizing:border-box;
+    }
+    .faq-badge {
+      flex-shrink:0; width:80px; height:80px; border-radius:16px;
+      background:#EFF6FF; display:flex; align-items:center; justify-content:center;
+      font-family:'Inter',sans-serif; font-size:20px; font-weight:800;
+      color:#93AEDD; letter-spacing:.04em;
+      transition:background 0.25s ease, color 0.25s ease;
+    }
+    .faq-question {
+      flex:1; font-family:'Inter',sans-serif;
+      font-size:clamp(17px,2vw,22px); font-weight:700; color:var(--ink);
+      line-height:1.4; transition:color 0.2s ease; user-select:none;
+    }
+    .faq-toggle {
+      flex-shrink:0; width:32px; height:32px;
+      display:flex; align-items:center; justify-content:center;
+      transition:transform 0.38s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .faq-toggle svg { width:26px; height:26px; stroke:#94A3B8; transition:stroke 0.22s ease; }
+
+    .faq-btn:hover .faq-badge { background:#DBEAFE; color:#2563EB; }
+    .faq-btn:hover .faq-question { color:var(--blue); }
+    .faq-btn:hover .faq-toggle svg { stroke:var(--blue); }
+
+    .faq-row.open .faq-badge { background:var(--blue); color:#fff; }
+    .faq-row.open .faq-question { color:var(--blue); }
+    .faq-row.open .faq-toggle { transform:rotate(45deg); }
+    .faq-row.open .faq-toggle svg { stroke:var(--blue); }
+    .faq-row.open .faq-btn { padding-bottom:8px; }
+
+    .faq-panel { display:grid; grid-template-rows:0fr; transition:grid-template-rows 0.4s cubic-bezier(0.4,0,0.2,1); }
+    .faq-row.open .faq-panel { grid-template-rows:1fr; }
+    .faq-panel-inner { overflow:hidden; }
+    .faq-answer {
+      padding:4px 5% 32px calc(5% + 100px); font-family:'Inter',sans-serif;
+      font-size:16px; font-weight:500; color:rgba(255,255,255,0.6); line-height:1.75;
+      max-width:55%; opacity:0; transform:translateY(-4px);
+      transition:opacity 0.3s ease 0.06s, transform 0.3s ease 0.06s;
+    }
+    .faq-row.open .faq-answer { opacity:1; transform:translateY(0); }
+  </style>
+
+  <script>
+  (function(){
+    var data=[
+      {q:'What is Private Mentorship?',a:'Private Mentorship is a personalized assistant and mentorship service designed to support education, family coordination, and daily life needs. Each family is assigned dedicated weekly time blocks with a trained assistant who works closely with them in structured sessions.'},
+      {q:'How do contract terms work?',a:'Plans are purchased in fixed terms (1 month or 2 months) and include a set number of reserved hours. These hours are scheduled into recurring weekly time blocks to ensure consistent availability.'},
+      {q:'What does \u201cReserved Weekly Time Blocks\u201d mean?',a:'Your hours are not booked ad-hoc. They are reserved in advance as standing weekly windows, ensuring predictable access and consistency.'},
+      {q:'Where do sessions take place?',a:'Sessions can take place at the family\u2019s home, at the assistant\u2019s location, in public spaces (libraries, caf\u00e9s, activity centers), or online. Location depends on the session goal.'},
+      {q:'Is transportation included?',a:'Transportation support may be available when the assigned assistant has access to a vehicle. This can include pickup and drop-off for sessions or activities.'},
+      {q:'What is Homework Screen Recording?',a:'During learning sessions, the screen can be recorded so parents can review progress later. This allows parents to stay informed without needing to supervise in real time.'},
+      {q:'Can we reschedule or cancel sessions?',a:'Each plan includes a limited number of reschedules per term. This ensures flexibility while protecting the integrity of reserved time blocks.'},
+      {q:'Can we change our assistant?',a:'Yes. If a family feels the match is not ideal, a replacement can be requested. Continuity and fit are important to the success of the program.'},
+      {q:'What kind of administrative support is included?',a:'Assistants can help with emails, family coordination, documentation, and scheduling. This support is handled within the boundaries of the contracted hours.'},
+    ];
+    var list=document.getElementById('faq-list');
+    data.forEach(function(item,i){
+      var num=String(i+1).padStart(2,'0');
+      var row=document.createElement('div');
+      row.className='faq-row';
+      row.innerHTML='<button class="faq-btn" aria-expanded="false"><span class="faq-badge">'+num+'</span><span class="faq-question">'+item.q+'</span><span class="faq-toggle" aria-hidden="true"><svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-width="2" stroke-linecap="round"><line x1="9" y1="2" x2="9" y2="16"/><line x1="2" y1="9" x2="16" y2="9"/></svg></span></button><div class="faq-panel" role="region"><div class="faq-panel-inner"><p class="faq-answer">'+item.a+'</p></div></div>';
+      var btn=row.querySelector('.faq-btn');
+      btn.addEventListener('click',function(){
+        var isOpen=row.classList.contains('open');
+        document.querySelectorAll('.faq-row.open').forEach(function(other){
+          if(other!==row){other.classList.remove('open');other.querySelector('.faq-btn').setAttribute('aria-expanded','false');}
+        });
+        row.classList.toggle('open',!isOpen);
+        btn.setAttribute('aria-expanded',String(!isOpen));
+      });
+      list.appendChild(row);
+    });
+  })();
+  </script>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="pm-logo.png" alt="Private Mentorship" />
+        <p>Dedicated personal assistants for families who want more — across Canada.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Program</h4>
+        <ul>
+          <li><a href="#roles">What We Do</a></li>
+          <li><a href="#how">How It Works</a></li>
+          <li><a href="#plans">Plans</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Our Assistants</a></li>
+          <li><a href="#">Join the Team</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="mailto:caleb@private-mentorship.com">caleb@private-mentorship.com</a></li>
+          <li><a href="#contact">Apply Now</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Private Mentorship. All rights reserved.</p>
+      <p>Canada-wide</p>
+    </div>
+  </footer>
+
+  <script>
+    // ── Age accordion ──
+    function selectAGI(index) {
+      // Update left-panel items
+      document.querySelectorAll('.agi-item').forEach(function(btn, i) {
+        var circle = btn.querySelector('.agi-circle');
+        if (i === index) {
+          btn.classList.add('agi-item-on');
+          circle.innerHTML = '&#8722;';
+        } else {
+          btn.classList.remove('agi-item-on');
+          circle.innerHTML = '+';
+        }
+      });
+      // Update right-panel content
+      document.querySelectorAll('.agi-panel').forEach(function(p) {
+        p.classList.remove('agi-panel-on');
+      });
+      var panel = document.querySelector('.agi-panel[data-agi="' + index + '"]');
+      if (panel) panel.classList.add('agi-panel-on');
+    }
+
+    // ── Nav scroll effect ──
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 40);
+    }, { passive: true });
+
+    // ── Scroll reveal ──
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => {
+      const parent = el.closest('.features-grid,.steps,.plans-grid,.serve-grid,.stories,.testimonials-grid,.roles-strip');
+      if (parent) {
+        const siblings = parent.querySelectorAll('.reveal');
+        const idx = Array.from(siblings).indexOf(el);
+        el.style.transitionDelay = `${idx * 80}ms`;
+      }
+      io.observe(el);
+    });
+
+    // ── Animated stat counters ──
+    const statIo = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        const el = e.target;
+        statIo.unobserve(el);
+
+        // text stat (e.g. "Canada")
+        if (el.dataset.text) { el.textContent = el.dataset.text; return; }
+        // suffix stat (e.g. "100%")
+        if (el.dataset.suffix) { el.textContent = el.textContent + el.dataset.suffix; return; }
+        // number count-up
+        const target = parseInt(el.dataset.target, 10);
+        if (isNaN(target)) return;
+        const duration = 1200;
+        const start = performance.now();
+        const tick = now => {
+          const p = Math.min((now - start) / duration, 1);
+          const ease = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.round(ease * target);
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('.stat-num[data-target], .stat-num[data-text], .stat-num[data-suffix]').forEach(el => statIo.observe(el));
+  </script>
+</body>
+</html>
