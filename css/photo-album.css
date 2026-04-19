@@ -1,0 +1,3 @@
+    #sp-photo-wrap:hover #sp-img-a,
+    #sp-photo-wrap:hover #sp-img-b { filter: grayscale(0%) !important; }
+    #sp-prev:focus, #sp-next:focus, #sp-sound-btn:focus { outline:none; }

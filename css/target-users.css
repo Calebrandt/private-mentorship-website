@@ -1,0 +1,19 @@
+    /* ── WHO WE SERVE ── */
+    .serve-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 56px;
+    }
+    .serve-card {
+      border-radius: var(--radius-md); padding: 28px 24px;
+      border: 1px solid var(--border); text-align: center;
+      background: var(--white);
+      transition: transform .25s, box-shadow .25s, border-color .25s;
+    }
+    .serve-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: rgba(37,99,235,0.2); }
+    .serve-icon {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--blue-light); display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px; transition: transform .3s;
+    }
+    .serve-card:hover .serve-icon { transform: scale(1.1); }
+    .serve-card h3 { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+    .serve-card p { font-size: 13px; color: var(--sub); line-height: 1.65; font-weight: 500; }

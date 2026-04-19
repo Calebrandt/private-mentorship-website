@@ -1,0 +1,15 @@
+    /* ── FOOTER ── */
+    footer { padding: 72px 5% 40px; border-top: 1px solid var(--border); background: var(--white); }
+    .footer-top { display: grid; grid-template-columns: 1.6fr repeat(3,1fr); gap: 48px; margin-bottom: 60px; }
+    .footer-brand p { font-size: 14px; color: var(--sub); margin-top: 14px; line-height: 1.75; max-width: 260px; font-weight: 500; }
+    .footer-brand img { height: 40px; }
+    .footer-col h4 { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 18px; text-transform: uppercase; letter-spacing: .8px; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .footer-col ul li a { font-size: 14px; color: var(--sub); text-decoration: none; transition: color .2s; font-weight: 500; }
+    .footer-col ul li a:hover { color: var(--brand); }
+    .footer-bottom {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px; padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+    .footer-bottom p { font-size: 12px; color: var(--hint); }

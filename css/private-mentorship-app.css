@@ -1,0 +1,23 @@
+    /* ── FEATURES ── */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 56px;
+    }
+    .feat-card {
+      border-radius: var(--radius-lg); padding: 32px 28px;
+      border: 1px solid var(--border);
+      transition: transform .25s, box-shadow .25s, border-color .25s;
+      cursor: default;
+    }
+    .feat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(37,99,235,0.12);
+      border-color: rgba(37,99,235,0.2);
+    }
+    .feat-icon {
+      width: 56px; height: 56px; border-radius: 16px;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
+      transition: transform .3s;
+    }
+    .feat-card:hover .feat-icon { transform: scale(1.1) rotate(-3deg); }
+    .feat-card h3 { font-size: 17px; font-weight: 700; color: var(--ink); letter-spacing: -.3px; margin-bottom: 8px; }
+    .feat-card p { font-size: 14px; color: var(--sub); line-height: 1.75; font-weight: 500; }

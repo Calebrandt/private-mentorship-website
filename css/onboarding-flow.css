@@ -1,0 +1,89 @@
+/* ── HOW IT WORKS ── */
+.how-outer { padding: 0 5% 100px; }
+.how-inner {
+  background: linear-gradient(135deg, #0F172A 0%, #1e3a8a 50%, #0F172A 100%);
+  border-radius: var(--radius-xl); padding: 88px 72px;
+  position: relative; overflow: hidden;
+}
+.how-inner::before {
+  content: ''; position: absolute; top: -100px; right: -100px;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(59,130,246,.15) 0%, transparent 65%);
+  pointer-events: none;
+}
+.how-inner::after {
+  content: ''; position: absolute; bottom: -100px; left: -100px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(139,92,246,.12) 0%, transparent 65%);
+  pointer-events: none;
+}
+.how-inner .section-label { color: rgba(255,255,255,.3); }
+.how-inner .section-title { color: #fff; }
+.how-inner .section-sub { color: rgba(255,255,255,.45); }
+.steps {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 0; margin-top: 64px;
+  position: relative;
+}
+.steps::before {
+  content: ''; position: absolute;
+  top: 28px; left: 10%; right: 10%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.15), rgba(255,255,255,.15), transparent);
+}
+.step { padding: 0 16px; position: relative; z-index: 1; }
+.step-dot {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 24px; backdrop-filter: blur(10px);
+  transition: background .3s;
+}
+.step:hover .step-dot { background: rgba(37,99,235,0.3); }
+.step-num { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,.25); margin-bottom: 10px; }
+.step h3 { font-size: 17px; font-weight: 700; color: #fff; letter-spacing: -.3px; margin-bottom: 10px; }
+.step p { font-size: 13px; color: rgba(255,255,255,.44); line-height: 1.75; font-weight: 500; }
+
+/* ── ASSISTANT TOOLKIT (DECONSTRUCTED) ── */
+.assistant-toolkit{
+  background:transparent;
+  padding:0;
+}
+
+.assistant-toolkit-inner{
+  max-width:1200px;
+  margin:0 auto;
+  padding:0;
+  background:transparent;
+  border-radius:0;
+  position:relative;
+  overflow:visible;
+}
+
+.assistant-toolkit-inner::before {
+  display:none;
+}
+
+.assistant-toolkit-inner::after {
+  display:none;
+}
+
+.assistant-toolkit-head{
+  display:none;
+}
+
+.assistant-toolkit-visual{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:40px 0 20px;
+}
+
+.assistant-toolkit-visual img,
+.assistant-toolkit-visual video{
+  width:50%;
+  height:auto;
+  display:block;
+  margin:0 auto;
+  background:transparent;
+  filter:none;
+}

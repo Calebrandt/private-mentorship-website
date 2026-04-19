@@ -1,0 +1,43 @@
+.partners-logos img:hover {
+  filter: grayscale(0%);
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* ── PARTNERS ── */
+.partners {
+  padding: 80px 5%;
+  text-align: center;
+}
+
+.partners-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--hint);
+  margin-bottom: 28px;
+}
+
+.partners-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 34px;
+  flex-wrap: wrap;
+  opacity: 1;
+}
+
+.partners-logos img {
+  height: 42px;
+  width: auto;
+  max-width: 210px;
+  object-fit: contain;
+  opacity: 1;
+  transition: transform 0.25s ease;
+}
+
+.partners-logos img:hover {
+  transform: scale(1.03);
+}
+

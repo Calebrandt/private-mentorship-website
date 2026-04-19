@@ -1,0 +1,208 @@
+/* ─── MADE-FOR STICKY SCROLL ──────────── */
+.made-for-outer {
+  height: 800vh;
+  position: relative;
+  background: #090e1a;
+  background: radial-gradient(circle at center, #161e31 0%, #090e1a 70%);
+}
+
+.made-for-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.made-for-content {
+  text-align: center;
+  width: 100%;
+  padding: 0 24px;
+}
+
+.made-for-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 26px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+  margin-bottom: 20px;
+  letter-spacing: -0.02em;
+}
+
+.made-for-mask {
+  position: relative;
+  height: 120px;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mf-word {
+  position: absolute;
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(60px, 10vw, 130px);
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.05em;
+  will-change: transform, opacity;
+  transition: transform 0.6s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.4s ease;
+  transform: translateY(100%);
+  opacity: 0;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.mf-word.is-active {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.mf-word.is-past {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+/* ─── AGI STAGE ──────────────────────────── */
+  .agi-section { background: #FFFFFF; padding: 60px 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Inter', sans-serif; }
+  .agi-stage { position: relative; width: 92%; max-width: 1400px; height: 88vh; min-height: 750px; background: #111; border-radius: 32px; overflow: hidden; display: flex; box-shadow: 0 40px 100px -20px rgba(0,0,0,0.12); border: 1px solid rgba(255,255,255,0.05); margin: 0 auto; }
+  .agi-bg-container { position: absolute; inset: 0; z-index: 0; }
+  .agi-bg-photo { 
+    position: absolute; 
+    inset: 0; 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    /* THIS IS THE FIX: Align the photo to the top so heads aren't cut off */
+    object-position: center top; 
+    opacity: 0; 
+    transition: opacity 0.8s ease, transform 1.2s ease; 
+    transform: scale(1.05); 
+  }
+  .agi-bg-photo.active { opacity: 1; transform: scale(1); }
+  /* Darkened overlay slightly to make sure faces stay visible but text remains readable */
+  .agi-bg-overlay { position: absolute; inset: 0; background: linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, transparent 100%); z-index: 1; }
+  .agi-sidebar { position: relative; z-index: 10; width: 340px; background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border-right: 1px solid rgba(255,255,255,0.1); padding: 40px 20px; display: flex; flex-direction: column; overflow-y: auto; }
+  .agi-nav-indicator { position: absolute; left: 0; width: 3px; height: 42px; background: #fff; box-shadow: 0 0 15px #fff; transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
+  .agi-nav-item { background: none; border: none; color: rgba(255,255,255,0.4); font-size: 14px; font-weight: 500; text-align: left; padding: 12px 15px; margin-bottom: 4px; cursor: pointer; transition: color 0.3s; position: relative; width: 100%; border-radius: 8px; }
+  .agi-nav-item.active { color: #fff; font-weight: 600; background: rgba(255,255,255,0.05); }
+  .agi-nav-age { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .agi-age-badge {
+    font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums;
+    letter-spacing: 0.03em; color: rgba(255,255,255,0.28);
+    white-space: nowrap; flex-shrink: 0;
+    padding-left: 10px;
+    border-left: 1px solid rgba(255,255,255,0.12);
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .agi-nav-item.active .agi-age-badge { color: rgba(255,255,255,0.55); border-color: rgba(255,255,255,0.25); }
+  .agi-sidebar-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(255,255,255,0.25); margin: 30px 0 12px 15px; font-weight: 700; }
+  .agi-main-content { position: relative; z-index: 10; flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 60px; }
+  .agi-top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
+  .agi-top-nav { display: flex; align-items: center; gap: 40px; background: rgba(0,0,0,0.3); padding: 15px 30px; border-radius: 99px; align-self: flex-start; border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(10px); }
+  .agi-preview-card {
+    width: 220px;
+    border-radius: 22px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.14);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 18px 45px rgba(0,0,0,0.22);
+    flex-shrink: 0;
+  }
+  .agi-preview-img {
+    width: 100%;
+    height: 132px;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+  }
+  .agi-preview-meta {
+    padding: 12px 14px 14px;
+  }
+  .agi-preview-label {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 4px;
+  }
+  .agi-preview-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.35;
+  }
+  .agi-role-node { display: flex; align-items: center; gap: 12px; opacity: 0.2; transition: opacity 0.5s; }
+    .agi-role-node.active { opacity: 1; }
+  .agi-role-dot { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: #fff; }
+  .agi-role-line { width: 50px; height: 1px; background: rgba(255,255,255,0.1); position: relative; overflow: hidden; }
+  .agi-role-line-glow { position: absolute; inset: 0; background: linear-gradient(90deg, transparent, #fff, transparent); transform: translateX(-100%); }
+  .agi-role-line.active .agi-role-line-glow { animation: agiLineGlow 2.5s infinite; }
+  @keyframes agiLineGlow { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+.agi-description-pod { max-width: 940px; background: rgba(255, 255, 255, 0.07); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.1); border-radius: 28px; padding: 26px 48px; transform: translateY(110px); opacity: 0; transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1); }
+    .agi-description-pod.active { transform: translateY(0); opacity: 1; }
+  .agi-eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(255,255,255,0.4); margin-bottom: 15px; display: block; }
+  .agi-description-pod h3 { color: #fff; font-size: 32px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 12px; line-height: 1.08; }
+  .agi-description-pod p { color: rgba(255,255,255,0.75); font-size: 15px; line-height: 1.58; margin-bottom: 22px; font-weight: 400; max-width: 720px; }
+    .agi-authority-tags { display: flex; flex-wrap: wrap; gap: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px; }
+  .agi-auth-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 6px; background: rgba(255,255,255,0.03); }
+
+
+/* ─── AGI CURSOR / BLAST / CHAOS CHIPS ──── */
+    /* Cursor */
+    #agi-cursor-ring, #agi-cursor-dot {
+      position: fixed; border-radius: 50%; pointer-events: none;
+      z-index: 99999; transform: translate(-50%,-50%); opacity: 0;
+      will-change: left, top;
+    }
+    #agi-cursor-ring {
+      width: 36px; height: 36px;
+      border: 1.5px solid rgba(96,165,250,0.65);
+      background: rgba(96,165,250,0.04);
+      transition: opacity 0.35s, width 0.22s cubic-bezier(0.34,1.56,0.64,1),
+                  height 0.22s cubic-bezier(0.34,1.56,0.64,1),
+                  border-color 0.45s, background 0.45s;
+    }
+    #agi-cursor-dot {
+      width: 6px; height: 6px;
+      background: #60A5FA;
+      box-shadow: 0 0 8px #60A5FA, 0 0 18px rgba(96,165,250,0.6);
+      transition: opacity 0.35s, background 0.45s, box-shadow 0.45s;
+    }
+    #agi-cursor-ring.agi-c-live { opacity: 1; }
+    #agi-cursor-dot.agi-c-live  { opacity: 1; }
+    .agi-stage-cursed, .agi-stage-cursed * { cursor: none !important; }
+
+    /* Blast canvas */
+    #agi-blast-canvas {
+      position: absolute; inset: 0; z-index: 50;
+      pointer-events: none; border-radius: 32px;
+    }
+    /* Chaos chips container — right side only (past sidebar) */
+    #agi-chaos-wrap {
+      position: absolute; top: 0; bottom: 0; right: 0;
+      left: 340px;   /* matches .agi-sidebar width */
+      z-index: 5; pointer-events: none; overflow: hidden;
+      border-radius: 0 32px 32px 0;
+    }
+    /* Chaos chip — text+icon pill */
+    .agi-chip {
+      position: absolute; pointer-events: none; white-space: nowrap;
+      font-family: 'Inter', sans-serif; font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      padding: 6px 13px 6px 10px; border-radius: 20px;
+      display: inline-flex; align-items: center; gap: 6px;
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      /* color, bg, border set dynamically via inline style */
+    }
+    /* Chaos icon — emoji-only floater */
+    .agi-icon {
+      position: absolute; pointer-events: none;
+      line-height: 1; user-select: none;
+      filter: drop-shadow(0 0 6px rgba(255,255,255,0.3));
+    }

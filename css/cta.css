@@ -1,0 +1,28 @@
+    /* ── CTA ── */
+    .cta-section { padding: 0 5% 100px; }
+    .cta-inner {
+      background: linear-gradient(135deg, #0F172A 0%, #1e3a8a 40%, #0F172A 100%);
+      border-radius: var(--radius-xl); padding: 96px 60px;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .cta-inner::before {
+      content: ''; position: absolute; top: -150px; right: -150px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(59,130,246,.20) 0%, transparent 60%);
+    }
+    .cta-inner::after {
+      content: ''; position: absolute; bottom: -150px; left: -150px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(139,92,246,.15) 0%, transparent 60%);
+    }
+    .cta-inner h2 {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(30px,4.5vw,54px); font-weight: 900;
+      color: #fff; letter-spacing: -2px; margin-bottom: 16px; position: relative; z-index: 1;
+    }
+    .cta-inner p {
+      font-size: 17px; color: rgba(255,255,255,.48);
+      max-width: 460px; margin: 0 auto 40px; line-height: 1.7;
+      position: relative; z-index: 1; font-weight: 500;
+    }
+    .cta-inner .comet-wrap { position: relative; z-index: 1; }

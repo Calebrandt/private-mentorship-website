@@ -1,0 +1,46 @@
+    .faq-row { border-bottom:1.5px solid var(--border); }
+    .faq-btn {
+      width:100%; background:none; border:none; cursor:pointer;
+      padding:26px 5%; display:flex; align-items:center; gap:20px;
+      text-align:left; outline:none; -webkit-tap-highlight-color:transparent;
+      box-sizing:border-box;
+    }
+    .faq-badge {
+      flex-shrink:0; width:80px; height:80px; border-radius:16px;
+      background:#EFF6FF; display:flex; align-items:center; justify-content:center;
+      font-family:'Inter',sans-serif; font-size:20px; font-weight:800;
+      color:#93AEDD; letter-spacing:.04em;
+      transition:background 0.25s ease, color 0.25s ease;
+    }
+    .faq-question {
+      flex:1; font-family:'Inter',sans-serif;
+      font-size:clamp(17px,2vw,22px); font-weight:700; color:var(--ink);
+      line-height:1.4; transition:color 0.2s ease; user-select:none;
+    }
+    .faq-toggle {
+      flex-shrink:0; width:32px; height:32px;
+      display:flex; align-items:center; justify-content:center;
+      transition:transform 0.38s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .faq-toggle svg { width:26px; height:26px; stroke:#94A3B8; transition:stroke 0.22s ease; }
+
+    .faq-btn:hover .faq-badge { background:#DBEAFE; color:#2563EB; }
+    .faq-btn:hover .faq-question { color:var(--blue); }
+    .faq-btn:hover .faq-toggle svg { stroke:var(--blue); }
+
+    .faq-row.open .faq-badge { background:var(--blue); color:#fff; }
+    .faq-row.open .faq-question { color:var(--blue); }
+    .faq-row.open .faq-toggle { transform:rotate(45deg); }
+    .faq-row.open .faq-toggle svg { stroke:var(--blue); }
+    .faq-row.open .faq-btn { padding-bottom:8px; }
+
+    .faq-panel { display:grid; grid-template-rows:0fr; transition:grid-template-rows 0.4s cubic-bezier(0.4,0,0.2,1); }
+    .faq-row.open .faq-panel { grid-template-rows:1fr; }
+    .faq-panel-inner { overflow:hidden; }
+    .faq-answer {
+      padding:4px 5% 32px calc(5% + 100px); font-family:'Inter',sans-serif;
+      font-size:16px; font-weight:500; color:var(--sub); line-height:1.75;
+      max-width:55%; opacity:0; transform:translateY(-4px);
+      transition:opacity 0.3s ease 0.06s, transform 0.3s ease 0.06s;
+    }
+        .faq-row.open .faq-answer { opacity:1; transform:translateY(0); }
