@@ -121,24 +121,18 @@
     const client = await getClient(callerUserId);
     const call = client.call('default', callId);
 
-    // Members = caller + recipients so Stream rings the right people
-    const memberRecords = [
-      { user_id: callerUserId },
-      ...recipientUserIds.map((id) => ({ user_id: id })),
-    ];
-
-    await call.getOrCreate({
-      ring: true,
-      data: { members: memberRecords, custom: { callType, conversationId } },
-    });
-
-    // Enable mic; enable camera only for video
+    // Don't pass Stream `members` or use Stream's built-in ring — that
+    // requires every participant to already exist on Stream's user
+    // database, which family members who haven't opened the app don't.
+    // Our own ring mechanism (the call_logs INSERT we wrote above
+    // triggers the recipient's realtime subscription → ring modal)
+    // handles the ringing UX, mirroring how the app does it.
     try {
       if (callType === 'video') await call.camera.enable(); else await call.camera.disable();
       await call.microphone.enable();
     } catch (e) { console.warn('[calls] track enable warning', e?.message); }
 
-    await call.join({ create: true });
+    await call.join({ create: true, data: { custom: { callType, conversationId, callerUserId, recipientUserIds } } });
 
     _bindCall(call, callId, callType);
     return { callId, call };
@@ -148,12 +142,12 @@
     if (!callId || !userId) throw new Error('acceptIncoming: missing fields');
     const client = await getClient(userId);
     const call = client.call('default', callId);
-    try { await call.accept(); } catch (e) { /* may not be a ringing call yet */ }
+    // No Stream-level accept() — we use our own ring via call_logs.
     try {
       if (callType === 'video') await call.camera.enable(); else await call.camera.disable();
       await call.microphone.enable();
     } catch (e) { console.warn('[calls] track enable warning', e?.message); }
-    await call.join();
+    await call.join({ create: true });
     _bindCall(call, callId, callType || 'audio');
     await sb.from('call_logs')
       .update({ status: 'answered', updated_at: new Date().toISOString() })
@@ -163,8 +157,8 @@
 
   async function declineIncoming({ callId, userId }) {
     if (!callId || !userId) return;
-    const client = await getClient(userId);
-    try { await client.call('default', callId).reject(); } catch (e) {}
+    // No Stream-level reject() — just mark the call_log as declined and
+    // the caller's UI will see the status change via realtime.
     await sb.from('call_logs')
       .update({ status: 'declined', updated_at: new Date().toISOString() })
       .eq('call_id', callId);
