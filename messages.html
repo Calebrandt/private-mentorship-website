@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Messages — Private Mentorship</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
+<link rel="stylesheet" href="js/sidebar.css?v=20260508c" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#F1F5F9;color:#1F2937;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;height:100%;}
+  :root{
+    --bg:#F1F5F9;
+    --card:#FFFFFF;
+    --border:#E2E8F0;
+    --border-soft:#EEF2F7;
+    --ink:#1F2937;
+    --ink-2:#0F172A;
+    --ink-mute:#64748B;
+    --ink-tert:#94A3B8;
+    --primary:#5750F1;
+    --primary-soft:#EEF1FB;
+    --bubble-self:#5750F1;
+    --bubble-self-ink:#FFFFFF;
+    --bubble-other:#FFFFFF;
+    --bubble-other-ink:#0F172A;
+    --system-bg:linear-gradient(180deg,#EEF6FF 0%,#FFFFFF 100%);
+  }
+
+  /* Topbar + shell baseline (mirrors dashboard shell) */
+  .nx-topbar{background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:14px 26px;gap:16px;position:sticky;top:0;z-index:20;}
+  .nx-topbar__title{font-size:18px;font-weight:800;letter-spacing:-.02em;color:var(--ink-2);margin:0;}
+  .nx-userpod{display:flex;align-items:center;gap:10px;padding:5px 12px 5px 5px;border:1px solid var(--border);border-radius:9999px;background:#fff;}
+  .nx-userpod__avatar{width:32px;height:32px;border-radius:50%;background:#27272A;color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;}
+  .nx-userpod__name{font-size:13px;font-weight:700;color:var(--ink);}
+
+  /* Page = full-bleed inside the shell minus the topbar */
+  .pm-msg-shell{
+    display:grid;
+    grid-template-columns:340px 1fr;
+    height:calc(100vh - 60px);
+    background:#fff;
+    border-top:1px solid var(--border);
+    transition:grid-template-columns .38s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .pm-msg-shell.is-inbox-collapsed{grid-template-columns:0 1fr;}
+
+  /* ─── INBOX (left column) ────────────────────────────────────────── */
+  .pm-msg-inbox{
+    border-right:1px solid var(--border);
+    display:flex;flex-direction:column;
+    background:#FAFBFD;
+    min-height:0;
+    overflow:hidden;
+    transition:transform .38s cubic-bezier(0.4, 0, 0.2, 1), opacity .25s ease;
+  }
+  .pm-msg-shell.is-inbox-collapsed .pm-msg-inbox{
+    transform:translateX(-100%);
+    opacity:0;
+    pointer-events:none;
+  }
+
+  /* Toggle button in the topbar */
+  .pm-msg-inbox-toggle{
+    display:flex;align-items:center;gap:8px;
+    padding:7px 13px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:9999px;
+    font:600 13px Inter,sans-serif;color:var(--ink-mute);
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .pm-msg-inbox-toggle:hover{background:#F1F5F9;color:var(--ink-2);}
+  .pm-msg-inbox-toggle.is-active{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 4px 14px -6px rgba(87,80,241,0.45);}
+  .pm-msg-inbox-toggle.is-active:hover{background:#4842D6;}
+  .pm-msg-inbox-toggle svg{width:15px;height:15px;}
+  .pm-msg-inbox-toggle .pm-msg-inbox-toggle__count{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:20px;height:20px;padding:0 6px;border-radius:9999px;
+    background:rgba(15,23,42,0.08);
+    color:var(--ink-2);
+    font:700 11px Inter,sans-serif;
+  }
+  .pm-msg-inbox-toggle.is-active .pm-msg-inbox-toggle__count{background:rgba(255,255,255,0.22);color:#fff;}
+  .pm-msg-inbox__head{
+    padding:18px 18px 12px;
+    border-bottom:1px solid var(--border-soft);
+    background:#FAFBFD;
+  }
+  .pm-msg-inbox__title{font-size:20px;font-weight:800;letter-spacing:-.02em;color:var(--ink-2);margin:0 0 12px;}
+  .pm-msg-search{position:relative;}
+  .pm-msg-search input{
+    width:100%;background:#fff;border:1px solid var(--border);
+    border-radius:10px;padding:9px 12px 9px 36px;
+    font:500 13px Inter,sans-serif;color:var(--ink);
+    transition:border-color .15s ease;
+  }
+  .pm-msg-search input:focus{outline:none;border-color:var(--primary);}
+  .pm-msg-search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--ink-tert);}
+
+  .pm-msg-inbox__list{flex:1;overflow-y:auto;padding:6px 6px 24px;}
+  .pm-msg-row{
+    display:flex;gap:12px;align-items:flex-start;
+    padding:12px 12px;border-radius:10px;cursor:pointer;
+    transition:background .12s ease;
+    margin-bottom:2px;
+  }
+  .pm-msg-row:hover{background:#EEF2F8;}
+  .pm-msg-row.is-active{background:#fff;box-shadow:0 1px 0 var(--border-soft), 0 4px 14px -8px rgba(15,23,42,0.14);}
+  .pm-msg-row__avatar{
+    width:42px;height:42px;border-radius:50%;flex:none;
+    background:linear-gradient(135deg,#475569 0%,#1F2937 100%);
+    color:#fff;font-weight:700;font-size:15px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .pm-msg-row__body{flex:1;min-width:0;}
+  .pm-msg-row__top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;}
+  .pm-msg-row__title{font-size:14px;font-weight:700;color:var(--ink-2);letter-spacing:-.005em;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pm-msg-row__time{font-size:11.5px;color:var(--ink-tert);font-weight:500;flex:none;}
+  .pm-msg-row__meta{display:flex;align-items:center;gap:6px;margin-top:3px;}
+  .pm-msg-row__pill{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:9999px;background:var(--primary-soft);color:var(--primary);}
+  .pm-msg-row__pill--family{background:#FEF3C7;color:#92400E;}
+  .pm-msg-row__pill--direct{background:#E0F2FE;color:#0369A1;}
+  .pm-msg-row__preview{font-size:13px;color:var(--ink-mute);margin:5px 0 0;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+
+  .pm-msg-empty{padding:60px 30px;text-align:center;color:var(--ink-mute);font-size:13px;}
+
+  /* ─── THREAD (right column) ──────────────────────────────────────── */
+  .pm-msg-thread{
+    display:flex;flex-direction:column;min-height:0;
+    background:radial-gradient(ellipse 80% 70% at 50% 65%, #15152A 0%, #0A0A14 55%, #06060C 100%);
+    position:relative;
+  }
+  /* Ambient blobs across the whole right pane */
+  .pm-msg-thread::before, .pm-msg-thread::after{
+    content:"";position:absolute;border-radius:50%;filter:blur(120px);pointer-events:none;
+    z-index:0;
+  }
+  .pm-msg-thread::before{
+    top:18%;left:22%;width:380px;height:380px;
+    background:rgba(139,92,246,0.16);
+    animation:pmGlowA 9s ease-in-out infinite;
+  }
+  .pm-msg-thread::after{
+    bottom:14%;right:18%;width:420px;height:420px;
+    background:rgba(99,102,241,0.16);
+    animation:pmGlowB 11s ease-in-out infinite;
+  }
+  /* Empty mode: center composer block vertically */
+  .pm-msg-thread.is-empty{justify-content:center;align-items:center;padding:32px;}
+  .pm-msg-thread.is-empty .pm-msg-composer{
+    background:transparent;border-top:none;padding:0;
+    width:100%;max-width:760px;
+  }
+  .pm-msg-thread.is-empty .pm-msg-composer::before,
+  .pm-msg-thread.is-empty .pm-msg-composer::after{display:none;}
+
+  /* In-thread mode: messages list on top, composer at bottom */
+  .pm-msg-thread:not(.is-empty) .pm-msg-thread__list{
+    background:#FAFBFD;flex:1;
+  }
+  .pm-msg-thread__head{
+    padding:14px 22px;
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:14px;
+    background:#fff;
+  }
+  .pm-msg-thread__back{display:none;border:none;background:none;cursor:pointer;color:var(--ink-mute);padding:6px;border-radius:8px;}
+  .pm-msg-thread__back:hover{background:#F1F5F9;color:var(--ink-2);}
+  .pm-msg-thread__avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#475569 0%,#1F2937 100%);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px;flex:none;}
+  .pm-msg-thread__title{font-size:15px;font-weight:700;color:var(--ink-2);margin:0;letter-spacing:-.005em;}
+  .pm-msg-thread__sub{font-size:12px;color:var(--ink-mute);margin:2px 0 0;font-weight:500;}
+  .pm-msg-thread__actions{margin-left:auto;display:flex;gap:6px;}
+  .pm-msg-thread__icon-btn{
+    width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:#fff;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;color:var(--ink-mute);
+    transition:background .15s ease,color .15s ease,border-color .15s ease;
+  }
+  .pm-msg-thread__icon-btn:hover{background:var(--primary-soft);color:var(--primary);border-color:#CFD8FA;}
+  .pm-msg-thread__icon-btn svg{width:17px;height:17px;}
+  .pm-msg-thread__icon-btn[disabled]{opacity:.4;cursor:not-allowed;}
+
+  .pm-msg-thread__list{flex:1;overflow-y:auto;padding:22px 22px 12px;background:#FAFBFD;}
+  .pm-msg-day{
+    display:flex;align-items:center;gap:14px;
+    margin:18px 0 12px;color:var(--ink-tert);font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  }
+  .pm-msg-day:before, .pm-msg-day:after{content:"";flex:1;height:1px;background:var(--border-soft);}
+
+  .pm-msg-bubble-row{display:flex;gap:10px;margin-bottom:8px;align-items:flex-end;}
+  .pm-msg-bubble-row.is-self{flex-direction:row-reverse;}
+  .pm-msg-bubble-avatar{width:30px;height:30px;border-radius:50%;background:#475569;color:#fff;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;flex:none;}
+  .pm-msg-bubble-row.is-self .pm-msg-bubble-avatar{visibility:hidden;}
+  .pm-msg-bubble-row.is-stack .pm-msg-bubble-avatar{visibility:hidden;}
+  .pm-msg-bubble{
+    max-width:60%;
+    padding:10px 14px;
+    border-radius:16px;
+    background:var(--bubble-other);
+    color:var(--bubble-other-ink);
+    font-size:14px;line-height:1.45;font-weight:500;
+    border:1px solid var(--border);
+    box-shadow:0 1px 0 rgba(15,23,42,0.02);
+    position:relative;
+    word-wrap:break-word;
+  }
+  .pm-msg-bubble-row.is-self .pm-msg-bubble{
+    background:var(--bubble-self);color:var(--bubble-self-ink);border-color:transparent;
+    border-bottom-right-radius:6px;
+  }
+  .pm-msg-bubble-row:not(.is-self) .pm-msg-bubble{
+    border-bottom-left-radius:6px;
+  }
+  .pm-msg-sender{font-size:11.5px;font-weight:700;color:var(--ink-mute);margin-bottom:4px;letter-spacing:-.005em;}
+  .pm-msg-bubble-row.is-self .pm-msg-sender{display:none;}
+  .pm-msg-subject{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--primary);margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid rgba(87,80,241,0.18);}
+  .pm-msg-bubble-row.is-self .pm-msg-subject{color:rgba(255,255,255,0.9);border-bottom-color:rgba(255,255,255,0.3);}
+  .pm-msg-time{font-size:10.5px;color:var(--ink-tert);margin-top:4px;text-align:right;font-weight:500;}
+  .pm-msg-bubble-row.is-self .pm-msg-time{color:rgba(255,255,255,0.75);}
+  .pm-msg-reaction{position:absolute;bottom:-12px;background:#fff;border:1px solid var(--border);border-radius:9999px;padding:2px 7px;font-size:13px;line-height:1;box-shadow:0 2px 4px rgba(15,23,42,0.06);}
+  .pm-msg-bubble-row:not(.is-self) .pm-msg-reaction{right:-6px;}
+  .pm-msg-bubble-row.is-self .pm-msg-reaction{left:-6px;}
+
+  /* System message card (matches app's premium feel) */
+  .pm-msg-system{
+    margin:24px auto;max-width:560px;
+    background:var(--system-bg);
+    border:1px solid #C9DFFF;border-radius:14px;
+    box-shadow:0 8px 24px -12px rgba(36,68,125,0.18);
+    overflow:hidden;
+  }
+  .pm-msg-system__head{
+    display:flex;align-items:center;gap:8px;
+    padding:11px 16px;
+    background:rgba(255,255,255,0.6);
+    border-bottom:1px solid #DAE7F8;
+    color:#3252A0;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  }
+  .pm-msg-system__head svg{width:14px;height:14px;}
+  .pm-msg-system__title{padding:14px 18px 4px;font-size:15px;font-weight:800;letter-spacing:-.012em;color:#0F172A;}
+  .pm-msg-system__body{padding:0 18px 14px;font-size:13.5px;line-height:1.55;color:#334155;white-space:pre-wrap;}
+  .pm-msg-system__foot{padding:10px 18px;border-top:1px dashed #C9DFFF;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:#5B7CC0;display:flex;align-items:center;gap:7px;}
+  .pm-msg-system__foot svg{width:12px;height:12px;}
+
+  /* ─── Composer area (dark glass, mirrors AnimatedAIChat from 21st.dev) ─── */
+  .pm-msg-composer{
+    position:relative;
+    padding:30px 28px 34px;
+    background:radial-gradient(ellipse 80% 60% at 50% 100%, #15152A 0%, #0A0A14 60%, #06060C 100%);
+    border-top:1px solid rgba(255,255,255,0.06);
+    overflow:hidden;
+  }
+  /* Ambient glow blobs (pure CSS, no JS) */
+  .pm-msg-composer::before, .pm-msg-composer::after{
+    content:"";position:absolute;border-radius:50%;filter:blur(96px);pointer-events:none;
+    will-change:transform,opacity;
+  }
+  .pm-msg-composer::before{
+    top:-110px;left:22%;width:320px;height:320px;
+    background:rgba(139,92,246,0.22);
+    animation:pmGlowA 7s ease-in-out infinite;
+  }
+  .pm-msg-composer::after{
+    bottom:-110px;right:18%;width:340px;height:340px;
+    background:rgba(99,102,241,0.22);
+    animation:pmGlowB 9s ease-in-out infinite;
+  }
+  @keyframes pmGlowA{0%,100%{opacity:.55;transform:translateY(0)}50%{opacity:.85;transform:translateY(8px)}}
+  @keyframes pmGlowB{0%,100%{opacity:.45;transform:translateY(0)}50%{opacity:.75;transform:translateY(-10px)}}
+
+  /* Inner column — centered, max-width like the original demo (max-w-2xl ~ 672px) */
+  .pm-msg-composer__inner{
+    position:relative;z-index:1;
+    max-width:680px;margin:0 auto;
+    display:flex;flex-direction:column;gap:14px;
+  }
+
+  /* Hero (only visible in empty state) */
+  .pm-msg-composer__hero{text-align:center;margin-bottom:6px;}
+  .pm-msg-composer__hero h2{
+    font:600 26px/1.15 Inter,sans-serif;letter-spacing:-.022em;
+    background:linear-gradient(90deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.42) 100%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    margin:0 0 6px;
+  }
+  .pm-msg-composer__hero-line{
+    height:1px;width:100%;
+    background:linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.18) 50%, transparent 100%);
+    animation:pmHeroLine .8s .15s ease-out both;
+    transform-origin:center;
+  }
+  @keyframes pmHeroLine{from{transform:scaleX(0);opacity:0}to{transform:scaleX(1);opacity:1}}
+  .pm-msg-composer__hero p{
+    font:500 12.5px Inter,sans-serif;color:rgba(255,255,255,0.42);
+    margin:9px 0 0;letter-spacing:-.005em;
+  }
+
+  .pm-msg-composer__card{
+    position:relative;
+    backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+    background:rgba(255,255,255,0.025);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:18px;
+    box-shadow:0 25px 50px -12px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.04) inset;
+    transition:border-color .22s ease, box-shadow .22s ease;
+  }
+  .pm-msg-composer__card:focus-within{
+    border-color:rgba(139,92,246,0.45);
+    box-shadow:0 0 0 3px rgba(139,92,246,0.14), 0 25px 50px -12px rgba(0,0,0,0.55);
+  }
+  .pm-msg-composer__textarea-wrap{padding:14px 18px 8px;}
+  .pm-msg-composer__textarea{
+    width:100%;
+    background:transparent;border:none;outline:none;resize:none;
+    font:500 14px/1.5 Inter,sans-serif;
+    color:rgba(255,255,255,0.92);
+    min-height:36px;max-height:200px;
+    caret-color:#A78BFA;
+  }
+  .pm-msg-composer__textarea::placeholder{color:rgba(255,255,255,0.22);}
+  .pm-msg-composer__textarea::-webkit-scrollbar{width:6px;}
+  .pm-msg-composer__textarea::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:9999px;}
+
+  .pm-msg-composer__bottom{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px 12px;
+    border-top:1px solid rgba(255,255,255,0.06);
+  }
+  .pm-msg-composer__icons{display:flex;align-items:center;gap:2px;}
+  .pm-msg-composer__icon-btn{
+    width:34px;height:34px;border:none;background:transparent;
+    color:rgba(255,255,255,0.4);
+    border-radius:9px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .15s ease, color .15s ease, transform .12s ease;
+  }
+  .pm-msg-composer__icon-btn:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.92);}
+  .pm-msg-composer__icon-btn:active{transform:scale(0.94);}
+  .pm-msg-composer__icon-btn svg{width:16px;height:16px;}
+  .pm-msg-composer__icon-btn[disabled]{opacity:.35;cursor:not-allowed;}
+
+  .pm-msg-composer__send{
+    display:flex;align-items:center;gap:8px;
+    padding:8px 16px;
+    border:none;border-radius:10px;
+    font:600 13px Inter,sans-serif;
+    cursor:pointer;
+    transition:transform .12s ease, box-shadow .15s ease, background .15s ease, color .15s ease;
+    background:rgba(255,255,255,0.05);
+    color:rgba(255,255,255,0.4);
+  }
+  .pm-msg-composer__send svg{width:14px;height:14px;}
+  .pm-msg-composer__send.has-text{
+    background:#FFFFFF;color:#0A0A0B;
+    box-shadow:0 4px 14px rgba(255,255,255,0.10), 0 1px 0 rgba(255,255,255,0.4) inset;
+  }
+  .pm-msg-composer__send.has-text:hover{transform:scale(1.02);}
+  .pm-msg-composer__send.has-text:active{transform:scale(0.98);}
+  .pm-msg-composer__send[disabled]{cursor:not-allowed;}
+
+  /* Sending state — replace icon with spinner */
+  .pm-msg-composer__send.is-sending svg{animation:pmSpin 1.2s linear infinite;}
+  @keyframes pmSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+  /* Suggestion chips below composer */
+  .pm-msg-chips{
+    display:flex;flex-wrap:wrap;justify-content:center;gap:8px;
+    padding-top:4px;
+  }
+  .pm-msg-chip{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:8px 13px;border-radius:10px;
+    background:rgba(255,255,255,0.025);
+    border:1px solid rgba(255,255,255,0.05);
+    color:rgba(255,255,255,0.6);
+    font:500 12.5px Inter,sans-serif;letter-spacing:-.005em;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease, border-color .15s ease, transform .12s ease;
+    animation:pmChipIn .35s ease-out both;
+  }
+  .pm-msg-chip:nth-child(1){animation-delay:.05s;}
+  .pm-msg-chip:nth-child(2){animation-delay:.12s;}
+  .pm-msg-chip:nth-child(3){animation-delay:.19s;}
+  .pm-msg-chip:nth-child(4){animation-delay:.26s;}
+  .pm-msg-chip:hover{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.92);border-color:rgba(255,255,255,0.10);}
+  .pm-msg-chip:active{transform:scale(0.97);}
+  .pm-msg-chip svg{width:14px;height:14px;}
+  @keyframes pmChipIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  /* ─── Floating "Sending" pill — 1:1 with the 21st.dev "zap Thinking" pill ─── */
+  /* Anchored to the viewport (fixed) so it never overlaps the chips. */
+  .pm-msg-thinking{
+    position:fixed;left:50%;bottom:16px;
+    z-index:60;
+    display:flex;align-items:center;gap:12px;
+    padding:8px 18px 8px 8px;
+    border-radius:9999px;
+    backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.05);
+    box-shadow:0 12px 32px -8px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.04) inset;
+    opacity:0;pointer-events:none;
+    transform:translateX(-50%) translateY(20px);
+    transition:opacity .28s ease, transform .28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .pm-msg-thinking.is-shown{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+
+  .pm-msg-thinking__badge{
+    width:32px;height:28px;border-radius:9999px;
+    background:rgba(255,255,255,0.05);
+    display:flex;align-items:center;justify-content:center;
+    font:500 12px Inter,sans-serif;letter-spacing:.01em;
+    color:rgba(255,255,255,0.92);
+    padding-bottom:1px;
+    flex:none;
+  }
+
+  .pm-msg-thinking__text{
+    font:500 14px Inter,sans-serif;letter-spacing:-.005em;
+    color:rgba(255,255,255,0.72);
+    display:flex;align-items:center;gap:8px;
+    padding-right:2px;
+  }
+
+  /* Dots — wave left → right, easeInOut, 1.2s, glow halo (matches reference exactly) */
+  .pm-msg-thinking__dots{display:flex;align-items:center;}
+  .pm-msg-thinking__dots span{
+    width:6px;height:6px;border-radius:50%;
+    background:rgba(255,255,255,0.92);
+    margin:0 2px;
+    box-shadow:0 0 4px rgba(255,255,255,0.3);
+    animation:pmDot 1.2s ease-in-out infinite;
+    opacity:.3;
+    transform:scale(.85);
+    will-change:opacity,transform;
+  }
+  .pm-msg-thinking__dots span:nth-child(1){animation-delay:.15s;}
+  .pm-msg-thinking__dots span:nth-child(2){animation-delay:.30s;}
+  .pm-msg-thinking__dots span:nth-child(3){animation-delay:.45s;}
+  @keyframes pmDot{
+    0%,100%{opacity:.3;transform:scale(.85);}
+    50%{opacity:.9;transform:scale(1.1);}
+  }
+
+  /* Recolor the thread list when composer is dark — keep the list light, but add a soft fade */
+  .pm-msg-thread__list{position:relative;}
+
+  /* Empty thread state */
+  .pm-msg-thread__empty{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+    color:var(--ink-mute);text-align:center;padding:40px;
+  }
+  .pm-msg-thread__empty svg{width:48px;height:48px;color:var(--ink-tert);}
+  .pm-msg-thread__empty h3{font-size:17px;font-weight:700;color:var(--ink-2);margin:0;}
+  .pm-msg-thread__empty p{font-size:13.5px;margin:0;max-width:340px;}
+
+  /* Loading skeleton */
+  .pm-skel{background:linear-gradient(90deg,#EEF2F7 0%,#F8FAFC 50%,#EEF2F7 100%);background-size:200% 100%;animation:skel 1.4s ease-in-out infinite;border-radius:8px;}
+  @keyframes skel{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+  .pm-skel-row{display:flex;gap:12px;padding:12px;}
+  .pm-skel-circle{width:42px;height:42px;border-radius:50%;}
+  .pm-skel-lines{flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center;}
+  .pm-skel-line{height:10px;}
+  .pm-skel-line.short{width:50%;}
+  .pm-skel-line.med{width:78%;}
+
+  /* Mobile */
+  @media (max-width:880px){
+    .pm-msg-shell{grid-template-columns:1fr;}
+    .pm-msg-inbox{display:flex;}
+    .pm-msg-thread{display:none;}
+    body.pm-msg-thread-open .pm-msg-inbox{display:none;}
+    body.pm-msg-thread-open .pm-msg-thread{display:flex;}
+    .pm-msg-thread__back{display:flex;}
+  }
+
+  /* ─── Bigger, intentional composer + subtle ambient glow (overrides) ─── */
+  .pm-msg-composer{overflow:visible;}
+  .pm-msg-composer__inner{max-width:720px;gap:18px;}
+  .pm-msg-composer__hero{margin-bottom:8px;}
+  .pm-msg-composer__hero h2{font:600 30px/1.15 Inter,sans-serif;letter-spacing:-.022em;}
+  .pm-msg-composer__hero p{font:500 13px Inter,sans-serif;margin:11px 0 0;}
+
+  .pm-msg-composer__card{border-radius:20px;}
+  /* Soft, barely-noticeable glow living BEHIND the composer card (always on) */
+  .pm-msg-composer__card::before{
+    content:"";position:absolute;inset:-55px -75px;z-index:-1;
+    background:
+      radial-gradient(circle at 28% 50%, rgba(139,92,246,0.10) 0%, transparent 55%),
+      radial-gradient(circle at 72% 55%, rgba(99,102,241,0.085) 0%, transparent 55%),
+      radial-gradient(circle at 50% 100%, rgba(217,70,239,0.05) 0%, transparent 60%);
+    filter:blur(48px);
+    pointer-events:none;
+    opacity:.85;
+    animation:pmComposerGlow 7s ease-in-out infinite;
+    border-radius:36px;
+  }
+  .pm-msg-composer__card:focus-within::before{opacity:1;animation-duration:5s;}
+  @keyframes pmComposerGlow{
+    0%,100%{opacity:.65;transform:scale(1) translateY(0);}
+    50%{opacity:.95;transform:scale(1.025) translateY(2px);}
+  }
+
+  .pm-msg-composer__textarea-wrap{padding:18px 22px 12px;}
+  .pm-msg-composer__textarea{
+    font:500 15px/1.55 Inter,sans-serif;
+    min-height:60px;max-height:220px;
+  }
+  .pm-msg-composer__bottom{padding:12px 14px;}
+  .pm-msg-composer__icon-btn{width:38px;height:38px;border-radius:10px;}
+  .pm-msg-composer__icon-btn svg{width:17px;height:17px;}
+  .pm-msg-composer__send{
+    padding:10px 20px;
+    font:600 13.5px Inter,sans-serif;
+    border-radius:11px;
+  }
+  .pm-msg-composer__send svg{width:15px;height:15px;}
+
+  /* ─── Active thread = SAME dark space, composer stays near center ─── */
+  .pm-msg-thread:not(.is-empty){
+    display:flex;flex-direction:column;
+    justify-content:center;align-items:center;
+    padding:24px 28px 32px;gap:14px;
+    position:relative;
+  }
+
+  /* Compact glass thread head — floats at top of thread pane (replaces the white bar) */
+  .pm-msg-thread:not(.is-empty) .pm-msg-thread__head{
+    position:absolute;top:18px;left:50%;transform:translateX(-50%);
+    z-index:3;
+    background:rgba(255,255,255,0.04);
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:9999px;
+    padding:6px 16px 6px 7px;gap:10px;
+    box-shadow:0 8px 24px -10px rgba(0,0,0,0.5);
+  }
+  .pm-msg-thread:not(.is-empty) .pm-msg-thread__title{color:rgba(255,255,255,0.92);font-size:13px;}
+  .pm-msg-thread:not(.is-empty) .pm-msg-thread__sub{color:rgba(255,255,255,0.5);font-size:11px;}
+  .pm-msg-thread:not(.is-empty) .pm-msg-thread__avatar{
+    width:30px;height:30px;font-size:12px;
+    background:linear-gradient(135deg,#6366F1 0%,#A78BFA 100%);
+  }
+  .pm-msg-thread:not(.is-empty) .pm-msg-thread__icon-btn{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    color:rgba(255,255,255,0.55);
+    width:30px;height:30px;
+  }
+  .pm-msg-thread:not(.is-empty) .pm-msg-thread__icon-btn:hover{
+    background:rgba(255,255,255,0.10);color:rgba(255,255,255,0.92);border-color:rgba(255,255,255,0.14);
+  }
+  .pm-msg-thread:not(.is-empty) .pm-msg-thread__icon-btn svg{width:14px;height:14px;}
+
+  /* Message list: transparent, centered narrow column, capped so composer stays put */
+  .pm-msg-thread:not(.is-empty) .pm-msg-thread__list{
+    width:100%;max-width:720px;
+    background:transparent;
+    flex:0 1 auto;
+    max-height:min(54vh,560px);
+    overflow-y:auto;
+    padding:18px 4px 6px;
+    display:flex;flex-direction:column;justify-content:flex-end;
+    gap:2px;
+    scroll-behavior:smooth;
+    -webkit-mask-image:linear-gradient(180deg, transparent 0%, #000 36px, #000 100%);
+            mask-image:linear-gradient(180deg, transparent 0%, #000 36px, #000 100%);
+  }
+  .pm-msg-thread:not(.is-empty) .pm-msg-thread__list::-webkit-scrollbar{width:6px;}
+  .pm-msg-thread:not(.is-empty) .pm-msg-thread__list::-webkit-scrollbar-thumb{
+    background:rgba(255,255,255,0.08);border-radius:9999px;
+  }
+  .pm-msg-thread:not(.is-empty) .pm-msg-thread__list::-webkit-scrollbar-track{background:transparent;}
+
+  /* Composer in active mode: transparent shell, centered, no big background block */
+  .pm-msg-thread:not(.is-empty) .pm-msg-composer{
+    width:100%;max-width:760px;
+    background:transparent;border-top:none;padding:0;
+  }
+  .pm-msg-thread:not(.is-empty) .pm-msg-composer::before,
+  .pm-msg-thread:not(.is-empty) .pm-msg-composer::after{display:none;}
+
+  /* "Open Conversations" CTA — only shown when no convo is active */
+  .pm-msg-cta{display:flex;justify-content:center;margin-top:2px;}
+  .pm-msg-cta-btn{
+    display:inline-flex;align-items:center;gap:9px;
+    padding:11px 18px 11px 16px;
+    border:1px solid rgba(139,92,246,0.28);
+    border-radius:12px;
+    background:linear-gradient(180deg, rgba(139,92,246,0.16), rgba(99,102,241,0.10));
+    color:#C4B5FD;
+    font:600 13px Inter,sans-serif;letter-spacing:-.005em;
+    cursor:pointer;
+    box-shadow:0 4px 14px -6px rgba(139,92,246,0.35), 0 1px 0 rgba(255,255,255,0.06) inset;
+    transition:transform .12s ease, background .15s ease, color .15s ease, box-shadow .15s ease, border-color .15s ease;
+  }
+  .pm-msg-cta-btn:hover{
+    background:linear-gradient(180deg, rgba(139,92,246,0.24), rgba(99,102,241,0.14));
+    color:#FFFFFF;
+    border-color:rgba(167,139,250,0.45);
+    box-shadow:0 10px 28px -8px rgba(139,92,246,0.55), 0 1px 0 rgba(255,255,255,0.10) inset;
+    transform:translateY(-1px);
+  }
+  .pm-msg-cta-btn:active{transform:scale(0.98);}
+  .pm-msg-cta-btn svg{width:14px;height:14px;}
+  .pm-msg-cta-btn .pm-msg-cta-arrow{transition:transform .15s ease;}
+  .pm-msg-cta-btn:hover .pm-msg-cta-arrow{transform:translateX(2px);}
+
+  /* Disabled empty-state composer styling */
+  .pm-msg-composer__textarea:disabled{
+    cursor:not-allowed;opacity:.7;
+  }
+  .pm-msg-composer__textarea:disabled::placeholder{color:rgba(255,255,255,0.30);}
+  .pm-msg-chip:disabled,
+  .pm-msg-chip[disabled]{
+    opacity:.45;cursor:not-allowed;pointer-events:none;
+  }
+
+  /* ─── Dark, Claude-clean bubbles for active thread ─── */
+  .pm-msg-thread:not(.is-empty) .pm-msg-bubble{
+    background:rgba(255,255,255,0.045);
+    color:rgba(255,255,255,0.92);
+    border:1px solid rgba(255,255,255,0.08);
+    box-shadow:0 8px 24px -16px rgba(0,0,0,0.55);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    max-width:75%;
+  }
+  .pm-msg-thread:not(.is-empty) .pm-msg-bubble-row.is-self .pm-msg-bubble{
+    background:#FFFFFF;color:#0A0A0B;border-color:transparent;
+    box-shadow:0 8px 22px -10px rgba(255,255,255,0.10), 0 1px 0 rgba(255,255,255,0.4) inset;
+  }
+  .pm-msg-thread:not(.is-empty) .pm-msg-bubble-avatar{
+    background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.92);
+    border:1px solid rgba(255,255,255,0.06);
+  }
+  .pm-msg-thread:not(.is-empty) .pm-msg-sender{color:rgba(255,255,255,0.55);}
+  .pm-msg-thread:not(.is-empty) .pm-msg-time{color:rgba(255,255,255,0.4);}
+  .pm-msg-thread:not(.is-empty) .pm-msg-bubble-row.is-self .pm-msg-time{color:rgba(0,0,0,0.5);}
+  .pm-msg-thread:not(.is-empty) .pm-msg-subject{color:#A78BFA;border-bottom-color:rgba(167,139,250,0.25);}
+  .pm-msg-thread:not(.is-empty) .pm-msg-bubble-row.is-self .pm-msg-subject{
+    color:rgba(0,0,0,0.7);border-bottom-color:rgba(0,0,0,0.15);
+  }
+
+  /* Day separator on dark */
+  .pm-msg-thread:not(.is-empty) .pm-msg-day{color:rgba(255,255,255,0.4);}
+  .pm-msg-thread:not(.is-empty) .pm-msg-day:before,
+  .pm-msg-thread:not(.is-empty) .pm-msg-day:after{background:rgba(255,255,255,0.08);}
+
+  /* System card on dark */
+  .pm-msg-thread:not(.is-empty) .pm-msg-system{
+    background:linear-gradient(180deg, rgba(99,102,241,0.10), rgba(139,92,246,0.04));
+    border:1px solid rgba(139,92,246,0.20);
+    box-shadow:0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+  .pm-msg-thread:not(.is-empty) .pm-msg-system__head{
+    background:rgba(255,255,255,0.04);
+    border-bottom:1px solid rgba(139,92,246,0.18);
+    color:#C4B5FD;
+  }
+  .pm-msg-thread:not(.is-empty) .pm-msg-system__title{color:rgba(255,255,255,0.95);}
+  .pm-msg-thread:not(.is-empty) .pm-msg-system__body{color:rgba(255,255,255,0.78);}
+  .pm-msg-thread:not(.is-empty) .pm-msg-system__foot{
+    border-top:1px dashed rgba(139,92,246,0.24);
+    color:#A78BFA;
+  }
+
+  /* Reactions on dark */
+  .pm-msg-thread:not(.is-empty) .pm-msg-reaction{
+    background:rgba(20,20,30,0.85);
+    border:1px solid rgba(255,255,255,0.10);
+    box-shadow:0 2px 6px rgba(0,0,0,0.4);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    color:rgba(255,255,255,0.95);
+  }
+
+  /* Empty fallback (convo open but no messages yet) on dark */
+  .pm-msg-thread:not(.is-empty) .pm-msg-empty{color:rgba(255,255,255,0.5);}
+
+  /* Bubble drop-in animation (the "in-space" feel) */
+  @keyframes pmBubbleIn{
+    from{opacity:0;transform:translateY(10px) scale(.985);}
+    to{opacity:1;transform:translateY(0) scale(1);}
+  }
+  .pm-msg-thread:not(.is-empty) .pm-msg-bubble-row{
+    animation:pmBubbleIn .38s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+  .pm-msg-thread:not(.is-empty) .pm-msg-system{
+    animation:pmBubbleIn .42s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+
+  /* ─── Final polish: crisper border, brighter icons, bolder chips ─── */
+  .pm-msg-composer__inner{max-width:740px;gap:20px;}
+  .pm-msg-composer__card{
+    border:1px solid rgba(255,255,255,0.11);
+    background:rgba(255,255,255,0.03);
+    border-radius:22px;
+  }
+  .pm-msg-composer__card:focus-within{
+    border-color:rgba(167,139,250,0.55);
+    box-shadow:0 0 0 3px rgba(139,92,246,0.16), 0 25px 50px -12px rgba(0,0,0,0.55);
+  }
+
+  /* Bigger, more intentional textarea */
+  .pm-msg-composer__textarea-wrap{padding:20px 24px 14px;}
+  .pm-msg-composer__textarea{
+    font:500 16px/1.55 Inter,sans-serif;
+    min-height:68px;max-height:240px;
+    color:rgba(255,255,255,0.95);
+  }
+  .pm-msg-composer__textarea::placeholder{color:rgba(255,255,255,0.32);}
+
+  /* Divider between textarea and bottom row — clearer, intentional */
+  .pm-msg-composer__bottom{
+    padding:13px 16px;
+    border-top:1px solid rgba(255,255,255,0.12);
+  }
+
+  /* Icon buttons in composer: crisper, slightly larger, more confident */
+  .pm-msg-composer__icon-btn{
+    color:rgba(255,255,255,0.6);
+    width:40px;height:40px;border-radius:11px;
+  }
+  .pm-msg-composer__icon-btn:hover{
+    background:rgba(255,255,255,0.08);
+    color:rgba(255,255,255,1);
+  }
+  .pm-msg-composer__icon-btn[disabled]{opacity:.75;}
+  .pm-msg-composer__icon-btn svg{width:19px;height:19px;}
+
+  /* Send button — slightly larger, more intentional */
+  .pm-msg-composer__send{
+    padding:11px 22px;
+    font:600 14px Inter,sans-serif;
+    border-radius:12px;
+  }
+  .pm-msg-composer__send svg{width:16px;height:16px;}
+
+  /* Quick-action chips: bigger, bolder, intentional */
+  .pm-msg-chip{
+    padding:11px 17px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.11);
+    color:rgba(255,255,255,0.82);
+    font:600 13.5px Inter,sans-serif;letter-spacing:-.005em;
+    border-radius:12px;
+    gap:9px;
+  }
+  .pm-msg-chip:hover{
+    background:rgba(255,255,255,0.08);
+    color:rgba(255,255,255,0.98);
+    border-color:rgba(255,255,255,0.18);
+  }
+  .pm-msg-chip svg{width:16px;height:16px;}
+
+  /* ─── Subtle ambient glow + cursor-follow glow (matches 21st.dev reference) ─── */
+  .pm-msg-thread{
+    background:radial-gradient(ellipse 80% 70% at 50% 65%, #111114 0%, #08080A 55%, #060608 100%);
+  }
+  /* ── Aurora glow #1: huge diagonal ribbon on the RIGHT half, behind the composer ── */
+  .pm-msg-thread::before{
+    display:block !important;
+    content:"";position:absolute;
+    top:50%;left:72%;
+    width:1100px;height:130vh;max-height:1500px;
+    border-radius:50%;
+    background:radial-gradient(ellipse at center,
+      rgba(167,139,250,0.55) 0%,
+      rgba(139,92,246,0.30) 32%,
+      rgba(99,102,241,0.14) 62%,
+      transparent 90%);
+    animation:pmAurora 5.5s ease-in-out infinite;
+    pointer-events:none;
+    z-index:0;
+    opacity:0.10;
+    will-change:transform, opacity, filter;
+  }
+  /* ── Aurora glow #2: same size, over and above the "How can I help today?" title ── */
+  .pm-msg-thread::after{
+    display:block !important;
+    content:"";position:absolute;
+    top:14%;left:50%;
+    width:1100px;height:130vh;max-height:1500px;
+    border-radius:50%;
+    background:radial-gradient(ellipse at center,
+      rgba(167,139,250,0.55) 0%,
+      rgba(139,92,246,0.30) 32%,
+      rgba(99,102,241,0.14) 62%,
+      transparent 90%);
+    animation:pmAurora 5.5s ease-in-out infinite;
+    animation-delay:-2.7s;
+    pointer-events:none;
+    z-index:0;
+    opacity:0.10;
+    will-change:transform, opacity, filter;
+  }
+
+  /* Diagonal sway: top swings NW, bottom swings SE — like northern lights ribbons */
+  @keyframes pmAurora{
+    0%,100%{
+      opacity:0.10;
+      transform:translate(-50%, -50%) rotate(-32deg) scale(0.95) translate(-6px, -3px);
+      filter:blur(80px) hue-rotate(-8deg);
+    }
+    25%{
+      opacity:0.16;
+      transform:translate(-50%, -50%) rotate(-28deg) scale(1.0) translate(2px, -6px);
+      filter:blur(82px) hue-rotate(4deg);
+    }
+    50%{
+      opacity:0.20;
+      transform:translate(-50%, -50%) rotate(-22deg) scale(1.05) translate(8px, 2px);
+      filter:blur(84px) hue-rotate(18deg);
+    }
+    75%{
+      opacity:0.16;
+      transform:translate(-50%, -50%) rotate(-26deg) scale(1.02) translate(2px, 6px);
+      filter:blur(82px) hue-rotate(8deg);
+    }
+  }
+
+  /* Composer card becomes a dark, opaque island so the glow stays behind it */
+  .pm-msg-composer__card{
+    background:rgba(14,14,20,0.78) !important;
+    backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  }
+
+  /* Composer card never has its own static glow */
+  .pm-msg-composer__card::before{display:none !important;}
+  .pm-msg-composer{overflow:visible;}
+  .pm-msg-composer::before,
+  .pm-msg-composer::after{display:none !important;}
+
+  /* Cursor fog — sits BEHIND UI elements so it never tints the composer / chips / CTA / title */
+  .pm-msg-cursor-glow{
+    position:fixed;
+    top:-200px;left:-200px;
+    width:400px;height:400px;
+    border-radius:50%;
+    pointer-events:none;
+    z-index:0;
+    opacity:0.045;
+    background:radial-gradient(circle,
+      rgba(167,139,250,0.55) 0%,
+      rgba(139,92,246,0.30) 35%,
+      rgba(99,102,241,0.15) 60%,
+      transparent 82%);
+    filter:blur(54px);
+    transform:translate3d(50vw, 50vh, 0);
+    transition:transform .75s cubic-bezier(0.22, 1, 0.36, 1), opacity .55s ease;
+    will-change:transform;
+  }
+  .pm-msg-cursor-glow.is-active{opacity:0.08;}
+
+  /* Lift composer__inner so it sits above the cursor glow, then make chips opaque enough to hide it under them */
+  .pm-msg-composer__inner{z-index:5;}
+  .pm-msg-thread__head{z-index:6 !important;}
+  .pm-msg-chip{
+    background:rgba(15,15,22,0.65);
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  }
+  .pm-msg-chip:hover{
+    background:rgba(25,25,32,0.75);
+  }
+</style>
+</head>
+<body class="pm-has-sidebar">
+<div id="pmSidebar"></div>
+
+<main class="pm-main">
+  <div class="nx-topbar">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <button class="pm-msg-inbox-toggle" id="inboxToggle" type="button" aria-label="Toggle conversations" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Conversations</span>
+        <span class="pm-msg-inbox-toggle__count" id="inboxToggleCount">0</span>
+      </button>
+      <h1 class="nx-topbar__title">Messages</h1>
+    </div>
+    <div class="nx-userpod" id="userpod">
+      <div class="nx-userpod__avatar" id="upAvatar">·</div>
+      <div class="nx-userpod__name" id="upName">…</div>
+    </div>
+  </div>
+
+  <div class="pm-msg-shell">
+    <!-- INBOX -->
+    <aside class="pm-msg-inbox" aria-label="Conversations">
+      <div class="pm-msg-inbox__head">
+        <h2 class="pm-msg-inbox__title">Conversations</h2>
+        <div class="pm-msg-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="inboxSearch" placeholder="Search conversations" />
+        </div>
+      </div>
+      <div class="pm-msg-inbox__list" id="inboxList">
+        <!-- skeleton during load -->
+        <div class="pm-skel-row"><div class="pm-skel pm-skel-circle"></div><div class="pm-skel-lines"><div class="pm-skel pm-skel-line med"></div><div class="pm-skel pm-skel-line short"></div></div></div>
+        <div class="pm-skel-row"><div class="pm-skel pm-skel-circle"></div><div class="pm-skel-lines"><div class="pm-skel pm-skel-line med"></div><div class="pm-skel pm-skel-line short"></div></div></div>
+        <div class="pm-skel-row"><div class="pm-skel pm-skel-circle"></div><div class="pm-skel-lines"><div class="pm-skel pm-skel-line med"></div><div class="pm-skel pm-skel-line short"></div></div></div>
+      </div>
+    </aside>
+
+    <!-- THREAD -->
+    <section class="pm-msg-thread is-empty" id="threadPane">
+
+      <!-- Active thread -->
+      <div class="pm-msg-thread__head" id="threadHead" style="display:none;">
+        <button class="pm-msg-thread__back" id="threadBack" aria-label="Back to inbox">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="pm-msg-thread__avatar" id="threadAvatar">·</div>
+        <div>
+          <h2 class="pm-msg-thread__title" id="threadTitle">…</h2>
+          <p class="pm-msg-thread__sub" id="threadSub">…</p>
+        </div>
+        <div class="pm-msg-thread__actions">
+          <button class="pm-msg-thread__icon-btn" id="btnAudioCall" title="Voice call (coming soon)" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.33 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </button>
+          <button class="pm-msg-thread__icon-btn" id="btnVideoCall" title="Video call (coming soon)" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          </button>
+          <button class="pm-msg-thread__icon-btn" id="btnRecents" title="Call history (coming soon)" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="pm-msg-thread__list" id="threadList" style="display:none;"></div>
+
+      <div class="pm-msg-composer" id="composer" style="display:none;">
+        <div class="pm-msg-composer__inner">
+          <div class="pm-msg-composer__hero" id="composerHero" style="display:none;">
+            <h2>How can I help today?</h2>
+            <div class="pm-msg-composer__hero-line"></div>
+            <p>Type a message or pick a quick action below</p>
+          </div>
+
+          <div class="pm-msg-composer__card">
+            <div class="pm-msg-composer__textarea-wrap">
+              <textarea class="pm-msg-composer__textarea" id="composerInput" rows="1" placeholder="Write a message…"></textarea>
+            </div>
+            <div class="pm-msg-composer__bottom">
+              <div class="pm-msg-composer__icons">
+                <button class="pm-msg-composer__icon-btn" id="btnAttach" type="button" aria-label="Attach file" title="Attach (coming soon)" disabled>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                </button>
+                <button class="pm-msg-composer__icon-btn" id="btnPlus" type="button" aria-label="Commands" title="Commands (coming soon)" disabled>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/></svg>
+                </button>
+              </div>
+              <button class="pm-msg-composer__send" id="composerSend" type="button" disabled aria-label="Send">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                <span>Send</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="pm-msg-cta" id="composerCta" style="display:none;">
+            <button class="pm-msg-cta-btn" id="ctaOpenConvos" type="button" aria-label="Open Conversations">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>Open Conversations</span>
+              <svg class="pm-msg-cta-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+
+          <div class="pm-msg-chips" id="composerChips">
+            <button class="pm-msg-chip" type="button" data-template="Could we reschedule our next session?">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Reschedule
+            </button>
+            <button class="pm-msg-chip" type="button" data-template="Quick question — ">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              Quick question
+            </button>
+            <button class="pm-msg-chip" type="button" data-template="Quick update — ">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Update
+            </button>
+            <button class="pm-msg-chip" type="button" data-template="Thanks so much! ">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              Thanks
+            </button>
+          </div>
+        </div>
+
+        <!-- Floating "Thinking…" pill, only shown while sending -->
+        <div class="pm-msg-thinking" id="composerThinking" aria-hidden="true">
+          <div class="pm-msg-thinking__badge">PM</div>
+          <div class="pm-msg-thinking__text">
+            <span>Sending</span>
+            <span class="pm-msg-thinking__dots"><span></span><span></span><span></span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+<div class="pm-msg-cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260508c"></script>
+<script src="js/hiring-service.js?v=20260508d"></script>
+<script src="js/messages-service.js?v=20260509a"></script>
+<script>
+// Demo-mode pre-stub: must run BEFORE sidebar.js (which redirects on no auth)
+if (new URLSearchParams(location.search).get('demo') === '1') {
+  window.pmHiring = Object.assign(window.pmHiring || {}, {
+    getCurrentUser: async () => ({ id: 'demo-me', email: 'demo@privatementorship.ca' }),
+    fetchCurrentUserProfile: async () => ({ full_name: 'Jane Demo', role: 'CLIENT' }),
+    isCurrentUserAdminOrOwner: async () => false,
+    signOut: async () => { location.href = 'index.html'; },
+  });
+}
+</script>
+<script src="js/sidebar.js?v=20260508c"></script>
+<script>
+(async () => {
+  const $ = id => document.getElementById(id);
+  const sb = window.pmSupabase;
+  // M is resolved AFTER the demo stub block below (which may swap window.pmMessages).
+  let M;
+
+  function esc(s){return (s||'').toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
+  function initial(s){return ((s||'?').trim().charAt(0) || '?').toUpperCase();}
+  function fmtTime(iso){
+    const d = new Date(iso); const now = new Date();
+    const sameDay = d.toDateString() === now.toDateString();
+    if (sameDay) return d.toLocaleTimeString([], { hour:'numeric', minute:'2-digit' });
+    const sameYear = d.getFullYear() === now.getFullYear();
+    return d.toLocaleDateString([], sameYear ? {month:'short', day:'numeric'} : {month:'short', day:'numeric', year:'numeric'});
+  }
+  function fmtDay(iso){
+    const d = new Date(iso); const now = new Date();
+    const yesterday = new Date(now); yesterday.setDate(now.getDate()-1);
+    if (d.toDateString() === now.toDateString()) return 'Today';
+    if (d.toDateString() === yesterday.toDateString()) return 'Yesterday';
+    return d.toLocaleDateString([], { weekday:'long', month:'long', day:'numeric' });
+  }
+  function fmtBubbleTime(iso){
+    return new Date(iso).toLocaleTimeString([], { hour:'numeric', minute:'2-digit' });
+  }
+  function pillClass(scope, type){
+    const t = (type||'').toUpperCase();
+    if (t === 'CLIENT_SHARED') return 'pm-msg-row__pill pm-msg-row__pill--family';
+    if (t === 'OWNER_DIRECT' || t === 'ASSISTANT_PRIVATE') return 'pm-msg-row__pill pm-msg-row__pill--direct';
+    return 'pm-msg-row__pill pm-msg-row__pill--direct';
+  }
+  function pillLabel(scope, type){
+    const t = (type||'').toUpperCase();
+    if (t === 'CLIENT_SHARED') return 'Family';
+    if (t === 'ASSISTANT_PRIVATE') return 'Assistant';
+    if (t === 'OWNER_DIRECT') return 'Direct · Owner';
+    return (scope || 'Direct').toString().replace(/_/g,' ').toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
+  }
+
+  // ─── Auth (with ?demo=1 stub for design previews) ──────────────
+  const isDemo = new URLSearchParams(location.search).get('demo') === '1';
+  let me = null;
+
+  if (isDemo) {
+    me = { id: 'demo-me', email: 'demo@privatementorship.ca' };
+    $('upName').textContent = 'Jane Demo';
+    $('upAvatar').textContent = 'J';
+    // Stub the service so the UI renders without DB
+    const now = Date.now();
+    const otherId = 'demo-other';
+    const ownerId = 'demo-owner';
+    const adminId = 'demo-admin';
+    const demoConvos = [
+      { id:'c1', title:'Smith Family', scope:'FAMILY', type:'CLIENT_SHARED', client_id:'cli-1',
+        last_message_body:'Membership change approved · plan starts June 1', last_message_subject:'Membership Change Approved', last_message_type:'system',
+        last_message_at: new Date(now - 1000*60*8).toISOString() },
+      { id:'c2', title:'Sarah · Assistant', scope:'DIRECT', type:'ASSISTANT_PRIVATE',
+        last_message_body:'Sounds good — see you Thursday at 4pm.', last_message_subject:'', last_message_type:null,
+        last_message_at: new Date(now - 1000*60*60*2).toISOString() },
+      { id:'c3', title:'Owner Direct', scope:'DIRECT', type:'OWNER_DIRECT',
+        last_message_body:'Just sent over the new contract for review.', last_message_subject:'', last_message_type:null,
+        last_message_at: new Date(now - 1000*60*60*26).toISOString() },
+    ];
+    const demoMsgs = {
+      c1: [
+        { id:'m1', conversation_id:'c1', profile_id:adminId, body:'Welcome! Looking forward to working together.', sender_name:'Caleb · Owner', created_at: new Date(now - 1000*60*60*48).toISOString() },
+        { id:'m2', conversation_id:'c1', profile_id:'demo-me', body:'Thank you, excited to get started.', sender_name:'Jane', created_at: new Date(now - 1000*60*60*47).toISOString() },
+        { id:'m3', conversation_id:'c1', profile_id:adminId, body:'Sarah will be your assistant — she\'ll reach out today.', sender_name:'Caleb · Owner', created_at: new Date(now - 1000*60*60*47 + 30000).toISOString() },
+        { id:'m4', conversation_id:'c1', profile_id:adminId, message_type:'system',
+          subject:'Membership Change Approved', event_type:'membership_change_approved',
+          body:'Your new plan (1mo_24h) has been approved.\n\nIt starts on June 1, 2026 and includes 24 hours over 1 month(s).\n\n3 weekly session(s) scheduled.',
+          created_at: new Date(now - 1000*60*8).toISOString() },
+      ],
+      c2: [
+        { id:'m5', conversation_id:'c2', profile_id:otherId, body:'Hi Jane! Wanted to confirm Thursday 4pm.', sender_name:'Sarah', created_at: new Date(now - 1000*60*60*3).toISOString() },
+        { id:'m6', conversation_id:'c2', profile_id:'demo-me', body:'Sounds good — see you Thursday at 4pm.', sender_name:'Jane', created_at: new Date(now - 1000*60*60*2).toISOString(), reaction:'👍' },
+      ],
+      c3: [
+        { id:'m7', conversation_id:'c3', profile_id:ownerId, body:'Just sent over the new contract for review.', sender_name:'Caleb · Owner', created_at: new Date(now - 1000*60*60*26).toISOString() },
+      ],
+    };
+    window.pmMessages = {
+      loadConversations: async () => demoConvos,
+      loadMessages: async (id) => demoMsgs[id] || [],
+      sendMessage: async ({ conversationId, body }) => {
+        const m = { id:'m'+Math.random().toString(36).slice(2,7), conversation_id:conversationId, profile_id:'demo-me', body, sender_name:'Jane', created_at:new Date().toISOString() };
+        (demoMsgs[conversationId] = demoMsgs[conversationId] || []).push(m);
+        return m;
+      },
+      setReaction: async () => {},
+      subscribeToConversation: () => null,
+      unsubscribe: () => {},
+      startPresenceHeartbeat: () => {},
+      stopPresenceHeartbeat: () => {},
+      clearPresence: async () => {},
+      loadCallLogs: async () => [],
+    };
+  }
+
+  M = window.pmMessages;
+
+  if (!isDemo) {
+    try {
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) { location.href = 'signin.html?next=' + encodeURIComponent('messages.html'); return; }
+      me = user;
+      const { data: prof } = await sb.from('profiles').select('full_name').eq('user_id', user.id).maybeSingle();
+      const name = prof?.full_name || user.email || 'Me';
+      $('upName').textContent = name;
+      $('upAvatar').textContent = initial(name);
+    } catch (e) {
+      console.error(e); location.href = 'signin.html'; return;
+    }
+  }
+
+  // ─── Inbox ─────────────────────────────────────────────────────
+  let convos = [];
+  let activeConvoId = null;
+  let activeConvo = null;
+  let liveChannel = null;
+
+  function renderInbox(filter = ''){
+    const list = $('inboxList');
+    const q = filter.trim().toLowerCase();
+    const filtered = !q ? convos : convos.filter(c =>
+      (c.title || '').toLowerCase().includes(q)
+      || (c.last_message_body || '').toLowerCase().includes(q)
+    );
+    if (!filtered.length) {
+      list.innerHTML = '<div class="pm-msg-empty">No conversations yet.</div>';
+      return;
+    }
+    list.innerHTML = filtered.map(c => {
+      const isActive = c.id === activeConvoId ? ' is-active' : '';
+      const preview = c.last_message_type === 'system'
+        ? `📋 ${esc(c.last_message_subject || 'System update')}`
+        : esc(c.last_message_body || 'No messages yet');
+      return `<div class="pm-msg-row${isActive}" data-id="${esc(c.id)}">
+        <div class="pm-msg-row__avatar">${esc(initial(c.title))}</div>
+        <div class="pm-msg-row__body">
+          <div class="pm-msg-row__top">
+            <span class="pm-msg-row__title">${esc(c.title || 'Untitled')}</span>
+            <span class="pm-msg-row__time">${esc(fmtTime(c.last_message_at))}</span>
+          </div>
+          <div class="pm-msg-row__meta">
+            <span class="${pillClass(c.scope, c.type)}">${esc(pillLabel(c.scope, c.type))}</span>
+          </div>
+          <p class="pm-msg-row__preview">${preview}</p>
+        </div>
+      </div>`;
+    }).join('');
+    list.querySelectorAll('.pm-msg-row').forEach(row => {
+      row.addEventListener('click', () => openConversation(row.dataset.id));
+    });
+  }
+
+  $('inboxSearch').addEventListener('input', (e) => renderInbox(e.target.value));
+
+  // ─── Inbox toggle (collapsible drawer) ─────────────────────────
+  const shellEl = document.querySelector('.pm-msg-shell');
+  const toggleBtn = $('inboxToggle');
+  const toggleCount = $('inboxToggleCount');
+  function setInboxOpen(open){
+    shellEl.classList.toggle('is-inbox-collapsed', !open);
+    toggleBtn.classList.toggle('is-active', open);
+    toggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  toggleBtn.addEventListener('click', () => {
+    const isOpen = !shellEl.classList.contains('is-inbox-collapsed');
+    setInboxOpen(!isOpen);
+  });
+  // Default: collapsed (focus on the composer)
+  setInboxOpen(false);
+
+  try {
+    convos = await M.loadConversations(me.id);
+    renderInbox();
+    if (toggleCount) toggleCount.textContent = String(convos.length);
+  } catch (e) {
+    console.error('loadConversations failed', e);
+    $('inboxList').innerHTML = '<div class="pm-msg-empty">Couldn\'t load conversations.</div>';
+  }
+
+  // Show the empty-mode composer (hero + composer + chips) when no thread is open
+  // (showComposerEmpty is defined later in this IIFE)
+
+  // ─── Thread ────────────────────────────────────────────────────
+  function renderMessages(messages){
+    const list = $('threadList');
+    if (!messages.length) {
+      list.innerHTML = '<div class="pm-msg-empty" style="padding:60px 20px;">No messages yet — say hi 👋</div>';
+      return;
+    }
+    let html = '';
+    let lastDay = '';
+    let lastSender = null;
+    messages.forEach(m => {
+      const day = fmtDay(m.created_at);
+      if (day !== lastDay) {
+        html += `<div class="pm-msg-day">${esc(day)}</div>`;
+        lastDay = day; lastSender = null;
+      }
+
+      // System message
+      if (m.message_type === 'system') {
+        html += `<div class="pm-msg-system">
+          <div class="pm-msg-system__head">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+            Official System Update
+          </div>
+          <div class="pm-msg-system__title">${esc(m.subject || 'System Update')}</div>
+          <div class="pm-msg-system__body">${esc(m.body)}</div>
+          <div class="pm-msg-system__foot">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Secure Contract Log · Private Mentorship
+          </div>
+        </div>`;
+        lastSender = null;
+        return;
+      }
+
+      const isSelf = m.profile_id === me.id;
+      const stack = lastSender === m.profile_id;
+      const rowCls = `pm-msg-bubble-row${isSelf ? ' is-self' : ''}${stack ? ' is-stack' : ''}`;
+      const avatar = isSelf ? '' : `<div class="pm-msg-bubble-avatar">${esc(initial(m.sender_name))}</div>`;
+      const senderName = (!isSelf && !stack) ? `<div class="pm-msg-sender">${esc(m.sender_name || 'Member')}</div>` : '';
+      const subject = m.subject ? `<div class="pm-msg-subject">${esc(m.subject)}</div>` : '';
+      const reaction = m.reaction ? `<span class="pm-msg-reaction" title="Reaction">${esc(m.reaction)}</span>` : '';
+
+      html += `<div class="${rowCls}" data-mid="${esc(m.id)}">
+        <div class="pm-msg-bubble-avatar">${esc(initial(m.sender_name))}</div>
+        <div class="pm-msg-bubble">
+          ${senderName}${subject}<div>${esc(m.body)}</div>
+          <div class="pm-msg-time">${esc(fmtBubbleTime(m.created_at))}</div>
+          ${reaction}
+        </div>
+      </div>`;
+      lastSender = m.profile_id;
+    });
+    list.innerHTML = html;
+    list.scrollTop = list.scrollHeight;
+  }
+
+  async function openConversation(id){
+    if (!id || id === activeConvoId) return;
+    activeConvoId = id;
+    activeConvo = convos.find(c => c.id === id);
+    if (!activeConvo) return;
+
+    document.body.classList.add('pm-msg-thread-open');
+    $('threadPane').classList.remove('is-empty');
+
+    $('threadHead').style.display = 'flex';
+    $('threadList').style.display = 'block';
+    showComposerInThread();
+
+    $('threadAvatar').textContent = initial(activeConvo.title);
+    $('threadTitle').textContent = activeConvo.title || 'Conversation';
+    $('threadSub').textContent = pillLabel(activeConvo.scope, activeConvo.type);
+
+    // Re-render inbox so the active row highlights
+    renderInbox($('inboxSearch').value || '');
+
+    $('threadList').innerHTML = '<div class="pm-msg-empty">Loading…</div>';
+    try {
+      const msgs = await M.loadMessages(id);
+      renderMessages(msgs);
+    } catch (e) {
+      console.error('loadMessages failed', e);
+      $('threadList').innerHTML = '<div class="pm-msg-empty">Couldn\'t load messages.</div>';
+    }
+
+    // Realtime
+    if (liveChannel) M.unsubscribe(liveChannel);
+    liveChannel = M.subscribeToConversation({
+      conversationId: id,
+      onInsert: async (newRow) => {
+        // Naive refresh — pull last 50 to get sender_name enriched
+        const msgs = await M.loadMessages(id);
+        renderMessages(msgs);
+      },
+      onUpdate: async () => {
+        const msgs = await M.loadMessages(id);
+        renderMessages(msgs);
+      },
+    });
+
+    // Presence heartbeat
+    M.startPresenceHeartbeat({ userId: me.id, conversationId: id });
+  }
+
+  $('threadBack').addEventListener('click', () => {
+    document.body.classList.remove('pm-msg-thread-open');
+  });
+
+  // ─── Composer ──────────────────────────────────────────────────
+  const ta = $('composerInput');
+  const sendBtn = $('composerSend');
+  const heroEl = $('composerHero');
+  const thinkingEl = $('composerThinking');
+
+  // Chip templates — clicking one inserts the template text and focuses the textarea
+  document.querySelectorAll('#composerChips .pm-msg-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const template = chip.dataset.template || '';
+      ta.value = (ta.value ? ta.value.trimEnd() + ' ' : '') + template;
+      autosize();
+      ta.focus();
+      ta.setSelectionRange(ta.value.length, ta.value.length);
+    });
+  });
+
+  const ctaEl = $('composerCta');
+  const chipEls = document.querySelectorAll('#composerChips .pm-msg-chip');
+  const heroSubEl = heroEl ? heroEl.querySelector('p') : null;
+
+  function showComposerEmpty(){
+    $('composer').style.display = 'block';
+    heroEl.style.display = 'block';
+    if (heroSubEl) heroSubEl.textContent = 'Pick a conversation to start chatting';
+    ta.disabled = true;
+    ta.placeholder = 'Select a conversation to start chatting…';
+    if (ctaEl) ctaEl.style.display = 'flex';
+    chipEls.forEach(c => c.disabled = true);
+    autosize();
+  }
+  function showComposerInThread(){
+    $('composer').style.display = 'block';
+    heroEl.style.display = 'none';
+    if (heroSubEl) heroSubEl.textContent = 'Type a message or pick a quick action below';
+    ta.disabled = false;
+    ta.placeholder = 'Write a message…';
+    if (ctaEl) ctaEl.style.display = 'none';
+    chipEls.forEach(c => c.disabled = false);
+    autosize();
+  }
+
+  // CTA: open the conversations drawer
+  const ctaBtn = $('ctaOpenConvos');
+  if (ctaBtn) ctaBtn.addEventListener('click', () => setInboxOpen(true));
+
+  function autosize(){
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, 200) + 'px';
+    const hasText = !!ta.value.trim();
+    sendBtn.disabled = !hasText || !activeConvoId;
+    sendBtn.classList.toggle('has-text', hasText && !!activeConvoId);
+  }
+  ta.addEventListener('input', autosize);
+  ta.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      doSend();
+    }
+  });
+
+  async function doSend(){
+    const body = ta.value.trim();
+    if (!body || !activeConvoId) return;
+    sendBtn.disabled = true;
+    sendBtn.classList.add('is-sending');
+    thinkingEl.classList.add('is-shown');
+    const minShownUntil = Date.now() + 3000; // hold the pill ~3s like the 21st.dev reference
+    try {
+      await M.sendMessage({ conversationId: activeConvoId, userId: me.id, body });
+      ta.value = '';
+      autosize();
+      // Realtime listener will re-render — but as a fallback, refresh now
+      const msgs = await M.loadMessages(activeConvoId);
+      renderMessages(msgs);
+      // Bump inbox row preview locally
+      const c = convos.find(x => x.id === activeConvoId);
+      if (c) { c.last_message_body = body; c.last_message_at = new Date().toISOString(); convos.sort((a,b)=>new Date(b.last_message_at)-new Date(a.last_message_at)); renderInbox($('inboxSearch').value || ''); }
+    } catch (e) {
+      console.error('send failed', e);
+      alert('Could not send message: ' + (e.message || e));
+    } finally {
+      const remaining = Math.max(0, minShownUntil - Date.now());
+      setTimeout(() => thinkingEl.classList.remove('is-shown'), remaining);
+      sendBtn.classList.remove('is-sending');
+      const hasText = !!ta.value.trim();
+      sendBtn.disabled = !hasText || !activeConvoId;
+      sendBtn.classList.toggle('has-text', hasText && !!activeConvoId);
+      ta.focus();
+    }
+  }
+  sendBtn.addEventListener('click', doSend);
+
+  // Cleanup on unload
+  window.addEventListener('beforeunload', () => {
+    if (liveChannel) M.unsubscribe(liveChannel);
+    M.stopPresenceHeartbeat();
+    if (me) M.clearPresence(me.id);
+  });
+
+  // Initial state: show the dark hero+composer+chips on the right pane
+  showComposerEmpty();
+
+  // Cursor-follow glow — barely visible, follows mouse like the 21st.dev reference
+  const glow = document.getElementById('cursorGlow');
+  if (glow) {
+    let pendingFrame = null;
+    let lx = window.innerWidth / 2, ly = window.innerHeight / 2;
+    const onMove = (e) => {
+      lx = e.clientX; ly = e.clientY;
+      glow.classList.add('is-active');
+      if (!pendingFrame) {
+        pendingFrame = requestAnimationFrame(() => {
+          glow.style.transform = `translate3d(${lx}px, ${ly}px, 0)`;
+          pendingFrame = null;
+        });
+      }
+    };
+    document.addEventListener('mousemove', onMove, { passive: true });
+  }
+})();
+</script>
+</body>
+</html>

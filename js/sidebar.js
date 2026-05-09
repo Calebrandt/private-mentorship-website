@@ -10,6 +10,7 @@
       { type: 'link', href: 'admin-scheduling.html', label: 'Scheduling', icon: 'calendar' },
       { type: 'link', href: 'admin-hiring.html', label: 'Hiring', icon: 'briefcase', badge: null, match: ['admin-hiring.html', 'admin-application.html'] },
       { type: 'link', href: 'admin-financials.html', label: 'Financials', icon: 'dollar' },
+      { type: 'link', href: 'messages.html', label: 'Messages', icon: 'message' },
       { type: 'divider' },
       {
         type: 'group', label: 'Tools', icon: 'tools',
@@ -31,7 +32,7 @@
     client: [
       { type: 'link', href: 'client-dashboard.html', label: 'Dashboard', icon: 'dashboard' },
       { type: 'link', href: 'client-schedule.html', label: 'Schedule', icon: 'calendar' },
-      { type: 'link', href: 'client-messages.html', label: 'Messages', icon: 'message' },
+      { type: 'link', href: 'messages.html', label: 'Messages', icon: 'message' },
       { type: 'link', href: 'client-membership.html', label: 'Membership', icon: 'briefcase' },
       { type: 'link', href: 'client-contract.html', label: 'Contract Details', icon: 'file-clock' },
       { type: 'link', href: 'client-hours.html', label: 'Hours & Billing', icon: 'clock' },
