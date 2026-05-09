@@ -614,31 +614,35 @@
   }
   .pm-msg-thread:not(.is-empty) .pm-msg-thread__list::-webkit-scrollbar-track{background:transparent;}
 
-  /* Composer in active mode: transparent shell, centered, no big background block */
+  /* Composer in active mode: transparent shell, centered, same width
+     as the messages list so left/right edges line up cleanly with
+     the message bubbles. */
   .pm-msg-thread:not(.is-empty) .pm-msg-composer{
-    width:100%;max-width:880px;
+    width:100%;max-width:720px;
     background:transparent;border-top:none;padding:0;
   }
   .pm-msg-thread:not(.is-empty) .pm-msg-composer::before,
   .pm-msg-thread:not(.is-empty) .pm-msg-composer::after{display:none;}
 
-  /* In thread mode the chips become a vertical column on the LEFT of
-     the composer card. This frees up the row of vertical space chips
-     used to take below the composer, so the message list breathes
-     and the composer sits closer to the bottom of the screen. */
+  /* Composer card stays a normal block (full width of the 720px
+     centered column). Chips float ABSOLUTELY to its left so they
+     don't take width from the card and don't push the card off-center
+     — the card aligns with the messages thread above it. */
   .pm-msg-thread:not(.is-empty) .pm-msg-composer__inner{
-    flex-direction:row;
-    align-items:flex-end;
+    flex-direction:column;
+    align-items:stretch;
     gap:14px;
-    max-width:880px;
+    max-width:720px;
+    position:relative;
   }
   .pm-msg-thread:not(.is-empty) .pm-msg-chips{
-    order:-1;                       /* render chips before the card */
-    flex:0 0 auto;
-    width:148px;                    /* compact column on the left */
+    position:absolute;
+    right:calc(100% + 14px);        /* sit just to the left of the card */
+    bottom:0;
+    width:148px;
     flex-direction:column;
     flex-wrap:nowrap;
-    justify-content:flex-end;       /* chips align to the bottom of the column */
+    justify-content:flex-end;       /* chips align with the bottom of the card */
     align-items:stretch;
     gap:6px;
     padding-top:0;
@@ -650,9 +654,6 @@
     font-size:12px;
     border-radius:9px;
     white-space:nowrap;
-  }
-  .pm-msg-thread:not(.is-empty) .pm-msg-composer__card{
-    flex:1 1 auto;min-width:0;       /* fill remaining horizontal space */
   }
 
   /* "Open Conversations" CTA — only shown when no convo is active */
