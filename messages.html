@@ -868,6 +868,201 @@
   .pm-msg-chip:hover{
     background:rgba(25,25,32,0.75);
   }
+
+  /* ─── CALL MODAL (full-screen overlay) ────────────────────────────── */
+  .pm-call-modal{
+    position:fixed;inset:0;z-index:9000;
+    background:radial-gradient(120% 100% at 50% 0%, #1a1830 0%, #0c0c14 60%, #07070b 100%);
+    display:none;flex-direction:column;
+    color:#fff;
+    font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;
+  }
+  .pm-call-modal.is-open{display:flex;}
+  .pm-call-modal__top{
+    padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;
+    background:linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 100%);
+  }
+  .pm-call-modal__who{display:flex;align-items:center;gap:12px;min-width:0;}
+  .pm-call-modal__avatar{
+    width:42px;height:42px;border-radius:50%;
+    background:linear-gradient(135deg,#5750F1,#9F75FF);
+    display:flex;align-items:center;justify-content:center;
+    font:800 16px Inter,sans-serif;color:#fff;flex:0 0 auto;
+    box-shadow:0 4px 16px -4px rgba(87,80,241,0.55);
+  }
+  .pm-call-modal__name{font:700 16px Inter,sans-serif;letter-spacing:-.01em;color:#fff;margin:0;}
+  .pm-call-modal__status{font:500 12.5px Inter,sans-serif;color:rgba(255,255,255,0.62);margin-top:2px;}
+  .pm-call-modal__type{
+    font:600 11.5px Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;
+    padding:5px 11px;border-radius:9999px;
+    background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.78);
+    border:1px solid rgba(255,255,255,0.10);
+  }
+  .pm-call-modal__stage{
+    flex:1;min-height:0;display:flex;align-items:center;justify-content:center;
+    padding:14px 22px;position:relative;
+  }
+  .pm-call-tiles{
+    display:grid;grid-template-columns:1fr;gap:14px;
+    width:100%;max-width:1100px;height:100%;
+  }
+  .pm-call-tiles.is-two{grid-template-columns:1fr 1fr;}
+  .pm-call-tile{
+    position:relative;border-radius:18px;overflow:hidden;
+    background:linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015));
+    border:1px solid rgba(255,255,255,0.06);
+    display:flex;align-items:center;justify-content:center;
+    aspect-ratio:16/10;
+    box-shadow:0 24px 60px -28px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .pm-call-tile video{
+    width:100%;height:100%;object-fit:cover;background:#000;display:block;
+  }
+  .pm-call-tile__placeholder{
+    display:flex;flex-direction:column;align-items:center;gap:14px;color:rgba(255,255,255,0.62);
+  }
+  .pm-call-tile__avatar-lg{
+    width:104px;height:104px;border-radius:50%;
+    background:linear-gradient(135deg,#5750F1,#9F75FF);
+    display:flex;align-items:center;justify-content:center;
+    font:800 38px Inter,sans-serif;color:#fff;
+    box-shadow:0 16px 48px -16px rgba(87,80,241,0.5);
+  }
+  .pm-call-tile__placeholder-name{font:600 15px Inter,sans-serif;color:rgba(255,255,255,0.85);}
+  .pm-call-tile__placeholder-sub{font:500 12.5px Inter,sans-serif;color:rgba(255,255,255,0.45);}
+  .pm-call-tile__label{
+    position:absolute;left:12px;bottom:12px;
+    background:rgba(0,0,0,0.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    color:#fff;font:600 12px Inter,sans-serif;
+    padding:5px 10px;border-radius:8px;
+    border:1px solid rgba(255,255,255,0.08);
+  }
+  .pm-call-tile__mute{
+    position:absolute;right:12px;bottom:12px;
+    width:30px;height:30px;border-radius:50%;
+    background:rgba(220,38,38,0.92);color:#fff;
+    display:none;align-items:center;justify-content:center;
+    border:1px solid rgba(255,255,255,0.18);
+  }
+  .pm-call-tile__mute svg{width:14px;height:14px;}
+  .pm-call-tile.is-muted .pm-call-tile__mute{display:flex;}
+  .pm-call-modal__controls{
+    padding:18px 22px 28px;
+    display:flex;align-items:center;justify-content:center;gap:16px;
+    background:linear-gradient(0deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 100%);
+  }
+  .pm-call-ctrl{
+    width:56px;height:56px;border-radius:50%;
+    background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.12);
+    color:#fff;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;transition:transform .12s ease, background .15s ease, border-color .15s ease;
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  }
+  .pm-call-ctrl:hover{background:rgba(255,255,255,0.14);transform:translateY(-1px);}
+  .pm-call-ctrl:active{transform:translateY(0);}
+  .pm-call-ctrl svg{width:22px;height:22px;}
+  .pm-call-ctrl.is-off{background:rgba(220,38,38,0.85);border-color:rgba(220,38,38,0.9);}
+  .pm-call-ctrl.is-off:hover{background:rgba(220,38,38,1);}
+  .pm-call-ctrl.is-end{background:#dc2626;border-color:rgba(255,255,255,0.18);}
+  .pm-call-ctrl.is-end:hover{background:#b91c1c;}
+
+  /* ─── INCOMING RING MODAL ─────────────────────────────────────────── */
+  .pm-ring-modal{
+    position:fixed;inset:auto 0 24px 0;z-index:9100;
+    display:none;justify-content:center;
+    pointer-events:none;
+  }
+  .pm-ring-modal.is-open{display:flex;}
+  .pm-ring-modal__card{
+    pointer-events:auto;
+    background:rgba(15,15,22,0.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+    border:1px solid rgba(255,255,255,0.10);
+    border-radius:18px;padding:14px 16px;
+    display:flex;align-items:center;gap:14px;
+    box-shadow:0 24px 60px -20px rgba(0,0,0,0.7);
+    color:#fff;min-width:380px;max-width:520px;
+    animation:pmRingSlideIn .35s cubic-bezier(0.4,0,0.2,1);
+  }
+  @keyframes pmRingSlideIn{from{transform:translateY(40px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+  .pm-ring-modal__avatar{
+    width:42px;height:42px;border-radius:50%;
+    background:linear-gradient(135deg,#5750F1,#9F75FF);
+    display:flex;align-items:center;justify-content:center;
+    font:800 16px Inter,sans-serif;color:#fff;flex:0 0 auto;
+    animation:pmRingPulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pmRingPulse{
+    0%,100%{box-shadow:0 0 0 0 rgba(87,80,241,0.45);}
+    50%{box-shadow:0 0 0 10px rgba(87,80,241,0);}
+  }
+  .pm-ring-modal__text{flex:1;min-width:0;}
+  .pm-ring-modal__title{font:700 14px Inter,sans-serif;color:#fff;margin:0;}
+  .pm-ring-modal__sub{font:500 12.5px Inter,sans-serif;color:rgba(255,255,255,0.62);margin-top:2px;}
+  .pm-ring-modal__actions{display:flex;gap:8px;flex:0 0 auto;}
+  .pm-ring-btn{
+    width:42px;height:42px;border-radius:50%;border:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;color:#fff;
+    transition:transform .12s ease, background .15s ease;
+  }
+  .pm-ring-btn:hover{transform:translateY(-1px);}
+  .pm-ring-btn svg{width:18px;height:18px;}
+  .pm-ring-btn.is-accept{background:#22c55e;}
+  .pm-ring-btn.is-accept:hover{background:#16a34a;}
+  .pm-ring-btn.is-decline{background:#dc2626;}
+  .pm-ring-btn.is-decline:hover{background:#b91c1c;}
+
+  /* ─── RECENTS MODAL ───────────────────────────────────────────────── */
+  .pm-recents-modal{
+    position:fixed;inset:0;z-index:8500;display:none;
+    align-items:flex-start;justify-content:center;
+    background:rgba(7,7,11,0.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    padding:80px 20px 20px;
+  }
+  .pm-recents-modal.is-open{display:flex;}
+  .pm-recents-modal__card{
+    width:100%;max-width:520px;
+    background:#fff;border:1px solid var(--border);border-radius:16px;
+    box-shadow:0 24px 64px -20px rgba(15,23,42,0.35);
+    overflow:hidden;
+    display:flex;flex-direction:column;max-height:80vh;
+  }
+  .pm-recents-modal__head{
+    padding:16px 18px;border-bottom:1px solid var(--border-soft);
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .pm-recents-modal__title{font:700 16px Inter,sans-serif;color:var(--ink-2);margin:0;letter-spacing:-.01em;}
+  .pm-recents-modal__close{
+    width:30px;height:30px;border-radius:8px;background:transparent;border:none;cursor:pointer;
+    color:var(--ink-mute);display:flex;align-items:center;justify-content:center;
+  }
+  .pm-recents-modal__close:hover{background:#F1F5F9;color:var(--ink-2);}
+  .pm-recents-modal__close svg{width:16px;height:16px;}
+  .pm-recents-modal__body{flex:1;overflow:auto;padding:6px 0;}
+  .pm-recents-row{
+    display:flex;align-items:center;gap:12px;
+    padding:11px 18px;
+    border-bottom:1px solid var(--border-soft);
+  }
+  .pm-recents-row:last-child{border-bottom:none;}
+  .pm-recents-row__icon{
+    width:34px;height:34px;border-radius:50%;flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;background:#5750F1;
+  }
+  .pm-recents-row__icon.is-missed{background:#dc2626;}
+  .pm-recents-row__icon.is-out{background:#0F172A;}
+  .pm-recents-row__icon svg{width:16px;height:16px;}
+  .pm-recents-row__body{flex:1;min-width:0;}
+  .pm-recents-row__top{display:flex;align-items:center;gap:8px;}
+  .pm-recents-row__name{font:600 13.5px Inter,sans-serif;color:var(--ink-2);letter-spacing:-.005em;}
+  .pm-recents-row__type{
+    font:600 10.5px Inter,sans-serif;letter-spacing:.04em;text-transform:uppercase;
+    padding:2px 7px;border-radius:9999px;
+    background:#F1F5F9;color:var(--ink-mute);
+  }
+  .pm-recents-row__sub{font:500 12px Inter,sans-serif;color:var(--ink-mute);margin-top:2px;}
+  .pm-recents-row__time{font:500 12px Inter,sans-serif;color:var(--ink-tert);flex:0 0 auto;}
+  .pm-recents-empty{padding:38px 20px;text-align:center;color:var(--ink-mute);font:500 13px Inter,sans-serif;}
 </style>
 </head>
 <body class="pm-has-sidebar">
@@ -1005,10 +1200,76 @@
 </main>
 <div class="pm-msg-cursor-glow" id="cursorGlow" aria-hidden="true"></div>
 
+<!-- Call modal (full-screen) -->
+<div class="pm-call-modal" id="callModal" role="dialog" aria-label="Call">
+  <div class="pm-call-modal__top">
+    <div class="pm-call-modal__who">
+      <div class="pm-call-modal__avatar" id="callAvatar">·</div>
+      <div>
+        <p class="pm-call-modal__name" id="callName">…</p>
+        <p class="pm-call-modal__status" id="callStatus">Ringing…</p>
+      </div>
+    </div>
+    <div class="pm-call-modal__type" id="callType">Audio Call</div>
+  </div>
+  <div class="pm-call-modal__stage">
+    <div class="pm-call-tiles" id="callTiles"></div>
+  </div>
+  <div class="pm-call-modal__controls">
+    <button class="pm-call-ctrl" id="callBtnMic" type="button" aria-label="Mute microphone">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    </button>
+    <button class="pm-call-ctrl" id="callBtnCam" type="button" aria-label="Toggle camera">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+    </button>
+    <button class="pm-call-ctrl is-end" id="callBtnEnd" type="button" aria-label="End call">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.33 1.85.57 2.81.7A2 2 0 0 1 22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91"/><line x1="23" y1="1" x2="1" y2="23"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- Incoming ring (small floating modal at bottom) -->
+<div class="pm-ring-modal" id="ringModal" role="dialog" aria-label="Incoming call">
+  <div class="pm-ring-modal__card">
+    <div class="pm-ring-modal__avatar" id="ringAvatar">·</div>
+    <div class="pm-ring-modal__text">
+      <p class="pm-ring-modal__title" id="ringTitle">Incoming call</p>
+      <p class="pm-ring-modal__sub" id="ringSub">…</p>
+    </div>
+    <div class="pm-ring-modal__actions">
+      <button class="pm-ring-btn is-decline" id="ringDecline" type="button" aria-label="Decline">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.33 1.85.57 2.81.7A2 2 0 0 1 22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91"/><line x1="23" y1="1" x2="1" y2="23"/></svg>
+      </button>
+      <button class="pm-ring-btn is-accept" id="ringAccept" type="button" aria-label="Accept">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.33 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Recent calls modal -->
+<div class="pm-recents-modal" id="recentsModal" role="dialog" aria-label="Recent calls">
+  <div class="pm-recents-modal__card">
+    <div class="pm-recents-modal__head">
+      <h3 class="pm-recents-modal__title">Recent calls</h3>
+      <button class="pm-recents-modal__close" id="recentsClose" type="button" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="pm-recents-modal__body" id="recentsBody">
+      <div class="pm-recents-empty">No call history yet.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden audio elements for remote participant audio (one per participant, bound dynamically) -->
+<div id="callAudioSinks" style="position:fixed;width:0;height:0;overflow:hidden;" aria-hidden="true"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260508c"></script>
 <script src="js/hiring-service.js?v=20260508d"></script>
 <script src="js/messages-service.js?v=20260509a"></script>
+<script src="js/calls-service.js?v=20260509a"></script>
 <script>
 // Demo-mode pre-stub: must run BEFORE sidebar.js (which redirects on no auth)
 if (new URLSearchParams(location.search).get('demo') === '1') {
@@ -1118,6 +1379,62 @@ if (new URLSearchParams(location.search).get('demo') === '1') {
       stopPresenceHeartbeat: () => {},
       clearPresence: async () => {},
       loadCallLogs: async () => [],
+    };
+
+    // Stub the calls service in demo mode so buttons just show the modal
+    // without trying to connect to Stream.io.
+    const demoRecents = [
+      { id:'cl1', conversation_id:'c1', call_id:'demo-1', call_type:'video',
+        status:'ended', created_at: new Date(now - 1000*60*60*4).toISOString(),
+        caller_user_id:'demo-other', recipient_user_id:'demo-me' },
+      { id:'cl2', conversation_id:'c1', call_id:'demo-2', call_type:'audio',
+        status:'missed', created_at: new Date(now - 1000*60*60*22).toISOString(),
+        caller_user_id:'demo-other', recipient_user_id:'demo-me' },
+      { id:'cl3', conversation_id:'c1', call_id:'demo-3', call_type:'audio',
+        status:'ended', created_at: new Date(now - 1000*60*60*48).toISOString(),
+        caller_user_id:'demo-me', recipient_user_id:'demo-other' },
+    ];
+    let demoCbs = {};
+    let demoIsInCall = false;
+    let demoMicEnabled = true;
+    let demoCamEnabled = false;
+    window.pmCalls = {
+      startCall: async ({ callType }) => {
+        demoIsInCall = true;
+        demoCamEnabled = callType === 'video';
+        const callId = `demo-call-${Date.now()}`;
+        // Simulate connecting → answered after 1.6s
+        setTimeout(() => { demoCbs.onParticipants?.([
+          { userId: 'demo-me', isLocalParticipant: true, audioStream: null, videoStream: null },
+          { userId: 'demo-other', isLocalParticipant: false, audioStream: null, videoStream: null },
+        ]); }, 1600);
+        demoCbs.onLocalState?.({ micEnabled: demoMicEnabled, cameraEnabled: demoCamEnabled, callType });
+        return { callId };
+      },
+      acceptIncoming: async ({ callId, callType }) => {
+        demoIsInCall = true;
+        demoCamEnabled = callType === 'video';
+        demoCbs.onParticipants?.([
+          { userId: 'demo-me', isLocalParticipant: true },
+          { userId: 'demo-other', isLocalParticipant: false },
+        ]);
+        demoCbs.onLocalState?.({ micEnabled: demoMicEnabled, cameraEnabled: demoCamEnabled, callType });
+        return { callId };
+      },
+      declineIncoming: async () => {},
+      endActiveCall: async () => { demoIsInCall = false; demoCbs.onEnded?.(); },
+      toggleMic: async () => { demoMicEnabled = !demoMicEnabled; demoCbs.onLocalState?.({ micEnabled: demoMicEnabled, cameraEnabled: demoCamEnabled }); },
+      toggleCamera: async () => { demoCamEnabled = !demoCamEnabled; demoCbs.onLocalState?.({ micEnabled: demoMicEnabled, cameraEnabled: demoCamEnabled }); },
+      bindVideo: () => () => {},
+      bindAudio: () => () => {},
+      subscribeToIncoming: () => {},
+      unsubscribeFromIncoming: () => {},
+      loadRecentsForConversation: async () => demoRecents,
+      disconnect: async () => {},
+      on: (ev, fn) => { demoCbs[ev] = fn; },
+      isInCall: () => demoIsInCall,
+      activeCallId: () => null,
+      activeCallType: () => null,
     };
   }
 
@@ -1419,6 +1736,239 @@ if (new URLSearchParams(location.search).get('demo') === '1') {
 
   // Initial state: show the dark hero+composer+chips on the right pane
   showComposerEmpty();
+
+  // ─── Calls (audio + video via Stream.io) ────────────────────────────
+  const C = window.pmCalls;
+  const callModal = $('callModal');
+  const ringModal = $('ringModal');
+  const recentsModal = $('recentsModal');
+  const callTilesEl = $('callTiles');
+  const audioSinks = $('callAudioSinks');
+  let _callRecipients = [];        // userIds we're calling (to bind incoming participant tile)
+  let _localStateCache = { micEnabled:true, cameraEnabled:false, callType:'audio' };
+  let _videoBindCleanup = [];
+  let _incomingPayload = null;
+
+  function openCallModal({ name, callType }) {
+    $('callAvatar').textContent = initial(name || 'Call');
+    $('callName').textContent = name || 'Call';
+    $('callStatus').textContent = 'Ringing…';
+    $('callType').textContent = callType === 'video' ? 'Video Call' : 'Audio Call';
+    callTilesEl.classList.remove('is-two');
+    callTilesEl.innerHTML = `<div class="pm-call-tile" data-uid="self">
+      <div class="pm-call-tile__placeholder">
+        <div class="pm-call-tile__avatar-lg">${esc(initial($('upName').textContent))}</div>
+        <div class="pm-call-tile__placeholder-name">You</div>
+        <div class="pm-call-tile__placeholder-sub">${callType === 'video' ? 'Camera off' : 'Connecting…'}</div>
+      </div>
+      <div class="pm-call-tile__label">You</div>
+      <div class="pm-call-tile__mute" title="Mic off"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div>
+    </div>`;
+    callModal.classList.add('is-open');
+    // Reset control button states
+    $('callBtnMic').classList.remove('is-off');
+    $('callBtnCam').classList.toggle('is-off', callType !== 'video');
+    $('callBtnCam').style.display = callType === 'video' ? 'flex' : 'none';
+  }
+  function closeCallModal() {
+    callModal.classList.remove('is-open');
+    callTilesEl.innerHTML = '';
+    audioSinks.innerHTML = '';
+    _videoBindCleanup.forEach(fn => { try { fn(); } catch (_) {} });
+    _videoBindCleanup = [];
+  }
+
+  function renderCallTiles(participants){
+    if (!participants?.length) return;
+    const otherName = activeConvo?.title || (_incomingPayload?.callerName || 'Caller');
+    callTilesEl.classList.toggle('is-two', participants.length > 1);
+    // Cleanup old bindings
+    _videoBindCleanup.forEach(fn => { try { fn(); } catch (_) {} });
+    _videoBindCleanup = [];
+    audioSinks.innerHTML = '';
+
+    callTilesEl.innerHTML = participants.map((p, i) => {
+      const isSelf = p.isLocalParticipant;
+      const name = isSelf ? 'You' : otherName;
+      const initials = initial(name);
+      return `<div class="pm-call-tile" data-uid="${esc(p.userId || (isSelf ? 'self' : 'other'))}" data-self="${isSelf ? '1' : '0'}">
+        <video autoplay playsinline muted="${isSelf ? 'muted' : ''}"></video>
+        <div class="pm-call-tile__placeholder" data-fallback>
+          <div class="pm-call-tile__avatar-lg">${esc(initials)}</div>
+          <div class="pm-call-tile__placeholder-name">${esc(name)}</div>
+          <div class="pm-call-tile__placeholder-sub">${isSelf ? (_localStateCache.cameraEnabled ? 'Camera on' : 'Camera off') : 'Connected'}</div>
+        </div>
+        <div class="pm-call-tile__label">${esc(name)}</div>
+        <div class="pm-call-tile__mute"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div>
+      </div>`;
+    }).join('');
+
+    // Bind tracks (real Stream tracks; demo has none and falls back to placeholder)
+    callTilesEl.querySelectorAll('.pm-call-tile').forEach((tile, i) => {
+      const p = participants[i]; if (!p) return;
+      const videoEl = tile.querySelector('video');
+      const fb = tile.querySelector('[data-fallback]');
+      const hasVideo = !!(p.videoStream && (p.videoStream.getVideoTracks?.().length || p.videoStream instanceof MediaStream));
+      if (hasVideo) {
+        _videoBindCleanup.push(C.bindVideo(videoEl, p));
+        videoEl.style.display = 'block';
+        if (fb) fb.style.display = 'none';
+      } else {
+        videoEl.style.display = 'none';
+        if (fb) fb.style.display = 'flex';
+      }
+      if (!p.isLocalParticipant && p.audioStream) {
+        const audioEl = document.createElement('audio');
+        audioSinks.appendChild(audioEl);
+        _videoBindCleanup.push(C.bindAudio(audioEl, p));
+      }
+    });
+
+    // Update status text — once we have a remote participant, mark as connected
+    const hasRemote = participants.some(p => !p.isLocalParticipant);
+    $('callStatus').textContent = hasRemote ? 'Connected' : 'Ringing…';
+  }
+
+  C.on('onParticipants', renderCallTiles);
+  C.on('onLocalState', (s) => {
+    _localStateCache = { ..._localStateCache, ...s };
+    $('callBtnMic').classList.toggle('is-off', !s.micEnabled);
+    $('callBtnCam').classList.toggle('is-off', !s.cameraEnabled);
+    // Reflect mute/camera-off state on self tile
+    const selfTile = callTilesEl.querySelector('.pm-call-tile[data-self="1"]') || callTilesEl.querySelector('.pm-call-tile[data-uid="self"]');
+    if (selfTile) selfTile.classList.toggle('is-muted', !s.micEnabled);
+  });
+  C.on('onEnded', () => closeCallModal());
+
+  // Buttons in thread head
+  const btnAudio = $('btnAudioCall');
+  const btnVideo = $('btnVideoCall');
+  const btnRecents = $('btnRecents');
+  // Enable now that calls service is loaded
+  if (btnAudio) btnAudio.disabled = false;
+  if (btnVideo) btnVideo.disabled = false;
+  if (btnRecents) btnRecents.disabled = false;
+  if (btnAudio) btnAudio.title = 'Voice call';
+  if (btnVideo) btnVideo.title = 'Video call';
+  if (btnRecents) btnRecents.title = 'Call history';
+
+  async function resolveRecipientUserIds() {
+    if (!activeConvoId || isDemo) return ['demo-other'];
+    try {
+      const { data: parts } = await sb.from('conversation_participants')
+        .select('profile_id').eq('conversation_id', activeConvoId).neq('profile_id', me.id);
+      return (parts || []).map(p => p.profile_id);
+    } catch (e) { console.warn('[calls] participants lookup failed', e); return []; }
+  }
+
+  async function handleStartCall(callType) {
+    if (!activeConvoId) { alert('Open a conversation first.'); return; }
+    if (C.isInCall?.()) { alert('Already on a call.'); return; }
+    try {
+      _callRecipients = await resolveRecipientUserIds();
+      openCallModal({ name: activeConvo?.title || 'Call', callType });
+      await C.startCall({
+        conversationId: activeConvoId,
+        callType,
+        callerUserId: me.id,
+        recipientUserIds: _callRecipients,
+      });
+    } catch (e) {
+      console.error('[calls] startCall failed', e);
+      alert('Could not start call: ' + (e.message || e));
+      closeCallModal();
+    }
+  }
+  if (btnAudio) btnAudio.addEventListener('click', () => handleStartCall('audio'));
+  if (btnVideo) btnVideo.addEventListener('click', () => handleStartCall('video'));
+
+  // Call control buttons
+  $('callBtnMic').addEventListener('click', () => C.toggleMic());
+  $('callBtnCam').addEventListener('click', () => C.toggleCamera());
+  $('callBtnEnd').addEventListener('click', async () => { await C.endActiveCall(); closeCallModal(); });
+
+  // Recents modal
+  function fmtCallStatus(row) {
+    const t = row.call_type === 'video' ? 'Video' : 'Audio';
+    if (row.status === 'missed') return `${t} · Missed`;
+    if (row.status === 'declined') return `${t} · Declined`;
+    if (row.status === 'ringing') return `${t} · Ringing…`;
+    if (row.status === 'answered') return `${t} · In progress`;
+    return `${t} · Ended`;
+  }
+  async function openRecents() {
+    if (!activeConvoId) { alert('Open a conversation first.'); return; }
+    recentsModal.classList.add('is-open');
+    const body = $('recentsBody');
+    body.innerHTML = '<div class="pm-recents-empty">Loading…</div>';
+    try {
+      const rows = await C.loadRecentsForConversation(activeConvoId);
+      if (!rows.length) { body.innerHTML = '<div class="pm-recents-empty">No call history yet.</div>'; return; }
+      body.innerHTML = rows.map(r => {
+        const isOut = r.caller_user_id === me.id;
+        const isMissed = r.status === 'missed' || (r.status === 'declined' && !isOut);
+        const cls = isMissed ? ' is-missed' : (isOut ? ' is-out' : '');
+        const icon = r.call_type === 'video'
+          ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>'
+          : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.33 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
+        return `<div class="pm-recents-row">
+          <div class="pm-recents-row__icon${cls}">${icon}</div>
+          <div class="pm-recents-row__body">
+            <div class="pm-recents-row__top">
+              <span class="pm-recents-row__name">${esc(activeConvo?.title || 'Conversation')}</span>
+              <span class="pm-recents-row__type">${isOut ? 'Outgoing' : 'Incoming'}</span>
+            </div>
+            <div class="pm-recents-row__sub">${esc(fmtCallStatus(r))}</div>
+          </div>
+          <div class="pm-recents-row__time">${esc(fmtTime(r.created_at))}</div>
+        </div>`;
+      }).join('');
+    } catch (e) {
+      console.error('[calls] loadRecents failed', e);
+      body.innerHTML = '<div class="pm-recents-empty">Couldn\'t load call history.</div>';
+    }
+  }
+  if (btnRecents) btnRecents.addEventListener('click', openRecents);
+  $('recentsClose').addEventListener('click', () => recentsModal.classList.remove('is-open'));
+  recentsModal.addEventListener('click', (e) => { if (e.target === recentsModal) recentsModal.classList.remove('is-open'); });
+
+  // Incoming call ring (non-demo)
+  if (!isDemo) {
+    C.on('onIncoming', (row) => {
+      _incomingPayload = row;
+      $('ringAvatar').textContent = initial('Caller');
+      $('ringTitle').textContent = `Incoming ${row.call_type === 'video' ? 'video' : 'voice'} call`;
+      $('ringSub').textContent = 'Tap accept to join';
+      ringModal.classList.add('is-open');
+    });
+    C.subscribeToIncoming(me.id);
+  }
+
+  $('ringAccept').addEventListener('click', async () => {
+    if (!_incomingPayload) return;
+    ringModal.classList.remove('is-open');
+    try {
+      openCallModal({ name: activeConvo?.title || 'Caller', callType: _incomingPayload.call_type });
+      await C.acceptIncoming({ callId: _incomingPayload.call_id, callType: _incomingPayload.call_type, userId: me.id });
+    } catch (e) {
+      console.error('[calls] accept failed', e);
+      alert('Could not join call: ' + (e.message || e));
+      closeCallModal();
+    }
+  });
+  $('ringDecline').addEventListener('click', async () => {
+    if (!_incomingPayload) return;
+    ringModal.classList.remove('is-open');
+    try { await C.declineIncoming({ callId: _incomingPayload.call_id, userId: me.id }); } catch (_) {}
+    _incomingPayload = null;
+  });
+
+  // Cleanup calls on unload
+  window.addEventListener('beforeunload', () => {
+    try { C.unsubscribeFromIncoming?.(); } catch (_) {}
+    try { C.endActiveCall?.(); } catch (_) {}
+    try { C.disconnect?.(); } catch (_) {}
+  });
 
   // Cursor-follow glow — barely visible, follows mouse like the 21st.dev reference
   const glow = document.getElementById('cursorGlow');
