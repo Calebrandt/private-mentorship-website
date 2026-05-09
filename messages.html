@@ -551,11 +551,13 @@
   /* flex-end keeps the messages list at the top of the available
      height and the composer sits low, but we leave ~40px of breathing
      room below so the composer doesn't feel jammed against the
-     viewport edge. */
+     viewport edge. Top padding is 0 — the list itself adds padding
+     equal to the floating Smith Family pill's clearance, so messages
+     reach right up under the pill. */
   .pm-msg-thread:not(.is-empty){
     display:flex;flex-direction:column;
     justify-content:flex-end;align-items:center;
-    padding:24px 28px 40px;gap:14px;
+    padding:0 28px 40px;gap:14px;
     position:relative;
   }
 
@@ -587,14 +589,19 @@
   }
   .pm-msg-thread:not(.is-empty) .pm-msg-thread__icon-btn svg{width:14px;height:14px;}
 
-  /* Message list: transparent, centered narrow column, capped so composer stays put */
+  /* Message list: transparent, centered narrow column, fills the
+     available height between the floating thread head and the
+     composer. Bigger list = more older messages visible without
+     scrolling. Top padding clears the floating Smith Family pill so
+     the most recent messages start right under it. */
   .pm-msg-thread:not(.is-empty) .pm-msg-thread__list{
     width:100%;max-width:720px;
     background:transparent;
-    flex:0 1 auto;
-    max-height:min(54vh,560px);
+    flex:1 1 auto;
+    min-height:0;
+    max-height:none;
     overflow-y:auto;
-    padding:18px 4px 6px;
+    padding:70px 4px 6px;
     display:flex;flex-direction:column;justify-content:flex-end;
     gap:2px;
     scroll-behavior:smooth;
