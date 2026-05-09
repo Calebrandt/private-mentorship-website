@@ -30,20 +30,42 @@
     --system-bg:linear-gradient(180deg,#EEF6FF 0%,#FFFFFF 100%);
   }
 
-  /* Topbar + shell baseline (mirrors dashboard shell) */
-  .nx-topbar{background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:14px 26px;gap:16px;position:sticky;top:0;z-index:20;}
-  .nx-topbar__title{font-size:18px;font-weight:800;letter-spacing:-.02em;color:var(--ink-2);margin:0;}
-  .nx-userpod{display:flex;align-items:center;gap:10px;padding:5px 12px 5px 5px;border:1px solid var(--border);border-radius:9999px;background:#fff;}
-  .nx-userpod__avatar{width:32px;height:32px;border-radius:50%;background:#27272A;color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;}
-  .nx-userpod__name{font-size:13px;font-weight:700;color:var(--ink);}
+  /* Topbar: floating overlay on top of the dark thread pane (no white
+     bar — the elements live inside the dark area as glass pills). */
+  .nx-topbar{
+    background:transparent;border-bottom:none;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 22px;gap:16px;
+    position:absolute;top:0;left:0;right:0;
+    z-index:20;
+    pointer-events:none;
+  }
+  .nx-topbar > *{pointer-events:auto;}
+  .nx-topbar__title{display:none;}
+  .nx-userpod{
+    display:flex;align-items:center;gap:10px;
+    padding:5px 12px 5px 5px;
+    border:1px solid rgba(255,255,255,0.10);
+    border-radius:9999px;
+    background:rgba(255,255,255,0.06);
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  }
+  .nx-userpod__avatar{
+    width:32px;height:32px;border-radius:50%;
+    background:linear-gradient(135deg,#5750F1,#9F75FF);
+    color:#fff;font-weight:700;font-size:13px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .nx-userpod__name{font-size:13px;font-weight:700;color:rgba(255,255,255,0.92);}
 
-  /* Page = full-bleed inside the shell minus the topbar */
+  /* Page = full-bleed; topbar is now an absolute overlay so the shell
+     fills the entire viewport. */
   .pm-msg-shell{
     display:grid;
     grid-template-columns:340px 1fr;
-    height:calc(100vh - 60px);
+    height:100vh;
     background:#fff;
-    border-top:1px solid var(--border);
+    border-top:none;
     transition:grid-template-columns .38s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .pm-msg-shell.is-inbox-collapsed{grid-template-columns:0 1fr;}
@@ -63,26 +85,27 @@
     pointer-events:none;
   }
 
-  /* Toggle button in the topbar */
+  /* Toggle button in the topbar — glass on dark */
   .pm-msg-inbox-toggle{
     display:flex;align-items:center;gap:8px;
     padding:7px 13px;
-    background:#fff;
-    border:1px solid var(--border);
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.10);
     border-radius:9999px;
-    font:600 13px Inter,sans-serif;color:var(--ink-mute);
+    font:600 13px Inter,sans-serif;color:rgba(255,255,255,0.78);
     cursor:pointer;
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
     transition:background .15s ease, color .15s ease, border-color .15s ease;
   }
-  .pm-msg-inbox-toggle:hover{background:#F1F5F9;color:var(--ink-2);}
-  .pm-msg-inbox-toggle.is-active{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 4px 14px -6px rgba(87,80,241,0.45);}
+  .pm-msg-inbox-toggle:hover{background:rgba(255,255,255,0.12);color:#fff;}
+  .pm-msg-inbox-toggle.is-active{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 4px 14px -6px rgba(87,80,241,0.55);}
   .pm-msg-inbox-toggle.is-active:hover{background:#4842D6;}
   .pm-msg-inbox-toggle svg{width:15px;height:15px;}
   .pm-msg-inbox-toggle .pm-msg-inbox-toggle__count{
     display:inline-flex;align-items:center;justify-content:center;
     min-width:20px;height:20px;padding:0 6px;border-radius:9999px;
-    background:rgba(15,23,42,0.08);
-    color:var(--ink-2);
+    background:rgba(255,255,255,0.14);
+    color:rgba(255,255,255,0.92);
     font:700 11px Inter,sans-serif;
   }
   .pm-msg-inbox-toggle.is-active .pm-msg-inbox-toggle__count{background:rgba(255,255,255,0.22);color:#fff;}
@@ -1109,21 +1132,22 @@
   .pm-recents-row__time{font:500 12px Inter,sans-serif;color:var(--ink-tert);flex:0 0 auto;}
   .pm-recents-empty{padding:38px 20px;text-align:center;color:var(--ink-mute);font:500 13px Inter,sans-serif;}
 
-  /* ─── NOTIFY (Web Push) toggle in topbar ──────────────────────────── */
+  /* ─── NOTIFY (Web Push) toggle in topbar — glass on dark ──────────── */
   .pm-msg-notify-toggle{
     display:flex;align-items:center;gap:8px;
     padding:7px 13px;
-    background:#fff;
-    border:1px solid var(--border);
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.10);
     border-radius:9999px;
-    font:600 13px Inter,sans-serif;color:var(--ink-mute);
+    font:600 13px Inter,sans-serif;color:rgba(255,255,255,0.78);
     cursor:pointer;
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
     transition:background .15s ease, color .15s ease, border-color .15s ease, box-shadow .15s ease;
   }
-  .pm-msg-notify-toggle:hover{background:#F1F5F9;color:var(--ink-2);}
+  .pm-msg-notify-toggle:hover{background:rgba(255,255,255,0.12);color:#fff;}
   .pm-msg-notify-toggle.is-on{
     background:var(--primary);color:#fff;border-color:var(--primary);
-    box-shadow:0 4px 14px -6px rgba(87,80,241,0.45);
+    box-shadow:0 4px 14px -6px rgba(87,80,241,0.55);
   }
   .pm-msg-notify-toggle.is-on:hover{background:#4842D6;color:#fff;}
   .pm-msg-notify-toggle svg{width:15px;height:15px;}
