@@ -582,11 +582,44 @@
 
   /* Composer in active mode: transparent shell, centered, no big background block */
   .pm-msg-thread:not(.is-empty) .pm-msg-composer{
-    width:100%;max-width:760px;
+    width:100%;max-width:880px;
     background:transparent;border-top:none;padding:0;
   }
   .pm-msg-thread:not(.is-empty) .pm-msg-composer::before,
   .pm-msg-thread:not(.is-empty) .pm-msg-composer::after{display:none;}
+
+  /* In thread mode the chips become a vertical column on the LEFT of
+     the composer card. This frees up the row of vertical space chips
+     used to take below the composer, so the message list breathes
+     and the composer sits closer to the bottom of the screen. */
+  .pm-msg-thread:not(.is-empty) .pm-msg-composer__inner{
+    flex-direction:row;
+    align-items:flex-end;
+    gap:14px;
+    max-width:880px;
+  }
+  .pm-msg-thread:not(.is-empty) .pm-msg-chips{
+    order:-1;                       /* render chips before the card */
+    flex:0 0 auto;
+    width:148px;                    /* compact column on the left */
+    flex-direction:column;
+    flex-wrap:nowrap;
+    justify-content:flex-end;       /* chips align to the bottom of the column */
+    align-items:stretch;
+    gap:6px;
+    padding-top:0;
+  }
+  .pm-msg-thread:not(.is-empty) .pm-msg-chip{
+    width:100%;
+    justify-content:flex-start;
+    padding:9px 12px;
+    font-size:12px;
+    border-radius:9px;
+    white-space:nowrap;
+  }
+  .pm-msg-thread:not(.is-empty) .pm-msg-composer__card{
+    flex:1 1 auto;min-width:0;       /* fill remaining horizontal space */
+  }
 
   /* "Open Conversations" CTA — only shown when no convo is active */
   .pm-msg-cta{display:flex;justify-content:center;margin-top:2px;}
