@@ -175,15 +175,27 @@
     _unbindCall();
   }
 
+  let _lastPartsSig = '';
   function _bindCall(call, callId, callType) {
     _activeCall = call;
     _activeCallId = callId;
     _activeCallType = callType;
+    _lastPartsSig = '';
 
-    // Live participants — array of { userId, sessionId, isLocalParticipant, audioStream, videoStream, ... }
+    // Live participants. Stream's participants$ fires on EVERY state
+    // change (mute toggles, audio level updates, etc.) — way more than
+    // we need. Dedup by a coarse signature so the host page doesn't
+    // rebuild its DOM 30+ times per second and freeze.
     if (call.state?.participants$?.subscribe) {
       _participantsSub = call.state.participants$.subscribe((parts) => {
-        try { _callbacks.onParticipants?.(parts || []); } catch (e) { console.warn(e); }
+        const arr = parts || [];
+        const sig = arr
+          .map(p => `${p.sessionId || p.userId}:${p.isLocalParticipant ? 'L' : 'R'}:${(p.publishedTracks || []).length}`)
+          .sort()
+          .join('|');
+        if (sig === _lastPartsSig) return;
+        _lastPartsSig = sig;
+        try { _callbacks.onParticipants?.(arr); } catch (e) { console.warn(e); }
       });
     }
     // Local mic/cam state — composite of two observables
@@ -231,18 +243,51 @@
   }
 
   // Bind a participant's video to a <video> element. Returns a cleanup fn.
-  // Stream uses an SFU model — remote video tracks are NOT delivered
-  // unless we explicitly bind them via the SDK. Without this call, the
-  // browser never receives the bytes for the remote camera. For the
-  // local participant we just attach the camera's MediaStream directly.
+  //
+  // Local vs remote need very different paths:
+  //   • LOCAL — attach the camera's MediaStream directly. We already
+  //     own this stream (camera.enable() created it). Subscribing via
+  //     SFU here doesn't make sense.
+  //   • REMOTE — Stream uses an SFU; tracks are NOT delivered unless we
+  //     bind a video element to that participant's sessionId. Without
+  //     bindVideoElement, the browser literally never receives the
+  //     bytes — that's why participant.videoStream stayed empty.
   function bindVideo(videoEl, participant) {
     if (!videoEl || !participant || !_activeCall) return () => {};
     videoEl.autoplay = true;
     videoEl.playsInline = true;
-    videoEl.muted = !!participant.isLocalParticipant; // avoid local echo
+    videoEl.muted = !!participant.isLocalParticipant;
 
-    // Prefer Stream's official binding APIs when available — these
-    // handle SFU subscription + dynascale automatically.
+    // ── LOCAL ────────────────────────────────────────────────────────
+    if (participant.isLocalParticipant) {
+      const cameraState = _activeCall.camera?.state;
+      const attach = (stream) => {
+        if (stream && videoEl.srcObject !== stream) {
+          videoEl.srcObject = stream;
+          videoEl.play?.().catch(() => {});
+        } else if (!stream) {
+          try { videoEl.srcObject = null; } catch (_) {}
+        }
+      };
+      // Try every known location for the local stream.
+      attach(
+        cameraState?.mediaStream
+        || cameraState?.value?.mediaStream
+        || participant.videoStream
+        || null
+      );
+      // Subscribe to camera stream changes (toggle mid-call, etc.).
+      let sub = null;
+      try {
+        sub = cameraState?.mediaStream$?.subscribe?.(attach);
+      } catch (_) {}
+      return () => {
+        try { sub?.unsubscribe?.(); } catch (_) {}
+        try { videoEl.srcObject = null; } catch (_) {}
+      };
+    }
+
+    // ── REMOTE ───────────────────────────────────────────────────────
     if (typeof _activeCall.bindVideoElement === 'function') {
       try {
         const cleanup = _activeCall.bindVideoElement(
@@ -256,23 +301,12 @@
         console.warn('[calls] bindVideoElement failed, falling back', e);
       }
     }
-    // Some SDK versions expose setSubscribedTracks instead
-    if (typeof _activeCall.setSubscribedTracks === 'function' && !participant.isLocalParticipant) {
+    if (typeof _activeCall.setSubscribedTracks === 'function') {
       try { _activeCall.setSubscribedTracks(participant.sessionId, ['videoTrack']); } catch (_) {}
     }
-    // Fallback: try the participant's videoStream directly (works for
-    // local + sometimes for remote once tracks have arrived)
     if (participant.videoStream instanceof MediaStream) {
       videoEl.srcObject = participant.videoStream;
       videoEl.play?.().catch(() => {});
-    } else if (participant.isLocalParticipant) {
-      // Final local fallback — pull straight from the camera state
-      const localStream = _activeCall.camera?.state?.mediaStream
-        || _activeCall.camera?.mediaStream;
-      if (localStream) {
-        videoEl.srcObject = localStream;
-        videoEl.play?.().catch(() => {});
-      }
     }
     return () => { try { videoEl.srcObject = null; } catch (_) {} };
   }

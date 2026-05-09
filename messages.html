@@ -1297,7 +1297,7 @@
 <script src="js/supabase-client.js?v=20260509c"></script>
 <script src="js/hiring-service.js?v=20260508d"></script>
 <script src="js/messages-service.js?v=20260509a"></script>
-<script src="js/calls-service.js?v=20260509f"></script>
+<script src="js/calls-service.js?v=20260509g"></script>
 <script src="js/push-service.js?v=20260509a"></script>
 <script>
 // Demo-mode pre-stub: must run BEFORE sidebar.js (which redirects on no auth)
@@ -1817,8 +1817,25 @@ if (new URLSearchParams(location.search).get('demo') === '1') {
     _videoBindCleanup = [];
   }
 
+  let _lastTilesSig = '';
   function renderCallTiles(participants){
     if (!participants?.length) return;
+
+    // Update connection status without rebuilding the DOM
+    const hasRemote = participants.some(p => !p.isLocalParticipant);
+    $('callStatus').textContent = hasRemote ? 'Connected' : 'Ringing…';
+
+    // Skip a full rebuild when the participant set hasn't actually
+    // changed. Stream emits a participants$ tick on every state delta
+    // (audio levels, mute toggles, etc.) — rebuilding the DOM each
+    // time froze the page.
+    const sig = participants
+      .map(p => p.sessionId || p.userId || (p.isLocalParticipant ? 'self' : 'other'))
+      .sort()
+      .join('|');
+    if (sig === _lastTilesSig) return;
+    _lastTilesSig = sig;
+
     const otherName = activeConvo?.title || (_incomingPayload?.callerName || 'Caller');
     callTilesEl.classList.toggle('is-two', participants.length > 1);
     // Cleanup old bindings
@@ -1852,21 +1869,28 @@ if (new URLSearchParams(location.search).get('demo') === '1') {
       const fb = tile.querySelector('[data-fallback]');
 
       if (videoEl) {
-        // Start hidden — show only when 'playing' fires (i.e., real
-        // frames are arriving). The placeholder (avatar) sits behind.
-        videoEl.style.display = 'none';
-        if (fb) fb.style.display = 'flex';
-        videoEl.addEventListener('playing', () => {
+        if (p.isLocalParticipant) {
+          // Local: we already own the camera stream — show the video
+          // element immediately (don't wait for the 'playing' event).
           videoEl.style.display = 'block';
           if (fb) fb.style.display = 'none';
-        });
-        const hide = () => {
+        } else {
+          // Remote: show only when 'playing' fires (real frames
+          // arriving from SFU). Avatar placeholder is visible until then.
           videoEl.style.display = 'none';
           if (fb) fb.style.display = 'flex';
-        };
-        videoEl.addEventListener('emptied', hide);
-        videoEl.addEventListener('pause', hide);
-        videoEl.addEventListener('ended', hide);
+          videoEl.addEventListener('playing', () => {
+            videoEl.style.display = 'block';
+            if (fb) fb.style.display = 'none';
+          });
+          const hide = () => {
+            videoEl.style.display = 'none';
+            if (fb) fb.style.display = 'flex';
+          };
+          videoEl.addEventListener('emptied', hide);
+          videoEl.addEventListener('pause', hide);
+          videoEl.addEventListener('ended', hide);
+        }
         _videoBindCleanup.push(C.bindVideo(videoEl, p));
       }
 
