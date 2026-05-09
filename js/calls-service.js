@@ -266,14 +266,29 @@
   function subscribeToIncoming(userId) {
     if (!userId) return;
     if (_incomingChannel) sb.removeChannel(_incomingChannel);
+    // Subscribe broadly — the call_logs.recipient_user_id column only
+    // holds ONE id, but family conversations have multiple participants
+    // who all need to ring. Filter participation client-side instead.
     _incomingChannel = sb.channel(`call-incoming-${userId}`)
       .on('postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'call_logs',
-          filter: `recipient_user_id=eq.${userId}` },
-        (payload) => {
+        { event: 'INSERT', schema: 'public', table: 'call_logs' },
+        async (payload) => {
           const row = payload.new;
           if (!row || row.status !== 'ringing') return;
           if (row.caller_user_id === userId) return; // ignore self
+          // Confirm this user belongs to the conversation the call was
+          // placed in. Skip rings from unrelated conversations.
+          try {
+            const { data: parts } = await sb.from('conversation_participants')
+              .select('profile_id')
+              .eq('conversation_id', row.conversation_id)
+              .eq('profile_id', userId)
+              .limit(1);
+            if (!parts || !parts.length) return;
+          } catch (e) {
+            console.warn('[calls] participant check failed', e);
+            return;
+          }
           try { _callbacks.onIncoming?.(row); } catch (e) { console.warn(e); }
         })
       .subscribe();
