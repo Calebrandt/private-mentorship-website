@@ -22,4 +22,4 @@ window.pmSupabase = sb;
 // then paste the public key below. Until this is set, push notifications won't
 // register (the rest of the site keeps working). See
 // supabase-functions/send-web-push/SETUP.md for full instructions.
-window.PM_VAPID_PUBLIC_KEY = '';
+window.PM_VAPID_PUBLIC_KEY = 'BLWiwGvXL6lcDdKWlBeRdl7eWgv8vbQJfuY5Lo57QXbD0_NPR8qlhnQ2kSYizpK0QP__IaDxk79mnJj-0EplYiA';
