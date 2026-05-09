@@ -916,9 +916,13 @@
   }
   .pm-call-tile video{
     position:absolute;inset:0;
-    width:100%;height:100%;object-fit:cover;background:#000;display:none;
+    width:100%;height:100%;object-fit:cover;background:transparent;display:block;
     z-index:2;
+    opacity:0;
+    transition:opacity .18s ease;
+    pointer-events:none;
   }
+  .pm-call-tile video.is-playing{opacity:1;}
   .pm-call-tile__placeholder{
     position:absolute;inset:0;
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:rgba(255,255,255,0.62);
@@ -1297,7 +1301,7 @@
 <script src="js/supabase-client.js?v=20260509c"></script>
 <script src="js/hiring-service.js?v=20260508d"></script>
 <script src="js/messages-service.js?v=20260509a"></script>
-<script src="js/calls-service.js?v=20260509h"></script>
+<script src="js/calls-service.js?v=20260509i"></script>
 <script src="js/push-service.js?v=20260509a"></script>
 <script>
 // Demo-mode pre-stub: must run BEFORE sidebar.js (which redirects on no auth)
@@ -1869,22 +1873,21 @@ if (new URLSearchParams(location.search).get('demo') === '1') {
       const fb = tile.querySelector('[data-fallback]');
 
       if (videoEl) {
+        // The video element MUST stay in the layout (display:block) for
+        // Stream's dynascale to consider it "visible" and subscribe to
+        // the track. We toggle opacity instead of display.
         if (p.isLocalParticipant) {
-          // Local: we already own the camera stream — show the video
-          // element immediately (don't wait for the 'playing' event).
-          videoEl.style.display = 'block';
+          videoEl.classList.add('is-playing');
           if (fb) fb.style.display = 'none';
         } else {
-          // Remote: show only when 'playing' fires (real frames
-          // arriving from SFU). Avatar placeholder is visible until then.
-          videoEl.style.display = 'none';
+          videoEl.classList.remove('is-playing');
           if (fb) fb.style.display = 'flex';
           videoEl.addEventListener('playing', () => {
-            videoEl.style.display = 'block';
+            videoEl.classList.add('is-playing');
             if (fb) fb.style.display = 'none';
           });
           const hide = () => {
-            videoEl.style.display = 'none';
+            videoEl.classList.remove('is-playing');
             if (fb) fb.style.display = 'flex';
           };
           videoEl.addEventListener('emptied', hide);
