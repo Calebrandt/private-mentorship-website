@@ -524,11 +524,17 @@
   }
   .pm-msg-composer__send svg{width:15px;height:15px;}
 
-  /* ─── Active thread = SAME dark space, composer stays near center ─── */
+  /* ─── Active thread = SAME dark space, composer pinned to the bottom ─── */
+  /* The 21px bottom padding lines the composer's bottom edge up with
+     the sidebar account avatar (the "J" near the bottom of the
+     sidebar), since the thread pane extends ~13px past the viewport.
+     flex-end keeps the messages list at the top of the available
+     height and the composer sits at the bottom — the user gets the
+     most vertical room for messages. */
   .pm-msg-thread:not(.is-empty){
     display:flex;flex-direction:column;
-    justify-content:center;align-items:center;
-    padding:24px 28px 32px;gap:14px;
+    justify-content:flex-end;align-items:center;
+    padding:24px 28px 21px;gap:14px;
     position:relative;
   }
 
