@@ -1063,6 +1063,25 @@
   .pm-recents-row__sub{font:500 12px Inter,sans-serif;color:var(--ink-mute);margin-top:2px;}
   .pm-recents-row__time{font:500 12px Inter,sans-serif;color:var(--ink-tert);flex:0 0 auto;}
   .pm-recents-empty{padding:38px 20px;text-align:center;color:var(--ink-mute);font:500 13px Inter,sans-serif;}
+
+  /* ─── NOTIFY (Web Push) toggle in topbar ──────────────────────────── */
+  .pm-msg-notify-toggle{
+    display:flex;align-items:center;gap:8px;
+    padding:7px 13px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:9999px;
+    font:600 13px Inter,sans-serif;color:var(--ink-mute);
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease, border-color .15s ease, box-shadow .15s ease;
+  }
+  .pm-msg-notify-toggle:hover{background:#F1F5F9;color:var(--ink-2);}
+  .pm-msg-notify-toggle.is-on{
+    background:var(--primary);color:#fff;border-color:var(--primary);
+    box-shadow:0 4px 14px -6px rgba(87,80,241,0.45);
+  }
+  .pm-msg-notify-toggle.is-on:hover{background:#4842D6;color:#fff;}
+  .pm-msg-notify-toggle svg{width:15px;height:15px;}
 </style>
 </head>
 <body class="pm-has-sidebar">
@@ -1078,9 +1097,15 @@
       </button>
       <h1 class="nx-topbar__title">Messages</h1>
     </div>
-    <div class="nx-userpod" id="userpod">
-      <div class="nx-userpod__avatar" id="upAvatar">·</div>
-      <div class="nx-userpod__name" id="upName">…</div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="pm-msg-notify-toggle" id="notifyToggle" type="button" style="display:none;" aria-label="Enable notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span id="notifyToggleLabel">Enable notifications</span>
+      </button>
+      <div class="nx-userpod" id="userpod">
+        <div class="nx-userpod__avatar" id="upAvatar">·</div>
+        <div class="nx-userpod__name" id="upName">…</div>
+      </div>
     </div>
   </div>
 
@@ -1266,10 +1291,11 @@
 <div id="callAudioSinks" style="position:fixed;width:0;height:0;overflow:hidden;" aria-hidden="true"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="js/supabase-client.js?v=20260508c"></script>
+<script src="js/supabase-client.js?v=20260509b"></script>
 <script src="js/hiring-service.js?v=20260508d"></script>
 <script src="js/messages-service.js?v=20260509a"></script>
 <script src="js/calls-service.js?v=20260509a"></script>
+<script src="js/push-service.js?v=20260509a"></script>
 <script>
 // Demo-mode pre-stub: must run BEFORE sidebar.js (which redirects on no auth)
 if (new URLSearchParams(location.search).get('demo') === '1') {
@@ -1712,6 +1738,16 @@ if (new URLSearchParams(location.search).get('demo') === '1') {
       // Bump inbox row preview locally
       const c = convos.find(x => x.id === activeConvoId);
       if (c) { c.last_message_body = body; c.last_message_at = new Date().toISOString(); convos.sort((a,b)=>new Date(b.last_message_at)-new Date(a.last_message_at)); renderInbox($('inboxSearch').value || ''); }
+      // Fan out a Web Push to other participants whose tab is closed/backgrounded
+      if (!isDemo && window.pmPush) {
+        const senderName = $('upName').textContent || 'Someone';
+        window.pmPush.fanOutForMessage({
+          conversationId: activeConvoId,
+          senderUserId: me.id,
+          subject: senderName,
+          body,
+        });
+      }
     } catch (e) {
       console.error('send failed', e);
       alert('Could not send message: ' + (e.message || e));
@@ -1969,6 +2005,73 @@ if (new URLSearchParams(location.search).get('demo') === '1') {
     try { C.endActiveCall?.(); } catch (_) {}
     try { C.disconnect?.(); } catch (_) {}
   });
+
+  // ─── Web Push registration (browser notifications when tab is closed) ─
+  const notifyBtn = $('notifyToggle');
+  const notifyLabel = $('notifyToggleLabel');
+  function setNotifyState(state) {
+    if (!notifyBtn) return;
+    if (state === 'unsupported' || state === 'denied' || state === 'no-vapid-key') {
+      notifyBtn.style.display = 'none'; return;
+    }
+    notifyBtn.style.display = 'flex';
+    if (state === 'granted') {
+      notifyBtn.classList.add('is-on');
+      notifyLabel.textContent = 'Notifications on';
+      notifyBtn.title = 'Notifications enabled — click to turn off';
+    } else {
+      notifyBtn.classList.remove('is-on');
+      notifyLabel.textContent = 'Enable notifications';
+      notifyBtn.title = 'Get a notification when someone messages you';
+    }
+  }
+
+  if (!isDemo && window.pmPush) {
+    if (!window.pmPush.canUse()) {
+      setNotifyState('unsupported');
+    } else if (!window.PM_VAPID_PUBLIC_KEY) {
+      // Owner hasn't generated VAPID keys yet — keep the button hidden
+      setNotifyState('no-vapid-key');
+    } else {
+      // Best-effort init: registers SW + re-subscribes if previously granted.
+      (async () => {
+        const initRes = await window.pmPush.init({ userId: me.id });
+        const perm = initRes.ok ? 'granted' : (initRes.reason || 'default');
+        setNotifyState(perm);
+      })();
+
+      notifyBtn.addEventListener('click', async () => {
+        const cur = await window.pmPush.getCurrentPermission();
+        if (cur === 'granted') {
+          // Toggle off — local unsubscribe (browser-level revoke must be done in browser settings)
+          await window.pmPush.unsubscribe({ userId: me.id });
+          setNotifyState('default');
+        } else {
+          try {
+            const res = await window.pmPush.requestPermissionAndSubscribe({ userId: me.id });
+            setNotifyState(res.perm || 'default');
+          } catch (e) {
+            console.error('[push] subscribe failed', e);
+            alert('Could not enable notifications: ' + (e.message || e));
+          }
+        }
+      });
+
+      // Listen for clicks on push notifications — the SW posts the conversationId
+      window.pmPush.onServiceWorkerMessage((data) => {
+        if (data?.type === 'PM_OPEN_CONVERSATION' && data.conversationId) {
+          openConversation(data.conversationId);
+        }
+      });
+    }
+  }
+
+  // ?c=<id> from a notification click → open that conversation on load
+  const wantedConvoId = new URLSearchParams(location.search).get('c');
+  if (wantedConvoId) {
+    // Wait a tick so convos are loaded
+    setTimeout(() => { openConversation(wantedConvoId); }, 200);
+  }
 
   // Cursor-follow glow — barely visible, follows mouse like the 21st.dev reference
   const glow = document.getElementById('cursorGlow');

@@ -17,3 +17,9 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 });
 
 window.pmSupabase = sb;
+
+// Web Push VAPID public key. Generate with `npx web-push generate-vapid-keys`,
+// then paste the public key below. Until this is set, push notifications won't
+// register (the rest of the site keeps working). See
+// supabase-functions/send-web-push/SETUP.md for full instructions.
+window.PM_VAPID_PUBLIC_KEY = '';
