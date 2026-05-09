@@ -23,13 +23,33 @@
   // ─── Stream SDK loader ─────────────────────────────────────────────────
   // Dynamically loads @stream-io/video-client only when the user actually
   // tries to start/accept a call — keeps the SDK off the critical path.
+  // Tries multiple CDNs so a single CDN hiccup (esm.sh has been flaky
+  // intermittently) doesn't break calling outright.
+  const SDK_CDN_URLS = [
+    'https://esm.sh/@stream-io/video-client@1',
+    'https://cdn.jsdelivr.net/npm/@stream-io/video-client@1/+esm',
+    'https://esm.sh/@stream-io/video-client',
+  ];
   let _sdkPromise = null;
   function loadSdk() {
     if (_sdkPromise) return _sdkPromise;
-    _sdkPromise = import('https://esm.sh/@stream-io/video-client@1').catch((e) => {
+    _sdkPromise = (async () => {
+      let lastErr;
+      for (const url of SDK_CDN_URLS) {
+        try {
+          const mod = await import(url);
+          if (mod && (mod.StreamVideoClient || mod.default?.StreamVideoClient)) {
+            return mod.StreamVideoClient ? mod : mod.default;
+          }
+          lastErr = new Error('Loaded ' + url + ' but no StreamVideoClient export');
+        } catch (e) {
+          console.warn('[calls] SDK load failed at', url, e?.message || e);
+          lastErr = e;
+        }
+      }
       _sdkPromise = null;
-      throw new Error('Failed to load Stream.io SDK: ' + (e?.message || e));
-    });
+      throw new Error('Failed to load Stream.io SDK from all CDNs: ' + (lastErr?.message || lastErr));
+    })();
     return _sdkPromise;
   }
 
@@ -118,7 +138,20 @@
       status: 'ringing',
     });
 
-    const client = await getClient(callerUserId);
+    // If SDK load or client connect fails, the call_log is already
+    // ringing on the receiver's side. Clean it up so we don't strand
+    // them with a "ghost" incoming call.
+    let client;
+    try {
+      client = await getClient(callerUserId);
+    } catch (e) {
+      try {
+        await sb.from('call_logs')
+          .update({ status: 'ended', updated_at: new Date().toISOString() })
+          .eq('call_id', callId);
+      } catch (_) {}
+      throw e;
+    }
     const call = client.call('default', callId);
 
     // Don't pass Stream `members` or use Stream's built-in ring — that
