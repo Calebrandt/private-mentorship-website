@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Home — Private Mentorship</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
+<link rel="stylesheet" href="js/sidebar.css?v=20260508c" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#F1F5F9;color:#1F2937;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+  :root{
+    --bg:#F1F5F9;
+    --card:#FFFFFF;
+    --border:#E2E8F0;
+    --border-soft:#EEF2F7;
+    --ink:#1F2937;
+    --ink-2:#0F172A;
+    --ink-mute:#64748B;
+    --ink-tert:#94A3B8;
+    --icon-green:#22C55E;
+    --icon-orange:#FB923C;
+    --icon-purple:#8B5CF6;
+    --icon-blue:#38BDF8;
+    --icon-pink:#EC4899;
+    --primary:#5750F1;
+    --primary-soft:#EEF1FB;
+    --green-soft:#DCFCE7;
+    --orange-soft:#FFF1E2;
+    --purple-soft:#EDE9FE;
+    --blue-soft:#E0F2FE;
+    --red:#EF4444;
+    --red-soft:#FEE2E2;
+  }
+
+  /* Top bar */
+  .nx-topbar{
+    background:#fff;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 26px;gap:16px;position:sticky;top:0;z-index:20;
+  }
+  .nx-search{flex:1;max-width:520px;position:relative;}
+  .nx-search input{
+    width:100%;background:#F1F5F9;border:1px solid transparent;
+    border-radius:10px;padding:10px 14px 10px 38px;
+    font:500 13.5px Inter,sans-serif;color:var(--ink);
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .nx-search input::placeholder{color:var(--ink-tert);font-weight:400;}
+  .nx-search input:focus{outline:none;border-color:var(--primary);background:#fff;}
+  .nx-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--ink-tert);}
+  .nx-userpod{display:flex;align-items:center;gap:10px;padding:5px 12px 5px 5px;border:1px solid var(--border);border-radius:9999px;background:#fff;}
+  .nx-userpod__avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#5750F1 0%,#0ABEF9 100%);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px -1px rgba(87,80,241,0.35);}
+  .nx-userpod__name{font-size:13.5px;font-weight:700;color:var(--ink);letter-spacing:-.005em;}
+
+  /* Shell */
+  .nx-shell{padding:32px 28px 80px;max-width:1380px;margin:0 auto;}
+  .nx-head{margin-bottom:28px;display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;}
+  .nx-head__body{flex:1;min-width:240px;}
+  .nx-h1{font-size:32px;font-weight:800;letter-spacing:-.025em;margin:0 0 8px;color:var(--ink-2);line-height:1.05;}
+  .nx-sub{font-size:14.5px;color:var(--ink-mute);margin:0;font-weight:500;letter-spacing:-.005em;}
+  .nx-head__cta{
+    background:linear-gradient(135deg,#5750F1,#0ABEF9);color:#fff;border:none;
+    padding:11px 18px;border-radius:9999px;
+    font:700 13px Inter,sans-serif;letter-spacing:-.005em;
+    cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;
+    box-shadow:0 6px 16px -4px rgba(87,80,241,0.4);
+    transition:transform .15s ease;
+  }
+  .nx-head__cta:hover{transform:translateY(-1px);}
+
+  /* KPI cards row */
+  .nx-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:24px;}
+  .nx-kpi{
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:26px 24px;box-shadow:0 1px 2px rgba(15,23,42,0.04);
+    transition:box-shadow .2s ease, transform .2s ease;
+  }
+  .nx-kpi:hover{box-shadow:0 12px 28px -10px rgba(15,23,42,0.14);transform:translateY(-2px);}
+  .nx-kpi__icon{
+    width:56px;height:56px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;margin-bottom:22px;
+    box-shadow:inset 0 -2px 6px rgba(0,0,0,0.10);
+  }
+  .nx-kpi__icon svg{width:24px;height:24px;color:#fff;stroke-width:2.4;}
+  .nx-kpi__icon--blue{background:var(--icon-blue);}
+  .nx-kpi__icon--green{background:var(--icon-green);}
+  .nx-kpi__icon--orange{background:var(--icon-orange);}
+  .nx-kpi__icon--purple{background:var(--icon-purple);}
+  .nx-kpi__bot{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;}
+  .nx-kpi__num{font-size:38px;font-weight:800;letter-spacing:-.03em;margin:0;color:var(--ink-2);line-height:1;font-variant-numeric:tabular-nums;}
+  .nx-kpi__label{font-size:14px;color:var(--ink-mute);margin:10px 0 0;font-weight:500;letter-spacing:-.005em;}
+
+  /* Generic card */
+  .nx-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:26px;box-shadow:0 1px 2px rgba(15,23,42,0.04);}
+  .nx-card__head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:20px;}
+  .nx-card__title{font-size:20px;font-weight:700;letter-spacing:-.018em;margin:0;color:var(--ink-2);line-height:1.15;}
+  .nx-card__sub{font-size:13px;color:var(--ink-mute);margin:5px 0 0;font-weight:500;}
+  .nx-card__cta{font-size:13px;font-weight:600;color:var(--primary);text-decoration:none;letter-spacing:-.005em;}
+  .nx-card__cta:hover{text-decoration:underline;}
+
+  /* Two-column row layout */
+  .nx-row{display:grid;gap:18px;margin-bottom:24px;}
+  .nx-row--6040{grid-template-columns:1.4fr 1fr;}
+
+  .nx-chart{margin-top:8px;min-height:280px;}
+  .nx-chart-foot{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;padding-top:18px;border-top:1px solid var(--border-soft);text-align:center;}
+  .nx-chart-foot__label{font-size:11px;color:var(--ink-mute);margin:0 0 6px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;}
+  .nx-chart-foot__value{font-size:24px;font-weight:800;color:var(--ink-2);margin:0;letter-spacing:-.025em;line-height:1;font-variant-numeric:tabular-nums;}
+
+  /* Client roster — scroll cards */
+  .nx-roster{display:flex;gap:14px;overflow-x:auto;padding:6px 2px 14px;scrollbar-width:thin;}
+  .nx-roster::-webkit-scrollbar{height:6px;}
+  .nx-roster::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:3px;}
+  .nx-client{
+    flex:0 0 240px;
+    background:#FAFBFC;border:1px solid var(--border);border-radius:12px;
+    padding:18px;display:flex;flex-direction:column;gap:12px;
+    text-decoration:none;color:inherit;
+    transition:border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+  }
+  .nx-client:hover{border-color:#B3D0F5;box-shadow:0 8px 20px -8px rgba(15,23,42,0.12);transform:translateY(-1px);}
+  .nx-client__head{display:flex;align-items:center;gap:11px;}
+  .nx-client__avatar{
+    width:40px;height:40px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(135deg,#5750F1 0%,#0ABEF9 100%);
+    color:#fff;display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:13.5px;box-shadow:0 3px 8px -2px rgba(87,80,241,0.3);
+  }
+  .nx-client__name{font-size:14.5px;font-weight:700;color:var(--ink-2);margin:0;line-height:1.2;letter-spacing:-.005em;}
+  .nx-client__email{font-size:11.5px;color:var(--ink-tert);margin:3px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;font-weight:500;}
+  .nx-client__stats{display:flex;gap:14px;border-top:1px solid var(--border);padding-top:12px;}
+  .nx-client__stat{flex:1;}
+  .nx-client__stat-label{font-size:10.5px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;color:var(--ink-tert);margin:0 0 3px;}
+  .nx-client__stat-value{font-size:17px;font-weight:800;color:var(--ink-2);margin:0;letter-spacing:-.018em;font-variant-numeric:tabular-nums;}
+  .nx-client__stat-value--success{color:#16A34A;}
+  .nx-roster-empty{flex:1;background:#FAFBFC;border:1px dashed var(--border);border-radius:12px;padding:28px;text-align:center;color:var(--ink-mute);font-size:13.5px;}
+
+  /* Tools grid */
+  .nx-tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;}
+  .nx-tool{
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:18px;display:flex;flex-direction:column;gap:10px;
+    text-decoration:none;color:inherit;position:relative;
+    transition:border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+  }
+  .nx-tool:hover{border-color:#B3D0F5;transform:translateY(-2px);box-shadow:0 8px 20px -8px rgba(15,23,42,0.12);}
+  .nx-tool__icon{
+    width:42px;height:42px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;color:#fff;
+    box-shadow:inset 0 -2px 5px rgba(0,0,0,0.10);
+  }
+  .nx-tool__icon svg{width:19px;height:19px;stroke-width:2.4;}
+  .nx-tool__icon--blue{background:var(--icon-blue);}
+  .nx-tool__icon--green{background:var(--icon-green);}
+  .nx-tool__icon--orange{background:var(--icon-orange);}
+  .nx-tool__icon--purple{background:var(--icon-purple);}
+  .nx-tool__icon--pink{background:var(--icon-pink);}
+  .nx-tool__icon--indigo{background:var(--primary);}
+  .nx-tool__title{font-size:15px;font-weight:700;color:var(--ink-2);margin:0;letter-spacing:-.012em;}
+  .nx-tool__sub{font-size:12.5px;color:var(--ink-mute);margin:0;line-height:1.4;font-weight:500;}
+  .nx-tool__badge{
+    background:linear-gradient(135deg,#DC2626,#EF4444);color:#fff;
+    align-self:flex-start;padding:3px 10px;border-radius:9999px;
+    font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    box-shadow:0 3px 8px -2px rgba(220,38,38,0.4);
+  }
+
+  .nx-skel{background:linear-gradient(90deg,#F1F5F9 25%,#E2E8F0 50%,#F1F5F9 75%);background-size:200% 100%;animation:nxshim 1.4s ease-in-out infinite;border-radius:6px;display:inline-block;height:1em;}
+  @keyframes nxshim{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
+  @media (max-width:1080px){
+    .nx-kpis{grid-template-columns:repeat(2,1fr);}
+    .nx-row--6040{grid-template-columns:1fr;}
+  }
+  @media (max-width:560px){
+    .nx-shell{padding:20px 16px 60px;}
+    .nx-h1{font-size:24px;}
+    .nx-topbar{padding:12px 16px;}
+    .nx-search{display:none;}
+    .nx-kpis{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body class="pm-has-sidebar">
+
+<div id="pmSidebar"></div>
+
+<header class="nx-topbar">
+  <div class="nx-search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="search" placeholder="Search clients, applicants, tools…" />
+  </div>
+  <div class="nx-userpod">
+    <span class="nx-userpod__avatar" id="nxUserAvatar">A</span>
+    <span class="nx-userpod__name" id="nxUserName">Admin</span>
+  </div>
+</header>
+
+<main class="nx-shell">
+
+  <header class="nx-head">
+    <div class="nx-head__body">
+      <h1 class="nx-h1" id="ahGreet">Welcome back</h1>
+      <p class="nx-sub" id="ahDate">—</p>
+    </div>
+    <a class="nx-head__cta" href="admin-create-client.html">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New client
+    </a>
+  </header>
+
+  <!-- KPI cards -->
+  <section class="nx-kpis">
+    <div class="nx-kpi">
+      <div class="nx-kpi__icon nx-kpi__icon--blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div class="nx-kpi__bot">
+        <div>
+          <p class="nx-kpi__num" id="kpiClients"><span class="nx-skel" style="width:60px;"></span></p>
+          <p class="nx-kpi__label">Active clients</p>
+        </div>
+      </div>
+    </div>
+    <div class="nx-kpi">
+      <div class="nx-kpi__icon nx-kpi__icon--green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div class="nx-kpi__bot">
+        <div>
+          <p class="nx-kpi__num" id="kpiHours"><span class="nx-skel" style="width:60px;"></span></p>
+          <p class="nx-kpi__label">Hours pending</p>
+        </div>
+      </div>
+    </div>
+    <div class="nx-kpi">
+      <div class="nx-kpi__icon nx-kpi__icon--orange">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      </div>
+      <div class="nx-kpi__bot">
+        <div>
+          <p class="nx-kpi__num" id="kpiApps"><span class="nx-skel" style="width:50px;"></span></p>
+          <p class="nx-kpi__label">Open applications</p>
+        </div>
+      </div>
+    </div>
+    <div class="nx-kpi">
+      <div class="nx-kpi__icon nx-kpi__icon--purple">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+      <div class="nx-kpi__bot">
+        <div>
+          <p class="nx-kpi__num" id="kpiRevenue"><span class="nx-skel" style="width:80px;"></span></p>
+          <p class="nx-kpi__label">Revenue this month</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Revenue chart + new clients chart -->
+  <section class="nx-row nx-row--6040">
+
+    <div class="nx-card">
+      <div class="nx-card__head">
+        <div>
+          <h2 class="nx-card__title">Revenue overview</h2>
+          <p class="nx-card__sub">Monthly paid invoices, last 6 months</p>
+        </div>
+      </div>
+      <div class="nx-chart" id="revenueChart"></div>
+      <div class="nx-chart-foot">
+        <div>
+          <p class="nx-chart-foot__label">6-month total</p>
+          <p class="nx-chart-foot__value" id="revenueTotal">$0</p>
+        </div>
+        <div>
+          <p class="nx-chart-foot__label">This month</p>
+          <p class="nx-chart-foot__value" id="revenueMonth">$0</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="nx-card">
+      <div class="nx-card__head">
+        <div>
+          <h2 class="nx-card__title">New clients</h2>
+          <p class="nx-card__sub">Sign-ups per month, last 6 months</p>
+        </div>
+      </div>
+      <div class="nx-chart" id="clientsChart"></div>
+      <div class="nx-chart-foot">
+        <div>
+          <p class="nx-chart-foot__label">6-month total</p>
+          <p class="nx-chart-foot__value" id="newClientsTotal">0</p>
+        </div>
+        <div>
+          <p class="nx-chart-foot__label">This month</p>
+          <p class="nx-chart-foot__value" id="newClientsMonth">0</p>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Client roster -->
+  <section class="nx-card" style="margin-bottom:22px;">
+    <div class="nx-card__head">
+      <div>
+        <h2 class="nx-card__title">Client roster</h2>
+        <p class="nx-card__sub">Quick access to your active clients</p>
+      </div>
+      <a class="nx-card__cta" href="admin-create-client.html">+ Add client</a>
+    </div>
+    <div id="ahRoster">
+      <div class="nx-roster-empty">Loading…</div>
+    </div>
+  </section>
+
+  <!-- Tools grid -->
+  <section class="nx-card">
+    <div class="nx-card__head">
+      <div>
+        <h2 class="nx-card__title">Management tools</h2>
+        <p class="nx-card__sub">Everything you need to run the business</p>
+      </div>
+    </div>
+    <div class="nx-tools" id="ahTools"></div>
+  </section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260508d"></script>
+<script src="js/hiring-service.js?v=20260508d"></script>
+<script src="js/sidebar.js?v=20260508c"></script>
+<script>
+(async () => {
+  const $ = id => document.getElementById(id);
+  function esc(s){return (s||'').toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
+  function fmtMoney(cents){
+    const v = (cents || 0) / 100;
+    if (v >= 1000) return '$' + (v/1000).toFixed(v >= 10000 ? 0 : 1) + 'K';
+    return '$' + v.toLocaleString('en-CA', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+  function fmtMoneyFull(cents){
+    return '$' + ((cents || 0)/100).toLocaleString('en-CA', { minimumFractionDigits:0, maximumFractionDigits:0 });
+  }
+
+  // ─── Demo mode ─────────────────────────────────────────────────
+  if (new URLSearchParams(location.search).get('demo') === '1') {
+    window.pmHiring = {
+      getCurrentUser: async () => ({ id:'admin-demo', email:'caleb@private-mentorship.com' }),
+      fetchCurrentUserProfile: async () => ({ full_name:'Caleb Brandt', role:'OWNER' }),
+      isCurrentUserAdminOrOwner: async () => true,
+      signOut: async () => { location.href = 'index.html'; },
+      adminFetchHomeKpis: async () => ({ activeClients: 12, totalHours: 184.5, openApplications: 3 }),
+      adminFetchMonthlyStats: async () => ({
+        months: [
+          { key:'Dec', monthIdx:11, year:2025, newClients:1, revenueCents: 320000 },
+          { key:'Jan', monthIdx:0,  year:2026, newClients:2, revenueCents: 480000 },
+          { key:'Feb', monthIdx:1,  year:2026, newClients:1, revenueCents: 540000 },
+          { key:'Mar', monthIdx:2,  year:2026, newClients:3, revenueCents: 720000 },
+          { key:'Apr', monthIdx:3,  year:2026, newClients:2, revenueCents: 680000 },
+          { key:'May', monthIdx:4,  year:2026, newClients:3, revenueCents: 780000 },
+        ],
+        revenueThisMonthCents: 780000,
+        newClientsThisMonth: 3,
+      }),
+      adminListClients: async () => [
+        { id:'c1', full_name:'The Smith Family',  email:'smith@example.com',   hours_balance:24 },
+        { id:'c2', full_name:'Jane Doe',          email:'jane@example.com',    hours_balance:8.5 },
+        { id:'c3', full_name:'Tony Wong',         email:'tony@example.com',    hours_balance:16 },
+        { id:'c4', full_name:'Alex Murphy',       email:'a@example.com',       hours_balance:12 },
+        { id:'c5', full_name:'The Patel Family',  email:'patel@example.com',   hours_balance:32 },
+        { id:'c6', full_name:'Sam Lee',           email:'sam@example.com',     hours_balance:6 },
+      ],
+    };
+    document.addEventListener('DOMContentLoaded', () => {
+      const bar = document.createElement('div');
+      bar.textContent = 'Demo mode — fake data, not from your account. Remove ?demo=1 from the URL to exit.';
+      bar.style.cssText = 'position:fixed;bottom:14px;right:14px;z-index:9999;background:#5750F1;color:#fff;font:600 12px Inter,sans-serif;padding:10px 14px;border-radius:9999px;box-shadow:0 8px 24px -6px rgba(87,80,241,0.45);';
+      document.body.appendChild(bar);
+    });
+  }
+
+  // Auth gate
+  const user = await window.pmHiring.getCurrentUser();
+  if (!user) { window.location.href = 'signin.html'; return; }
+  const isAdmin = await window.pmHiring.isCurrentUserAdminOrOwner();
+  if (!isAdmin) { await window.pmHiring.signOut(); window.location.href = 'signin.html?notauthorized=1'; return; }
+
+  // User pod + greeting
+  const profile = await window.pmHiring.fetchCurrentUserProfile().catch(() => null);
+  const fullName = profile?.full_name || user.email?.split('@')[0] || 'Admin';
+  const firstName = fullName.split(' ')[0];
+  $('nxUserName').textContent = firstName;
+  $('nxUserAvatar').textContent = (firstName[0] || 'A').toUpperCase();
+  const hr = new Date().getHours();
+  const greet = hr < 12 ? 'morning' : (hr < 17 ? 'afternoon' : 'evening');
+  $('ahGreet').textContent = `Good ${greet}, ${firstName}`;
+  $('ahDate').textContent = new Date().toLocaleDateString('en-CA', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+
+  // Pull all data in parallel
+  const [kpis, monthly, clients] = await Promise.all([
+    window.pmHiring.adminFetchHomeKpis().catch(()=>({activeClients:0,totalHours:0,openApplications:0})),
+    window.pmHiring.adminFetchMonthlyStats(6).catch(()=>({months:[],revenueThisMonthCents:0,newClientsThisMonth:0})),
+    window.pmHiring.adminListClients({ limit: 12 }).catch(()=>[]),
+  ]);
+
+  // KPIs
+  $('kpiClients').textContent = kpis.activeClients;
+  $('kpiHours').textContent = Number(kpis.totalHours || 0).toFixed(1);
+  $('kpiApps').textContent = kpis.openApplications;
+  $('kpiRevenue').textContent = fmtMoney(monthly.revenueThisMonthCents || 0);
+
+  // Revenue chart (area, indigo)
+  const months = monthly.months || [];
+  const totalRev = months.reduce((s, m) => s + (m.revenueCents || 0), 0);
+  $('revenueTotal').textContent = fmtMoneyFull(totalRev);
+  $('revenueMonth').textContent = fmtMoneyFull(monthly.revenueThisMonthCents || 0);
+
+  new ApexCharts($('revenueChart'), {
+    chart:{ type:'area', height:280, toolbar:{show:false}, fontFamily:'Inter, sans-serif', animations:{enabled:true,speed:700} },
+    series:[ { name:'Revenue', data: months.map(m=>+(m.revenueCents/100).toFixed(0)) } ],
+    colors:['#5750F1'],
+    stroke:{ curve:'smooth', width:3 },
+    fill:{ type:'gradient', gradient:{ shadeIntensity:1, opacityFrom:0.32, opacityTo:0.02, stops:[0,90,100] } },
+    grid:{ borderColor:'#E2E8F0', strokeDashArray:4, xaxis:{lines:{show:false}} },
+    dataLabels:{ enabled:false },
+    legend:{ show:false },
+    xaxis:{ categories: months.map(m=>m.key), labels:{ style:{ colors:'#94A3B8', fontSize:'12px', fontWeight:500 } }, axisBorder:{ show:false }, axisTicks:{ show:false } },
+    yaxis:{ labels:{ style:{ colors:'#94A3B8', fontSize:'11px' }, formatter:v=>'$'+(v>=1000?(v/1000).toFixed(1)+'K':v.toFixed(0)) } },
+    tooltip:{ theme:'light', y:{ formatter:v=>'$'+v.toLocaleString('en-CA') } },
+    markers:{ size:0, hover:{ size:6, sizeOffset:3 }, colors:['#5750F1'], strokeColors:'#fff', strokeWidth:3 },
+  }).render();
+
+  // New-clients chart (bar, cyan)
+  const totalNew = months.reduce((s, m) => s + (m.newClients || 0), 0);
+  $('newClientsTotal').textContent = totalNew;
+  $('newClientsMonth').textContent = monthly.newClientsThisMonth || 0;
+
+  new ApexCharts($('clientsChart'), {
+    chart:{ type:'bar', height:280, toolbar:{show:false}, fontFamily:'Inter, sans-serif' },
+    series:[ { name:'New clients', data: months.map(m=>m.newClients) } ],
+    colors:['#0ABEF9'],
+    plotOptions:{ bar:{ columnWidth:'48%', borderRadius:6, borderRadiusApplication:'end' } },
+    dataLabels:{ enabled:false },
+    grid:{ borderColor:'#E2E8F0', strokeDashArray:4, xaxis:{lines:{show:false}} },
+    xaxis:{ categories: months.map(m=>m.key), labels:{ style:{ colors:'#94A3B8', fontSize:'12px', fontWeight:500 } }, axisBorder:{ show:false }, axisTicks:{ show:false } },
+    yaxis:{ labels:{ style:{ colors:'#94A3B8', fontSize:'11px' }, formatter:v=>v.toFixed(0) } },
+    tooltip:{ theme:'light' },
+  }).render();
+
+  // Roster
+  const roster = $('ahRoster');
+  if (!clients.length) {
+    roster.innerHTML = `<div class="nx-roster-empty">No clients yet. <a href="admin-create-client.html" style="color:#5750F1;font-weight:700;">Create the first one →</a></div>`;
+  } else {
+    roster.innerHTML = `<div class="nx-roster">${clients.map(c => {
+      const name = c.full_name || c.display_name || 'Client';
+      const initials = name.split(/\s+/).map(s => s[0] || '').slice(0,2).join('').toUpperCase() || 'C';
+      const hours = Number(c.hours_balance || 0).toFixed(1);
+      return `<a class="nx-client" href="#" title="${esc(name)}">
+        <div class="nx-client__head">
+          <div class="nx-client__avatar">${esc(initials)}</div>
+          <div style="min-width:0;flex:1;">
+            <p class="nx-client__name">${esc(name)}</p>
+            <p class="nx-client__email">${esc(c.email || '—')}</p>
+          </div>
+        </div>
+        <div class="nx-client__stats">
+          <div class="nx-client__stat">
+            <p class="nx-client__stat-label">Hours</p>
+            <p class="nx-client__stat-value">${hours}</p>
+          </div>
+          <div class="nx-client__stat">
+            <p class="nx-client__stat-label">Status</p>
+            <p class="nx-client__stat-value nx-client__stat-value--success">Active</p>
+          </div>
+        </div>
+      </a>`;
+    }).join('')}</div>`;
+  }
+
+  // Tools grid
+  const openCount = kpis.openApplications || 0;
+  const tools = [
+    { href:'admin-hiring.html',             icon:'briefcase',  tone:'orange', title:'Hiring',                sub:'Application reviews + decisions',         badge: openCount > 0 ? `${openCount} open` : null },
+    { href:'admin-schedule-requests.html',  icon:'inbox',      tone:'indigo', title:'Schedule Requests',     sub:'Approve cancels, reschedules, extras' },
+    { href:'admin-membership-requests.html',icon:'briefcase',  tone:'purple', title:'Membership Requests',   sub:'Plan + schedule changes for next contract' },
+    { href:'admin-create-client.html',      icon:'user-plus',  tone:'green',  title:'Create Client',         sub:'Bootstrap a new family account' },
+    { href:'admin-assistant-profiles.html', icon:'user-circle',tone:'purple', title:'Assistant Profiles',    sub:'Public bios for clients to browse' },
+    { href:'admin-clients.html',            icon:'users',      tone:'blue',   title:'Clients',               sub:'Directory + profiles + hours' },
+    { href:'admin-scheduling.html',         icon:'calendar',   tone:'indigo', title:'Scheduling',            sub:'Calendar + appointments' },
+    { href:'admin-financials.html',         icon:'dollar',     tone:'green',  title:'Financials',            sub:'Invoices + receipts' },
+    { href:'admin-intro-requests.html',     icon:'inbox',      tone:'pink',   title:'Intro Requests',        sub:'New family inquiries' },
+    { href:'admin-membership-requests.html',icon:'inbox',      tone:'orange', title:'Membership Requests',   sub:'Plan changes + renewals' },
+    { href:'admin-family-management.html',  icon:'users',      tone:'purple', title:'Family Management',     sub:'Family groups + invites' },
+    { href:'admin-tasks.html',              icon:'check',      tone:'blue',   title:'Tasks',                 sub:'Internal to-dos' },
+    { href:'admin-education.html',          icon:'book',       tone:'pink',   title:'Education / Homework',  sub:'Learning hub admin' },
+    { href:'admin-notifications.html',      icon:'bell',       tone:'indigo', title:'Notifications',         sub:'System notices + alerts' },
+  ];
+  $('ahTools').innerHTML = tools.map(t => `
+    <a class="nx-tool" href="${t.href}">
+      <div class="nx-tool__icon nx-tool__icon--${t.tone}">${ICONS[t.icon] || ICONS.folder}</div>
+      <p class="nx-tool__title">${esc(t.title)}</p>
+      <p class="nx-tool__sub">${esc(t.sub)}</p>
+      ${t.badge ? `<span class="nx-tool__badge">${esc(t.badge)}</span>` : ''}
+    </a>`).join('');
+})();
+
+const ICONS = {
+  briefcase:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
+  'user-plus':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>',
+  'user-circle':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.66A8 8 0 0 1 17 20.66"/></svg>',
+  users:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  calendar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+  dollar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+  inbox:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+  book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+  folder:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>',
+};
+</script>
+</body>
+</html>

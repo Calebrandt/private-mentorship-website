@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Assistant Profiles — Private Mentorship</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,500&display=swap" />
+<link rel="stylesheet" href="js/sidebar.css?v=20260508a" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#F4F5F7;color:#0F172A;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+
+  .ap-shell{padding:36px 32px 80px;max-width:1180px;margin:0 auto;}
+  .ap-head{margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;}
+  .ap-head__body{flex:1;min-width:240px;}
+  .ap-eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#0071e3;margin:0 0 8px;}
+  .ap-h1{font-family:"Archivo","Inter",sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0 0 6px;color:#0F172A;}
+  .ap-sub{font-size:14px;color:#64748B;margin:0;line-height:1.5;}
+  .ap-newbtn{
+    background:#0F172A;color:#fff;border:none;
+    padding:10px 18px;border-radius:9999px;font-size:13px;font-weight:600;
+    cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+    transition:background .18s ease;
+  }
+  .ap-newbtn:hover{background:#1E293B;}
+  .ap-newbtn svg{width:14px;height:14px;}
+
+  /* List */
+  .ap-list{display:flex;flex-direction:column;gap:10px;}
+  .ap-card{
+    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    padding:18px 22px;display:flex;align-items:center;gap:16px;
+    cursor:pointer;
+    transition:border-color .18s ease, box-shadow .18s ease;
+  }
+  .ap-card:hover{border-color:#B3D0F5;box-shadow:0 4px 14px -4px rgba(15,23,42,0.1);}
+  .ap-avatar{
+    flex:0 0 44px;width:44px;height:44px;border-radius:50%;
+    background:linear-gradient(135deg,#3B82F6,#1E40AF);
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:800;font-size:14px;
+  }
+  .ap-card__body{flex:1;min-width:0;}
+  .ap-card__name{font-size:15px;font-weight:700;color:#0F172A;margin:0 0 3px;}
+  .ap-card__sub{font-size:12.5px;color:#64748B;margin:0;}
+  .ap-card__pills{display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0;}
+  .ap-pill{
+    font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    padding:3px 9px;border-radius:9999px;
+  }
+  .ap-pill--published{background:#ECFDF5;color:#047857;}
+  .ap-pill--draft{background:#F1F5F9;color:#64748B;}
+  .ap-pill--missing{background:#FEF3C7;color:#92400E;}
+
+  .ap-empty{
+    background:#fff;border:1px dashed #E2E8F0;border-radius:14px;
+    padding:48px 32px;text-align:center;color:#64748B;
+  }
+  .ap-empty__title{font-family:"Archivo","Inter",sans-serif;font-size:17px;font-weight:700;color:#0F172A;margin:0 0 6px;}
+  .ap-empty__sub{font-size:13px;margin:0 0 16px;}
+
+  .ap-loading{text-align:center;padding:60px 20px;color:#64748B;font-size:14px;}
+  .ap-spinner{
+    width:16px;height:16px;border-radius:50%;
+    border:2px solid #E2E8F0;border-top-color:#0071e3;
+    animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* Editor modal */
+  .ap-modal{
+    display:none;position:fixed;inset:0;z-index:80;
+    background:rgba(15,23,42,0.55);
+    align-items:center;justify-content:center;padding:24px;
+  }
+  .ap-modal.is-shown{display:flex;}
+  .ap-modal__panel{
+    background:#fff;border-radius:18px;
+    width:100%;max-width:680px;max-height:90vh;overflow-y:auto;
+    box-shadow:0 30px 70px -20px rgba(15,23,42,0.5);
+  }
+  .ap-modal__head{
+    padding:24px 30px 18px;border-bottom:1px solid #E2E8F0;
+    display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+  }
+  .ap-modal__title{font-family:"Archivo","Inter",sans-serif;font-size:22px;font-weight:800;letter-spacing:-.015em;margin:0 0 4px;}
+  .ap-modal__sub{font-size:13px;color:#64748B;margin:0;}
+  .ap-modal__close{
+    background:transparent;border:none;font-size:24px;color:#94A3B8;cursor:pointer;
+    line-height:1;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;
+  }
+  .ap-modal__body{padding:24px 30px;display:flex;flex-direction:column;gap:18px;}
+  .ap-modal__foot{
+    padding:18px 30px;border-top:1px solid #E2E8F0;
+    display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .ap-modal__foot-actions{display:flex;gap:10px;}
+
+  .ap-field{display:flex;flex-direction:column;gap:6px;}
+  .ap-field__label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748B;}
+  .ap-field__input,.ap-field__textarea,.ap-field__select{
+    width:100%;padding:11px 14px;border:1px solid #CBD5E1;border-radius:10px;
+    font-family:inherit;font-size:14px;color:#0F172A;background:#fff;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .ap-field__input:focus,.ap-field__textarea:focus,.ap-field__select:focus{
+    outline:none;border-color:#0071e3;box-shadow:0 0 0 3px rgba(0,113,227,0.12);
+  }
+  .ap-field__textarea{min-height:90px;resize:vertical;}
+  .ap-field__hint{font-size:11.5px;color:#64748B;margin:0;}
+
+  .ap-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media (max-width:560px){.ap-row{grid-template-columns:1fr;}}
+
+  .ap-toggle{
+    display:flex;align-items:center;gap:12px;
+    padding:14px 16px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;
+    cursor:pointer;
+  }
+  .ap-toggle input{margin:0;}
+  .ap-toggle__body{flex:1;}
+  .ap-toggle__title{font-size:13px;font-weight:700;color:#0F172A;margin:0 0 2px;}
+  .ap-toggle__sub{font-size:12px;color:#64748B;margin:0;line-height:1.4;}
+
+  .ap-btn{
+    background:transparent;border:1px solid #CBD5E1;color:#0F172A;
+    padding:11px 22px;border-radius:9999px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .ap-btn:hover{background:#F1F5F9;}
+  .ap-btn--primary{background:#0F172A;color:#fff;border-color:#0F172A;}
+  .ap-btn--primary:hover{background:#1E293B;}
+  .ap-btn--danger{background:transparent;color:#DC2626;border-color:#FCA5A5;}
+  .ap-btn--danger:hover{background:#FEF2F2;}
+  .ap-btn:disabled{opacity:0.5;cursor:not-allowed;}
+
+  .ap-error{
+    background:#FEE2E2;border:1px solid #FCA5A5;color:#991B1B;
+    padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:10px;display:none;
+  }
+  .ap-error.is-shown{display:block;}
+  .ap-success{
+    background:#ECFDF5;border:1px solid #86EFAC;color:#047857;
+    padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:10px;display:none;
+  }
+  .ap-success.is-shown{display:block;}
+</style>
+</head>
+<body class="pm-has-sidebar">
+
+<!-- Sidebar mounts here -->
+<div id="pmSidebar"></div>
+
+<main class="ap-shell">
+  <div class="ap-head">
+    <div class="ap-head__body">
+      <p class="ap-eyebrow">Admin · Tools</p>
+      <h1 class="ap-h1">Assistant Profiles</h1>
+      <p class="ap-sub">Manage public-facing assistant profiles. Edits here are what families see when browsing assistants.</p>
+    </div>
+    <button type="button" class="ap-newbtn" id="apNewBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New profile
+    </button>
+  </div>
+
+  <div id="apListArea">
+    <div class="ap-loading"><span class="ap-spinner"></span> Loading profiles…</div>
+  </div>
+</main>
+
+<!-- Editor modal -->
+<div class="ap-modal" id="apModal" aria-hidden="true">
+  <div class="ap-modal__panel">
+    <div class="ap-modal__head">
+      <div>
+        <h2 class="ap-modal__title" id="apModalTitle">Edit assistant profile</h2>
+        <p class="ap-modal__sub">Public information shown to families. Toggle "Published" to make this profile visible.</p>
+      </div>
+      <button type="button" class="ap-modal__close" id="apModalClose" aria-label="Close">×</button>
+    </div>
+    <div class="ap-modal__body">
+      <div class="ap-error" id="apModalError"></div>
+      <div class="ap-success" id="apModalSuccess"></div>
+
+      <div class="ap-field" id="apFieldAssistant">
+        <label class="ap-field__label" for="apAssistantId">Assistant (user)</label>
+        <select class="ap-field__select" id="apAssistantId"></select>
+        <p class="ap-field__hint">Pick the user who owns this profile. Only people whose role is <code>ASSISTANT</code> appear here.</p>
+      </div>
+
+      <div class="ap-row">
+        <div class="ap-field">
+          <label class="ap-field__label" for="apDisplayName">Display name</label>
+          <input class="ap-field__input" type="text" id="apDisplayName" placeholder="e.g., Sarah K." />
+        </div>
+        <div class="ap-field">
+          <label class="ap-field__label" for="apCity">City</label>
+          <input class="ap-field__input" type="text" id="apCity" placeholder="Vancouver" />
+        </div>
+      </div>
+
+      <div class="ap-field">
+        <label class="ap-field__label" for="apBio">Bio</label>
+        <textarea class="ap-field__textarea" id="apBio" placeholder="A few sentences in the assistant's voice."></textarea>
+      </div>
+
+      <div class="ap-field">
+        <label class="ap-field__label" for="apLanguages">Languages</label>
+        <input class="ap-field__input" type="text" id="apLanguages" placeholder="English, French, Mandarin" />
+        <p class="ap-field__hint">Comma-separated.</p>
+      </div>
+
+      <div class="ap-field">
+        <label class="ap-field__label" for="apCertifications">Certifications</label>
+        <input class="ap-field__input" type="text" id="apCertifications" placeholder="First Aid, BC Teaching, ASD support" />
+        <p class="ap-field__hint">Comma-separated.</p>
+      </div>
+
+      <div class="ap-field">
+        <label class="ap-field__label" for="apEducation">Education summary</label>
+        <textarea class="ap-field__textarea" id="apEducation" placeholder="UBC — B.Ed., Education, 2021"></textarea>
+      </div>
+
+      <div class="ap-field">
+        <label class="ap-field__label" for="apExperience">Experience summary</label>
+        <textarea class="ap-field__textarea" id="apExperience" placeholder="3 years tutoring math, focus on ages 9–14."></textarea>
+      </div>
+
+      <label class="ap-toggle">
+        <input type="checkbox" id="apPublished" />
+        <span class="ap-toggle__body">
+          <span class="ap-toggle__title">Published</span>
+          <span class="ap-toggle__sub">When on, this profile is visible to families browsing the assistants marketplace.</span>
+        </span>
+      </label>
+    </div>
+    <div class="ap-modal__foot">
+      <button type="button" class="ap-btn ap-btn--danger" id="apDeleteBtn" hidden>Delete profile</button>
+      <div class="ap-modal__foot-actions">
+        <button type="button" class="ap-btn" id="apCancelBtn">Cancel</button>
+        <button type="button" class="ap-btn ap-btn--primary" id="apSaveBtn">Save profile</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260508a"></script>
+<script src="js/hiring-service.js?v=20260508a"></script>
+<script src="js/sidebar.js?v=20260508a"></script>
+<script>
+let profiles = [];
+let assistantUsers = [];
+let editingId = null;
+
+const modal = document.getElementById('apModal');
+const errEl = document.getElementById('apModalError');
+const okEl = document.getElementById('apModalSuccess');
+
+function escapeHtml(s){ return (s || '').toString().replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[c])); }
+function clearMessages(){ errEl.classList.remove('is-shown'); okEl.classList.remove('is-shown'); }
+function showError(msg){ errEl.textContent = msg; errEl.classList.add('is-shown'); okEl.classList.remove('is-shown'); }
+function showSuccess(msg){ okEl.textContent = msg; okEl.classList.add('is-shown'); errEl.classList.remove('is-shown'); }
+
+function userById(id){ return assistantUsers.find(u => u.user_id === id); }
+
+function renderList(){
+  const area = document.getElementById('apListArea');
+  if (!profiles.length){
+    area.innerHTML = `<div class="ap-empty">
+      <p class="ap-empty__title">No assistant profiles yet</p>
+      <p class="ap-empty__sub">Create the first profile so families can see who's available.</p>
+    </div>`;
+    return;
+  }
+  const rows = profiles.map(p => {
+    const user = userById(p.assistant_id);
+    const displayName = p.display_name || (user && user.full_name) || (user && user.email) || 'Unnamed';
+    const initials = displayName.split(/\s+/).map(s => s[0] || '').slice(0,2).join('').toUpperCase() || 'A';
+    const city = p.city ? escapeHtml(p.city) : '<em style="color:#94A3B8;">No city</em>';
+    const langs = (p.languages || []).length ? escapeHtml((p.languages || []).join(', ')) : '<em style="color:#94A3B8;">No languages</em>';
+    const pill = p.is_published
+      ? '<span class="ap-pill ap-pill--published">Published</span>'
+      : '<span class="ap-pill ap-pill--draft">Draft</span>';
+    const missing = !p.display_name || !p.bio
+      ? '<span class="ap-pill ap-pill--missing">Incomplete</span>'
+      : '';
+    return `<div class="ap-card" data-id="${escapeHtml(p.assistant_id)}">
+      <div class="ap-avatar">${escapeHtml(initials)}</div>
+      <div class="ap-card__body">
+        <p class="ap-card__name">${escapeHtml(displayName)}</p>
+        <p class="ap-card__sub">${city} · ${langs}</p>
+      </div>
+      <div class="ap-card__pills">${pill}${missing}</div>
+    </div>`;
+  }).join('');
+  area.innerHTML = `<div class="ap-list">${rows}</div>`;
+  area.querySelectorAll('[data-id]').forEach(card => {
+    card.addEventListener('click', () => openEditor(card.dataset.id));
+  });
+}
+
+function openEditor(assistantId){
+  clearMessages();
+  editingId = assistantId || null;
+  const isNew = !assistantId;
+
+  document.getElementById('apModalTitle').textContent = isNew ? 'New assistant profile' : 'Edit assistant profile';
+  document.getElementById('apDeleteBtn').hidden = isNew;
+
+  // Populate user picker (disabled if editing existing)
+  const sel = document.getElementById('apAssistantId');
+  sel.innerHTML = '<option value="">— Pick an assistant —</option>' +
+    assistantUsers.map(u => `<option value="${escapeHtml(u.user_id)}">${escapeHtml(u.full_name || u.email || u.user_id)}</option>`).join('');
+  sel.disabled = !isNew;
+
+  if (isNew){
+    sel.value = '';
+    document.getElementById('apDisplayName').value = '';
+    document.getElementById('apCity').value = '';
+    document.getElementById('apBio').value = '';
+    document.getElementById('apLanguages').value = '';
+    document.getElementById('apCertifications').value = '';
+    document.getElementById('apEducation').value = '';
+    document.getElementById('apExperience').value = '';
+    document.getElementById('apPublished').checked = false;
+  } else {
+    const p = profiles.find(x => x.assistant_id === assistantId);
+    if (!p) return;
+    sel.value = assistantId;
+    document.getElementById('apDisplayName').value = p.display_name || '';
+    document.getElementById('apCity').value = p.city || '';
+    document.getElementById('apBio').value = p.bio || '';
+    document.getElementById('apLanguages').value = (p.languages || []).join(', ');
+    document.getElementById('apCertifications').value = (p.certifications || []).join(', ');
+    document.getElementById('apEducation').value = p.education_summary || '';
+    document.getElementById('apExperience').value = p.experience_summary || '';
+    document.getElementById('apPublished').checked = !!p.is_published;
+  }
+
+  modal.classList.add('is-shown');
+  modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeEditor(){
+  modal.classList.remove('is-shown');
+  modal.setAttribute('aria-hidden', 'true');
+  editingId = null;
+}
+
+document.getElementById('apNewBtn').addEventListener('click', () => openEditor(null));
+document.getElementById('apModalClose').addEventListener('click', closeEditor);
+document.getElementById('apCancelBtn').addEventListener('click', closeEditor);
+modal.addEventListener('click', e => { if (e.target === modal) closeEditor(); });
+
+document.getElementById('apSaveBtn').addEventListener('click', async () => {
+  clearMessages();
+  const sel = document.getElementById('apAssistantId');
+  const assistantId = editingId || sel.value;
+  if (!assistantId){ showError('Pick an assistant before saving.'); return; }
+
+  const csv = s => (s || '').split(',').map(x => x.trim()).filter(Boolean);
+  const profile = {
+    assistant_id: assistantId,
+    display_name: document.getElementById('apDisplayName').value.trim() || null,
+    city: document.getElementById('apCity').value.trim() || null,
+    bio: document.getElementById('apBio').value.trim() || null,
+    languages: csv(document.getElementById('apLanguages').value),
+    certifications: csv(document.getElementById('apCertifications').value),
+    education_summary: document.getElementById('apEducation').value.trim() || null,
+    experience_summary: document.getElementById('apExperience').value.trim() || null,
+    is_published: document.getElementById('apPublished').checked,
+    approved_public_fields: {},
+  };
+
+  const btn = document.getElementById('apSaveBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await window.pmHiring.adminUpsertAssistantProfile(profile);
+    showSuccess('Saved.');
+    setTimeout(async () => {
+      await reload();
+      closeEditor();
+    }, 600);
+  } catch (e){
+    console.error(e);
+    showError(e?.message || 'Could not save profile.');
+    btn.disabled = false; btn.textContent = 'Save profile';
+  }
+});
+
+document.getElementById('apDeleteBtn').addEventListener('click', async () => {
+  if (!editingId) return;
+  if (!confirm('Delete this assistant profile? This cannot be undone.')) return;
+  const btn = document.getElementById('apDeleteBtn');
+  btn.disabled = true; btn.textContent = 'Deleting…';
+  try {
+    await window.pmHiring.adminDeleteAssistantProfile(editingId);
+    await reload();
+    closeEditor();
+  } catch (e){
+    console.error(e);
+    showError(e?.message || 'Could not delete profile.');
+    btn.disabled = false; btn.textContent = 'Delete profile';
+  }
+});
+
+async function reload(){
+  document.getElementById('apListArea').innerHTML = '<div class="ap-loading"><span class="ap-spinner"></span> Loading profiles…</div>';
+  try {
+    [profiles, assistantUsers] = await Promise.all([
+      window.pmHiring.adminListAssistantProfiles(),
+      window.pmHiring.adminListAssistantUsers(),
+    ]);
+    renderList();
+  } catch (e){
+    console.error(e);
+    document.getElementById('apListArea').innerHTML = `<div class="ap-empty"><p class="ap-empty__title">Couldn't load profiles</p><p class="ap-empty__sub">${escapeHtml(e?.message || '')}</p></div>`;
+  }
+}
+
+(async function init(){
+  // Wait briefly for sidebar.js to verify auth + role.
+  await new Promise(r => setTimeout(r, 300));
+  await reload();
+})();
+</script>
+
+</body>
+</html>

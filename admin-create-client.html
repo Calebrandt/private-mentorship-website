@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Create Client — Private Mentorship</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&display=swap" />
+<link rel="stylesheet" href="js/sidebar.css?v=20260508c" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#F4F5F7;color:#0F172A;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+
+  .cc-shell{padding:36px 32px 80px;max-width:880px;margin:0 auto;}
+  .cc-head{margin-bottom:28px;}
+  .cc-eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#0071e3;margin:0 0 8px;}
+  .cc-h1{font-family:"Archivo","Inter",sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0 0 8px;color:#0F172A;}
+  .cc-sub{font-size:14px;color:#64748B;margin:0;line-height:1.5;max-width:560px;}
+
+  .cc-card{
+    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    padding:28px 30px;
+    box-shadow:0 1px 2px rgba(15,23,42,0.04);
+  }
+
+  .cc-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+  .cc-row--full{grid-template-columns:1fr;}
+  .cc-field{display:flex;flex-direction:column;gap:6px;}
+  .cc-label{font-size:12.5px;font-weight:600;color:#334155;letter-spacing:-.005em;}
+  .cc-hint{font-size:11.5px;color:#94A3B8;margin-top:-2px;}
+  .cc-input,.cc-select{
+    appearance:none;-webkit-appearance:none;
+    background:#fff;border:1px solid #CBD5E1;border-radius:9px;
+    padding:10px 12px;font:500 14px "Inter",sans-serif;color:#0F172A;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .cc-input:focus,.cc-select:focus{outline:none;border-color:#0071e3;box-shadow:0 0 0 3px rgba(0,113,227,0.16);}
+  .cc-input::placeholder{color:#94A3B8;}
+
+  .cc-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px;border-top:1px solid #E2E8F0;padding-top:20px;}
+  .cc-btn{
+    border:none;font:600 13.5px "Inter",sans-serif;
+    padding:11px 20px;border-radius:9999px;cursor:pointer;
+    transition:background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .cc-btn--ghost{background:transparent;color:#475569;border:1px solid #CBD5E1;}
+  .cc-btn--ghost:hover{background:#F1F5F9;}
+  .cc-btn--primary{background:#0F172A;color:#fff;}
+  .cc-btn--primary:hover{background:#1E293B;}
+  .cc-btn[disabled]{opacity:.55;cursor:not-allowed;}
+
+  .cc-alert{
+    margin-top:18px;padding:12px 14px;border-radius:10px;
+    font-size:13px;line-height:1.45;
+    display:none;
+  }
+  .cc-alert.is-shown{display:block;}
+  .cc-alert--err{background:#FEF2F2;color:#991B1B;border:1px solid #FECACA;}
+  .cc-alert--ok{background:#ECFDF5;color:#065F46;border:1px solid #A7F3D0;}
+
+  .cc-pwbar{display:flex;align-items:center;gap:8px;}
+  .cc-pwbar__btn{
+    background:transparent;border:1px solid #CBD5E1;color:#475569;
+    padding:6px 10px;border-radius:7px;font:500 12px "Inter",sans-serif;cursor:pointer;
+  }
+  .cc-pwbar__btn:hover{background:#F1F5F9;}
+
+  /* Recent created clients summary */
+  .cc-recent{margin-top:32px;}
+  .cc-recent__h{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748B;margin:0 0 12px;}
+  .cc-recent__list{display:flex;flex-direction:column;gap:8px;}
+  .cc-recent__row{
+    background:#fff;border:1px solid #E2E8F0;border-radius:11px;padding:12px 16px;
+    display:flex;align-items:center;gap:12px;
+  }
+  .cc-recent__avatar{
+    width:34px;height:34px;border-radius:50%;background:#27272A;color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;
+  }
+  .cc-recent__name{font-size:13.5px;font-weight:600;color:#0F172A;margin:0;}
+  .cc-recent__email{font-size:12px;color:#64748B;margin:0;}
+
+  @media (max-width:640px){
+    .cc-shell{padding:24px 16px 60px;}
+    .cc-h1{font-size:26px;}
+    .cc-row{grid-template-columns:1fr;}
+    .cc-card{padding:20px;}
+  }
+</style>
+</head>
+<body>
+<div id="pmSidebar"></div>
+
+<div class="cc-shell">
+  <header class="cc-head">
+    <p class="cc-eyebrow">Admin · Clients</p>
+    <h1 class="cc-h1">Create a client account</h1>
+    <p class="cc-sub">Sets up a new client so they can sign in to the website. Bare minimum required: email, password, and legal name. Plan, contract, and hours are configured separately later.</p>
+  </header>
+
+  <div class="cc-card">
+    <form id="ccForm" autocomplete="off">
+      <div class="cc-row cc-row--full">
+        <div class="cc-field">
+          <label class="cc-label" for="ccFullName">Legal name</label>
+          <input class="cc-input" id="ccFullName" name="fullName" type="text" placeholder="Jane Doe" required />
+        </div>
+      </div>
+
+      <div class="cc-row">
+        <div class="cc-field">
+          <label class="cc-label" for="ccEmail">Email</label>
+          <input class="cc-input" id="ccEmail" name="email" type="email" placeholder="jane@example.com" required />
+        </div>
+        <div class="cc-field">
+          <label class="cc-label" for="ccPhone">Phone <span style="color:#94A3B8;font-weight:500;">(optional)</span></label>
+          <input class="cc-input" id="ccPhone" name="phone" type="tel" placeholder="+1 604 555 0100" />
+        </div>
+      </div>
+
+      <div class="cc-row">
+        <div class="cc-field">
+          <label class="cc-label" for="ccPassword">Password</label>
+          <div class="cc-pwbar">
+            <input class="cc-input" id="ccPassword" name="password" type="text" placeholder="At least 8 characters" required style="flex:1;" />
+            <button type="button" class="cc-pwbar__btn" id="ccGenPw">Generate</button>
+          </div>
+          <p class="cc-hint">Share this with the client securely. They can change it after signing in.</p>
+        </div>
+        <div class="cc-field">
+          <label class="cc-label" for="ccRole">Family role <span style="color:#94A3B8;font-weight:500;">(optional)</span></label>
+          <select class="cc-select" id="ccRole" name="role">
+            <option value="PRIMARY">Primary client</option>
+            <option value="SPOUSE">Spouse</option>
+            <option value="FAMILY">Family member</option>
+          </select>
+          <p class="cc-hint">Stored on the user profile for app-side context.</p>
+        </div>
+      </div>
+
+      <div class="cc-actions">
+        <button type="button" class="cc-btn cc-btn--ghost" id="ccReset">Clear form</button>
+        <button type="submit" class="cc-btn cc-btn--primary" id="ccSubmit">Create client</button>
+      </div>
+
+      <div class="cc-alert cc-alert--err" id="ccErr"></div>
+      <div class="cc-alert cc-alert--ok" id="ccOk"></div>
+    </form>
+  </div>
+
+  <section class="cc-recent" id="ccRecentWrap" hidden>
+    <h2 class="cc-recent__h">Recently created</h2>
+    <div class="cc-recent__list" id="ccRecent"></div>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/hiring-service.js"></script>
+<script src="js/sidebar.js"></script>
+<script>
+(async () => {
+  // Auth gate: must be admin/owner
+  try {
+    const user = await window.pmHiring.getCurrentUser();
+    if (!user) { window.location.href = 'signin.html'; return; }
+    const isAdmin = await window.pmHiring.isCurrentUserAdminOrOwner();
+    if (!isAdmin) { window.location.href = 'index.html'; return; }
+  } catch (e) {
+    window.location.href = 'signin.html'; return;
+  }
+
+  const $ = (id) => document.getElementById(id);
+  const form = $('ccForm');
+  const errEl = $('ccErr');
+  const okEl = $('ccOk');
+  const submitBtn = $('ccSubmit');
+
+  function showErr(msg) { errEl.textContent = msg; errEl.classList.add('is-shown'); okEl.classList.remove('is-shown'); }
+  function showOk(msg) { okEl.textContent = msg; okEl.classList.add('is-shown'); errEl.classList.remove('is-shown'); }
+  function clearAlerts() { errEl.classList.remove('is-shown'); okEl.classList.remove('is-shown'); }
+
+  // Generate a strong password
+  $('ccGenPw').addEventListener('click', () => {
+    const charset = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%';
+    let pw = '';
+    const arr = new Uint32Array(14);
+    crypto.getRandomValues(arr);
+    for (const n of arr) pw += charset[n % charset.length];
+    $('ccPassword').value = pw;
+  });
+
+  // Reset
+  $('ccReset').addEventListener('click', () => { form.reset(); clearAlerts(); });
+
+  // Submit
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearAlerts();
+    const fullName = $('ccFullName').value.trim();
+    const email = $('ccEmail').value.trim().toLowerCase();
+    const phone = $('ccPhone').value.trim() || null;
+    const password = $('ccPassword').value;
+    const role = $('ccRole').value;
+
+    if (!fullName || !email || !password) {
+      showErr('Legal name, email, and password are required.');
+      return;
+    }
+    if (password.length < 8) {
+      showErr('Password must be at least 8 characters.');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Creating…';
+    try {
+      const res = await window.pmHiring.adminCreateClientAccount({ email, password, fullName, phone, role });
+      showOk(`Created ${res.full_name} (${res.email}). They can now sign in at the homepage.`);
+      form.reset();
+      await refreshRecent();
+    } catch (err) {
+      showErr(err?.message || 'Failed to create client.');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Create client';
+    }
+  });
+
+  // Recent clients list
+  async function refreshRecent() {
+    try {
+      const list = await window.pmHiring.adminListClients({ limit: 6 });
+      const wrap = $('ccRecentWrap');
+      const root = $('ccRecent');
+      if (!list.length) { wrap.hidden = true; return; }
+      wrap.hidden = false;
+      root.innerHTML = list.map(c => {
+        const name = c.full_name || c.display_name || '—';
+        const initials = (name.split(/\s+/).map(s => s[0] || '').slice(0,2).join('') || 'C').toUpperCase();
+        return `<div class="cc-recent__row">
+          <div class="cc-recent__avatar">${initials}</div>
+          <div style="flex:1;min-width:0;">
+            <p class="cc-recent__name">${escapeHtml(name)}</p>
+            <p class="cc-recent__email">${escapeHtml(c.email || '—')}</p>
+          </div>
+        </div>`;
+      }).join('');
+    } catch (_) { /* silent */ }
+  }
+  function escapeHtml(s){return (s||'').toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
+
+  await refreshRecent();
+})();
+</script>
+</body>
+</html>

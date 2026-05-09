@@ -91,6 +91,43 @@
     }
     .nav-cta:hover { filter: brightness(1.1); transform: scale(1.04); box-shadow: 0 6px 20px rgba(37,99,235,0.4); }
 
+    /* GOLD nav CTA — static rich gold, white text, no shine sweep */
+    .nav-cta--gold {
+      background: linear-gradient(110deg,
+        #C99A3A 0%,
+        #D9AE48 30%,
+        #E8C068 50%,
+        #D9AE48 70%,
+        #C99A3A 100%
+      ) !important;
+      color: #ffffff !important;
+      padding: 9px 20px !important;
+      border-radius: 980px !important;
+      font-size: 14px !important;
+      font-weight: 700 !important;
+      text-shadow: 0 1px 2px rgba(102,72,20,0.45);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.45) inset,
+        0 0 0 1px rgba(184,138,54,0.45),
+        0 2px 6px rgba(102,72,20,0.18) !important;
+      transition: filter .2s, transform .15s, box-shadow .25s !important;
+    }
+    .nav-cta--gold:hover {
+      filter: brightness(1.05);
+      transform: scale(1.04);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.55) inset,
+        0 0 0 1px rgba(184,138,54,0.55),
+        0 4px 10px rgba(102,72,20,0.22) !important;
+    }
+    @keyframes navCtaGoldShimmer {
+      0%, 100% { background-position: 0% 50%; }
+      50%      { background-position: 100% 50%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .nav-cta--gold { animation: none !important; }
+    }
+
     /* ── COMET BUTTON ── */
     @property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
     @keyframes orbit { to { --angle: 360deg; } }
@@ -197,6 +234,10 @@ margin-bottom: 24px;
     .hl-word {
       font-style: italic;
       font-weight: 700;
+      /* Fallback solid color so the word stays readable even if the
+         compositor drops the gradient (heavy marquee pages occasionally
+         lose -webkit-text-fill-color: transparent under paint pressure). */
+      color: #67C3E5;
       background: linear-gradient(90deg,
         #4B9FC8 0%,
         #67C3E5 30%,
@@ -211,6 +252,15 @@ margin-bottom: 24px;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       animation: waterShimmer 20s linear infinite, glowWave 16s ease-in-out infinite;
+      animation-play-state: running;
+      /* GPU-promote so this animation runs on its own layer instead of
+         repainting the entire headline every frame. */
+      will-change: background-position, filter;
+    }
+    /* Pause the shimmer when user prefers reduced motion or when the
+       headline isn't on screen — handled via JS below for off-screen. */
+    @media (prefers-reduced-motion: reduce) {
+      .hl-word { animation: none; }
     }
 
 .hl-script {

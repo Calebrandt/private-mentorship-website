@@ -1,6 +1,8 @@
 .identity-hero {
   --identity-contour: rgba(23, 21, 20, 0.055);
   --identity-wire: rgba(23, 21, 20, 0.22);
+  /* Warm cream backdrop sampled from the original portrait photo. */
+  background-color: #e5dfd1;
   position: relative;
   width: 100%;
   min-height: 100vh;
@@ -51,10 +53,19 @@
 .portrait__stage {
   position: relative;
   aspect-ratio: 2752 / 1536;
-  width: min(94vw, calc(90dvh * 2752 / 1536));
-  max-width: 1600px;
+  width: min(98vw, calc(100dvh * 2752 / 1536));
+max-width: 100vw;
   user-select: none;
   -webkit-user-select: none;
+  /* Clip the zoomed portrait + helmet edges. */
+  overflow: hidden;
+  /* Parallax head-tracking. --parallax-x/y are updated by hero.js
+     each frame based on mouse position. Smoothed there, not via
+     a CSS transition (transition would fight the JS lerp). */
+  --parallax-x: 0px;
+  --parallax-y: 0px;
+  transform: translate3d(var(--parallax-x), var(--parallax-y), 0);
+  will-change: transform;
 }
 
 .portrait__base,
@@ -67,12 +78,33 @@
   display: block;
 }
 
+.portrait__stage canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
 .portrait__base {
   z-index: 1;
   object-fit: cover;
   pointer-events: none;
   -webkit-user-drag: none;
   image-rendering: -webkit-optimize-contrast;
+  /* Modest zoom + small downshift. Goal is the Lando layout:
+     full head + neck + top of sweater all visible in frame, with a
+     little headroom above the hair. Previous values (1.22 + 11%)
+     made the face huge but clipped the neck and shoulders.
+     helmetFit.cy in hero.js (0.41) matches the new face position. */
+  transform: scale(1.10) translateY(6%);
+  transform-origin: 50% 35%;
+}
+
+/* Wire mesh scales + shifts identically so it stays pinned to her head. */
+.portrait__wire {
+  transform: scale(1.10) translateY(6%);
+  transform-origin: 50% 35%;
 }
 
 .portrait__reveal {
@@ -96,21 +128,44 @@
 
 .portrait.is-loaded .portrait__wire { opacity: 1; }
 
-.wire {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  transition: stroke-dashoffset 1700ms cubic-bezier(0.65, 0.02, 0.2, 1);
+@media (prefers-reduced-motion: reduce) {
+  .portrait__reveal,
+  .portrait__wire { transition-duration: 0ms; }
+}
+
+/* ------------------------------------------------------------------
+   Helmet simulation layer (populated by hero.js into .portrait__wire)
+   Intent: a premium, technical "wireframe helmet being constructed"
+   around the face — a top-down wave reveals the mesh while the trail
+   dissolves softly behind it. Never a hard dark outline.
+   ------------------------------------------------------------------ */
+
+/* Fallback (no-JS) — the `stroke` attribute on the <g>s provides the
+   visible paint, so these CSS rules are mostly for safety + a11y. */
+.hx-grid path,
+.hx-seams path {
+  fill: none;
   vector-effect: non-scaling-stroke;
 }
 
-.portrait.is-loaded .wire--outer  { stroke-dashoffset: 0; transition-delay:  80ms; }
-.portrait.is-loaded .wire--center { stroke-dashoffset: 0; transition-delay: 280ms; }
-.portrait.is-loaded .wire--crown  { stroke-dashoffset: 0; transition-delay: 560ms; }
-.portrait.is-loaded .wire--visor  { stroke-dashoffset: 0; transition-delay: 740ms; }
-.portrait.is-loaded .wire--jaw    { stroke-dashoffset: 0; transition-delay: 920ms; }
+/* Helmet + visor contour. CRITICAL: fill:none — a filled path here would
+   render as a solid dark helmet-shape on top of the reveal canvas. */
+.hx-outline {
+  fill: none;
+  stroke: rgba(23, 21, 20, 0.32);
+  stroke-width: 1.1;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.hx-outline.hx-visor {
+  stroke: rgba(23, 21, 20, 0.28);
+  stroke-width: 1.0;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .portrait__reveal,
-  .portrait__wire,
-  .wire { transition-duration: 0ms; }
+  /* Hold the mesh in a faint steady state rather than animating */
+  .hx-shell { opacity: 0.5; }
+  .hx-outline { opacity: 0.55 !important; }
 }

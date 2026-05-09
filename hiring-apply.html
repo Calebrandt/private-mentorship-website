@@ -1,0 +1,2281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
+<title>Assistant Application — Private Mentorship</title>
+<meta name="description" content="Apply to become a Private Mentorship Assistant. A serious, self-paced application for serious work." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,500;1,600&display=swap" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  :root{
+    --bg:#f5f5f7;
+    --paper:#FAFAF8;
+    --surface:#FFFFFF;
+    --ink:#1d1d1f;
+    --ink-2:#2a2a2c;
+    --ink-mute:#6e6e73;
+    --ink-tert:#aeaeb2;
+    --hair:#d2d2d7;
+    --hair-light:#e8e8ed;
+    --input-bg:#f5f5f7;
+    --accent:#0071e3;
+    --accent-deep:#0058b3;
+    --accent-fade:#e8f2fd;
+    --accent-border:#b3d0f5;
+    --warn-bg:#FEF3C7;
+    --warn-border:#F59E0B;
+    --warn-ink:#92400E;
+    --danger:#ff3b30;
+    --danger-fade:#fff1f0;
+    --success:#10B981;
+    --success-fade:#ECFDF5;
+    --success-ink:#047857;
+    --sans:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --display:"Archivo","Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;
+    --serif:"Playfair Display",Georgia,serif;
+    --ease-out:cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;}
+  body{min-height:100vh;}
+  a{color:inherit;}
+
+  /* ─── NAV ─── */
+  .ha-nav{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 40px;
+    background:rgba(245,245,247,0.85);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--hair-light);
+  }
+  .ha-nav__logo{font-size:13px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--ink);text-decoration:none;}
+  .ha-nav__links{display:flex;gap:28px;align-items:center;}
+  .ha-nav__links a{font-size:13px;font-weight:500;color:var(--ink-mute);text-decoration:none;}
+  .ha-nav__links a:hover{color:var(--ink);}
+
+  /* ─── HERO ─── */
+  .ha-hero{
+    padding:140px 32px 28px;
+    text-align:center;
+    max-width:880px;
+    margin:0 auto;
+  }
+  .ha-hero__eyebrow{font-size:11px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;}
+  .ha-hero__title{
+    font-family:var(--display);font-size:clamp(40px,6vw,68px);font-weight:800;letter-spacing:-0.04em;line-height:1.0;color:var(--ink);margin:0 0 16px;
+  }
+  .ha-hero__title em{font-family:var(--serif);font-style:italic;font-weight:500;color:var(--ink-mute);letter-spacing:-0.02em;}
+  .ha-hero__sub{font-size:16px;font-weight:400;line-height:1.55;color:var(--ink-mute);max-width:600px;margin:0 auto;}
+
+  /* ─── PROGRESS BAR (24 steps) ─── */
+  .ha-progress{
+    max-width:760px;margin:30px auto 22px;padding:0 32px;
+  }
+  .ha-progress__bar{
+    width:100%;height:6px;background:var(--hair-light);border-radius:999px;overflow:hidden;position:relative;
+  }
+  .ha-progress__fill{
+    height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-deep));
+    border-radius:999px;width:0%;
+    transition:width .35s var(--ease-out);
+  }
+  .ha-progress__meta{
+    display:flex;align-items:center;justify-content:space-between;margin-top:12px;
+    font-size:11px;font-weight:600;color:var(--ink-mute);letter-spacing:.06em;text-transform:uppercase;
+  }
+  .ha-progress__meta strong{color:var(--accent);font-weight:700;}
+
+  /* ─── STEP HEADER (above each step) ─── */
+  .ha-stephead{
+    max-width:760px;margin:0 auto;padding:0 32px 20px;text-align:center;
+  }
+  .ha-stephead__icon{
+    width:54px;height:54px;border-radius:14px;
+    background:var(--accent-fade);color:var(--accent);
+    display:inline-flex;align-items:center;justify-content:center;
+    margin:0 auto 16px;
+  }
+  .ha-stephead__icon svg{width:24px;height:24px;}
+  .ha-stephead__eyebrow{
+    font-size:11px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;
+  }
+  .ha-stephead__title{
+    font-family:var(--display);font-size:clamp(28px,3.4vw,38px);font-weight:800;letter-spacing:-0.025em;color:var(--ink);margin:0 0 8px;
+  }
+  .ha-stephead__title em{font-family:var(--serif);font-style:italic;font-weight:500;color:var(--ink-mute);letter-spacing:-.012em;}
+  .ha-stephead__sub{font-size:15px;color:var(--ink-mute);margin:0 auto;max-width:560px;line-height:1.55;}
+
+  /* ─── FORM SHELL ─── */
+  .ha-wrap{
+    max-width:760px;margin:0 auto 120px;padding:0 32px;
+  }
+  .ha-step{display:none;}
+  .ha-step.is-active{display:block;animation:fadeUp .35s var(--ease-out);}
+  @keyframes fadeUp{
+    from{opacity:0;transform:translateY(8px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+
+  /* ─── CARDS ─── */
+  .ha-card{
+    background:var(--surface);
+    border:1px solid var(--hair-light);
+    border-radius:16px;
+    padding:28px 28px 24px;
+    margin-bottom:18px;
+    box-shadow:0 1px 2px rgba(10,10,10,0.02);
+  }
+  .ha-card__head{margin-bottom:18px;}
+  .ha-card__title{font-size:17px;font-weight:700;letter-spacing:-0.01em;color:var(--ink);margin:0 0 4px;}
+  .ha-card__sub{font-size:13.5px;color:var(--ink-mute);margin:0;line-height:1.5;}
+  .ha-divider{height:1px;background:var(--hair-light);margin:24px 0;}
+
+  /* ─── LABELS / HINTS ─── */
+  .ha-label{
+    display:block;font-size:12px;font-weight:600;color:var(--ink);
+    margin:18px 0 8px;letter-spacing:.01em;
+  }
+  .ha-label--top{margin-top:0;}
+  .ha-hint{font-size:12.5px;color:var(--ink-mute);margin:0 0 10px;line-height:1.5;}
+
+  /* ─── INPUTS ─── */
+  .ha-input,.ha-textarea,.ha-select{
+    width:100%;background:var(--input-bg);
+    border:1px solid var(--hair);border-radius:10px;
+    padding:13px 14px;
+    font-family:var(--sans);font-size:14px;font-weight:400;color:var(--ink);
+    transition:border-color .18s var(--ease-out), box-shadow .18s var(--ease-out), background .18s var(--ease-out);
+    -webkit-appearance:none;appearance:none;
+  }
+  .ha-input::placeholder,.ha-textarea::placeholder{color:var(--ink-tert);}
+  .ha-input:focus,.ha-textarea:focus,.ha-select:focus{
+    outline:none;border-color:var(--accent);background:#FFF;
+    box-shadow:0 0 0 4px rgba(0,113,227,0.12);
+  }
+  .ha-textarea{resize:vertical;min-height:120px;line-height:1.55;}
+
+  .ha-row{display:flex;gap:12px;flex-wrap:wrap;}
+  .ha-row > *{flex:1;min-width:0;}
+
+  /* ─── TOGGLE (segmented) ─── */
+  .ha-toggle{
+    display:flex;background:var(--input-bg);
+    border:1px solid var(--hair-light);border-radius:10px;
+    padding:3px;gap:3px;
+  }
+  .ha-toggle__btn{
+    flex:1;background:transparent;border:0;
+    padding:9px 12px;
+    font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink-mute);
+    border-radius:8px;cursor:pointer;
+    transition:background .18s var(--ease-out), color .18s var(--ease-out), box-shadow .18s var(--ease-out);
+  }
+  .ha-toggle__btn.is-active{
+    background:var(--surface);color:var(--ink);
+    box-shadow:0 1px 3px rgba(10,10,10,0.08);
+  }
+
+  /* ─── PILLS ─── */
+  .ha-pills{display:flex;flex-wrap:wrap;gap:8px;}
+  .ha-pill{
+    background:var(--surface);
+    border:1px solid var(--hair);
+    border-radius:999px;
+    padding:9px 16px;
+    font-family:var(--sans);font-size:13px;font-weight:500;color:var(--ink);
+    cursor:pointer;user-select:none;
+    transition:all .18s var(--ease-out);
+  }
+  .ha-pill:hover{border-color:var(--accent-border);}
+  .ha-pill.is-active{
+    background:var(--accent-fade);
+    color:var(--accent-deep);
+    border-color:var(--accent-border);
+    font-weight:600;
+  }
+
+  /* ─── CHOICE CARDS (rich radio) ─── */
+  .ha-choices{display:flex;flex-direction:column;gap:10px;}
+  .ha-choice{
+    display:flex;align-items:flex-start;gap:14px;
+    padding:16px 18px;
+    background:var(--input-bg);
+    border:1px solid var(--hair-light);border-radius:12px;
+    cursor:pointer;user-select:none;font-family:inherit;text-align:left;
+    transition:all .18s var(--ease-out);
+  }
+  .ha-choice:hover{border-color:var(--accent-border);}
+  .ha-choice.is-active{
+    background:var(--accent-fade);border-color:var(--accent-border);
+  }
+  .ha-choice__bullet{
+    width:22px;height:22px;border-radius:50%;
+    border:1.5px solid var(--hair);background:var(--surface);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;margin-top:1px;position:relative;
+    transition:all .14s var(--ease-out);
+  }
+  .ha-choice.is-active .ha-choice__bullet{background:var(--accent);border-color:var(--accent);}
+  .ha-choice__bullet::after{
+    content:"";width:8px;height:8px;border-radius:50%;background:#fff;
+    opacity:0;transition:opacity .14s var(--ease-out);
+  }
+  .ha-choice.is-active .ha-choice__bullet::after{opacity:1;}
+  .ha-choice__body{flex:1;min-width:0;}
+  .ha-choice__title{font-size:15px;font-weight:700;color:var(--ink);margin:0 0 2px;}
+  .ha-choice__sub{font-size:13px;color:var(--ink-mute);margin:0;line-height:1.5;}
+  .ha-choice__example{font-size:13px;color:var(--ink-2);margin-top:8px;font-style:italic;}
+
+  /* ─── CHECKLIST (multi) — same look as ha-choice but square box ─── */
+  .ha-multi{display:flex;flex-direction:column;gap:10px;}
+  .ha-multi__item{
+    display:flex;align-items:flex-start;gap:14px;
+    padding:16px 18px;
+    background:var(--input-bg);
+    border:1px solid var(--hair-light);border-radius:12px;
+    cursor:pointer;user-select:none;
+    transition:all .18s var(--ease-out);
+  }
+  .ha-multi__item:hover{border-color:var(--accent-border);}
+  .ha-multi__item.is-active{
+    background:var(--accent-fade);border-color:var(--accent-border);
+  }
+  .ha-checkbox{
+    width:22px;height:22px;border-radius:6px;
+    border:1.5px solid var(--hair);background:var(--surface);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;margin-top:1px;
+    transition:all .14s var(--ease-out);
+  }
+  .ha-multi__item.is-active .ha-checkbox,
+  .ha-agree.is-active .ha-checkbox{background:var(--accent);border-color:var(--accent);color:#FFF;}
+  .ha-checkbox svg{width:13px;height:13px;display:none;}
+  .ha-multi__item.is-active .ha-checkbox svg,
+  .ha-agree.is-active .ha-checkbox svg{display:block;}
+  .ha-multi__title{font-size:14.5px;font-weight:600;color:var(--ink);}
+  .ha-multi__sub{font-size:13px;color:var(--ink-mute);margin-top:3px;line-height:1.5;}
+  .ha-multi__example{font-size:12.5px;color:var(--ink-2);margin-top:8px;font-style:italic;}
+
+  /* ─── AGREEMENT ROW (simple ack checkbox) ─── */
+  .ha-agree{
+    display:flex;align-items:flex-start;gap:14px;
+    padding:14px 4px;cursor:pointer;user-select:none;
+  }
+  .ha-agree__text{font-size:14px;color:var(--ink);line-height:1.55;flex:1;}
+
+  /* ─── DAY CHIPS ─── */
+  .ha-daychips{display:flex;flex-wrap:wrap;gap:8px;}
+  .ha-daychip{
+    background:var(--surface);
+    border:1px solid var(--hair);
+    border-radius:10px;
+    padding:11px 16px;
+    font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink-mute);
+    cursor:pointer;user-select:none;text-align:center;
+    transition:all .18s var(--ease-out);
+  }
+  .ha-daychip:hover{border-color:var(--accent-border);}
+  .ha-daychip.is-active{background:var(--accent);color:#FFF;border-color:var(--accent);}
+
+  /* ─── CALLOUT ─── */
+  .ha-callout{
+    background:var(--accent-fade);
+    border:1px solid var(--accent-border);
+    border-radius:12px;
+    padding:16px 18px;
+    margin:14px 0;
+  }
+  .ha-callout__title{font-size:13px;font-weight:700;color:var(--accent-deep);margin:0 0 6px;}
+  .ha-callout__body{font-size:13.5px;color:var(--ink-2);margin:0;line-height:1.55;}
+  .ha-callout--warn{background:var(--warn-bg);border-color:var(--warn-border);}
+  .ha-callout--warn .ha-callout__title{color:var(--warn-ink);}
+  .ha-callout--warn .ha-callout__body{color:#78350F;}
+  .ha-callout--danger{background:var(--danger-fade);border-color:var(--danger);}
+  .ha-callout--danger .ha-callout__title{color:var(--danger);}
+
+  /* ─── INFO BLOCK ─── */
+  .ha-info{
+    background:var(--input-bg);border-radius:12px;
+    padding:16px 18px;margin:12px 0;
+    font-size:13.5px;line-height:1.6;color:var(--ink-2);
+  }
+  .ha-info p{margin:0 0 10px;}
+  .ha-info p:last-child{margin-bottom:0;}
+  .ha-info strong{color:var(--ink);font-weight:700;}
+  .ha-info ul{margin:6px 0 0 0;padding-left:18px;}
+  .ha-info li{margin:2px 0;}
+
+  /* ─── META GRID (small data tiles) ─── */
+  .ha-meta-grid{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0;
+  }
+  .ha-meta-grid__item{
+    background:var(--input-bg);
+    padding:12px 14px;border-radius:10px;border:1px solid var(--hair-light);
+  }
+  .ha-meta-grid__label{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-tert);margin:0 0 4px;}
+  .ha-meta-grid__value{font-size:14px;font-weight:700;color:var(--ink);margin:0;}
+
+  /* ─── LINK LIST ─── */
+  .ha-links{display:flex;flex-direction:column;gap:8px;margin:12px 0;}
+  .ha-links a{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    background:var(--input-bg);border:1px solid var(--hair-light);border-radius:10px;
+    padding:13px 16px;text-decoration:none;color:var(--ink);
+    transition:border-color .18s var(--ease-out), background .18s var(--ease-out);
+  }
+  .ha-links a:hover{border-color:var(--accent-border);background:var(--accent-fade);}
+  .ha-links a strong{font-size:13.5px;font-weight:700;display:block;}
+  .ha-links a small{font-size:11.5px;color:var(--ink-mute);font-weight:500;display:block;margin-top:2px;}
+  .ha-links a svg{width:16px;height:16px;color:var(--ink-mute);flex-shrink:0;}
+
+  /* ─── RATE TABLE ─── */
+  .ha-rates{
+    background:var(--input-bg);border:1px solid var(--hair-light);border-radius:10px;
+    overflow:hidden;margin:12px 0;
+  }
+  .ha-rates__row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:11px 16px;border-bottom:1px solid var(--hair-light);font-size:13px;
+  }
+  .ha-rates__row:last-child{border-bottom:none;}
+  .ha-rates__row--head{background:var(--surface);font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:.14em;color:var(--ink-mute);}
+  .ha-rates__row--total{background:var(--accent-fade);font-weight:700;color:var(--accent-deep);}
+  .ha-rates__label{color:var(--ink);}
+  .ha-rates__value{color:var(--ink);font-weight:700;}
+
+  /* ─── CHAR COUNTER ─── */
+  .ha-counter{
+    font-size:11.5px;color:var(--ink-tert);font-weight:600;
+    text-align:right;margin-top:6px;letter-spacing:.04em;
+  }
+  .ha-counter.is-ok{color:var(--success-ink);}
+
+  /* ─── UPLOAD CARD ─── */
+  .ha-upload{
+    border:1.5px dashed var(--hair);
+    border-radius:14px;background:var(--input-bg);
+    padding:18px 20px;
+    display:flex;align-items:center;gap:16px;
+    margin-bottom:12px;
+    transition:all .18s var(--ease-out);
+  }
+  .ha-upload:hover{border-color:var(--accent-border);background:var(--accent-fade);}
+  .ha-upload.is-filled{border-style:solid;border-color:var(--success);background:var(--success-fade);}
+  .ha-upload__icon{
+    flex:0 0 44px;width:44px;height:44px;border-radius:10px;
+    background:var(--accent-fade);color:var(--accent);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .ha-upload.is-filled .ha-upload__icon{background:var(--success);color:#fff;}
+  .ha-upload__icon svg{width:20px;height:20px;}
+  .ha-upload__body{flex:1;min-width:0;}
+  .ha-upload__title{font-size:14px;font-weight:700;color:var(--ink);margin:0 0 2px;}
+  .ha-upload__sub{font-size:12.5px;color:var(--ink-mute);margin:0;line-height:1.4;word-break:break-all;}
+  .ha-upload__btn{
+    background:var(--surface);color:var(--accent);
+    border:1px solid var(--accent-border);border-radius:999px;padding:8px 16px;
+    font-size:12.5px;font-weight:700;
+    cursor:pointer;transition:all .18s var(--ease-out);
+    white-space:nowrap;
+  }
+  .ha-upload__btn:hover{background:var(--accent);color:#fff;}
+  .ha-upload__remove{
+    background:transparent;border:none;color:var(--danger);
+    font-size:11.5px;font-weight:700;cursor:pointer;
+    margin-left:6px;
+  }
+  .ha-upload__file{display:none;}
+  .ha-upload__add-more{
+    width:100%;background:var(--surface);
+    border:1px dashed var(--accent-border);border-radius:10px;padding:11px;
+    font-family:var(--sans);font-size:13px;font-weight:600;color:var(--accent);
+    cursor:pointer;margin-top:6px;
+    transition:all .18s var(--ease-out);
+  }
+  .ha-upload__add-more:hover{background:var(--accent-fade);}
+
+  /* ─── SIGNATURE PAD ─── */
+  .ha-sig-wrap{
+    background:var(--input-bg);
+    border:1.5px dashed var(--hair);
+    border-radius:14px;padding:14px;margin-top:8px;
+  }
+  .ha-sig-canvas{
+    display:block;width:100%;height:160px;
+    background:var(--surface);
+    border-radius:10px;cursor:crosshair;
+    border:1px solid var(--hair-light);
+    touch-action:none;
+  }
+  .ha-sig-actions{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-top:10px;
+  }
+  .ha-sig-hint{font-size:12px;color:var(--ink-mute);font-style:italic;}
+  .ha-sig-clear{
+    background:transparent;border:1px solid var(--hair);
+    padding:6px 12px;border-radius:999px;
+    font-size:11.5px;font-weight:600;color:var(--ink-mute);
+    cursor:pointer;
+    transition:all .18s var(--ease-out);
+  }
+  .ha-sig-clear:hover{color:var(--ink);border-color:var(--ink);}
+
+  /* ─── PROFILE PREVIEW (Step 19) ─── */
+  .ha-profile{
+    background:var(--surface);border:1px solid var(--hair-light);
+    border-radius:16px;padding:28px;margin-bottom:14px;
+    box-shadow:0 1px 2px rgba(10,10,10,0.02);
+  }
+  .ha-profile__top{display:flex;align-items:center;gap:18px;margin-bottom:20px;}
+  .ha-profile__avatar{
+    width:64px;height:64px;border-radius:50%;
+    background:var(--accent-fade);color:var(--accent);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--display);font-size:22px;font-weight:800;
+    flex-shrink:0;
+  }
+  .ha-profile__top-body{flex:1;min-width:0;}
+  .ha-profile__name{font-family:var(--display);font-size:22px;font-weight:800;letter-spacing:-.015em;margin:0 0 3px;color:var(--ink);}
+  .ha-profile__role{font-size:11px;color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin:0 0 3px;}
+  .ha-profile__loc{font-size:13px;color:var(--ink-mute);margin:0;}
+  .ha-profile__badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;}
+  .ha-profile__badge{
+    background:var(--accent-fade);color:var(--accent-deep);
+    border:1px solid var(--accent-border);
+    padding:5px 11px;border-radius:999px;
+    font-size:11.5px;font-weight:600;
+  }
+  .ha-profile__section{margin-top:18px;padding-top:18px;border-top:1px solid var(--hair-light);}
+  .ha-profile__section-label{
+    font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-tert);
+    margin:0 0 8px;
+  }
+  .ha-profile__bio{font-size:14px;line-height:1.55;color:var(--ink-2);margin:0;}
+  .ha-profile__chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+  .ha-profile__chip{
+    background:var(--input-bg);border:1px solid var(--hair-light);
+    padding:5px 11px;border-radius:8px;
+    font-size:12px;font-weight:600;color:var(--ink-tert);
+  }
+  .ha-profile__chip.is-on{background:var(--accent-fade);border-color:var(--accent-border);color:var(--accent-deep);}
+
+  /* ─── REVIEW LIST ─── */
+  .ha-review{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .ha-review-row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:14px 18px;background:var(--surface);
+    border:1px solid var(--hair-light);border-radius:10px;
+    cursor:pointer;
+    transition:border-color .18s var(--ease-out);
+  }
+  .ha-review-row:hover{border-color:var(--accent-border);}
+  .ha-review-row__label{font-size:13.5px;font-weight:600;color:var(--ink);}
+  .ha-review-row__status{
+    font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    padding:4px 10px;border-radius:999px;
+  }
+  .ha-review-row__status.is-ok{background:var(--success-fade);color:var(--success-ink);}
+  .ha-review-row__status.is-todo{background:var(--danger-fade);color:var(--danger);}
+
+  /* ─── CONDITIONAL ─── */
+  .ha-conditional{display:none;}
+  .ha-conditional.is-shown{display:block;animation:fadeUp .3s var(--ease-out);}
+
+  /* ─── BUTTONS / NAV ─── */
+  .ha-actions{
+    display:flex;gap:12px;align-items:center;margin-top:24px;flex-wrap:wrap;
+  }
+  .ha-btn-back{
+    background:var(--surface);border:1px solid var(--hair);
+    color:var(--ink);
+    border-radius:14px;padding:14px 22px;
+    font-family:var(--sans);font-size:14px;font-weight:600;
+    cursor:pointer;
+    transition:all .18s var(--ease-out);
+  }
+  .ha-btn-back:hover{background:#fafafb;border-color:var(--accent-border);}
+  .ha-btn-back:disabled{opacity:.4;cursor:not-allowed;}
+  .ha-btn-primary{
+    flex:1;border:0;border-radius:14px;
+    padding:16px 24px;
+    font-family:var(--sans);font-size:14px;font-weight:700;letter-spacing:-0.01em;color:#FFF;
+    background:linear-gradient(90deg,var(--accent),var(--accent-deep));
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    box-shadow:0 6px 18px -6px rgba(0,113,227,0.55);
+    transition:transform .14s var(--ease-out), box-shadow .14s var(--ease-out), opacity .14s var(--ease-out);
+  }
+  .ha-btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 24px -6px rgba(0,113,227,0.65);}
+  .ha-btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+  .ha-btn-primary svg{width:16px;height:16px;}
+  .ha-btn-save{
+    background:var(--surface);border:1px solid var(--hair);
+    color:var(--ink-mute);
+    border-radius:14px;padding:14px 20px;
+    font-family:var(--sans);font-size:13px;font-weight:600;
+    cursor:pointer;white-space:nowrap;
+    transition:all .18s var(--ease-out);
+  }
+  .ha-btn-save:hover{background:#fafafb;color:var(--ink);border-color:var(--accent-border);}
+
+  /* ─── ERROR INLINE ─── */
+  .ha-error{
+    font-size:13px;color:var(--danger);font-weight:600;
+    margin-top:8px;min-height:18px;
+    display:flex;align-items:center;gap:6px;
+  }
+
+  /* ─── RESUME BANNER ─── */
+  .ha-resume-banner{
+    max-width:760px;margin:0 auto 22px;
+    background:#EEF2FF;border:1px solid #C7D2FE;border-radius:14px;
+    padding:14px 18px;
+    display:flex;align-items:center;gap:14px;
+    font-size:13px;color:#3730A3;line-height:1.5;
+  }
+  .ha-resume-banner__msg{flex:1;}
+  .ha-resume-banner__msg strong{color:#1E1B4B;}
+  .ha-resume-banner__btn{
+    background:transparent;border:1px solid #C7D2FE;color:#3730A3;
+    padding:8px 14px;border-radius:9px;font-size:12px;font-weight:600;
+    cursor:pointer;white-space:nowrap;
+  }
+  .ha-resume-banner__btn:hover{background:#fff;}
+
+  /* ─── SAVED INDICATOR (toast) ─── */
+  .ha-saved-indicator{
+    position:fixed;right:24px;bottom:24px;
+    background:#0F172A;color:#fff;padding:11px 18px;border-radius:10px;
+    font-size:13px;font-weight:600;letter-spacing:-0.005em;
+    box-shadow:0 12px 28px -10px rgba(0,0,0,0.35);
+    opacity:0;transform:translateY(8px);pointer-events:none;
+    transition:opacity .22s var(--ease-out), transform .22s var(--ease-out);
+    z-index:1200;
+  }
+  .ha-saved-indicator.is-visible{opacity:1;transform:translateY(0);}
+
+  /* ─── ENTRY (step 0) ─── */
+  .ha-entry{
+    text-align:center;max-width:680px;margin:0 auto;padding:120px 32px 60px;
+  }
+  .ha-entry__eyebrow{font-size:11px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;}
+  .ha-entry__title{
+    font-family:var(--display);font-size:clamp(40px,6vw,68px);font-weight:800;letter-spacing:-0.04em;line-height:1.0;color:var(--ink);margin:0 0 18px;
+  }
+  .ha-entry__title em{font-family:var(--serif);font-style:italic;font-weight:500;color:var(--ink-mute);letter-spacing:-0.02em;}
+  .ha-entry__sub{font-size:16px;line-height:1.6;color:var(--ink-mute);max-width:560px;margin:0 auto 28px;}
+  .ha-entry__cta{
+    display:inline-flex;align-items:center;justify-content:center;gap:10px;
+    background:linear-gradient(90deg,var(--accent),var(--accent-deep));
+    color:#fff;border:none;
+    padding:18px 36px;border-radius:14px;
+    font-size:15px;font-weight:700;
+    cursor:pointer;
+    box-shadow:0 10px 26px -8px rgba(0,113,227,0.55);
+    transition:transform .14s var(--ease-out), box-shadow .14s var(--ease-out);
+  }
+  .ha-entry__cta:hover{transform:translateY(-1px);box-shadow:0 14px 32px -10px rgba(0,113,227,0.65);}
+  .ha-entry__ghost{
+    background:transparent;color:var(--ink-mute);border:none;
+    font-size:13px;font-weight:600;cursor:pointer;margin-top:14px;
+    padding:8px 16px;
+  }
+  .ha-entry__ghost:hover{color:var(--ink);}
+  .ha-entry__resume{
+    background:#EEF2FF;border:1px solid #C7D2FE;border-radius:14px;
+    padding:18px 22px;margin:0 auto 24px;max-width:520px;text-align:left;
+  }
+  .ha-entry__resume-label{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#3730A3;margin:0 0 4px;}
+  .ha-entry__resume-text{font-size:14px;color:#1E1B4B;margin:0;line-height:1.5;}
+  .ha-entry__features{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:48px;text-align:left;
+  }
+  .ha-entry__feature{
+    background:var(--surface);border:1px solid var(--hair-light);border-radius:14px;padding:18px 18px;
+  }
+  .ha-entry__feature-icon{
+    width:36px;height:36px;border-radius:10px;background:var(--accent-fade);color:var(--accent);
+    display:flex;align-items:center;justify-content:center;margin-bottom:12px;
+  }
+  .ha-entry__feature-icon svg{width:16px;height:16px;}
+  .ha-entry__feature-title{font-size:13px;font-weight:700;color:var(--ink);margin:0 0 4px;}
+  .ha-entry__feature-sub{font-size:12.5px;color:var(--ink-mute);margin:0;line-height:1.45;}
+
+  /* ─── SUCCESS (step 25) ─── */
+  .ha-success{
+    text-align:center;padding:120px 32px 60px;max-width:600px;margin:0 auto;
+  }
+  .ha-success__icon{
+    width:80px;height:80px;border-radius:50%;
+    background:var(--success-fade);color:var(--success-ink);
+    display:inline-flex;align-items:center;justify-content:center;margin-bottom:24px;
+  }
+  .ha-success__icon svg{width:34px;height:34px;}
+  .ha-success__eyebrow{font-size:11px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--success-ink);margin-bottom:14px;}
+  .ha-success__title{
+    font-family:var(--display);font-size:clamp(36px,5vw,52px);font-weight:800;letter-spacing:-0.04em;line-height:1.0;color:var(--ink);margin:0 0 18px;
+  }
+  .ha-success__title em{font-family:var(--serif);font-style:italic;font-weight:500;color:var(--ink-mute);letter-spacing:-.02em;}
+  .ha-success__sub{font-size:16px;line-height:1.6;color:var(--ink-mute);margin:0 0 28px;}
+  .ha-success__details{
+    background:var(--surface);border:1px solid var(--hair-light);border-radius:14px;
+    padding:20px 24px;margin:0 auto 24px;max-width:480px;text-align:left;
+  }
+  .ha-success__details-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:13.5px;}
+  .ha-success__details-label{color:var(--ink-mute);font-weight:600;}
+  .ha-success__details-value{color:var(--ink);font-weight:700;}
+
+  /* ─── EXIT MODAL ─── */
+  .ha-modal{
+    display:none;position:fixed;inset:0;z-index:80;
+    background:rgba(15,15,17,0.45);
+    align-items:center;justify-content:center;padding:20px;
+  }
+  .ha-modal.is-shown{display:flex;}
+  .ha-modal__panel{
+    background:var(--surface);border-radius:16px;
+    padding:28px;max-width:420px;width:100%;
+    box-shadow:0 20px 50px -10px rgba(0,0,0,0.3);
+  }
+  .ha-modal__title{font-family:var(--display);font-size:20px;font-weight:800;letter-spacing:-.015em;color:var(--ink);margin:0 0 8px;}
+  .ha-modal__body{font-size:14px;line-height:1.55;color:var(--ink-mute);margin:0 0 22px;}
+  .ha-modal__actions{display:flex;gap:10px;justify-content:flex-end;}
+  .ha-modal__btn{
+    background:transparent;border:1px solid var(--hair);
+    padding:11px 20px;border-radius:10px;
+    font-size:13px;font-weight:600;color:var(--ink);text-decoration:none;
+    cursor:pointer;
+  }
+  .ha-modal__btn:hover{background:#fafafb;}
+  .ha-modal__btn--primary{
+    background:linear-gradient(90deg,var(--accent),var(--accent-deep));
+    color:#fff;border:none;
+  }
+
+  /* ─── FOOTER ─── */
+  .ha-footer{border-top:1px solid var(--hair-light);padding:32px;text-align:center;font-size:12px;color:var(--ink-tert);letter-spacing:.04em;}
+  .ha-footer a{color:var(--ink-mute);text-decoration:none;margin:0 14px;}
+  .ha-footer a:hover{color:var(--ink);}
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width:680px){
+    .ha-nav{padding:14px 18px;}
+    .ha-nav__links{gap:14px;}
+    .ha-nav__links a:not(.ha-nav__cta){display:none;}
+    .ha-hero,.ha-entry,.ha-success{padding-left:22px;padding-right:22px;}
+    .ha-wrap{padding:0 18px;margin-bottom:60px;}
+    .ha-progress,.ha-stephead{padding:0 18px;}
+    .ha-card{padding:22px 20px;border-radius:14px;}
+    .ha-row{flex-direction:column;}
+    .ha-meta-grid{grid-template-columns:1fr;}
+    .ha-entry__features{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="ha-nav">
+  <a class="ha-nav__logo" href="hiring.html">Private Mentorship</a>
+  <div class="ha-nav__links">
+    <a href="hiring.html">Hiring</a>
+    <a href="the-assistant.html">The Assistant</a>
+    <button type="button" class="ha-nav__cta" id="haSaveExitTop" style="background:var(--surface);border:1px solid var(--hair);color:var(--ink);padding:8px 14px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;">Save &amp; Exit</button>
+  </div>
+</nav>
+
+<!-- ═══ STEP 0 — ENTRY ═══ -->
+<section class="ha-step is-active" data-step="0">
+  <div class="ha-entry">
+    <div class="ha-entry__eyebrow">Assistant Application</div>
+    <h1 class="ha-entry__title">A serious application <em>for serious work</em>.</h1>
+    <p class="ha-entry__sub">Twenty-four steps. About 30 minutes. Save and resume any time on this device. No interview is offered until your application is complete and verified.</p>
+
+    <div id="haResumeBlock" class="ha-entry__resume" hidden>
+      <p class="ha-entry__resume-label">Welcome back</p>
+      <p class="ha-entry__resume-text">You have an application in progress. Last saved <span id="haResumeTimestamp">just now</span>.</p>
+    </div>
+
+    <button type="button" class="ha-entry__cta" id="haStartBtn">
+      <span id="haStartBtnLabel">Start Application</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+    <div>
+      <button type="button" class="ha-entry__ghost" id="haResetBtn" hidden>Start over</button>
+    </div>
+
+    <div class="ha-entry__features">
+      <div class="ha-entry__feature">
+        <div class="ha-entry__feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <p class="ha-entry__feature-title">~30 minutes</p>
+        <p class="ha-entry__feature-sub">Time to complete fully</p>
+      </div>
+      <div class="ha-entry__feature">
+        <div class="ha-entry__feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></div>
+        <p class="ha-entry__feature-title">Auto-save</p>
+        <p class="ha-entry__feature-sub">Leave and resume any time on this device</p>
+      </div>
+      <div class="ha-entry__feature">
+        <div class="ha-entry__feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <p class="ha-entry__feature-title">Confidential</p>
+        <p class="ha-entry__feature-sub">Reviewed by humans only</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROGRESS BAR (visible from step 1+) -->
+<div class="ha-progress" id="haProgress" hidden style="margin-top:120px;">
+  <div class="ha-progress__bar"><div class="ha-progress__fill" id="haProgressFill"></div></div>
+  <div class="ha-progress__meta">
+    <span><strong id="haProgressStep">1</strong> of 24 · <span id="haProgressLabel">Welcome</span></span>
+    <span id="haProgressSaved">All changes saved</span>
+  </div>
+</div>
+
+<!-- STEP HEADERS + CONTENT -->
+<div class="ha-wrap" id="haWrap">
+
+  <!-- ═══ STEP 1 — WELCOME ═══ -->
+  <div class="ha-stephead" data-stephead="1">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 1 of 24 · Welcome</div>
+    <h2 class="ha-stephead__title">A serious application <em>for serious work</em></h2>
+    <p class="ha-stephead__sub">This application is intentionally detailed. No interview is offered unless the application is complete and verified.</p>
+  </div>
+  <section class="ha-step" data-step="1">
+    <div class="ha-card">
+      <label class="ha-agree" data-toggle-agree="welcomeAck">
+        <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="ha-agree__text">I understand this is intentionally time-intensive and must be completed in full.</span>
+      </label>
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 2 — TRANSPARENCY ═══ -->
+  <div class="ha-stephead" data-stephead="2">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 2 of 24 · Transparency</div>
+    <h2 class="ha-stephead__title">How your information <em>is used</em></h2>
+    <p class="ha-stephead__sub">Some profile information may be shared with families if you are accepted. Sensitive documents are never made public.</p>
+  </div>
+  <section class="ha-step" data-step="2">
+    <div class="ha-card">
+      <label class="ha-agree" data-toggle-agree="consentShare">
+        <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="ha-agree__text">I understand some profile information may be shared with families if I am accepted.</span>
+      </label>
+      <label class="ha-agree" data-toggle-agree="consentReview">
+        <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="ha-agree__text">I consent to verification and internal review as part of the hiring process.</span>
+      </label>
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 3 — WORK YOU'RE OPEN TO ═══ -->
+  <div class="ha-stephead" data-stephead="3">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-4V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 3 of 24 · The work</div>
+    <h2 class="ha-stephead__title">What kind of work are you <em>open to</em>?</h2>
+    <p class="ha-stephead__sub">These answers help us match you with the right contracts. Choose what you are genuinely comfortable with.</p>
+  </div>
+  <section class="ha-step" data-step="3">
+    <div class="ha-card">
+      <div class="ha-card__head">
+        <h3 class="ha-card__title">How many people at a time?</h3>
+        <p class="ha-card__sub">Are you comfortable working one-on-one, in groups, or both?</p>
+      </div>
+      <div class="ha-choices" data-choices="formatSelection">
+        <button type="button" class="ha-choice" data-value="private">
+          <span class="ha-choice__bullet"></span>
+          <span class="ha-choice__body">
+            <span class="ha-choice__title">One-on-one only</span>
+            <span class="ha-choice__sub">You work with one person per session.</span>
+          </span>
+        </button>
+        <button type="button" class="ha-choice" data-value="group">
+          <span class="ha-choice__bullet"></span>
+          <span class="ha-choice__body">
+            <span class="ha-choice__title">Group classes only</span>
+            <span class="ha-choice__sub">You teach a small group at the same time — for example, a group English class with eight students.</span>
+          </span>
+        </button>
+        <button type="button" class="ha-choice" data-value="both">
+          <span class="ha-choice__bullet"></span>
+          <span class="ha-choice__body">
+            <span class="ha-choice__title">Both</span>
+            <span class="ha-choice__sub">You are comfortable with either, depending on the contract.</span>
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <div class="ha-card">
+      <div class="ha-card__head">
+        <h3 class="ha-card__title">What types of work are you open to?</h3>
+        <p class="ha-card__sub">Pick every type you are willing to do. The more you select, the more contracts you qualify for.</p>
+      </div>
+      <div class="ha-multi" data-multi="serviceTypes">
+        <div class="ha-multi__item" data-value="teaching">
+          <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <div>
+            <div class="ha-multi__title">Teaching</div>
+            <div class="ha-multi__sub">Tutoring school subjects, helping with homework, or running a class.</div>
+          </div>
+        </div>
+        <div class="ha-multi__item" data-value="mentorship">
+          <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <div>
+            <div class="ha-multi__title">Mentorship</div>
+            <div class="ha-multi__sub">Helping someone build life skills, routines, confidence, or social skills.</div>
+          </div>
+        </div>
+        <div class="ha-multi__item" data-value="support">
+          <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <div>
+            <div class="ha-multi__title">Support work</div>
+            <div class="ha-multi__sub">Helping someone in the community with everyday tasks — for example, going to the library together, riding transit, or handling daily routines.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 4 — CONTRACTOR & PAY ═══ -->
+  <div class="ha-stephead" data-stephead="4">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 4 of 24 · Pay &amp; contractor terms</div>
+    <h2 class="ha-stephead__title">How pay <em>works</em></h2>
+    <p class="ha-stephead__sub">Assistants are paid as independent contractors. Read the rates and confirm you understand the terms.</p>
+  </div>
+  <section class="ha-step" data-step="4">
+    <div class="ha-card">
+      <div class="ha-card__head">
+        <h3 class="ha-card__title">Rate tiers</h3>
+        <p class="ha-card__sub">Pay rate depends on the type of session and group size.</p>
+      </div>
+      <div class="ha-rates">
+        <div class="ha-rates__row ha-rates__row--head">
+          <span>Session type</span><span>Rate</span>
+        </div>
+        <div class="ha-rates__row">
+          <span class="ha-rates__label">One-on-one session</span>
+          <span class="ha-rates__value">$42 / hr</span>
+        </div>
+        <div class="ha-rates__row">
+          <span class="ha-rates__label">Group class — under 10 students</span>
+          <span class="ha-rates__value">$24 / hr</span>
+        </div>
+        <div class="ha-rates__row">
+          <span class="ha-rates__label">Group class — 10 to 15 students</span>
+          <span class="ha-rates__value">$48 / hr</span>
+        </div>
+        <div class="ha-rates__row ha-rates__row--total">
+          <span>Example: one full group block</span>
+          <span>$1,152 / month</span>
+        </div>
+      </div>
+      <p class="ha-hint" style="margin-top:12px;">Group class pay is guaranteed regardless of individual student attendance. One-on-one sessions are billed per session and depend on family schedules.</p>
+    </div>
+
+    <div class="ha-card">
+      <div class="ha-card__head">
+        <h3 class="ha-card__title">Independent contractor terms</h3>
+        <p class="ha-card__sub">You must agree to all three to continue.</p>
+      </div>
+      <label class="ha-agree" data-toggle-agree="contractorAck1">
+        <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="ha-agree__text">I understand I am an independent contractor — not an employee.</span>
+      </label>
+      <label class="ha-agree" data-toggle-agree="contractorAck2">
+        <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="ha-agree__text">I am responsible for my own tax obligations.</span>
+      </label>
+      <label class="ha-agree" data-toggle-agree="contractorAck3">
+        <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="ha-agree__text">I understand income depends on active contracts and is not guaranteed.</span>
+      </label>
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 5 — IDENTITY ═══ -->
+  <div class="ha-stephead" data-stephead="5">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 5 of 24 · Legal identity</div>
+    <h2 class="ha-stephead__title">Tell us <em>who you are</em></h2>
+    <p class="ha-stephead__sub">For verification only. Not visible to families.</p>
+  </div>
+  <section class="ha-step" data-step="5">
+    <div class="ha-card">
+      <label class="ha-label ha-label--top">Full legal name</label>
+      <input class="ha-input" type="text" data-field="legalName" placeholder="First Last" autocomplete="name" />
+      <label class="ha-label">Preferred name</label>
+      <input class="ha-input" type="text" data-field="preferredName" placeholder="How we should address you" />
+      <div class="ha-row">
+        <div>
+          <label class="ha-label">Phone</label>
+          <input class="ha-input" type="tel" data-field="phone" placeholder="(604) 000-0000" autocomplete="tel" />
+        </div>
+        <div>
+          <label class="ha-label">Date of birth</label>
+          <input class="ha-input" type="date" data-field="dob" />
+        </div>
+      </div>
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 6 — ADDRESS ═══ -->
+  <div class="ha-stephead" data-stephead="6">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 6 of 24 · Home address</div>
+    <h2 class="ha-stephead__title">Where do you <em>live</em>?</h2>
+    <p class="ha-stephead__sub">Used for background checks and to match you to families in your area.</p>
+  </div>
+  <section class="ha-step" data-step="6">
+    <div class="ha-card">
+      <label class="ha-label ha-label--top">Address line 1</label>
+      <input class="ha-input" type="text" data-field="addressLine1" placeholder="123 Main St" autocomplete="address-line1" />
+      <label class="ha-label">Address line 2 (optional)</label>
+      <input class="ha-input" type="text" data-field="addressLine2" placeholder="Unit / Apt" autocomplete="address-line2" />
+      <div class="ha-row">
+        <div>
+          <label class="ha-label">City</label>
+          <input class="ha-input" type="text" data-field="city" placeholder="Vancouver" autocomplete="address-level2" />
+        </div>
+        <div>
+          <label class="ha-label">Province</label>
+          <input class="ha-input" type="text" data-field="province" placeholder="BC" style="text-transform:uppercase;" autocomplete="address-level1" />
+        </div>
+        <div>
+          <label class="ha-label">Postal code</label>
+          <input class="ha-input" type="text" data-field="postalCode" placeholder="V6B 1A1" style="text-transform:uppercase;" autocomplete="postal-code" />
+        </div>
+      </div>
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 7 — TRANSPORTATION ═══ -->
+  <div class="ha-stephead" data-stephead="7">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17a2 2 0 1 0 4 0M15 17a2 2 0 1 0 4 0M3 17V7l3-3h12l3 3v10"/><path d="M3 13h18"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 7 of 24 · Transportation</div>
+    <h2 class="ha-stephead__title">How will you <em>get there</em>?</h2>
+    <p class="ha-stephead__sub">Some families need an assistant who can drive. Most are reachable by transit.</p>
+  </div>
+  <section class="ha-step" data-step="7">
+    <div class="ha-card">
+      <div class="ha-card__head">
+        <h3 class="ha-card__title">Mobility</h3>
+      </div>
+      <label class="ha-agree" data-toggle-agree="hasCar">
+        <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="ha-agree__text">I have consistent access to a vehicle.</span>
+      </label>
+      <label class="ha-agree" data-toggle-agree="willingTransit">
+        <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="ha-agree__text">I am willing to use transit or rideshare when needed.</span>
+      </label>
+    </div>
+    <div class="ha-card">
+      <div class="ha-card__head">
+        <h3 class="ha-card__title">Driving for clients</h3>
+        <p class="ha-card__sub">Some contracts include driving children to activities or appointments.</p>
+      </div>
+      <label class="ha-agree" data-toggle-agree="canDriveClients">
+        <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="ha-agree__text">I am willing to drive as part of the role when requested.</span>
+      </label>
+      <label class="ha-agree ha-conditional" data-show-when='{"canDriveClients":[true]}' data-toggle-agree="validLicense">
+        <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="ha-agree__text">I hold a valid driver's license. (Required if you selected driving above.)</span>
+      </label>
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 8 — WORK ENVIRONMENT ═══ -->
+  <div class="ha-stephead" data-stephead="8">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 8 of 24 · Work environment</div>
+    <h2 class="ha-stephead__title">Where can you <em>host sessions</em>?</h2>
+    <p class="ha-stephead__sub">Pick every place you can run a session. Hosting at your own home opens up more contracts.</p>
+  </div>
+  <section class="ha-step" data-step="8">
+    <div class="ha-card">
+      <div class="ha-multi" data-multi="locations">
+        <div class="ha-multi__item" data-bind="locAssistantHome">
+          <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <div>
+            <div class="ha-multi__title">My home</div>
+            <div class="ha-multi__sub">Families come to you. Highest demand.</div>
+          </div>
+        </div>
+        <div class="ha-multi__item" data-bind="locClientHome">
+          <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <div>
+            <div class="ha-multi__title">The client's home</div>
+            <div class="ha-multi__sub">You travel to where the family lives.</div>
+          </div>
+        </div>
+        <div class="ha-multi__item" data-bind="locOnline">
+          <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <div>
+            <div class="ha-multi__title">Online / remote</div>
+            <div class="ha-multi__sub">Sessions held over video call.</div>
+          </div>
+        </div>
+        <div class="ha-multi__item" data-bind="locCommunity">
+          <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <div>
+            <div class="ha-multi__title">A community location</div>
+            <div class="ha-multi__sub">For example, a public library or school study room.</div>
+          </div>
+        </div>
+      </div>
+      <div class="ha-callout ha-callout--warn ha-conditional" data-hide-when='{"locAssistantHome":[true]}' style="margin-top:16px;">
+        <p class="ha-callout__title">Heads up</p>
+        <p class="ha-callout__body">Not hosting at your home reduces your potential client base by about 40 percent. Many families specifically want drop-off services.</p>
+      </div>
+    </div>
+
+    <div class="ha-conditional" data-show-when='{"locAssistantHome":[true]}'>
+      <div class="ha-card">
+        <div class="ha-card__head">
+          <h3 class="ha-card__title">Safety &amp; privacy</h3>
+          <p class="ha-card__sub">Required because you will be hosting at home.</p>
+        </div>
+        <label class="ha-label ha-label--top">Who lives in the home?</label>
+        <div class="ha-pills" data-pills="homeShareStatus">
+          <button type="button" class="ha-pill" data-value="Live alone">Live alone</button>
+          <button type="button" class="ha-pill" data-value="Shared (adults)">Shared (adults)</button>
+          <button type="button" class="ha-pill" data-value="Shared (children)">Shared (children)</button>
+          <button type="button" class="ha-pill" data-value="Parents / family">Parents / family</button>
+        </div>
+        <div class="ha-divider"></div>
+        <label class="ha-agree" data-toggle-agree="homeSubstanceFree">
+          <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <span class="ha-agree__text">I confirm my home is smoke-free and free of illicit drugs and alcohol during sessions.</span>
+        </label>
+      </div>
+      <div class="ha-card">
+        <div class="ha-card__head">
+          <h3 class="ha-card__title">Describe the study area</h3>
+          <p class="ha-card__sub">Lighting, noise level, and how private the space is.</p>
+        </div>
+        <textarea class="ha-textarea" data-field="homeEnvDescription" data-min="20" placeholder="e.g., Bright open-concept room, quiet during the day, dedicated desk…"></textarea>
+        <p class="ha-counter" data-counter-for="homeEnvDescription">0 / 20 minimum</p>
+      </div>
+      <div class="ha-card">
+        <div class="ha-card__head">
+          <h3 class="ha-card__title">Workspace photo</h3>
+          <p class="ha-card__sub">A clean, well-lit photo of where sessions would happen. This appears on your profile.</p>
+        </div>
+        <div class="ha-upload" data-upload="HOME_WORKSPACE_PHOTO">
+          <div class="ha-upload__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+          <div class="ha-upload__body"><p class="ha-upload__title">Upload workspace photo</p><p class="ha-upload__sub" data-upload-status>JPG or PNG, max 10 MB</p></div>
+          <button type="button" class="ha-upload__btn" data-upload-trigger>Upload</button>
+          <input type="file" class="ha-upload__file" accept="image/*" data-upload-input />
+        </div>
+      </div>
+    </div>
+
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 9 — AVAILABILITY ═══ -->
+  <div class="ha-stephead" data-stephead="9">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 9 of 24 · Availability</div>
+    <h2 class="ha-stephead__title">When are you <em>available</em>?</h2>
+    <p class="ha-stephead__sub">Pick every window you can usually work. We'll match you to families that fit.</p>
+  </div>
+  <section class="ha-step" data-step="9">
+    <div class="ha-card">
+      <div class="ha-card__head">
+        <h3 class="ha-card__title">General windows</h3>
+      </div>
+      <div class="ha-multi" data-multi="availability">
+        <div class="ha-multi__item" data-bind="availWeekdays">
+          <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <div><div class="ha-multi__title">Weekdays (daytime)</div></div>
+        </div>
+        <div class="ha-multi__item" data-bind="availEvenings">
+          <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <div><div class="ha-multi__title">Evenings</div></div>
+        </div>
+        <div class="ha-multi__item" data-bind="availWeekends">
+          <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+          <div><div class="ha-multi__title">Weekends</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="ha-card">
+      <div class="ha-card__head">
+        <h3 class="ha-card__title">Minimum hours per week</h3>
+        <p class="ha-card__sub">The fewest hours you can reliably commit to in a typical week.</p>
+      </div>
+      <input class="ha-input" type="number" min="1" data-field="minHoursPerWeek" placeholder="e.g., 6" inputmode="numeric" />
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 10 — WORK HISTORY ═══ -->
+  <div class="ha-stephead" data-stephead="10">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 10 of 24 · Work history</div>
+    <h2 class="ha-stephead__title">Your most relevant <em>role</em></h2>
+    <p class="ha-stephead__sub">Be brief and factual. You can expand at the interview if selected.</p>
+  </div>
+  <section class="ha-step" data-step="10">
+    <div class="ha-card">
+      <label class="ha-label ha-label--top">Role / title</label>
+      <input class="ha-input" type="text" data-field="workRole" placeholder="e.g., Tutor / Nanny / Care aide" />
+      <label class="ha-label">Years in similar work</label>
+      <input class="ha-input" type="number" min="0" data-field="workYears" placeholder="e.g., 2" inputmode="numeric" />
+      <label class="ha-label">Short summary — what you actually did</label>
+      <textarea class="ha-textarea" data-field="workSummary" data-min="20" placeholder="Two to five sentences."></textarea>
+      <p class="ha-counter" data-counter-for="workSummary">0 / 20 minimum</p>
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 11 — CHILD EXPERIENCE ═══ -->
+  <div class="ha-stephead" data-stephead="11">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 11 of 24 · Child &amp; family experience</div>
+    <h2 class="ha-stephead__title">Who have you <em>worked with</em>?</h2>
+    <p class="ha-stephead__sub">Pick every age group you have real experience with.</p>
+  </div>
+  <section class="ha-step" data-step="11">
+    <div class="ha-card">
+      <div class="ha-multi" data-multi="ages">
+        <div class="ha-multi__item" data-bind="childAges_0_5"><span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div><div class="ha-multi__title">Ages 0–5</div></div></div>
+        <div class="ha-multi__item" data-bind="childAges_6_12"><span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div><div class="ha-multi__title">Ages 6–12</div></div></div>
+        <div class="ha-multi__item" data-bind="childAges_13_18"><span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><div><div class="ha-multi__title">Ages 13–18</div></div></div>
+      </div>
+    </div>
+    <div class="ha-card">
+      <div class="ha-card__head">
+        <h3 class="ha-card__title">Describe your experience</h3>
+        <p class="ha-card__sub">Two or three sentences. What did you do, and what were you responsible for?</p>
+      </div>
+      <textarea class="ha-textarea" data-field="childExpSummary" data-min="30" placeholder="e.g., Two years tutoring grade 4–7 math. Built study routines and tracked progress with parents weekly."></textarea>
+      <p class="ha-counter" data-counter-for="childExpSummary">0 / 30 minimum</p>
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 12 — VALUES ═══ -->
+  <div class="ha-stephead" data-stephead="12">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 12 of 24 · Strengths</div>
+    <h2 class="ha-stephead__title">What do you <em>bring</em> to the role?</h2>
+    <p class="ha-stephead__sub">Select what you naturally bring to the role. Then describe your approach in your own words.</p>
+  </div>
+  <section class="ha-step" data-step="12">
+    <div class="ha-card">
+      <div class="ha-card__head">
+        <h3 class="ha-card__title">Core strengths</h3>
+        <p class="ha-card__sub">Choose all that apply.</p>
+      </div>
+      <div class="ha-pills" data-pills-multi="values">
+        <button type="button" class="ha-pill" data-bind="valPatience">Patience</button>
+        <button type="button" class="ha-pill" data-bind="valStructure">Structure &amp; routine</button>
+        <button type="button" class="ha-pill" data-bind="valAccountability">Accountability</button>
+        <button type="button" class="ha-pill" data-bind="valSafety">Emotional safety</button>
+        <button type="button" class="ha-pill" data-bind="valAcademic">Academic focus</button>
+        <button type="button" class="ha-pill" data-bind="valIndependence">Independence coaching</button>
+      </div>
+    </div>
+    <div class="ha-card">
+      <div class="ha-card__head">
+        <h3 class="ha-card__title">Your approach</h3>
+        <p class="ha-card__sub">Two or three sentences. What kind of assistant do you try to be?</p>
+      </div>
+      <textarea class="ha-textarea" data-field="valSummary" data-min="20" placeholder="e.g., I try to be a calm, consistent presence who helps the student build confidence over time."></textarea>
+      <p class="ha-counter" data-counter-for="valSummary">0 / 20 minimum</p>
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 13 — UPLOADS CORE ═══ -->
+  <div class="ha-stephead" data-stephead="13">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 13 of 24 · Identification &amp; résumé</div>
+    <h2 class="ha-stephead__title">Upload your <em>essentials</em></h2>
+    <p class="ha-stephead__sub">PDF or high-quality image. Both files are required to continue.</p>
+  </div>
+  <section class="ha-step" data-step="13">
+    <div class="ha-card">
+      <div class="ha-upload" data-upload="ID_PHOTO">
+        <div class="ha-upload__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="9" cy="12" r="2.5"/><path d="M14 10h5M14 14h3"/></svg></div>
+        <div class="ha-upload__body"><p class="ha-upload__title">Government photo ID</p><p class="ha-upload__sub" data-upload-status>Driver's license, passport, or provincial ID</p></div>
+        <button type="button" class="ha-upload__btn" data-upload-trigger>Upload</button>
+        <input type="file" class="ha-upload__file" accept="image/*,application/pdf" data-upload-input />
+      </div>
+      <div class="ha-upload" data-upload="RESUME">
+        <div class="ha-upload__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+        <div class="ha-upload__body"><p class="ha-upload__title">Professional résumé</p><p class="ha-upload__sub" data-upload-status>PDF preferred, max 10 MB</p></div>
+        <button type="button" class="ha-upload__btn" data-upload-trigger>Upload</button>
+        <input type="file" class="ha-upload__file" accept="image/*,application/pdf" data-upload-input />
+      </div>
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 14 — BACKGROUND INFO ═══ -->
+  <div class="ha-stephead" data-stephead="14">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 14 of 24 · Background check</div>
+    <h2 class="ha-stephead__title">Trust &amp; safety <em>verification</em></h2>
+    <p class="ha-stephead__sub">Because you will work with families and minors, we require a specific level of screening.</p>
+  </div>
+  <section class="ha-step" data-step="14">
+    <div class="ha-callout ha-callout--danger">
+      <p class="ha-callout__title">Important</p>
+      <p class="ha-callout__body">You must request a <strong>Vulnerable Sector (PIC-VS)</strong> check. Standard criminal record checks will be rejected.</p>
+    </div>
+    <div class="ha-card">
+      <div class="ha-card__head">
+        <h3 class="ha-card__title">Where to apply</h3>
+        <p class="ha-card__sub">Choose the agency that serves your area.</p>
+      </div>
+      <div class="ha-links">
+        <a href="https://www.rcmp-grc.gc.ca/en/criminal-record-checks" target="_blank" rel="noopener">
+          <span><strong>RCMP — Criminal Record Checks</strong><small>PIC vs PIC-VS — we require PIC-VS</small></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+        </a>
+        <a href="https://vpd.ca/police-information-checks/" target="_blank" rel="noopener">
+          <span><strong>Vancouver Police (VPD)</strong><small>Standard Plus Vulnerable Sector Screening</small></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+        </a>
+        <a href="https://justice.gov.bc.ca/criminalrecordcheck/" target="_blank" rel="noopener">
+          <span><strong>BC Government</strong><small>Criminal Record Check (Applicants)</small></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg>
+        </a>
+      </div>
+      <div class="ha-meta-grid">
+        <div class="ha-meta-grid__item"><p class="ha-meta-grid__label">Fee</p><p class="ha-meta-grid__value">Paid by applicant</p></div>
+        <div class="ha-meta-grid__item"><p class="ha-meta-grid__label">Time limit</p><p class="ha-meta-grid__value">Issued within 3 months</p></div>
+      </div>
+      <div class="ha-info">
+        <p><strong>What PIC-VS includes:</strong> criminal convictions, outstanding charges, and other judicial orders. May include certain non-convictions where you were a bona fide suspect in a founded substantiated offence. Does not include unsubstantiated allegations.</p>
+        <p><strong>How to apply:</strong> visit your local RCMP detachment or police agency and bring two pieces of government-issued ID (one with a photo). You are responsible for any fees, which vary by agency.</p>
+      </div>
+      <div class="ha-divider"></div>
+      <label class="ha-agree" data-toggle-agree="backgroundInfoAck">
+        <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="ha-agree__text">I confirm I will obtain a Vulnerable Sector (PIC-VS) check from within Canada and upload it to complete my profile.</span>
+      </label>
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 15 — UPLOAD CRC ═══ -->
+  <div class="ha-stephead" data-stephead="15">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 15 of 24 · Upload background check</div>
+    <h2 class="ha-stephead__title">Upload your <em>PIC-VS</em></h2>
+    <p class="ha-stephead__sub">PDF or clear image showing your full legal name and date issued.</p>
+  </div>
+  <section class="ha-step" data-step="15">
+    <div class="ha-card">
+      <div class="ha-upload" data-upload="CRIMINAL_RECORD_CHECK">
+        <div class="ha-upload__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
+        <div class="ha-upload__body"><p class="ha-upload__title">Criminal Record Check (PIC-VS)</p><p class="ha-upload__sub" data-upload-status>Must show your full legal name and date issued</p></div>
+        <button type="button" class="ha-upload__btn" data-upload-trigger>Upload</button>
+        <input type="file" class="ha-upload__file" accept="image/*,application/pdf" data-upload-input />
+      </div>
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 16 — CERTS INFO ═══ -->
+  <div class="ha-stephead" data-stephead="16">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><polyline points="8.21 13.89 7 22 12 19 17 22 15.79 13.88"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 16 of 24 · Certificates &amp; training</div>
+    <h2 class="ha-stephead__title">Show your <em>credentials</em></h2>
+    <p class="ha-stephead__sub">Upload any credentials that show safety, professionalism, or specialized support for families and youth.</p>
+  </div>
+  <section class="ha-step" data-step="16">
+    <div class="ha-callout">
+      <p class="ha-callout__title">Strongly preferred</p>
+      <p class="ha-callout__body">Valid First Aid + CPR. Child or youth training (education, behavior support, special needs) is a major plus.</p>
+    </div>
+    <div class="ha-card">
+      <div class="ha-card__head">
+        <h3 class="ha-card__title">What to upload</h3>
+      </div>
+      <div class="ha-info">
+        <p><strong>Safety</strong></p>
+        <ul>
+          <li>First Aid / CPR (show expiry if applicable)</li>
+          <li>Naloxone training (if applicable)</li>
+        </ul>
+        <p style="margin-top:12px;"><strong>Child &amp; family support</strong></p>
+        <ul>
+          <li>Education or tutoring credentials</li>
+          <li>Behavior support, ASD, or special needs training</li>
+          <li>Mental Health First Aid (if applicable)</li>
+        </ul>
+        <p style="margin-top:12px;"><strong>Professional</strong></p>
+        <ul>
+          <li>Coaching or instructor certifications</li>
+          <li>FoodSafe (if relevant)</li>
+          <li>Other relevant certificates</li>
+        </ul>
+      </div>
+      <div class="ha-meta-grid">
+        <div class="ha-meta-grid__item"><p class="ha-meta-grid__label">Expiry</p><p class="ha-meta-grid__value">Must be valid</p></div>
+        <div class="ha-meta-grid__item"><p class="ha-meta-grid__label">Quality</p><p class="ha-meta-grid__value">Readable upload</p></div>
+      </div>
+      <div class="ha-info">
+        <p><strong>Rules:</strong> upload a PDF or clear photo. Your legal name must be visible (or explain if different). If a certificate has an expiry, it must be visible. Cropped or blurry uploads may be rejected.</p>
+        <p><strong>Privacy:</strong> certificates may be summarized to families to help establish trust. Your raw documents are not publicly visible.</p>
+      </div>
+      <div class="ha-divider"></div>
+      <label class="ha-agree" data-toggle-agree="certsInfoAck">
+        <span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span class="ha-agree__text">I confirm any uploaded certificates are authentic, readable, and show my name (and expiry date if applicable).</span>
+      </label>
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 17 — UPLOAD CERTS ═══ -->
+  <div class="ha-stephead" data-stephead="17">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 17 of 24 · Upload certificates</div>
+    <h2 class="ha-stephead__title">Upload your <em>certificates</em></h2>
+    <p class="ha-stephead__sub">At least one certificate is required.</p>
+  </div>
+  <section class="ha-step" data-step="17">
+    <div class="ha-card">
+      <div class="ha-upload" data-upload="CERT_FIRST_AID">
+        <div class="ha-upload__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M12 10v6M9 13h6"/></svg></div>
+        <div class="ha-upload__body"><p class="ha-upload__title">First Aid Certificate</p><p class="ha-upload__sub" data-upload-status>PDF or image</p></div>
+        <button type="button" class="ha-upload__btn" data-upload-trigger>Upload</button>
+        <input type="file" class="ha-upload__file" accept="image/*,application/pdf" data-upload-input />
+      </div>
+      <div id="haCertOtherList"></div>
+      <button type="button" class="ha-upload__add-more" id="haCertAddBtn">+ Add another certificate</button>
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 18 — SCENARIOS ═══ -->
+  <div class="ha-stephead" data-stephead="18">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 18 of 24 · Scenarios</div>
+    <h2 class="ha-stephead__title">Two real <em>situations</em></h2>
+    <p class="ha-stephead__sub">Answer clearly and professionally. Each answer must be at least 80 characters.</p>
+  </div>
+  <section class="ha-step" data-step="18">
+    <div class="ha-card">
+      <div class="ha-card__head">
+        <h3 class="ha-card__title">Scenario 1 — Safety</h3>
+        <p class="ha-card__sub">A child discloses something sensitive and asks you not to tell anyone. What do you do, and why?</p>
+      </div>
+      <textarea class="ha-textarea" data-field="scenarioSafety" data-min="80" placeholder="Write your answer." style="min-height:140px;"></textarea>
+      <p class="ha-counter" data-counter-for="scenarioSafety">0 / 80 minimum</p>
+    </div>
+    <div class="ha-card">
+      <div class="ha-card__head">
+        <h3 class="ha-card__title">Scenario 2 — Boundaries</h3>
+        <p class="ha-card__sub">A parent asks you to share private information about another family you work with. What do you do?</p>
+      </div>
+      <textarea class="ha-textarea" data-field="scenarioBoundaries" data-min="80" placeholder="Write your answer." style="min-height:140px;"></textarea>
+      <p class="ha-counter" data-counter-for="scenarioBoundaries">0 / 80 minimum</p>
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 19 — PROFILE PREVIEW ═══ -->
+  <div class="ha-stephead" data-stephead="19">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.66A8 8 0 0 1 17 20.66"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 19 of 24 · Profile preview</div>
+    <h2 class="ha-stephead__title">How families will <em>see you</em></h2>
+    <p class="ha-stephead__sub">This is your professional introduction. Update earlier steps if anything looks off.</p>
+  </div>
+  <section class="ha-step" data-step="19">
+    <div class="ha-profile">
+      <div class="ha-profile__top">
+        <div class="ha-profile__avatar" id="haProfileAvatar">PA</div>
+        <div class="ha-profile__top-body">
+          <p class="ha-profile__role">Private Mentorship Assistant</p>
+          <h3 class="ha-profile__name" id="haProfileName">Your Preferred Name</h3>
+          <p class="ha-profile__loc" id="haProfileLoc">City, Province</p>
+        </div>
+      </div>
+      <div class="ha-profile__badges" id="haProfileBadges"></div>
+      <div class="ha-profile__section">
+        <p class="ha-profile__section-label">About me</p>
+        <p class="ha-profile__bio" id="haProfileBio">Complete your work history to populate your bio.</p>
+      </div>
+      <div class="ha-profile__section">
+        <p class="ha-profile__section-label">Availability</p>
+        <div class="ha-profile__chips">
+          <span class="ha-profile__chip" data-chip="availWeekdays">Weekdays</span>
+          <span class="ha-profile__chip" data-chip="availEvenings">Evenings</span>
+          <span class="ha-profile__chip" data-chip="availWeekends">Weekends</span>
+        </div>
+      </div>
+    </div>
+    <div class="ha-callout">
+      <p class="ha-callout__title">Tip</p>
+      <p class="ha-callout__body">Families engage 80% faster with candidates who have verified badges and a clear bio.</p>
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 20 — BOUNDARIES ═══ -->
+  <div class="ha-stephead" data-stephead="20">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 20 of 24 · Scope &amp; boundaries</div>
+    <h2 class="ha-stephead__title">Non-negotiable <em>boundaries</em></h2>
+    <p class="ha-stephead__sub">For safety and professionalism, you must explicitly agree to all four.</p>
+  </div>
+  <section class="ha-step" data-step="20">
+    <div class="ha-card">
+      <div class="ha-card__head">
+        <h3 class="ha-card__title">Role limitations</h3>
+      </div>
+      <label class="ha-agree" data-toggle-agree="boundaryAck1"><span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="ha-agree__text">I understand I am not a replacement parent or therapist.</span></label>
+      <label class="ha-agree" data-toggle-agree="boundaryAck2"><span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="ha-agree__text">I will not provide medical, legal, or disciplinary authority.</span></label>
+    </div>
+    <div class="ha-card">
+      <div class="ha-card__head">
+        <h3 class="ha-card__title">Professional conduct</h3>
+      </div>
+      <label class="ha-agree" data-toggle-agree="boundaryAck3"><span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="ha-agree__text">I understand families may end services at any time.</span></label>
+      <label class="ha-agree" data-toggle-agree="boundaryAck4"><span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="ha-agree__text">I will follow Private Mentorship communication protocols exclusively.</span></label>
+    </div>
+    <div class="ha-callout ha-callout--danger">
+      <p class="ha-callout__title">Zero tolerance</p>
+      <p class="ha-callout__body">Violating these boundaries results in immediate termination of the assistant contract.</p>
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 21 — CONFIDENTIALITY ═══ -->
+  <div class="ha-stephead" data-stephead="21">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 21 of 24 · Confidentiality</div>
+    <h2 class="ha-stephead__title">Trust is our most valuable <em>asset</em></h2>
+    <p class="ha-stephead__sub">You must agree to protect the privacy of all families and clients.</p>
+  </div>
+  <section class="ha-step" data-step="21">
+    <div class="ha-card">
+      <label class="ha-agree" data-toggle-agree="confidentialityAck1"><span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="ha-agree__text">I will not discuss families, clients, or their personal details outside of work.</span></label>
+      <label class="ha-agree" data-toggle-agree="confidentialityAck2"><span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="ha-agree__text">I will not post about clients, their homes, or sessions on social media.</span></label>
+      <label class="ha-agree" data-toggle-agree="confidentialityAck3"><span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="ha-agree__text">I understand that violating confidentiality may result in immediate removal and legal action.</span></label>
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 22 — LEGAL LIABILITY ═══ -->
+  <div class="ha-stephead" data-stephead="22">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 4-9 4-9-4 9-4z"/><path d="M3 11l9 4 9-4"/><path d="M3 15l9 4 9-4"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 22 of 24 · Legal liability</div>
+    <h2 class="ha-stephead__title">Strict data <em>protection</em></h2>
+    <p class="ha-stephead__sub">You may handle highly sensitive personal data — SIN, banking, visas. Acknowledge the legal consequences of misuse.</p>
+  </div>
+  <section class="ha-step" data-step="22">
+    <div class="ha-callout ha-callout--danger">
+      <p class="ha-callout__title">Strict data protection</p>
+      <p class="ha-callout__body">Private Mentorship has zero tolerance for data breaches. We prosecute theft of client data to the fullest extent of the law.</p>
+    </div>
+    <div class="ha-card">
+      <div class="ha-card__head">
+        <h3 class="ha-card__title">Binding agreement</h3>
+      </div>
+      <label class="ha-agree" data-toggle-agree="legalAck1"><span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="ha-agree__text">I acknowledge I may access sensitive data including SIN numbers, banking details, and government permits.</span></label>
+      <label class="ha-agree" data-toggle-agree="legalAck2"><span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="ha-agree__text">I understand that unauthorized sharing or use of this data is a criminal offense.</span></label>
+      <label class="ha-agree" data-toggle-agree="legalAck3"><span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="ha-agree__text">I accept full legal liability for damages caused by my intentional misuse or negligence regarding client data.</span></label>
+      <div class="ha-divider"></div>
+      <label class="ha-label ha-label--top">Signature</label>
+      <p class="ha-hint">Sign with your finger or mouse.</p>
+      <div class="ha-sig-wrap">
+        <canvas class="ha-sig-canvas" id="haSigCanvas"></canvas>
+        <div class="ha-sig-actions">
+          <span class="ha-sig-hint" id="haSigHint">Sign above</span>
+          <button type="button" class="ha-sig-clear" id="haSigClear">Clear</button>
+        </div>
+      </div>
+    </div>
+    <div class="ha-info">
+      <p><strong>Legal notice:</strong> All access to client data is logged. In the event of identity theft or fraud linked to your account, Private Mentorship will cooperate fully with law enforcement and affected families to pursue legal action.</p>
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 23 — FINAL REVIEW ═══ -->
+  <div class="ha-stephead" data-stephead="23">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 23 of 24 · Final review</div>
+    <h2 class="ha-stephead__title">Review your <em>application</em></h2>
+    <p class="ha-stephead__sub">Make sure each section is complete. Tap any row to jump back and fix.</p>
+  </div>
+  <section class="ha-step" data-step="23">
+    <div class="ha-review" id="haReviewList"></div>
+    <div class="ha-card">
+      <div class="ha-card__head">
+        <h3 class="ha-card__title">Confirmations</h3>
+      </div>
+      <label class="ha-agree" data-toggle-agree="confirmTruth"><span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="ha-agree__text">I confirm the information provided is accurate and truthful.</span></label>
+      <label class="ha-agree" data-toggle-agree="confirmBackground"><span class="ha-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="ha-agree__text">I understand background checks and verification may be required.</span></label>
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Continue<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 24 — SUBMIT ═══ -->
+  <div class="ha-stephead" data-stephead="24">
+    <div class="ha-stephead__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
+    <div class="ha-stephead__eyebrow">Step 24 of 24 · Submit</div>
+    <h2 class="ha-stephead__title">Ready to <em>submit</em>?</h2>
+    <p class="ha-stephead__sub">When you submit, your application is locked for review. We respond within five business days.</p>
+  </div>
+  <section class="ha-step" data-step="24">
+    <div class="ha-card">
+      <div class="ha-card__head">
+        <h3 class="ha-card__title">Confirmation</h3>
+      </div>
+      <p class="ha-hint">Press <strong>Submit application</strong> below to send your application for review. You will see a confirmation reference on the next screen.</p>
+      <div class="ha-callout">
+        <p class="ha-callout__title">Reminder</p>
+        <p class="ha-callout__body">After submission, you cannot edit your application unless we request a correction. Take a moment to review previous steps if anything feels incomplete.</p>
+      </div>
+    </div>
+    <div class="ha-actions"><button type="button" class="ha-btn-back" data-action="back">Back</button><button type="button" class="ha-btn-save" data-action="save">Save &amp; Exit</button><button type="button" class="ha-btn-primary" data-action="next">Submit application<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button></div>
+    <div class="ha-error" data-error></div>
+  </section>
+
+  <!-- ═══ STEP 25 — SUCCESS ═══ -->
+  <section class="ha-step" data-step="25">
+    <div class="ha-success">
+      <div class="ha-success__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="ha-success__eyebrow">Submitted · Under review</div>
+      <h1 class="ha-success__title">Thank you for <em>applying</em></h1>
+      <p class="ha-success__sub">Your application has been received. We review applications in the order received and respond within five business days.</p>
+      <div class="ha-success__details">
+        <div class="ha-success__details-row"><span class="ha-success__details-label">Reference number</span><span class="ha-success__details-value" id="haRefNumber">PMA-XXXXXX</span></div>
+        <div class="ha-success__details-row"><span class="ha-success__details-label">Submitted</span><span class="ha-success__details-value" id="haSubmittedAt">—</span></div>
+        <div class="ha-success__details-row"><span class="ha-success__details-label">Status</span><span class="ha-success__details-value" style="color:var(--success-ink);">Under review</span></div>
+      </div>
+      <a href="hiring.html" class="ha-entry__cta" style="text-decoration:none;">
+        <span>Return to hiring page</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+  </section>
+
+</div>
+
+<!-- SAVED INDICATOR -->
+<div class="ha-saved-indicator" id="haSaved">Saved on this device</div>
+
+<!-- EXIT MODAL -->
+<div class="ha-modal" id="haExitModal">
+  <div class="ha-modal__panel">
+    <h3 class="ha-modal__title">Save and exit?</h3>
+    <p class="ha-modal__body">Your progress is saved on this device. You can return to this page on the same browser any time to continue.</p>
+    <div class="ha-modal__actions">
+      <button type="button" class="ha-modal__btn" id="haExitCancel">Stay</button>
+      <a href="hiring.html" class="ha-modal__btn ha-modal__btn--primary">Save &amp; Exit</a>
+    </div>
+  </div>
+</div>
+
+<footer class="ha-footer">
+  <a href="index.html">Home</a>
+  <a href="hiring.html">Hiring</a>
+  <a href="the-assistant.html">The Assistant</a>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260507a"></script>
+<script src="js/hiring-service.js?v=20260507a"></script>
+<script>
+const TOTAL_STEPS = 24;
+
+// Maps each form field to the step_key blob it belongs to (saved in application_steps.data jsonb).
+const STEP_FIELDS = {
+  WELCOME: ['welcomeAck'],
+  CONSENT: ['consentShare', 'consentReview'],
+  POSITION_STRATEGY: ['formatSelection', 'serviceTypes'],
+  EARNINGS: ['contractorAck1', 'contractorAck2', 'contractorAck3'],
+  IDENTITY: ['legalName', 'preferredName', 'phone', 'dob'],
+  ADDRESS: ['addressLine1', 'addressLine2', 'city', 'province', 'postalCode'],
+  TRANSPORTATION: ['hasCar', 'willingTransit', 'canDriveClients', 'validLicense'],
+  WORK_ENV: ['locAssistantHome', 'locClientHome', 'locOnline', 'locCommunity', 'homeShareStatus', 'homeSubstanceFree', 'homeEnvDescription'],
+  AVAILABILITY: ['availWeekdays', 'availEvenings', 'availWeekends', 'minHoursPerWeek'],
+  WORK_HISTORY: ['workRole', 'workYears', 'workSummary'],
+  CHILD_EXP: ['childAges_0_5', 'childAges_6_12', 'childAges_13_18', 'childExpSummary'],
+  VALUES: ['valPatience', 'valStructure', 'valAccountability', 'valSafety', 'valAcademic', 'valIndependence', 'valSummary'],
+  BACKGROUND_INFO: ['backgroundInfoAck'],
+  CERTS_INFO: ['certsInfoAck'],
+  BOUNDARIES: ['boundaryAck1', 'boundaryAck2', 'boundaryAck3', 'boundaryAck4'],
+  CONFIDENTIALITY: ['confidentialityAck1', 'confidentialityAck2', 'confidentialityAck3'],
+  LEGAL_LIABILITY: ['legalAck1', 'legalAck2', 'legalAck3', 'legalSigDataUrl'],
+  FINAL_REVIEW: ['confirmTruth', 'confirmBackground'],
+};
+const FIELD_TO_STEP = {};
+Object.entries(STEP_FIELDS).forEach(([k, fs]) => fs.forEach(f => { FIELD_TO_STEP[f] = k; }));
+// Step 18 scenario answers go to application_responses, not application_steps.
+const SCENARIO_FIELDS = { scenarioSafety: 'SCENARIO_SAFETY', scenarioBoundaries: 'SCENARIO_BOUNDARIES' };
+
+// Step number (1-24) → step_key (used for current_step_key on the application row).
+const STEP_NUMBER_TO_KEY = ['WELCOME','CONSENT','POSITION_STRATEGY','EARNINGS','IDENTITY','ADDRESS','TRANSPORTATION','WORK_ENV','AVAILABILITY','WORK_HISTORY','CHILD_EXP','VALUES','UPLOADS_CORE','BACKGROUND_INFO','UPLOADS_BACKGROUND','CERTS_INFO','UPLOADS_CERTS','SCENARIOS','PROFILE_PREVIEW','BOUNDARIES','CONFIDENTIALITY','LEGAL_LIABILITY','FINAL_REVIEW','SUBMIT'];
+
+const STEP_LABELS = ['Welcome','Transparency','The work','Pay & terms','Identity','Address','Transportation','Work environment','Availability','Work history','Child experience','Strengths','Documents','Background check','Upload check','Certificates','Upload certs','Scenarios','Profile preview','Boundaries','Confidentiality','Legal liability','Final review','Submit'];
+
+const STEPS = [
+  { v:()=>state.welcomeAck===true, e:'Please acknowledge to continue.' },
+  { v:()=>state.consentShare && state.consentReview, e:'Please acknowledge both consents.' },
+  { v:()=>!!state.formatSelection && Array.isArray(state.serviceTypes) && state.serviceTypes.length>0, e:'Pick a format and at least one type of work.' },
+  { v:()=>state.contractorAck1 && state.contractorAck2 && state.contractorAck3, e:'Please acknowledge all three terms.' },
+  { v:()=>(state.legalName||'').length>=3 && (state.preferredName||'').length>=1 && (state.phone||'').length>=7 && (state.dob||'').length>=8, e:'Fill out all identity fields.' },
+  { v:()=>(state.addressLine1||'').length>=4 && (state.city||'').length>=2 && (state.province||'').length>=2 && (state.postalCode||'').length>=4, e:'Fill out the full address.' },
+  { v:()=>{ if(!state.willingTransit) return false; if(state.canDriveClients && !state.validLicense) return false; return true; }, e:'Confirm transit; if driving, also confirm license.' },
+  { v:()=>{ const a=state.locAssistantHome||state.locClientHome||state.locOnline||state.locCommunity; if(!a) return false; if(state.locAssistantHome){ if(!state.homeShareStatus) return false; if(!state.homeSubstanceFree) return false; if((state.homeEnvDescription||'').length<20) return false; if(!state._documents||!state._documents.HOME_WORKSPACE_PHOTO) return false;} return true;}, e:'Pick at least one location and complete any home-hosting fields.' },
+  { v:()=>(state.availWeekdays||state.availEvenings||state.availWeekends) && (state.minHoursPerWeek||'').toString().length>=1, e:'Select at least one window and enter hours.' },
+  { v:()=>(state.workRole||'').length>=2 && (state.workYears||'').toString().length>=1 && (state.workSummary||'').length>=20, e:'Complete role, years, and a summary.' },
+  { v:()=>(state.childAges_0_5||state.childAges_6_12||state.childAges_13_18) && (state.childExpSummary||'').length>=30, e:'Pick at least one age group and write at least 30 characters.' },
+  { v:()=>(state.valPatience||state.valStructure||state.valAccountability||state.valSafety||state.valAcademic||state.valIndependence) && (state.valSummary||'').length>=20, e:'Choose at least one strength and write at least 20 characters.' },
+  { v:()=>state._documents && state._documents.ID_PHOTO && state._documents.RESUME, e:'Upload your government ID and résumé.' },
+  { v:()=>state.backgroundInfoAck===true, e:'Acknowledge the PIC-VS requirement.' },
+  { v:()=>state._documents && state._documents.CRIMINAL_RECORD_CHECK, e:'Upload your background check.' },
+  { v:()=>state.certsInfoAck===true, e:'Acknowledge the certificate guidelines.' },
+  { v:()=>{ if(!state._documents) return false; if(state._documents.CERT_FIRST_AID) return true; return Object.keys(state._documents).some(k=>k.startsWith('CERT_OTHER')); }, e:'Upload at least one certificate.' },
+  { v:()=>(state.scenarioSafety||'').length>=80 && (state.scenarioBoundaries||'').length>=80, e:'Both answers must be at least 80 characters.' },
+  { v:()=>true, e:'' },
+  { v:()=>state.boundaryAck1 && state.boundaryAck2 && state.boundaryAck3 && state.boundaryAck4, e:'Please acknowledge all four boundaries.' },
+  { v:()=>state.confidentialityAck1 && state.confidentialityAck2 && state.confidentialityAck3, e:'Please acknowledge all three.' },
+  { v:()=>state.legalAck1 && state.legalAck2 && state.legalAck3 && state.legalSigDataUrl, e:'Acknowledge all three and provide your signature.' },
+  { v:()=>state.confirmTruth && state.confirmBackground, e:'Please confirm both statements.' },
+  { v:()=>true, e:'' }
+];
+
+let applicationId = null;
+let appStatus = 'draft';
+let state = { _documents: {} };
+let currentStep = 0;
+const saveTimers = {};
+
+// ─── Save indicators ─────────────────────────────────────────────
+function setSaveStatus(label, color){
+  const meta = document.getElementById('haProgressSaved');
+  if (meta){ meta.textContent = label; meta.style.color = color || ''; }
+}
+function flashSaved(){
+  setSaveStatus('All changes saved', 'var(--success-ink)');
+  const toast = document.getElementById('haSaved');
+  if (toast){ toast.classList.add('is-visible'); clearTimeout(flashSaved._t); flashSaved._t = setTimeout(()=>toast.classList.remove('is-visible'), 1400); }
+}
+
+// ─── State + persistence ─────────────────────────────────────────
+function setField(key, value){
+  state[key] = value;
+  refreshConditionals(); refreshCounters();
+  if (currentStep === 19) refreshProfile();
+  if (FIELD_TO_STEP[key]) scheduleStepSave(FIELD_TO_STEP[key]);
+  else if (SCENARIO_FIELDS[key]) scheduleScenarioSave(key);
+}
+
+function scheduleStepSave(stepKey){
+  if (!applicationId) return;
+  if (saveTimers[stepKey]) clearTimeout(saveTimers[stepKey]);
+  setSaveStatus('Saving…');
+  saveTimers[stepKey] = setTimeout(async () => {
+    const fields = STEP_FIELDS[stepKey] || [];
+    const data = {};
+    fields.forEach(f => { if (state[f] !== undefined) data[f] = state[f]; });
+    try {
+      await window.pmHiring.saveApplicationStep({ applicationId, stepKey, dataObject: data });
+      flashSaved();
+    } catch (e) {
+      console.error('saveApplicationStep failed', e);
+      setSaveStatus('Save failed', 'var(--danger)');
+    }
+  }, 600);
+}
+
+function scheduleScenarioSave(field){
+  if (!applicationId) return;
+  const scenarioKey = SCENARIO_FIELDS[field];
+  if (saveTimers[scenarioKey]) clearTimeout(saveTimers[scenarioKey]);
+  setSaveStatus('Saving…');
+  saveTimers[scenarioKey] = setTimeout(async () => {
+    try {
+      await window.pmHiring.saveScenarioResponse({
+        applicationId, scenarioKey,
+        responseText: state[field] || '',
+        minChars: 80,
+      });
+      flashSaved();
+    } catch (e) {
+      console.error('saveScenarioResponse failed', e);
+      setSaveStatus('Save failed', 'var(--danger)');
+    }
+  }, 800);
+}
+
+// ─── Step navigation ─────────────────────────────────────────────
+function showStep(n){
+  currentStep = n;
+  document.querySelectorAll('.ha-step').forEach(el => el.classList.toggle('is-active', Number(el.dataset.step) === n));
+  document.querySelectorAll('.ha-stephead').forEach(el => { el.style.display = (Number(el.dataset.stephead) === n) ? 'block' : 'none'; });
+  const progress = document.getElementById('haProgress');
+  if (n === 0 || n === 25){ progress.hidden = true; }
+  else {
+    progress.hidden = false;
+    document.getElementById('haProgressFill').style.width = ((n/TOTAL_STEPS)*100) + '%';
+    document.getElementById('haProgressStep').textContent = n;
+    document.getElementById('haProgressLabel').textContent = STEP_LABELS[n-1];
+  }
+  if (n === 25) populateSuccess();
+  if (n === 19) refreshProfile();
+  if (n === 23) refreshReview();
+  if (n === 22) initSig();
+  refreshConditionals(); refreshCounters();
+  document.querySelectorAll('[data-error]').forEach(e => e.textContent = '');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (applicationId && n >= 1 && n <= TOTAL_STEPS){
+    const stepKey = STEP_NUMBER_TO_KEY[n - 1];
+    const progressPercent = Math.round((n / TOTAL_STEPS) * 100);
+    window.pmHiring.updateApplicationProgress({ applicationId, currentStepKey: stepKey, progressPercent }).catch(e => console.error('progress update failed', e));
+  }
+}
+
+function nextStep(){
+  if (currentStep === 0){ showStep(1); return; }
+  if (currentStep === TOTAL_STEPS){ submit(); return; }
+  const def = STEPS[currentStep - 1];
+  if (def && !def.v()){
+    const errEl = document.querySelector(`[data-step="${currentStep}"] [data-error]`);
+    if (errEl) errEl.textContent = def.e;
+    return;
+  }
+  showStep(currentStep + 1);
+}
+function prevStep(){ if (currentStep > 1) showStep(currentStep - 1); }
+
+// ─── Restore UI from state (after server hydrate) ────────────────
+function restore(){
+  document.querySelectorAll('[data-field]').forEach(input => {
+    const k = input.dataset.field;
+    if (state[k] !== undefined && state[k] !== null) input.value = state[k];
+  });
+  document.querySelectorAll('[data-toggle-agree]').forEach(row => {
+    row.classList.toggle('is-active', !!state[row.dataset.toggleAgree]);
+  });
+  document.querySelectorAll('[data-choices]').forEach(group => {
+    const k = group.dataset.choices; const v = state[k];
+    group.querySelectorAll('[data-value]').forEach(opt => opt.classList.toggle('is-active', opt.dataset.value === v));
+  });
+  document.querySelectorAll('[data-pills]').forEach(group => {
+    const k = group.dataset.pills; const v = state[k];
+    group.querySelectorAll('[data-value]').forEach(opt => opt.classList.toggle('is-active', opt.dataset.value === v));
+  });
+  document.querySelectorAll('[data-pills-multi]').forEach(group => {
+    group.querySelectorAll('[data-bind]').forEach(opt => opt.classList.toggle('is-active', !!state[opt.dataset.bind]));
+  });
+  document.querySelectorAll('[data-multi]').forEach(group => {
+    if (group.dataset.multi === 'serviceTypes'){
+      const arr = state.serviceTypes || [];
+      group.querySelectorAll('[data-value]').forEach(opt => opt.classList.toggle('is-active', arr.includes(opt.dataset.value)));
+    }
+    group.querySelectorAll('[data-bind]').forEach(opt => opt.classList.toggle('is-active', !!state[opt.dataset.bind]));
+  });
+  // Render any documents already on file.
+  if (state._documents){
+    Object.keys(state._documents).forEach(k => {
+      const card = document.querySelector(`[data-upload="${k}"]`);
+      if (card) renderUploadFilled(card, state._documents[k]);
+    });
+  }
+  // Render signature if present.
+  if (state.legalSigDataUrl){
+    const c = document.getElementById('haSigCanvas');
+    if (c){
+      const ctx = c.getContext('2d'); const img = new Image();
+      img.onload = () => { ctx.drawImage(img, 0, 0, c.width, c.height); document.getElementById('haSigHint').textContent = 'Signed'; };
+      img.src = state.legalSigDataUrl;
+    }
+  }
+}
+
+// ─── Wire input bindings (run once on DOMContentLoaded) ──────────
+function wireInputs(){
+  document.querySelectorAll('[data-field]').forEach(input => {
+    const k = input.dataset.field;
+    const h = () => setField(k, input.value);
+    input.addEventListener('input', h); input.addEventListener('change', h);
+  });
+  document.querySelectorAll('[data-toggle-agree]').forEach(row => {
+    row.addEventListener('click', e => {
+      e.preventDefault();
+      const k = row.dataset.toggleAgree;
+      const v = !state[k];
+      setField(k, v); row.classList.toggle('is-active', v);
+    });
+  });
+  document.querySelectorAll('[data-choices]').forEach(group => {
+    const k = group.dataset.choices;
+    group.querySelectorAll('[data-value]').forEach(opt => {
+      opt.addEventListener('click', e => {
+        e.preventDefault();
+        group.querySelectorAll('[data-value]').forEach(o => o.classList.remove('is-active'));
+        opt.classList.add('is-active');
+        setField(k, opt.dataset.value);
+      });
+    });
+  });
+  document.querySelectorAll('[data-pills]').forEach(group => {
+    const k = group.dataset.pills;
+    group.querySelectorAll('[data-value]').forEach(opt => {
+      opt.addEventListener('click', e => {
+        e.preventDefault();
+        group.querySelectorAll('[data-value]').forEach(o => o.classList.remove('is-active'));
+        opt.classList.add('is-active');
+        setField(k, opt.dataset.value);
+      });
+    });
+  });
+  document.querySelectorAll('[data-pills-multi]').forEach(group => {
+    group.querySelectorAll('[data-bind]').forEach(opt => {
+      opt.addEventListener('click', e => {
+        e.preventDefault();
+        const k = opt.dataset.bind; const v = !state[k];
+        setField(k, v); opt.classList.toggle('is-active', v);
+      });
+    });
+  });
+  document.querySelectorAll('[data-multi]').forEach(group => {
+    if (group.dataset.multi === 'serviceTypes'){
+      group.querySelectorAll('[data-value]').forEach(opt => {
+        opt.addEventListener('click', e => {
+          e.preventDefault();
+          const v = opt.dataset.value;
+          const arr = Array.isArray(state.serviceTypes) ? [...state.serviceTypes] : [];
+          const i = arr.indexOf(v);
+          if (i >= 0) arr.splice(i, 1); else arr.push(v);
+          setField('serviceTypes', arr);
+          opt.classList.toggle('is-active', arr.includes(v));
+        });
+      });
+    }
+    group.querySelectorAll('[data-bind]').forEach(opt => {
+      opt.addEventListener('click', e => {
+        e.preventDefault();
+        const k = opt.dataset.bind; const v = !state[k];
+        setField(k, v); opt.classList.toggle('is-active', v);
+      });
+    });
+  });
+}
+
+// ─── Conditionals & counters ─────────────────────────────────────
+function refreshConditionals(){
+  document.querySelectorAll('[data-show-when]').forEach(el => {
+    try { const c = JSON.parse(el.dataset.showWhen); el.classList.toggle('is-shown', Object.keys(c).every(k => c[k].includes(state[k]))); } catch(e){}
+  });
+  document.querySelectorAll('[data-hide-when]').forEach(el => {
+    try { const c = JSON.parse(el.dataset.hideWhen); const m = Object.keys(c).every(k => c[k].includes(state[k])); el.classList.toggle('is-shown', !m); } catch(e){}
+  });
+}
+function refreshCounters(){
+  document.querySelectorAll('[data-counter-for]').forEach(el => {
+    const k = el.dataset.counterFor; const input = document.querySelector(`[data-field="${k}"]`); if (!input) return;
+    const min = parseInt(input.dataset.min || '0', 10); const len = (state[k] || input.value || '').length;
+    el.textContent = `${len} / ${min} minimum`; el.classList.toggle('is-ok', len >= min);
+  });
+}
+
+// ─── Uploads (real Supabase Storage) ─────────────────────────────
+function wireUpload(card){
+  const k = card.dataset.upload;
+  const trigger = card.querySelector('[data-upload-trigger]');
+  const input = card.querySelector('[data-upload-input]');
+  if (!trigger || !input) return;
+
+  trigger.addEventListener('click', () => input.click());
+  input.addEventListener('change', async e => {
+    const f = e.target.files && e.target.files[0]; if (!f) return;
+    if (f.size > 50 * 1024 * 1024){ alert('File is too large (max 50 MB).'); input.value = ''; return; }
+    if (!applicationId){ alert('Application not ready yet — please wait a moment.'); input.value = ''; return; }
+    const status = card.querySelector('[data-upload-status]');
+    if (status) status.textContent = 'Uploading…';
+    trigger.disabled = true; setSaveStatus('Uploading…');
+    try {
+      const stepKey = STEP_NUMBER_TO_KEY[currentStep - 1] || null;
+      const result = await window.pmHiring.uploadApplicationDocument({ applicationId, docType: k, file: f, stepKey });
+      state._documents[k] = { docType: k, name: f.name, size: f.size, type: f.type, path: result.path };
+      renderUploadFilled(card, state._documents[k]);
+      if (currentStep === 19) refreshProfile();
+      flashSaved();
+    } catch (err) {
+      console.error('upload failed', err);
+      if (status) status.textContent = 'Upload failed — try again';
+      trigger.disabled = false; setSaveStatus('Save failed', 'var(--danger)');
+      alert('Upload failed: ' + (err?.message || 'try again'));
+    }
+    input.value = '';
+  });
+}
+
+function renderUploadFilled(card, data){
+  card.classList.add('is-filled');
+  const status = card.querySelector('[data-upload-status]');
+  const trigger = card.querySelector('[data-upload-trigger]');
+  if (status) status.textContent = `${data.name || 'Uploaded file'} · ${data.size ? (data.size/1024).toFixed(0) + ' KB' : 'on file'}`;
+  if (trigger){
+    trigger.textContent = 'Replace';
+    trigger.disabled = false;
+    if (!card.querySelector('.ha-upload__remove')){
+      const rm = document.createElement('button');
+      rm.type = 'button'; rm.className = 'ha-upload__remove'; rm.textContent = 'Remove';
+      rm.addEventListener('click', async () => {
+        const dt = card.dataset.upload;
+        rm.disabled = true; setSaveStatus('Removing…');
+        try {
+          await window.pmHiring.deleteApplicationDocument({ applicationId, docType: dt });
+          delete state._documents[dt];
+          card.classList.remove('is-filled');
+          if (status) status.textContent = 'Choose a file to upload';
+          trigger.textContent = 'Upload';
+          rm.remove();
+          if (currentStep === 19) refreshProfile();
+          flashSaved();
+        } catch (e) {
+          console.error('delete failed', e);
+          rm.disabled = false; setSaveStatus('Save failed', 'var(--danger)');
+          alert('Could not remove file: ' + (e?.message || 'try again'));
+        }
+      });
+      trigger.parentNode.insertBefore(rm, trigger.nextSibling);
+    }
+  }
+}
+
+// ─── Cert "other" slots (dynamic) ────────────────────────────────
+const certAddBtn = document.getElementById('haCertAddBtn');
+const certList = document.getElementById('haCertOtherList');
+let certCount = 0;
+function addCertSlot(){
+  certCount++;
+  const k = certCount === 1 ? 'CERT_OTHER' : `CERT_OTHER_${certCount}`;
+  const card = document.createElement('div');
+  card.className = 'ha-upload'; card.dataset.upload = k;
+  card.innerHTML = `<div class="ha-upload__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><polyline points="8.21 13.89 7 22 12 19 17 22 15.79 13.88"/></svg></div><div class="ha-upload__body"><p class="ha-upload__title">${certCount === 1 ? 'Other certificate' : `Other certificate (${certCount})`}</p><p class="ha-upload__sub" data-upload-status>Optional</p></div><button type="button" class="ha-upload__btn" data-upload-trigger>Upload</button><input type="file" class="ha-upload__file" accept="image/*,application/pdf" data-upload-input />`;
+  certList.appendChild(card);
+  wireUpload(card);
+  if (state._documents && state._documents[k]) renderUploadFilled(card, state._documents[k]);
+}
+function ensureCertSlots(){
+  if (!state._documents) return;
+  for (let i = 1; i <= 6; i++){
+    const k = i === 1 ? 'CERT_OTHER' : `CERT_OTHER_${i}`;
+    if (state._documents[k] && certCount < i) addCertSlot();
+  }
+}
+certAddBtn.addEventListener('click', () => { if (certCount >= 6) return; addCertSlot(); if (certCount >= 6) certAddBtn.disabled = true; });
+
+// ─── Signature pad ───────────────────────────────────────────────
+let sigInited = false;
+function initSig(){
+  if (sigInited) return; sigInited = true;
+  const c = document.getElementById('haSigCanvas');
+  const hint = document.getElementById('haSigHint'); if (!c) return;
+  const resize = () => {
+    const r = c.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    c.width = r.width * dpr; c.height = r.height * dpr;
+    const ctx = c.getContext('2d'); ctx.scale(dpr, dpr);
+    ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#1d1d1f';
+    if (state.legalSigDataUrl){
+      const img = new Image();
+      img.onload = () => { ctx.drawImage(img, 0, 0, r.width, r.height); hint.textContent = 'Signed'; };
+      img.src = state.legalSigDataUrl;
+    }
+  };
+  resize(); window.addEventListener('resize', resize);
+  const ctx = c.getContext('2d');
+  let drawing = false, last = null;
+  const pos = e => { const r = c.getBoundingClientRect(); const t = e.touches ? e.touches[0] : e; return { x: t.clientX - r.left, y: t.clientY - r.top }; };
+  const start = e => { e.preventDefault(); drawing = true; last = pos(e); };
+  const move = e => { if (!drawing) return; e.preventDefault(); const p = pos(e); ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke(); last = p; hint.textContent = 'Capturing…'; };
+  const end = () => { if (!drawing) return; drawing = false; setField('legalSigDataUrl', c.toDataURL('image/png')); hint.textContent = 'Signed'; };
+  c.addEventListener('mousedown', start); c.addEventListener('mousemove', move); window.addEventListener('mouseup', end);
+  c.addEventListener('touchstart', start, { passive: false }); c.addEventListener('touchmove', move, { passive: false }); c.addEventListener('touchend', end);
+  document.getElementById('haSigClear').addEventListener('click', () => {
+    ctx.clearRect(0, 0, c.width, c.height);
+    setField('legalSigDataUrl', null);
+    hint.textContent = 'Sign above';
+  });
+}
+
+// ─── Profile preview ─────────────────────────────────────────────
+function refreshProfile(){
+  const name = state.preferredName || state.legalName || 'Your Name';
+  document.getElementById('haProfileName').textContent = name;
+  document.getElementById('haProfileAvatar').textContent = name.split(' ').map(s => s[0] || '').slice(0, 2).join('').toUpperCase() || 'PA';
+  document.getElementById('haProfileLoc').textContent = [state.city, state.province].filter(Boolean).join(', ') || 'City, Province';
+  document.getElementById('haProfileBio').textContent = state.workSummary || 'Complete your work history to populate your bio.';
+  const badges = document.getElementById('haProfileBadges'); badges.innerHTML = '';
+  if (state._documents && state._documents.CRIMINAL_RECORD_CHECK) badges.insertAdjacentHTML('beforeend', '<span class="ha-profile__badge">Background verified</span>');
+  if (state._documents && state._documents.CERT_FIRST_AID) badges.insertAdjacentHTML('beforeend', '<span class="ha-profile__badge">First Aid</span>');
+  const others = state._documents ? Object.keys(state._documents).filter(k => k.startsWith('CERT_OTHER')).length : 0;
+  if (others > 0) badges.insertAdjacentHTML('beforeend', `<span class="ha-profile__badge">+${others} cert${others > 1 ? 's' : ''}</span>`);
+  document.querySelectorAll('[data-chip]').forEach(c => c.classList.toggle('is-on', !!state[c.dataset.chip]));
+}
+
+// ─── Final review list ───────────────────────────────────────────
+function refreshReview(){
+  const list = document.getElementById('haReviewList'); if (!list) return; list.innerHTML = '';
+  STEPS.forEach((def, i) => {
+    if (i === 18 || i === 22 || i === 23) return;
+    const n = i + 1; const ok = def.v();
+    const row = document.createElement('div'); row.className = 'ha-review-row';
+    row.innerHTML = `<span class="ha-review-row__label">Step ${n} · ${STEP_LABELS[i]}</span><span class="ha-review-row__status ${ok ? 'is-ok' : 'is-todo'}">${ok ? 'Complete' : 'Incomplete'}</span>`;
+    row.addEventListener('click', () => showStep(n));
+    list.appendChild(row);
+  });
+}
+
+// ─── Submit ──────────────────────────────────────────────────────
+async function submit(){
+  const btn = document.querySelector('[data-step="24"] [data-action="next"]');
+  if (btn) btn.disabled = true;
+  setSaveStatus('Submitting…');
+  try {
+    // Make sure any pending step writes flush before locking.
+    await flushPendingSaves();
+    const updated = await window.pmHiring.submitApplication(applicationId);
+    appStatus = updated.status;
+    state._refNumber = 'PMA-' + applicationId.slice(0, 8).toUpperCase();
+    state._submittedAt = updated.submitted_at || new Date().toISOString();
+    // Fire-and-forget: notify owner via Resend edge function. Failure here doesn't block submit.
+    window.pmHiring.notifyOwnerOfSubmission(applicationId).catch(() => {});
+    showStep(25);
+  } catch (e) {
+    console.error('submit failed', e);
+    alert('Submit failed: ' + (e?.message || 'try again'));
+    if (btn) btn.disabled = false;
+    setSaveStatus('Save failed', 'var(--danger)');
+  }
+}
+
+async function flushPendingSaves(){
+  const keys = Object.keys(saveTimers);
+  keys.forEach(k => { clearTimeout(saveTimers[k]); delete saveTimers[k]; });
+  // Flush every step blob synchronously so submit captures the final state.
+  const stepWrites = Object.entries(STEP_FIELDS).map(([stepKey, fields]) => {
+    const data = {};
+    fields.forEach(f => { if (state[f] !== undefined) data[f] = state[f]; });
+    return window.pmHiring.saveApplicationStep({ applicationId, stepKey, dataObject: data });
+  });
+  // Flush scenarios.
+  const scenarioWrites = Object.entries(SCENARIO_FIELDS).map(([field, scenarioKey]) =>
+    window.pmHiring.saveScenarioResponse({ applicationId, scenarioKey, responseText: state[field] || '', minChars: 80 })
+  );
+  await Promise.all([...stepWrites, ...scenarioWrites].map(p => p.catch(e => console.error('flush save failed', e))));
+}
+
+function populateSuccess(){
+  if (state._refNumber) document.getElementById('haRefNumber').textContent = state._refNumber;
+  if (state._submittedAt) document.getElementById('haSubmittedAt').textContent = new Date(state._submittedAt).toLocaleString();
+}
+
+// ─── Exit modal ──────────────────────────────────────────────────
+const exitModal = document.getElementById('haExitModal');
+function openExit(){
+  if (currentStep === 0 || currentStep === 25){ window.location.href = 'hiring.html'; return; }
+  exitModal.classList.add('is-shown');
+}
+document.getElementById('haSaveExitTop').addEventListener('click', openExit);
+document.getElementById('haExitCancel').addEventListener('click', () => exitModal.classList.remove('is-shown'));
+exitModal.addEventListener('click', e => { if (e.target === exitModal) exitModal.classList.remove('is-shown'); });
+
+// ─── Action buttons ──────────────────────────────────────────────
+document.querySelectorAll('[data-action="back"]').forEach(b => b.addEventListener('click', prevStep));
+document.querySelectorAll('[data-action="next"]').forEach(b => b.addEventListener('click', nextStep));
+document.querySelectorAll('[data-action="save"]').forEach(b => b.addEventListener('click', openExit));
+
+// ─── Init: auth gate + hydrate from Supabase ─────────────────────
+function showLoadingOverlay(message){
+  const entry = document.querySelector('.wz-entry, .ha-entry, [data-step="0"]');
+  // Reuse step 0 as a transient "Loading…" panel.
+  document.querySelectorAll('.ha-step').forEach(el => el.classList.toggle('is-active', el.dataset.step === '0'));
+  document.querySelectorAll('.ha-stephead').forEach(el => { el.style.display = 'none'; });
+  document.getElementById('haProgress').hidden = true;
+  // Replace step 0 content with a loader.
+  const stepZero = document.querySelector('.ha-step[data-step="0"]');
+  if (stepZero){
+    stepZero.innerHTML = `<div class="ha-entry"><div class="ha-entry__eyebrow">Assistant Application</div><h1 class="ha-entry__title">Loading your <em>application</em>…</h1><p class="ha-entry__sub">${message || 'Connecting to Supabase. One moment.'}</p></div>`;
+  }
+}
+
+function showFatal(message){
+  const stepZero = document.querySelector('.ha-step[data-step="0"]');
+  if (stepZero){
+    stepZero.innerHTML = `<div class="ha-entry">
+      <div class="ha-entry__eyebrow" style="color:var(--danger);">Something went wrong</div>
+      <h1 class="ha-entry__title">We couldn't load your <em>application</em></h1>
+      <p class="ha-entry__sub">${message || 'Please refresh the page or sign back in.'}</p>
+      <div class="ha-entry__cta-stack">
+        <button type="button" class="ha-entry__cta" id="haFatalSignOut"><span>Sign out and start over</span></button>
+        <a class="ha-entry__ghost" href="hiring-entry.html" style="text-align:center;">Back to entry</a>
+      </div>
+    </div>`;
+    const so = document.getElementById('haFatalSignOut');
+    if (so) so.addEventListener('click', async () => {
+      so.disabled = true; so.querySelector('span').textContent = 'Signing out…';
+      await window.pmHiring.signOut();
+      window.location.href = 'hiring-entry.html';
+    });
+  }
+  document.querySelectorAll('.ha-step').forEach(el => el.classList.toggle('is-active', el.dataset.step === '0'));
+  document.getElementById('haProgress').hidden = true;
+}
+
+async function init(){
+  showLoadingOverlay('Checking your session…');
+  wireInputs();
+  document.querySelectorAll('[data-upload]').forEach(c => wireUpload(c));
+  addCertSlot(); // first "Other certificate" slot
+
+  let user;
+  try { user = await window.pmHiring.getCurrentUser(); }
+  catch (e){ console.error(e); }
+  if (!user){
+    window.location.href = 'hiring-entry.html';
+    return;
+  }
+
+  // If the signed-in user is an admin/owner, redirect them to the admin dashboard
+  // — the hiring wizard is for applicants only.
+  try {
+    const isAdmin = await window.pmHiring.isCurrentUserAdminOrOwner();
+    if (isAdmin) {
+      window.location.href = 'admin-dashboard.html';
+      return;
+    }
+  } catch (_) { /* fall through and try as applicant */ }
+
+  try { await window.pmHiring.ensureApplicantDraft(); }
+  catch (e){
+    console.error('ensureApplicantDraft failed', e);
+    showFatal(`This account (${user.email}) isn't set up as an applicant. If you're trying to apply for a job, sign out and create a new account using the "Start new application" option.`);
+    return;
+  }
+
+  let app;
+  try { app = await window.pmHiring.fetchLatestApplicationForCurrentUser(); }
+  catch (e){
+    console.error('fetchLatestApplication failed', e);
+    showFatal('Could not load your application.');
+    return;
+  }
+  if (!app){ showFatal('No application found.'); return; }
+
+  applicationId = app.id;
+  appStatus = app.status;
+
+  let dossier;
+  try { dossier = await window.pmHiring.fetchApplicationDossier(applicationId); }
+  catch (e){
+    console.error('fetchDossier failed', e);
+    showFatal('Could not load your saved answers.');
+    return;
+  }
+
+  // Hydrate state.
+  state = { _documents: {}, serviceTypes: [] };
+  (dossier.steps || []).forEach(s => {
+    if (s.data && typeof s.data === 'object') Object.assign(state, s.data);
+  });
+  (dossier.responses || []).forEach(r => {
+    if (r.scenario_key === 'SCENARIO_SAFETY') state.scenarioSafety = r.response_text || '';
+    if (r.scenario_key === 'SCENARIO_BOUNDARIES') state.scenarioBoundaries = r.response_text || '';
+  });
+  (dossier.documents || []).forEach(d => {
+    state._documents[d.doc_type] = {
+      id: d.id, docType: d.doc_type,
+      name: d.original_filename || d.doc_type,
+      size: d.file_size || 0,
+      type: d.mime_type || null,
+      path: d.storage_path,
+    };
+  });
+
+  restore();
+  ensureCertSlots();
+  refreshConditionals();
+  refreshCounters();
+
+  const FINAL = ['submitted', 'under_review', 'waitlisted', 'accepted', 'rejected'];
+  if (FINAL.includes(app.status)){
+    state._refNumber = 'PMA-' + applicationId.slice(0, 8).toUpperCase();
+    state._submittedAt = app.submitted_at || app.updated_at;
+    showStep(25);
+    return;
+  }
+
+  // Pick starting step from current_step_key, else step 1.
+  let startStep = 1;
+  if (app.current_step_key){
+    const idx = STEP_NUMBER_TO_KEY.indexOf(app.current_step_key);
+    if (idx >= 0) startStep = idx + 1;
+  }
+  showStep(Math.max(1, Math.min(TOTAL_STEPS, startStep)));
+  flashSaved();
+}
+
+if (document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+</script>
+
+</body>
+</html>

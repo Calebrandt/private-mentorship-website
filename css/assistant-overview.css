@@ -1,70 +1,187 @@
-    /* ── HERO ── */
+    /* ── HERO (video shrinks on scroll, cream editorial palette) ── */
     .hero {
-      position: relative; min-height: 100vh;
-      display: flex; align-items: center; justify-content: center;
-      text-align: center; overflow: hidden;
-      padding: 120px 5% 80px;
+      position: relative;
+      height: 200vh;
+      background: #F5F1E8;
+      color: #171514;
+      padding: 0;
+      margin: 0;
+      overflow: visible;
+      --p: 0;
+      --vs: 1;
+    }
+    .hero__stage {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    /* Decorative contour lines, fade in as cream reveals */
+    .hero__bg {
+      position: absolute; inset: 0; z-index: 0;
+      pointer-events: none;
+      opacity: calc(var(--p) * 1.4);
+    }
+    .hero__contours {
+      width: 100%; height: 100%;
+      color: rgba(23,21,20,0.08);
+    }
+
+    /* Top-right enrollment pill */
+    .hero__pill {
+      position: absolute;
+      top: 108px;
+      right: 7%;
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 8px 16px;
+      background: rgba(23,21,20,0.03);
+      border: 1px solid rgba(23,21,20,0.14);
+      border-radius: 980px;
+      font-family: 'Archivo', 'Inter', sans-serif;
+      font-weight: 500; font-size: 10px;
+      letter-spacing: 0.22em;
+      color: rgba(23,21,20,0.78);
+      text-transform: uppercase;
+      z-index: 3;
+      opacity: max(0, min(1, (var(--p) - 0.12) * 2.2));
+    }
+    .live-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #34D399;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.75)} }
+
+    /* Video frame — full-bleed at rest, scales down on scroll */
+    .hero__video-frame {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 100vw; height: 100vh;
+      transform: translate(-50%, -50%) scale(var(--vs));
+      transform-origin: center center;
+      border-radius: calc(var(--p) * 10px);
+      overflow: hidden;
+      z-index: 2;
+      will-change: transform, border-radius;
+      box-shadow: 0 calc(var(--p) * 40px) calc(var(--p) * 100px) rgba(23,21,20, calc(var(--p) * 0.22));
     }
     .hero-video {
       position: absolute; inset: 0;
-      width: 100%; height: 100%; object-fit: cover; z-index: 0;
-      transform: scale(0.82); transform-origin: center center;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transform: none;
     }
-    .hero-overlay {
-      position: absolute; inset: 0;
-      background: linear-gradient(160deg, rgba(10,15,44,.47) 0%, rgba(0,60,180,.30) 50%, rgba(10,15,44,.49) 100%);
-      z-index: 1;
-      transform: scale(0.82); transform-origin: center center;
+
+    /* Bottom editorial stack: eyebrow + headline + sub + CTAs */
+    .hero__foot {
+      position: absolute;
+      left: 7%;
+      bottom: 72px;
+      width: min(580px, 44%);
+      z-index: 3;
+      opacity: max(0, min(1, (var(--p) - 0.35) * 2));
+      transform: translateY(calc((1 - var(--p)) * 14px));
     }
-    /* animated gradient shimmer over video */
-    .hero-shimmer {
-      position: absolute; inset: 0; z-index: 2;
-      transform: scale(0.82); transform-origin: center center;
-      background: linear-gradient(
-        105deg,
-        transparent 0%,
-        rgba(59,130,246,0.08) 30%,
-        rgba(139,92,246,0.06) 60%,
-        transparent 100%
-      );
-      animation: shimmer 8s ease-in-out infinite alternate;
+    .hero__eyebrow {
+      display: inline-block;
+      font-family: 'Archivo', 'Inter', sans-serif;
+      font-weight: 500;
+      font-size: 10px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: rgba(23,21,20,0.56);
+      margin: 0 0 22px;
     }
-    @keyframes shimmer {
-      from { transform: translateX(-10%) skewX(-3deg); }
-      to   { transform: translateX(10%) skewX(3deg); }
-    }
-    .hero-content { position: relative; z-index: 3; max-width: 880px; margin: 0 auto; }
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.22);
-      backdrop-filter: blur(12px);
-      border-radius: 980px; padding: 7px 16px;
-      font-size: 11px; font-weight: 700;
-      color: rgba(255,255,255,.85); letter-spacing: .8px;
-      text-transform: uppercase; margin-bottom: 32px;
-    }
-    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #34D399; animation: pulse 2s ease-in-out infinite; }
-    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.75)} }
-    .hero h1 {
+    .hero__headline {
+      display: flex; flex-direction: column;
       font-family: 'Inter', sans-serif;
-      font-size: clamp(40px, 7vw, 84px); font-weight: 900;
-      letter-spacing: -3px; line-height: 1.02;
-      color: #fff; margin-bottom: 26px;
+      font-weight: 500;
+      font-size: clamp(28px, 3.4vw, 50px);
+      letter-spacing: -0.022em;
+      line-height: 1.12;
+      color: rgba(23,21,20,0.92);
+      text-transform: none;
+      margin: 0 0 26px;
     }
-    .hero h1 .hl {
-      background: linear-gradient(90deg, #93C5FD 0%, #5AB8D8 45%, #BAE8F5 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-      background-size: 200% auto;
-      animation: gradientShift 5s ease infinite;
+    .hero__headline-line { display: block; }
+    .hero__headline-line--accent {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-style: italic;
+      font-weight: 500;
+      color: rgba(23,21,20,0.88);
     }
-    @keyframes gradientShift { 0%{background-position:0%} 50%{background-position:100%} 100%{background-position:0%} }
-    .hero-sub {
-      font-size: clamp(16px,2vw,20px); color: rgba(255,255,255,.65);
-      max-width: 600px; margin: 0 auto 48px; line-height: 1.75; font-weight: 500;
+    .hero__sub {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(13px, 1vw, 15px);
+      line-height: 1.75;
+      color: rgba(23,21,20,0.60);
+      max-width: 460px;
+      margin: 0 0 32px;
+      font-weight: 400;
     }
-    .hero-actions { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+    .hero__actions {
+      display: flex; align-items: center;
+      gap: 22px; flex-wrap: wrap;
+    }
+    .hero__cta {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 12px 22px;
+      background: #171514;
+      color: #F5F1E8;
+      border-radius: 2px;
+      font-family: 'Archivo', 'Inter', sans-serif;
+      font-weight: 500; font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: background .2s, transform .15s;
+    }
+    .hero__cta:hover { background: #0a0908; transform: translateY(-1px); }
+    .hero__cta svg { opacity: 0.85; }
+    .hero__ghost {
+      font-family: 'Archivo', 'Inter', sans-serif;
+      font-weight: 500; font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(23,21,20,0.56);
+      text-decoration: none;
+      padding: 8px 2px;
+      border-bottom: 1px solid rgba(23,21,20,0.2);
+      transition: color .2s, border-color .2s;
+    }
+    .hero__ghost:hover { color: #171514; border-color: #171514; }
+
+    /* Bottom-right folder-tag — echoes the portrait hero's card */
+    .hero__tag {
+      position: absolute;
+      right: 7%;
+      bottom: 72px;
+      display: flex; flex-direction: column; gap: 6px;
+      z-index: 3;
+      opacity: max(0, min(1, (var(--p) - 0.55) * 2.4));
+      transform: translateY(calc((1 - var(--p)) * 10px));
+      padding: 14px 18px 14px 16px;
+      background: rgba(255, 253, 248, 0.82);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(23,21,20,0.08);
+      border-radius: 3px 10px 3px 3px;
+    }
+    .hero__tag-line {
+      font-family: 'Archivo', 'Inter', sans-serif;
+      font-weight: 500; font-size: 9px;
+      letter-spacing: 0.22em;
+      color: rgba(23,21,20,0.62);
+      text-transform: uppercase;
+    }
+    .hero__tag-line:first-child {
+      font-size: 10px;
+      color: rgba(23,21,20,0.78);
+    }
+
+    /* Make sure btn-ghost on the hero still gets a visible treatment if used elsewhere */
 
     /* ── STATS BAR ── */
     .stats-bar {

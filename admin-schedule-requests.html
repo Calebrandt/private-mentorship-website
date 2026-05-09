@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Schedule Requests — Private Mentorship</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
+<link rel="stylesheet" href="js/sidebar.css?v=20260508c" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#F1F5F9;color:#1F2937;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+  :root{
+    --bg:#F1F5F9;--card:#FFFFFF;--border:#E2E8F0;--border-soft:#EEF2F7;
+    --ink:#1F2937;--ink-2:#0F172A;--ink-mute:#64748B;--ink-tert:#94A3B8;
+    --primary:#5750F1;--primary-soft:#EEF1FB;
+    --green-soft:#DCFCE7;--orange-soft:#FFF1E2;--red:#EF4444;--red-soft:#FEE2E2;
+  }
+
+  /* Top bar */
+  .nx-topbar{background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:14px 26px;gap:16px;position:sticky;top:0;z-index:20;}
+  .nx-search{flex:1;max-width:520px;position:relative;}
+  .nx-search input{width:100%;background:#F1F5F9;border:1px solid transparent;border-radius:10px;padding:10px 14px 10px 38px;font:500 13.5px Inter,sans-serif;color:var(--ink);transition:border-color .15s ease, background .15s ease;}
+  .nx-search input::placeholder{color:var(--ink-tert);font-weight:400;}
+  .nx-search input:focus{outline:none;border-color:var(--primary);background:#fff;}
+  .nx-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--ink-tert);}
+  .nx-userpod{display:flex;align-items:center;gap:10px;padding:5px 12px 5px 5px;border:1px solid var(--border);border-radius:9999px;background:#fff;}
+  .nx-userpod__avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#5750F1 0%,#0ABEF9 100%);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px -1px rgba(87,80,241,0.35);}
+  .nx-userpod__name{font-size:13.5px;font-weight:700;color:var(--ink);letter-spacing:-.005em;}
+
+  /* Shell */
+  .nx-shell{padding:32px 28px 80px;max-width:1180px;margin:0 auto;}
+  .nx-head{margin-bottom:28px;}
+  .nx-h1{font-size:32px;font-weight:800;letter-spacing:-.025em;margin:0 0 8px;color:var(--ink-2);line-height:1.05;}
+  .nx-sub{font-size:14.5px;color:var(--ink-mute);margin:0;font-weight:500;letter-spacing:-.005em;}
+
+  /* Tabs */
+  .nx-tabs{
+    display:inline-flex;background:#fff;border:1px solid var(--border);border-radius:11px;
+    padding:5px;gap:3px;margin-bottom:22px;
+    box-shadow:0 1px 2px rgba(15,23,42,0.04);
+  }
+  .nx-tab{
+    background:transparent;border:0;cursor:pointer;
+    padding:9px 16px;border-radius:8px;
+    font:600 13px Inter,sans-serif;color:var(--ink-mute);letter-spacing:-.005em;
+    display:inline-flex;align-items:center;gap:8px;
+    transition:background .12s ease, color .12s ease;
+  }
+  .nx-tab:hover{color:var(--ink-2);}
+  .nx-tab.is-active{background:linear-gradient(135deg,#5750F1,#0ABEF9);color:#fff;box-shadow:0 4px 10px -3px rgba(87,80,241,0.35);}
+  .nx-tab__count{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:20px;height:20px;padding:0 7px;border-radius:9999px;
+    background:#F1F5F9;color:var(--ink-mute);
+    font-size:11px;font-weight:800;
+  }
+  .nx-tab.is-active .nx-tab__count{background:rgba(255,255,255,0.22);color:#fff;}
+
+  /* Request card */
+  .nx-list{display:flex;flex-direction:column;gap:14px;}
+  .nx-req{
+    background:#fff;border:1px solid var(--border);border-radius:14px;
+    padding:22px 24px;
+    box-shadow:0 1px 2px rgba(15,23,42,0.04);
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .nx-req:hover{border-color:#C7D2FE;box-shadow:0 8px 18px -8px rgba(15,23,42,0.10);}
+  .nx-req__top{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;}
+  .nx-req__avatar{
+    width:44px;height:44px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(135deg,#5750F1 0%,#0ABEF9 100%);
+    color:#fff;display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:14px;
+    box-shadow:0 4px 10px -3px rgba(87,80,241,0.35);
+  }
+  .nx-req__head{flex:1;min-width:0;}
+  .nx-req__client{font-size:16px;font-weight:800;color:var(--ink-2);margin:0;letter-spacing:-.012em;}
+  .nx-req__meta{font-size:13px;color:var(--ink-mute);margin:4px 0 0;font-weight:500;letter-spacing:-.005em;}
+  .nx-req__type{
+    display:inline-flex;align-items:center;gap:7px;flex-shrink:0;
+    font-size:13px;font-weight:700;letter-spacing:-.005em;
+    padding:6px 12px;border-radius:9999px;
+  }
+  .nx-req__type::before{content:'';width:7px;height:7px;border-radius:50%;}
+  .nx-req__type--cancel{background:var(--red-soft);color:#991B1B;}
+  .nx-req__type--cancel::before{background:#DC2626;box-shadow:0 0 0 3px rgba(220,38,38,0.16);}
+  .nx-req__type--reschedule{background:var(--primary-soft);color:#3730A3;}
+  .nx-req__type--reschedule::before{background:#5750F1;box-shadow:0 0 0 3px rgba(87,80,241,0.16);}
+  .nx-req__type--extra{background:var(--green-soft);color:#166534;}
+  .nx-req__type--extra::before{background:#22C55E;box-shadow:0 0 0 3px rgba(34,197,94,0.16);}
+
+  .nx-req__details{
+    display:grid;grid-template-columns:1fr 1fr;gap:16px;
+    background:#FAFBFC;border:1px solid var(--border);border-radius:11px;
+    padding:16px 18px;margin-bottom:16px;
+  }
+  .nx-req__field{}
+  .nx-req__field-label{font-size:11px;color:var(--ink-tert);margin:0 0 5px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;}
+  .nx-req__field-value{font-size:14px;color:var(--ink-2);margin:0;font-weight:600;letter-spacing:-.005em;line-height:1.4;}
+  .nx-req__reason{
+    background:#FAFBFC;border-left:3px solid var(--primary);
+    padding:12px 14px;border-radius:0 9px 9px 0;margin-bottom:18px;
+    font-size:13.5px;color:var(--ink);font-style:italic;line-height:1.5;letter-spacing:-.005em;
+  }
+  .nx-req__reason-label{display:block;font-style:normal;font-weight:700;font-size:11px;color:var(--ink-tert);letter-spacing:.10em;text-transform:uppercase;margin-bottom:5px;}
+
+  .nx-req__actions{display:flex;justify-content:flex-end;gap:10px;}
+  .nx-btn{
+    border:none;font:700 13px Inter,sans-serif;padding:10px 18px;border-radius:9999px;
+    cursor:pointer;transition:transform .12s ease, background .15s ease;
+    letter-spacing:-.005em;
+  }
+  .nx-btn--ghost{background:#F1F5F9;color:var(--ink-2);}
+  .nx-btn--ghost:hover{background:#E2E8F0;}
+  .nx-btn--reject{background:#fff;color:#991B1B;border:1px solid #FCA5A5;}
+  .nx-btn--reject:hover{background:var(--red-soft);}
+  .nx-btn--approve{background:linear-gradient(135deg,#16A34A,#22C55E);color:#fff;box-shadow:0 6px 14px -4px rgba(22,163,74,0.4);}
+  .nx-btn--approve:hover{transform:translateY(-1px);}
+  .nx-btn--primary{background:linear-gradient(135deg,#5750F1,#0ABEF9);color:#fff;box-shadow:0 6px 14px -4px rgba(87,80,241,0.4);}
+  .nx-btn[disabled]{opacity:.55;cursor:not-allowed;transform:none;}
+
+  /* Reviewed indicator (when viewing approved/rejected) */
+  .nx-req--reviewed{opacity:.85;background:#FAFBFC;}
+  .nx-req__resolution{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:13px;font-weight:600;letter-spacing:-.005em;
+  }
+  .nx-req__resolution::before{content:'';width:7px;height:7px;border-radius:50%;}
+  .nx-req__resolution--approved{color:#16A34A;}
+  .nx-req__resolution--approved::before{background:#22C55E;box-shadow:0 0 0 3px rgba(34,197,94,0.18);}
+  .nx-req__resolution--rejected{color:#DC2626;}
+  .nx-req__resolution--rejected::before{background:#EF4444;box-shadow:0 0 0 3px rgba(239,68,68,0.18);}
+
+  .nx-empty{padding:48px 24px;text-align:center;background:#fff;border:1px dashed var(--border);border-radius:14px;color:var(--ink-mute);font-size:14px;font-weight:500;}
+  .nx-empty__icon{
+    width:54px;height:54px;border-radius:14px;
+    background:linear-gradient(135deg,#EEF1FB,#E0F2FE);
+    color:var(--primary);
+    display:inline-flex;align-items:center;justify-content:center;
+    margin-bottom:14px;
+  }
+  .nx-empty__icon svg{width:24px;height:24px;stroke-width:2.2;}
+  .nx-empty__title{font-size:16px;font-weight:700;color:var(--ink-2);margin:0 0 4px;letter-spacing:-.012em;}
+  .nx-empty__sub{font-size:13px;color:var(--ink-mute);margin:0;}
+
+  .nx-skel{background:linear-gradient(90deg,#F1F5F9 25%,#E2E8F0 50%,#F1F5F9 75%);background-size:200% 100%;animation:nxshim 1.4s ease-in-out infinite;border-radius:6px;display:inline-block;height:1em;}
+  @keyframes nxshim{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
+  /* Modal (reject reason) */
+  .nx-modal{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(15,23,42,0.55);backdrop-filter:blur(3px);}
+  .nx-modal.is-shown{display:flex;}
+  .nx-modal__card{background:#fff;border:1px solid var(--border);border-radius:16px;width:100%;max-width:460px;box-shadow:0 28px 60px -16px rgba(15,23,42,0.5);padding:26px;}
+  .nx-modal__head{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;}
+  .nx-modal__icon{width:42px;height:42px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,#DC2626,#EF4444);box-shadow:inset 0 -2px 5px rgba(0,0,0,0.12);}
+  .nx-modal__icon svg{width:20px;height:20px;stroke-width:2.4;}
+  .nx-modal__title{font-size:18px;font-weight:800;color:var(--ink-2);margin:0;letter-spacing:-.018em;line-height:1.2;}
+  .nx-modal__subtitle{font-size:13px;color:var(--ink-mute);margin:5px 0 0;font-weight:500;line-height:1.45;}
+  .nx-modal__field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .nx-modal__label{font-size:12px;font-weight:700;color:var(--ink-2);letter-spacing:-.005em;}
+  .nx-modal__textarea{width:100%;background:#F8FAFC;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font:500 13.5px Inter,sans-serif;color:var(--ink-2);min-height:90px;resize:vertical;font-family:inherit;}
+  .nx-modal__textarea:focus{outline:none;border-color:var(--primary);background:#fff;}
+  .nx-modal__actions{display:flex;justify-content:flex-end;gap:10px;}
+
+  /* Toast */
+  .nx-toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);z-index:1100;background:var(--ink-2);color:#fff;padding:13px 22px;border-radius:9999px;font:600 13.5px Inter,sans-serif;letter-spacing:-.005em;box-shadow:0 16px 36px -10px rgba(15,23,42,0.55);opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s ease;}
+  .nx-toast.is-shown{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
+  .nx-toast--success{background:linear-gradient(135deg,#16A34A,#22C55E);}
+  .nx-toast--error{background:linear-gradient(135deg,#DC2626,#EF4444);}
+
+  @media (max-width:760px){
+    .nx-req__details{grid-template-columns:1fr;}
+    .nx-req__top{flex-wrap:wrap;}
+    .nx-req__actions{flex-direction:column;align-items:stretch;}
+    .nx-shell{padding:20px 16px 60px;}
+    .nx-h1{font-size:24px;}
+    .nx-search{display:none;}
+  }
+</style>
+</head>
+<body class="pm-has-sidebar">
+
+<div id="pmSidebar"></div>
+
+<header class="nx-topbar">
+  <div class="nx-search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="search" placeholder="Search requests…" />
+  </div>
+  <div class="nx-userpod">
+    <span class="nx-userpod__avatar" id="nxUserAvatar">A</span>
+    <span class="nx-userpod__name" id="nxUserName">Admin</span>
+  </div>
+</header>
+
+<main class="nx-shell">
+
+  <header class="nx-head">
+    <h1 class="nx-h1">Schedule requests</h1>
+    <p class="nx-sub" id="nxSub">Review pending cancel, reschedule, and additional-session requests from clients.</p>
+  </header>
+
+  <div class="nx-tabs" id="nxTabs">
+    <button class="nx-tab is-active" type="button" data-tab="all">All <span class="nx-tab__count" data-count="all">0</span></button>
+    <button class="nx-tab" type="button" data-tab="cancel">Cancellations <span class="nx-tab__count" data-count="cancel">0</span></button>
+    <button class="nx-tab" type="button" data-tab="reschedule">Reschedules <span class="nx-tab__count" data-count="reschedule">0</span></button>
+    <button class="nx-tab" type="button" data-tab="extra">Additional <span class="nx-tab__count" data-count="extra">0</span></button>
+    <button class="nx-tab" type="button" data-tab="reviewed">Reviewed</button>
+  </div>
+
+  <div id="reqList"><div class="nx-empty">Loading…</div></div>
+
+</main>
+
+<!-- Reject modal -->
+<div class="nx-modal" id="rejectModal">
+  <div class="nx-modal__card">
+    <div class="nx-modal__head">
+      <div class="nx-modal__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+      <div>
+        <h3 class="nx-modal__title">Reject this request?</h3>
+        <p class="nx-modal__subtitle" id="rejectSubtitle">The client will see your reason in their request history.</p>
+      </div>
+    </div>
+    <div class="nx-modal__field">
+      <label class="nx-modal__label" for="rejectReason">Reason</label>
+      <textarea class="nx-modal__textarea" id="rejectReason" placeholder="Why this can't be approved (e.g. slot unavailable, contract policy, etc.)"></textarea>
+    </div>
+    <div class="nx-modal__actions">
+      <button class="nx-btn nx-btn--ghost" type="button" id="rejectClose">Keep open</button>
+      <button class="nx-btn nx-btn--approve" type="button" id="rejectSubmit" style="background:linear-gradient(135deg,#DC2626,#EF4444);">Confirm reject</button>
+    </div>
+  </div>
+</div>
+
+<div class="nx-toast" id="nxToast"><span id="nxToastText">Done</span></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260508d"></script>
+<script src="js/hiring-service.js?v=20260508f"></script>
+<script src="js/sidebar.js?v=20260508c"></script>
+<script>
+(async () => {
+  const $ = id => document.getElementById(id);
+  function esc(s){return (s||'').toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
+  function fmtDate(iso){return iso ? new Date(iso).toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'}) : '—';}
+  function fmtDateTime(iso){return iso ? new Date(iso).toLocaleString('en-CA',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}) : '—';}
+  function timeAgo(iso){
+    if (!iso) return '';
+    const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+    if (m < 1) return 'just now';
+    if (m < 60) return m + 'm ago';
+    const h = Math.round(m/60);
+    if (h < 24) return h + 'h ago';
+    const d = Math.round(h/24);
+    if (d < 30) return d + 'd ago';
+    return fmtDate(iso);
+  }
+  function fmtTime(t){
+    if (!t) return '';
+    const [h,m] = String(t).split(':');
+    const hh = Number(h), mm = Number(m||0);
+    const period = hh >= 12 ? 'PM' : 'AM';
+    const h12 = ((hh + 11) % 12) + 1;
+    return `${h12}:${String(mm).padStart(2,'0')} ${period}`;
+  }
+  function initials(name){return (name || '?').split(/\s+/).map(s => s[0] || '').slice(0,2).join('').toUpperCase() || '?';}
+
+  // ─── Demo mode ────────────────────────────────────────────────
+  if (new URLSearchParams(location.search).get('demo') === '1') {
+    const now = Date.now();
+    const reqs = [
+      { id:'r1', client_id:'c1', appointment_id:'a1', request_type:'cancel',     status:'pending', reason:'Family event came up — can we move this?', created_at: new Date(now - 1000*60*45).toISOString() },
+      { id:'r2', client_id:'c2', appointment_id:'a2', request_type:'reschedule', status:'pending', reason:'I have a doctor appointment that morning.', created_at: new Date(now - 1000*60*60*3).toISOString(),
+        requested_date: new Date(now + 6*86400000).toISOString().split('T')[0], requested_start:'17:00:00', requested_end:'18:00:00',
+        proposed_schedule:{ starts_at: new Date(now + 6*86400000 + 17*3600000).toISOString(), duration_min: 60 } },
+      { id:'r3', client_id:'c3', appointment_id:null,  request_type:'extra',     status:'pending', reason:'Need extra prep before the SAT next month.', created_at: new Date(now - 1000*60*60*22).toISOString(),
+        requested_date: new Date(now + 4*86400000).toISOString().split('T')[0], requested_start:'14:00:00', requested_end:'15:30:00',
+        proposed_schedule:{ starts_at: new Date(now + 4*86400000 + 14*3600000).toISOString(), duration_min: 90 } },
+      { id:'r4', client_id:'c4', appointment_id:'a4', request_type:'cancel', status:'approved', reason:'Sick — kid stayed home.', admin_response:'Approved — no fee', created_at: new Date(now - 1000*60*60*24*2).toISOString(), reviewed_at: new Date(now - 1000*60*60*24*2 + 3600000).toISOString() },
+      { id:'r5', client_id:'c2', appointment_id:'a5', request_type:'reschedule', status:'rejected', reason:'Want a Sunday slot.', admin_response:'Sundays not in your contract pattern. Try a Tuesday slot.', created_at: new Date(now - 1000*60*60*24*5).toISOString(), reviewed_at: new Date(now - 1000*60*60*24*4).toISOString() },
+    ];
+    const clientsById = {
+      c1: { id:'c1', full_name:'The Smith Family',  email:'smith@example.com' },
+      c2: { id:'c2', full_name:'Jane Doe',          email:'jane@example.com' },
+      c3: { id:'c3', full_name:'Tony Wong',         email:'tony@example.com' },
+      c4: { id:'c4', full_name:'Alex Murphy',       email:'a@example.com' },
+    };
+    const appointmentsById = {
+      a1: { id:'a1', starts_at: new Date(now + 2*86400000 + 16*3600000).toISOString(), ends_at: new Date(now + 2*86400000 + 17*3600000).toISOString(), kind:'Session', title:'Math', duration_minutes: 60 },
+      a2: { id:'a2', starts_at: new Date(now + 4*86400000 + 17*3600000).toISOString(), ends_at: new Date(now + 4*86400000 + 18*3600000).toISOString(), kind:'Session', title:'Reading', duration_minutes: 60 },
+      a4: { id:'a4', starts_at: new Date(now - 1000*60*60*24*2 + 16*3600000).toISOString(), kind:'Session', title:'Math' },
+      a5: { id:'a5', starts_at: new Date(now + 7*86400000 + 17*3600000).toISOString(), kind:'Session', title:'Math' },
+    };
+
+    window.pmHiring = {
+      getCurrentUser: async () => ({ id:'admin-demo', email:'caleb@private-mentorship.com' }),
+      fetchCurrentUserProfile: async () => ({ full_name:'Caleb Brandt', role:'OWNER' }),
+      isCurrentUserAdminOrOwner: async () => true,
+      signOut: async () => { location.href = 'index.html'; },
+      adminListScheduleRequests: async ({ statuses = ['pending'], types = null } = {}) => {
+        let filtered = reqs.filter(r => statuses.includes(r.status));
+        if (types && types.length) filtered = filtered.filter(r => types.includes(r.request_type));
+        return { requests: filtered, clientsById, appointmentsById };
+      },
+      adminApproveCancelRequest: async (reqId) => {
+        await new Promise(r => setTimeout(r, 500));
+        const r = reqs.find(x => x.id === reqId); if (r) { r.status = 'approved'; r.admin_response = 'Cancellation approved'; r.reviewed_at = new Date().toISOString(); }
+        return { request: r };
+      },
+      adminApproveRescheduleRequest: async (reqId) => {
+        await new Promise(r => setTimeout(r, 500));
+        const r = reqs.find(x => x.id === reqId); if (r) { r.status = 'approved'; r.admin_response = 'Reschedule approved'; r.reviewed_at = new Date().toISOString(); }
+        return { request: r };
+      },
+      adminApproveExtraRequest: async (reqId) => {
+        await new Promise(r => setTimeout(r, 500));
+        const r = reqs.find(x => x.id === reqId); if (r) { r.status = 'approved'; r.admin_response = 'Additional session approved'; r.reviewed_at = new Date().toISOString(); }
+        return { request: r };
+      },
+      adminRejectScheduleRequest: async (reqId, reason) => {
+        await new Promise(r => setTimeout(r, 500));
+        const r = reqs.find(x => x.id === reqId); if (r) { r.status = 'rejected'; r.admin_response = reason || 'Rejected'; r.reviewed_at = new Date().toISOString(); }
+        return r;
+      },
+    };
+    document.addEventListener('DOMContentLoaded', () => {
+      const bar = document.createElement('div');
+      bar.textContent = 'Demo mode — fake data. Remove ?demo=1 from the URL to exit.';
+      bar.style.cssText = 'position:fixed;bottom:14px;right:14px;z-index:9999;background:#5750F1;color:#fff;font:600 12px Inter,sans-serif;padding:10px 14px;border-radius:9999px;box-shadow:0 8px 24px -6px rgba(87,80,241,0.45);';
+      document.body.appendChild(bar);
+    });
+  }
+
+  // Auth + admin gate
+  const user = await window.pmHiring.getCurrentUser();
+  if (!user) { window.location.href = 'signin.html'; return; }
+  const isAdmin = await window.pmHiring.isCurrentUserAdminOrOwner();
+  if (!isAdmin) { await window.pmHiring.signOut(); window.location.href = 'signin.html?notauthorized=1'; return; }
+
+  const profile = await window.pmHiring.fetchCurrentUserProfile().catch(() => null);
+  const fullName = profile?.full_name || user.email?.split('@')[0] || 'Admin';
+  const firstName = fullName.split(' ')[0];
+  $('nxUserName').textContent = firstName;
+  $('nxUserAvatar').textContent = (firstName[0] || 'A').toUpperCase();
+
+  // State
+  let currentTab = 'all';
+  let allPending = [];
+  let allReviewed = [];
+  let clientsById = {};
+  let appointmentsById = {};
+
+  async function loadAll(){
+    const pending = await window.pmHiring.adminListScheduleRequests({ statuses: ['pending'], limit: 200 });
+    const reviewed = await window.pmHiring.adminListScheduleRequests({ statuses: ['approved','rejected'], limit: 50 });
+    allPending = pending.requests || [];
+    allReviewed = reviewed.requests || [];
+    clientsById = { ...pending.clientsById, ...reviewed.clientsById };
+    appointmentsById = { ...pending.appointmentsById, ...reviewed.appointmentsById };
+    refreshTabCounts();
+    render();
+  }
+
+  function refreshTabCounts(){
+    const counts = {
+      all: allPending.length,
+      cancel: allPending.filter(r => r.request_type === 'cancel').length,
+      reschedule: allPending.filter(r => r.request_type === 'reschedule').length,
+      extra: allPending.filter(r => r.request_type === 'extra').length,
+    };
+    Object.entries(counts).forEach(([k,v]) => {
+      const el = document.querySelector(`[data-count="${k}"]`);
+      if (el) el.textContent = v;
+    });
+  }
+
+  function typeLabel(t){ return ({ cancel:'Cancellation', reschedule:'Reschedule', extra:'Additional session' })[t] || t; }
+  function typeClass(t){ return ({ cancel:'cancel', reschedule:'reschedule', extra:'extra' })[t] || 'cancel'; }
+
+  function renderRequestCard(req, mode='pending') {
+    const client = clientsById[req.client_id] || { full_name:'Unknown client', email:'' };
+    const apt = req.appointment_id ? appointmentsById[req.appointment_id] : null;
+    const isReviewed = mode !== 'pending';
+
+    // Build "Original" + "Proposed" detail cells
+    let originalLabel = '—';
+    let originalValue = req.appointment_id ? 'Loading…' : 'New session';
+    if (apt) {
+      const d = new Date(apt.starts_at);
+      originalLabel = d.toLocaleDateString('en-CA', { weekday:'long', month:'long', day:'numeric' });
+      originalValue = `${d.toLocaleTimeString('en-CA',{hour:'numeric',minute:'2-digit'})}${apt.title ? ' · ' + esc(apt.title) : ''}`;
+    }
+
+    let proposedLabel = '—';
+    let proposedValue = '—';
+    const proposedIso = req.proposed_schedule?.starts_at || (req.requested_date && req.requested_start ? `${req.requested_date}T${req.requested_start}` : null);
+    if (proposedIso) {
+      const d = new Date(proposedIso);
+      proposedLabel = d.toLocaleDateString('en-CA', { weekday:'long', month:'long', day:'numeric' });
+      proposedValue = d.toLocaleTimeString('en-CA',{hour:'numeric',minute:'2-digit'});
+      const dur = req.proposed_schedule?.duration_min;
+      if (dur) proposedValue += ` · ${dur} min`;
+    } else if (req.request_type === 'cancel') {
+      proposedLabel = 'Action';
+      proposedValue = 'Cancel this session';
+    }
+
+    const detailsHtml = `<div class="nx-req__details">
+      <div class="nx-req__field">
+        <p class="nx-req__field-label">${apt ? 'Original session' : (req.request_type === 'extra' ? 'Request' : 'Original')}</p>
+        <p class="nx-req__field-value">${esc(originalLabel)}</p>
+        <p class="nx-req__field-value" style="color:var(--ink-mute);font-weight:500;margin-top:2px;">${esc(originalValue)}</p>
+      </div>
+      <div class="nx-req__field">
+        <p class="nx-req__field-label">${req.request_type === 'cancel' ? 'Outcome' : 'Proposed'}</p>
+        <p class="nx-req__field-value">${esc(proposedLabel)}</p>
+        <p class="nx-req__field-value" style="color:var(--ink-mute);font-weight:500;margin-top:2px;">${esc(proposedValue)}</p>
+      </div>
+    </div>`;
+
+    const reasonHtml = req.reason ? `<div class="nx-req__reason">
+      <span class="nx-req__reason-label">Client's reason</span>
+      "${esc(req.reason)}"
+    </div>` : '';
+
+    let actionsHtml = '';
+    if (isReviewed) {
+      const resCls = req.status === 'approved' ? 'nx-req__resolution--approved' : 'nx-req__resolution--rejected';
+      const resLabel = req.status === 'approved' ? 'Approved' : 'Rejected';
+      actionsHtml = `<div class="nx-req__actions" style="justify-content:space-between;align-items:center;">
+        <span class="nx-req__resolution ${resCls}">${resLabel} · ${esc(timeAgo(req.reviewed_at))}</span>
+        ${req.admin_response ? `<span style="font-size:13px;color:var(--ink-mute);font-style:italic;">"${esc(req.admin_response)}"</span>` : ''}
+      </div>`;
+    } else {
+      actionsHtml = `<div class="nx-req__actions">
+        <button class="nx-btn nx-btn--reject" type="button" data-action="reject" data-id="${esc(req.id)}">Reject</button>
+        <button class="nx-btn nx-btn--approve" type="button" data-action="approve" data-id="${esc(req.id)}" data-type="${esc(req.request_type)}">Approve</button>
+      </div>`;
+    }
+
+    return `<div class="nx-req${isReviewed ? ' nx-req--reviewed' : ''}" data-req-id="${esc(req.id)}">
+      <div class="nx-req__top">
+        <div class="nx-req__avatar">${esc(initials(client.full_name))}</div>
+        <div class="nx-req__head">
+          <p class="nx-req__client">${esc(client.full_name)}</p>
+          <p class="nx-req__meta">${esc(client.email || '')} · submitted ${esc(timeAgo(req.created_at))}</p>
+        </div>
+        <span class="nx-req__type nx-req__type--${typeClass(req.request_type)}">${esc(typeLabel(req.request_type))}</span>
+      </div>
+      ${detailsHtml}
+      ${reasonHtml}
+      ${actionsHtml}
+    </div>`;
+  }
+
+  function render(){
+    const wrap = $('reqList');
+    let list, mode = 'pending';
+    if (currentTab === 'reviewed') {
+      list = allReviewed; mode = 'reviewed';
+    } else if (currentTab === 'all') {
+      list = allPending;
+    } else {
+      list = allPending.filter(r => r.request_type === currentTab);
+    }
+
+    if (!list.length) {
+      const inboxIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>';
+      wrap.innerHTML = `<div class="nx-empty">
+        <div class="nx-empty__icon">${inboxIcon}</div>
+        <p class="nx-empty__title">${currentTab === 'reviewed' ? 'No reviewed requests yet' : 'Inbox is empty'}</p>
+        <p class="nx-empty__sub">${currentTab === 'reviewed' ? "Approved and rejected requests will show here." : "When clients submit cancel, reschedule, or additional-session requests, they'll appear here for review."}</p>
+      </div>`;
+      return;
+    }
+
+    wrap.innerHTML = `<div class="nx-list">${list.map(r => renderRequestCard(r, mode)).join('')}</div>`;
+    bindRowActions();
+  }
+
+  // Tabs
+  document.querySelectorAll('#nxTabs .nx-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentTab = btn.dataset.tab;
+      document.querySelectorAll('#nxTabs .nx-tab').forEach(b => b.classList.toggle('is-active', b === btn));
+      render();
+    });
+  });
+
+  // Toast
+  let toastTimer = null;
+  function showToast(text, kind='success'){
+    const t = $('nxToast');
+    $('nxToastText').textContent = text;
+    t.classList.remove('nx-toast--error','nx-toast--success');
+    t.classList.add(kind === 'error' ? 'nx-toast--error' : 'nx-toast--success');
+    t.classList.add('is-shown');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('is-shown'), 3500);
+  }
+
+  // Reject modal
+  let rejectingId = null;
+  function openRejectModal(id, clientName, type){
+    rejectingId = id;
+    $('rejectSubtitle').textContent = `Reject ${typeLabel(type).toLowerCase()} request from ${clientName}? Your reason will be visible to the client.`;
+    $('rejectReason').value = '';
+    $('rejectSubmit').disabled = false;
+    $('rejectSubmit').textContent = 'Confirm reject';
+    $('rejectModal').classList.add('is-shown');
+  }
+  function closeRejectModal(){ $('rejectModal').classList.remove('is-shown'); rejectingId = null; }
+  $('rejectClose').addEventListener('click', closeRejectModal);
+  $('rejectModal').addEventListener('click', e => { if (e.target.id === 'rejectModal') closeRejectModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeRejectModal(); });
+  $('rejectSubmit').addEventListener('click', async () => {
+    if (!rejectingId) return;
+    const reason = $('rejectReason').value.trim();
+    if (!reason) { showToast('Please add a reason for rejection', 'error'); return; }
+    const btn = $('rejectSubmit');
+    btn.disabled = true; btn.textContent = 'Rejecting…';
+    try {
+      await window.pmHiring.adminRejectScheduleRequest(rejectingId, reason);
+      closeRejectModal();
+      showToast('Request rejected — client notified.');
+      await loadAll();
+    } catch (e) {
+      btn.disabled = false; btn.textContent = 'Confirm reject';
+      showToast(e?.message || 'Failed to reject request', 'error');
+    }
+  });
+
+  // Action handlers (approve / reject)
+  function bindRowActions(){
+    document.querySelectorAll('[data-action="approve"]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id, type = btn.dataset.type;
+        btn.disabled = true; btn.textContent = 'Approving…';
+        try {
+          if (type === 'cancel') await window.pmHiring.adminApproveCancelRequest(id);
+          else if (type === 'reschedule') await window.pmHiring.adminApproveRescheduleRequest(id);
+          else if (type === 'extra') await window.pmHiring.adminApproveExtraRequest(id);
+          else throw new Error('Unknown request type: ' + type);
+          showToast(`${typeLabel(type)} approved`);
+          await loadAll();
+        } catch (e) {
+          btn.disabled = false; btn.textContent = 'Approve';
+          showToast(e?.message || 'Failed to approve request', 'error');
+        }
+      });
+    });
+    document.querySelectorAll('[data-action="reject"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        const card = btn.closest('.nx-req');
+        const clientName = card?.querySelector('.nx-req__client')?.textContent || 'this client';
+        const type = card?.querySelector('.nx-req__type')?.textContent || 'request';
+        const lookup = (allPending.find(r => r.id === id) || {}).request_type || 'cancel';
+        openRejectModal(id, clientName, lookup);
+      });
+    });
+  }
+
+  await loadAll();
+})();
+</script>
+</body>
+</html>

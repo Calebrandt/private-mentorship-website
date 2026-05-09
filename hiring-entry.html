@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Apply for an Assistant Role — Private Mentorship</title>
+<meta name="description" content="Apply to become a Private Mentorship Assistant. Start a new application or sign in to continue." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,500;1,600&display=swap" />
+<link rel="stylesheet" href="js/auth-shell.css?v=20260507a" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  .entry-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px;}
+  .entry-action{
+    background:var(--input-bg);border:1px solid var(--hair-light);border-radius:14px;
+    padding:22px 22px 24px;cursor:pointer;text-align:left;font-family:inherit;
+    transition:all .18s var(--ease-out);display:flex;flex-direction:column;gap:6px;
+    text-decoration:none;color:var(--ink);
+  }
+  .entry-action:hover{border-color:var(--accent-border);background:var(--accent-fade);text-decoration:none;}
+  .entry-action__icon{
+    width:34px;height:34px;border-radius:10px;background:var(--surface);color:var(--accent);
+    display:flex;align-items:center;justify-content:center;margin-bottom:8px;
+    border:1px solid var(--hair-light);
+  }
+  .entry-action__icon svg{width:16px;height:16px;}
+  .entry-action__title{font-size:14px;font-weight:700;color:var(--ink);margin:0;}
+  .entry-action__sub{font-size:12.5px;color:var(--ink-mute);margin:0;line-height:1.4;}
+  .entry-resume{
+    background:var(--accent-fade);border:1px solid var(--accent-border);
+    border-radius:12px;padding:14px 18px;margin:0 0 18px;
+    font-size:13px;color:var(--ink-2);line-height:1.5;
+  }
+  .entry-resume strong{color:var(--accent-deep);font-weight:700;}
+  @media (max-width:520px){
+    .entry-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="auth-nav">
+  <a class="auth-nav__logo" href="hiring.html">Private Mentorship</a>
+  <div class="auth-nav__links">
+    <a href="hiring.html">Hiring</a>
+    <a href="the-assistant.html">The Assistant</a>
+    <a href="index.html">Home</a>
+  </div>
+</nav>
+
+<main class="auth-shell">
+  <div class="auth-card auth-card--wide">
+    <div class="auth-icon-wrap"><div class="auth-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-4V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg></div></div>
+    <p class="auth-eyebrow">Assistant Application</p>
+    <h1 class="auth-title">Apply for an <em>assistant</em> role</h1>
+    <p class="auth-sub">A serious application for serious work. About 30 minutes. Save and resume any time.</p>
+
+    <div id="entryResume" class="entry-resume" hidden>
+      <strong id="entryResumeTitle">Welcome back.</strong>
+      <span id="entryResumeMessage"> You have an application in progress.</span>
+    </div>
+
+    <div id="entryLoading" style="text-align:center;padding:18px 0;">
+      <span class="auth-spinner" style="border-color:rgba(0,113,227,0.25);border-top-color:var(--accent);"></span>
+      <p style="font-size:12.5px;color:var(--ink-mute);margin:10px 0 0;">Checking your application status…</p>
+    </div>
+
+    <div id="entryActions" class="entry-grid" hidden>
+      <a class="entry-action" id="entryNewApp" href="hiring-signup.html">
+        <div class="entry-action__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg></div>
+        <p class="entry-action__title" id="entryNewAppTitle">Start new application</p>
+        <p class="entry-action__sub" id="entryNewAppSub">Create an account and begin the wizard.</p>
+      </a>
+      <a class="entry-action" id="entrySignIn" href="hiring-login.html">
+        <div class="entry-action__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg></div>
+        <p class="entry-action__title" id="entrySignInTitle">Sign in to continue</p>
+        <p class="entry-action__sub" id="entrySignInSub">Resume an in-progress application or check your status.</p>
+      </a>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;flex-wrap:wrap;gap:10px;">
+      <a class="auth-back" href="hiring.html" style="margin-top:0;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back to hiring page
+      </a>
+      <button type="button" id="entrySignOut" hidden style="background:transparent;border:none;color:var(--ink-mute);font-size:13px;font-weight:600;cursor:pointer;padding:6px 0;">Sign out</button>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260507a"></script>
+<script src="js/hiring-service.js?v=20260507a"></script>
+<script>
+(async function init(){
+  const loadingEl = document.getElementById('entryLoading');
+  const actionsEl = document.getElementById('entryActions');
+  const resumeEl = document.getElementById('entryResume');
+  const resumeTitle = document.getElementById('entryResumeTitle');
+  const resumeMsg = document.getElementById('entryResumeMessage');
+  const newAppLink = document.getElementById('entryNewApp');
+  const newAppTitle = document.getElementById('entryNewAppTitle');
+  const newAppSub = document.getElementById('entryNewAppSub');
+  const signInLink = document.getElementById('entrySignIn');
+  const signInTitle = document.getElementById('entrySignInTitle');
+  const signInSub = document.getElementById('entrySignInSub');
+  const signOutBtn = document.getElementById('entrySignOut');
+
+  function showActions(){ loadingEl.hidden = true; actionsEl.hidden = false; }
+
+  signOutBtn.addEventListener('click', async () => {
+    signOutBtn.disabled = true; signOutBtn.textContent = 'Signing out…';
+    await window.pmHiring.signOut();
+    window.location.reload();
+  });
+
+  try {
+    const user = await window.pmHiring.getCurrentUser();
+
+    if (!user) {
+      // Logged out — show signup / sign-in.
+      showActions();
+      return;
+    }
+
+    // Show the sign-out affordance for any logged-in state.
+    signOutBtn.hidden = false;
+
+    // If they're an admin/owner, the hiring wizard isn't for them.
+    // Route them to the admin dashboard instead.
+    let isAdmin = false;
+    try { isAdmin = await window.pmHiring.isCurrentUserAdminOrOwner(); } catch (_) {}
+    if (isAdmin) {
+      newAppLink.href = 'admin-dashboard.html';
+      newAppTitle.textContent = 'Open admin dashboard';
+      newAppSub.textContent = 'Review submitted applications.';
+      signInLink.style.display = 'none';
+      resumeTitle.textContent = `Signed in as ${user.email} (admin).`;
+      resumeMsg.innerHTML = ' This account is an owner/admin, not an applicant. Use the dashboard to review applications, or <a href="#" id="entrySwitchAccount">sign out</a> to apply as someone else.';
+      resumeEl.hidden = false;
+      showActions();
+      // Wire the inline sign-out link too.
+      const sw = document.getElementById('entrySwitchAccount');
+      if (sw) sw.addEventListener('click', async (e) => { e.preventDefault(); await window.pmHiring.signOut(); window.location.reload(); });
+      return;
+    }
+
+    // Applicant: figure out application state.
+    try { await window.pmHiring.ensureApplicantDraft(); } catch (e) { /* non-fatal */ }
+    const app = await window.pmHiring.fetchLatestApplicationForCurrentUser();
+
+    if (!app) {
+      newAppLink.href = 'hiring-apply.html';
+      newAppTitle.textContent = 'Begin your application';
+      newAppSub.textContent = 'Open the wizard and start at step 1.';
+      signInLink.style.display = 'none';
+      resumeTitle.textContent = `Signed in as ${user.email}.`;
+      resumeMsg.textContent = ' Ready to start your application.';
+      resumeEl.hidden = false;
+      showActions();
+      return;
+    }
+
+    const FINAL_ISH = ['submitted', 'under_review', 'waitlisted', 'accepted', 'rejected', 'archived'];
+    if (FINAL_ISH.includes(app.status)) {
+      newAppLink.href = 'hiring-apply.html';
+      newAppTitle.textContent = 'View application status';
+      newAppSub.textContent = 'See your reference number and current review status.';
+      signInLink.style.display = 'none';
+      resumeTitle.textContent = `Application ${app.status.replace('_',' ')}.`;
+      resumeMsg.textContent = ' Last updated ' + new Date(app.updated_at).toLocaleDateString() + '.';
+      resumeEl.hidden = false;
+      showActions();
+      return;
+    }
+
+    // Draft or correction_requested — let them resume.
+    newAppLink.href = 'hiring-apply.html';
+    newAppTitle.textContent = app.status === 'correction_requested' ? 'Address corrections' : 'Continue your application';
+    newAppSub.textContent = `Step ${app.current_step_key || 'Welcome'} · ${app.progress_percent || 0}% complete.`;
+    signInLink.style.display = 'none';
+    resumeTitle.textContent = `Welcome back, ${user.email}.`;
+    resumeMsg.textContent = ' Pick up where you left off — your progress is saved.';
+    resumeEl.hidden = false;
+    showActions();
+  } catch (e) {
+    console.error('entry init failed', e);
+    showActions();
+  }
+})();
+</script>
+
+</body>
+</html>

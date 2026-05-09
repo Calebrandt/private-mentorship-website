@@ -1,1 +1,35 @@
+# Claude Code worktrees
 .claude/
+
+# Backup files (auto-generated during edits — not source of truth)
+*.pre-*
+*.backup-*
+*.backup
+*.bak
+*.orig
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Node / npm (we don't use them but just in case)
+node_modules/
+package-lock.json
+
+# Env / secrets — NEVER commit
+.env
+.env.*
+*.key
+*.pem
+
+# Auto-generated images (Gemini exports etc.)
+Gemini_Generated_Image_*.png
+Gemini_Generated_Image_*.png.backup
+
+# Local scratch
+.nrg-scroll-notes.md
+*.zip
+private-mentorship-app.zip

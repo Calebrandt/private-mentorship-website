@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Hiring Now — Private Mentorship Assistants</title>
+  <meta name="description" content="Private Mentorship is hiring assistants across Canada. Long-term roles working alongside families with character, follow-through, and care." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Archivo:wght@400;500;600;700;800;900&family=Bodoni+Moda:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/shared.css?v=20260506b" />
+  <link rel="icon" href="assets/logos/pm-logo.png" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;}
+    html,body{margin:0;padding:0;background:#faf6ec;color:#3a2a10;font-family:"Inter","Archivo",system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+    body{overflow-x:hidden;}
+    a{color:inherit;}
+
+    /* ============================================================
+       HR-WHY-US — sage card with image + 3 feature rows
+       ============================================================ */
+    .hr-why-us{background:#faf6ec;padding:0 28px 90px;}
+    .hr-why-us__card{
+      max-width:1340px;margin:0 auto;
+      background:#BFCCBE;
+      border-radius:28px;
+      padding:64px 56px 72px;
+      box-shadow:0 1px 2px rgba(17,17,17,0.04), 0 24px 60px -28px rgba(58,80,52,0.30);
+    }
+    .hr-why-us__head{text-align:center;max-width:680px;margin:0 auto 56px;}
+    .hr-why-us__h{margin:0 0 18px;font-family:"Inter","Archivo",sans-serif;font-weight:900;font-size:clamp(36px,4.5vw,56px);line-height:1.05;letter-spacing:-.025em;color:#0f1a14;text-transform:uppercase;}
+    .hr-why-us__sub{margin:0;font-family:"Inter",sans-serif;font-size:15px;line-height:1.6;color:rgba(15,26,20,0.62);}
+    .hr-why-us__body{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;}
+    .hr-why-us__photo-wrap{position:relative;border-radius:22px;overflow:hidden;aspect-ratio:1/1;background:#0f1a14;}
+    .hr-why-us__photo-wrap img{display:block;width:100%;height:100%;object-fit:cover;}
+    .hr-why-us__seal{
+      position:absolute;top:18px;left:18px;
+      width:108px;height:108px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(255,255,255,0.92);
+      box-shadow:0 1px 2px rgba(0,0,0,0.05), 0 8px 18px -6px rgba(0,0,0,0.18);
+    }
+    .hr-why-us__seal-svg{width:100%;height:100%;animation:hrPortalSpin 16s linear infinite;}
+    .hr-why-us__seal-svg text{font-family:"Inter",sans-serif;font-size:11px;font-weight:700;letter-spacing:.18em;fill:#0f1a14;text-transform:uppercase;}
+    .hr-why-us__seal-mark{position:absolute;font-family:"Inter",sans-serif;font-weight:800;font-size:10px;letter-spacing:.16em;color:#0f1a14;text-transform:uppercase;text-align:center;line-height:1.1;}
+    @media (prefers-reduced-motion:reduce){
+      .hr-why-us__seal-svg{animation:none !important;}
+    }
+
+    .hr-why-us__features{display:flex;flex-direction:column;gap:14px;}
+    .hr-why-us__feature{
+      display:flex;align-items:center;gap:18px;
+      padding:20px 22px;
+      background:#fff;border-radius:18px;
+      box-shadow:0 1px 2px rgba(0,0,0,0.04), 0 14px 28px -16px rgba(15,26,20,0.18);
+      text-decoration:none;
+      transition:transform .25s cubic-bezier(.2,.7,.2,1), box-shadow .25s ease;
+    }
+    .hr-why-us__feature:hover{transform:translateX(4px);box-shadow:0 1px 2px rgba(0,0,0,0.05), 0 22px 40px -18px rgba(15,26,20,0.24);}
+    .hr-why-us__feature-icon{flex:0 0 56px;width:56px;height:56px;border-radius:50%;background:#0f1a14;color:#fff;display:flex;align-items:center;justify-content:center;}
+    .hr-why-us__feature-icon svg{width:24px;height:24px;}
+    .hr-why-us__feature-text{flex:1 1 auto;min-width:0;}
+    .hr-why-us__feature-title{margin:0 0 6px;font-family:"Inter",sans-serif;font-size:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#0f1a14;}
+    .hr-why-us__feature-desc{margin:0;font-family:"Inter",sans-serif;font-size:13px;line-height:1.5;color:rgba(15,26,20,0.62);}
+    .hr-why-us__feature-arrow{flex:0 0 auto;color:rgba(15,26,20,0.35);}
+
+    @media (max-width:1024px){
+      .hr-why-us{padding:0 20px 70px;}
+      .hr-why-us__card{padding:48px 32px 56px;}
+      .hr-why-us__body{grid-template-columns:1fr;gap:32px;}
+      .hr-why-us__photo-wrap{aspect-ratio:4/3;}
+      .hr-why-us__head{margin-bottom:36px;}
+    }
+    @media (max-width:560px){
+      .hr-why-us__card{padding:36px 22px 44px;border-radius:22px;}
+      .hr-why-us__feature{padding:14px 16px;gap:14px;}
+      .hr-why-us__feature-icon{flex-basis:46px;width:46px;height:46px;}
+      .hr-why-us__feature-icon svg{width:20px;height:20px;}
+      .hr-why-us__seal{width:84px;height:84px;}
+    }
+
+    /* ============================================================
+       HR-SERVICES — single bordered grid, 4 cols × 2 rows,
+       photo/text alternating per column (matches reference)
+       ============================================================ */
+    .hr-services{background:#faf6ec;padding:80px 28px 90px;}
+    .hr-services__inner{max-width:1340px;margin:0 auto;}
+    .hr-services__head{margin:0 0 40px;}
+    .hr-services__h{margin:0 0 18px;font-family:"Inter","Archivo",sans-serif;font-weight:900;font-size:clamp(40px,5.4vw,68px);line-height:1.0;letter-spacing:-.035em;color:#0f1a14;text-transform:uppercase;}
+    .hr-services__sub{margin:0;max-width:680px;font-family:"Inter",sans-serif;font-size:15px;line-height:1.6;color:rgba(15,26,20,0.62);font-weight:400;}
+
+    .hr-services__grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      grid-template-rows:200px 200px;
+      background:#fff;
+      border:1px solid rgba(15,26,20,0.10);
+      border-radius:18px;
+      overflow:hidden;
+      box-shadow:0 1px 2px rgba(15,26,20,0.03), 0 22px 48px -28px rgba(15,26,20,0.14);
+    }
+    .hr-services__cell{
+      position:relative;
+      display:flex;
+      flex-direction:column;
+      border-right:1px solid rgba(15,26,20,0.10);
+      border-bottom:1px solid rgba(15,26,20,0.10);
+    }
+    .hr-services__cell:nth-child(4n){border-right:none;}
+    .hr-services__cell:nth-child(n+5){border-bottom:none;}
+
+    .hr-services__cell--text{
+      padding:18px 18px 16px;
+      background:#fff;
+    }
+    .hr-services__cell-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px;}
+    .hr-services__cell-title{margin:0;font-family:"Inter","Archivo",sans-serif;font-weight:800;font-size:clamp(14px,1.1vw,17px);letter-spacing:-.012em;line-height:1.1;color:#0f1a14;text-transform:uppercase;}
+    .hr-services__chips{display:flex;flex-wrap:wrap;gap:6px;}
+    .hr-services__chips span{
+      display:inline-flex;align-items:center;
+      padding:4px 10px;
+      border:1px solid rgba(15,26,20,0.16);
+      border-radius:980px;
+      font-family:"Inter",sans-serif;font-size:11px;font-weight:500;
+      color:rgba(15,26,20,0.78);
+    }
+    .hr-services__cell-go{
+      position:absolute;
+      bottom:12px;right:12px;
+      width:28px;height:28px;
+      border-radius:50%;border:none;
+      background:#0f1a14;color:#fff;
+      cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+      text-decoration:none;
+      transition:background .18s ease, transform .15s ease;
+    }
+    .hr-services__cell-go:hover{background:#1c2a22;transform:translate(2px,-2px);}
+    .hr-services__cell-go svg{width:11px;height:11px;}
+
+    .hr-services__cell--photo{
+      background:#e9e6e1;
+      overflow:hidden;
+    }
+    .hr-services__cell--photo img{
+      display:block;width:100%;height:100%;
+      object-fit:cover;object-position:center 30%;
+    }
+
+    @media (max-width:1024px){
+      .hr-services{padding:56px 20px 64px;}
+      .hr-services__grid{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(4,180px);}
+      .hr-services__cell{border-right:1px solid rgba(15,26,20,0.10) !important;border-bottom:1px solid rgba(15,26,20,0.10) !important;}
+      .hr-services__cell:nth-child(2n){border-right:none !important;}
+      .hr-services__cell:nth-child(n+7){border-bottom:none !important;}
+    }
+    @media (max-width:560px){
+      .hr-services__grid{grid-template-columns:1fr;grid-template-rows:repeat(8,160px);}
+      .hr-services__cell{border-right:none !important;border-bottom:1px solid rgba(15,26,20,0.10) !important;}
+      .hr-services__cell:last-child{border-bottom:none !important;}
+    }
+
+    /* ============================================================
+       HR-PORTAL — sage-green hero card (Connect/Freelance reference)
+       ============================================================ */
+    .hr-portal{padding:28px 28px 0;background:#faf6ec;}
+    .hr-portal__card{
+      position:relative;
+      max-width:1340px;
+      margin:0 auto;
+      background:#BFCCBE;
+      border-radius:28px;
+      padding:34px 44px 56px;
+      overflow:hidden;
+      box-shadow:0 1px 2px rgba(17,17,17,0.04), 0 24px 60px -28px rgba(58,80,52,0.30);
+    }
+
+    /* Top nav row inside card */
+    .hr-portal__nav{position:relative;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:8px;}
+    .hr-portal__brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:#0f1a14;font-family:"Inter",sans-serif;font-weight:800;font-size:15px;letter-spacing:.06em;text-transform:uppercase;}
+    .hr-portal__brand-mark{display:grid;grid-template-columns:repeat(3,3px);grid-template-rows:repeat(3,3px);gap:2px;}
+    .hr-portal__brand-mark span{width:3px;height:3px;background:#0f1a14;border-radius:50%;}
+    .hr-portal__links{display:flex;align-items:center;gap:30px;list-style:none;margin:0;padding:0;}
+    .hr-portal__links a{font-family:"Inter",sans-serif;font-size:14px;font-weight:500;color:rgba(15,26,20,0.80);text-decoration:none;transition:color .18s ease;}
+    .hr-portal__links a:hover{color:#0f1a14;}
+    .hr-portal__actions{display:flex;align-items:center;gap:10px;}
+    .hr-portal__login{padding:10px 22px;border-radius:980px;border:1px solid rgba(15,26,20,0.30);background:transparent;color:#0f1a14;font-family:"Inter",sans-serif;font-size:14px;font-weight:600;text-decoration:none;transition:background .18s ease, color .18s ease;}
+    .hr-portal__login:hover{background:#0f1a14;color:#fff;}
+    .hr-portal__join{padding:10px 22px;border-radius:980px;background:#0f1a14;color:#fff;font-family:"Inter",sans-serif;font-size:14px;font-weight:600;text-decoration:none;transition:background .18s ease, transform .15s ease;}
+    .hr-portal__join:hover{background:#1c2a22;transform:translateY(-1px);}
+
+    /* Hero stage */
+    .hr-portal__hero{position:relative;min-height:680px;}
+    .hr-portal__h{
+      margin:30px 0 0;
+      font-family:"Inter","Archivo",sans-serif;
+      font-weight:900;
+      font-size:clamp(88px,16vw,232px);
+      line-height:0.9;
+      letter-spacing:-.05em;
+      color:#ECEAE0;
+      text-transform:uppercase;
+      text-align:left;
+      position:relative;
+      z-index:1;
+      pointer-events:none;
+      user-select:none;
+      white-space:nowrap;
+    }
+
+    /* Search bar */
+    .hr-portal__search{
+      position:relative;z-index:3;
+      margin-top:36px;
+      max-width:540px;
+      display:flex;align-items:center;gap:8px;
+      padding:8px 8px 8px 22px;
+      background:#fff;
+      border-radius:980px;
+      box-shadow:0 1px 2px rgba(17,17,17,0.04), 0 12px 24px -12px rgba(58,80,52,0.18);
+    }
+    .hr-portal__search-icon{flex:0 0 18px;color:rgba(15,26,20,0.55);}
+    .hr-portal__search-input{flex:1 1 auto;border:none;outline:none;background:transparent;font-family:"Inter",sans-serif;font-size:15px;color:#0f1a14;padding:10px 0;min-width:0;}
+    .hr-portal__search-input::placeholder{color:rgba(15,26,20,0.42);}
+    .hr-portal__search-mic{flex:0 0 36px;width:36px;height:36px;border-radius:50%;border:none;background:transparent;color:rgba(15,26,20,0.62);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .18s ease;}
+    .hr-portal__search-mic:hover{background:rgba(15,26,20,0.06);}
+    .hr-portal__search-go{flex:0 0 44px;width:44px;height:44px;border-radius:50%;border:none;background:#0f1a14;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .18s ease, transform .15s ease;}
+    .hr-portal__search-go:hover{background:#1c2a22;transform:translateX(2px);}
+
+    /* Skills row */
+    .hr-portal__chips-row{position:relative;z-index:3;margin-top:18px;display:flex;align-items:center;flex-wrap:wrap;gap:10px;}
+    .hr-portal__chips-label{font-family:"Inter",sans-serif;font-size:13px;font-weight:500;color:rgba(15,26,20,0.65);margin-right:4px;}
+    .hr-portal__chip{display:inline-flex;align-items:center;padding:7px 14px;border:1px solid rgba(15,26,20,0.22);border-radius:980px;background:transparent;font-family:"Inter",sans-serif;font-size:13px;font-weight:500;color:#0f1a14;text-decoration:none;transition:background .18s ease, border-color .18s ease;}
+    .hr-portal__chip:hover{background:rgba(255,255,255,0.55);border-color:rgba(15,26,20,0.40);}
+
+    /* Description */
+    .hr-portal__desc{position:relative;z-index:3;margin:24px 0 0;max-width:520px;font-family:"Inter",sans-serif;font-size:14px;line-height:1.6;color:rgba(15,26,20,0.78);}
+
+    /* Photo on right */
+    .hr-portal__photo{position:absolute;right:-2%;bottom:-56px;width:48%;max-width:640px;z-index:2;pointer-events:none;}
+    .hr-portal__photo img{display:block;width:100%;height:auto;}
+
+    /* Stats card (bottom-left) */
+    .hr-portal__stats{position:absolute;left:0;bottom:0;z-index:4;background:#fff;border-radius:22px;padding:18px 22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 2px rgba(17,17,17,0.04), 0 18px 36px -16px rgba(58,80,52,0.22);min-width:300px;}
+    .hr-portal__stats-head{display:flex;align-items:center;justify-content:space-between;gap:14px;}
+    .hr-portal__stats-label{font-family:"Inter",sans-serif;font-size:14px;font-weight:600;color:#0f1a14;}
+    .hr-portal__stats-stars{color:#F5A623;font-size:13px;letter-spacing:1px;}
+    .hr-portal__stats-body{display:flex;align-items:center;gap:16px;}
+    .hr-portal__stats-avatars{display:flex;align-items:center;}
+    .hr-portal__stats-avatars span{width:32px;height:32px;border-radius:50%;border:2px solid #fff;overflow:hidden;margin-left:-8px;background:#e9e6e1;flex-shrink:0;box-shadow:0 1px 2px rgba(0,0,0,0.06);}
+    .hr-portal__stats-avatars span:first-child{margin-left:0;}
+    .hr-portal__stats-avatars img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 30%;}
+    .hr-portal__stats-num{display:flex;flex-direction:column;}
+    .hr-portal__stats-big{font-family:"Inter",sans-serif;font-size:18px;font-weight:700;color:#0f1a14;line-height:1.1;}
+    .hr-portal__stats-meta{font-family:"Inter",sans-serif;font-size:12px;color:rgba(15,26,20,0.55);}
+
+    /* Profile chip — half-on / half-off the photo's left edge */
+    .hr-portal__profile{position:absolute;left:40%;bottom:18%;z-index:6;background:#fff;border-radius:22px;padding:18px 22px;display:flex;flex-direction:column;gap:12px;box-shadow:0 1px 2px rgba(17,17,17,0.04), 0 18px 36px -16px rgba(58,80,52,0.22);min-width:240px;}
+    .hr-portal__profile-top{display:flex;align-items:center;gap:12px;}
+    .hr-portal__profile-avatar{width:42px;height:42px;border-radius:50%;overflow:hidden;background:#e9e6e1;flex-shrink:0;}
+    .hr-portal__profile-avatar img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 30%;}
+    .hr-portal__profile-name{font-family:"Inter",sans-serif;font-size:15px;font-weight:700;color:#0f1a14;line-height:1.1;}
+    .hr-portal__profile-role{font-family:"Inter",sans-serif;font-size:12px;color:rgba(15,26,20,0.55);margin-top:2px;}
+    .hr-portal__profile-row{display:flex;align-items:center;gap:10px;font-family:"Inter",sans-serif;font-size:13px;color:rgba(15,26,20,0.78);font-weight:500;}
+    .hr-portal__profile-icon{flex:0 0 26px;width:26px;height:26px;border-radius:8px;background:#0f1a14;color:#fff;display:inline-flex;align-items:center;justify-content:center;}
+    .hr-portal__profile-icon svg{width:13px;height:13px;}
+
+    /* Discover-more rotating badge — clear of title letters, on photo */
+    .hr-portal__discover{position:absolute;right:3%;top:34%;z-index:6;width:120px;height:120px;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+    .hr-portal__discover-svg{position:absolute;inset:0;width:100%;height:100%;animation:hrPortalSpin 14s linear infinite;}
+    .hr-portal__discover-svg text{font-family:"Inter",sans-serif;font-size:13px;font-weight:600;letter-spacing:.16em;fill:#0f1a14;text-transform:uppercase;}
+    .hr-portal__discover-dots{display:grid;grid-template-columns:repeat(3,4px);grid-template-rows:repeat(3,4px);gap:4px;}
+    .hr-portal__discover-dots span{width:4px;height:4px;background:#0f1a14;border-radius:50%;}
+    @keyframes hrPortalSpin{to{transform:rotate(360deg);}}
+    @media (prefers-reduced-motion:reduce){
+      .hr-portal__discover-svg{animation:none !important;}
+    }
+
+    @media (max-width:1100px){
+      .hr-portal__profile{left:36%;bottom:18%;min-width:220px;padding:14px 18px;}
+      .hr-portal__discover{right:3%;top:32%;width:100px;height:100px;}
+    }
+    @media (max-width:880px){
+      .hr-portal{padding:18px 16px 0;}
+      .hr-portal__card{padding:22px 22px 36px;border-radius:22px;}
+      .hr-portal__nav{flex-wrap:wrap;gap:14px;}
+      .hr-portal__links{order:3;width:100%;justify-content:flex-start;flex-wrap:wrap;gap:18px;}
+      .hr-portal__h{font-size:clamp(64px,18vw,120px);}
+      .hr-portal__hero{min-height:auto;}
+      .hr-portal__photo{position:relative;right:auto;bottom:auto;width:100%;max-width:none;margin-top:24px;}
+      .hr-portal__stats,.hr-portal__profile{position:relative;left:auto;right:auto;bottom:auto;margin-top:18px;}
+      .hr-portal__discover{display:none;}
+    }
+
+    /* ===== PM-HIRE — copied from index.html (cream/gold premium variant) ===== */
+    .pm-hire{position:relative;background:#faf6ec;padding:160px 0 180px;overflow:hidden;isolation:isolate;}
+    .pm-hire__bg{position:absolute;inset:0;z-index:-1;background:
+      radial-gradient(ellipse 50% 60% at 22% 28%, rgba(44,133,121,0.10) 0%, rgba(44,133,121,0) 60%),
+      radial-gradient(ellipse 70% 80% at 82% 65%, rgba(214,168,74,0.16) 0%, rgba(214,168,74,0) 65%),
+      radial-gradient(ellipse 40% 50% at 50% 100%, rgba(245,217,137,0.12) 0%, rgba(245,217,137,0) 70%),
+      linear-gradient(180deg, #faf6ec 0%, #f4ecd8 100%);
+    }
+    .pm-hire__inner{max-width:1380px;margin:0 auto;padding:0 32px;}
+    .pm-hire__grid{display:grid;grid-template-columns:1fr 1.2fr;gap:56px;align-items:center;}
+
+    /* LEFT */
+    .pm-hire__h{margin:0 0 32px;font-family:"Inter","Archivo",sans-serif;color:#3a2a10;}
+    .pm-hire__h-pre{display:block;font-weight:400;font-size:clamp(24px,2.2vw,30px);letter-spacing:-.005em;color:rgba(58,42,16,0.55);margin-bottom:18px;font-family:"Inter","Archivo",sans-serif;}
+    .pm-hire__h-main{display:block;font-weight:800;font-size:clamp(72px,10vw,148px);line-height:0.95;letter-spacing:-.045em;}
+    .pm-hire__h-bold{font-weight:800;letter-spacing:-.045em;background:linear-gradient(90deg,#8b6a2e 0%,#b88a36 18%,#d6a84a 32%,#f5d989 50%,#d6a84a 68%,#b88a36 82%,#8b6a2e 100%);background-size:220% 100%;background-position:0% 50%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;animation:pmHireGold 7s ease-in-out infinite;filter:drop-shadow(0 1px 0 rgba(255,238,180,0.35)) drop-shadow(0 18px 32px rgba(180,135,55,0.20));}
+    @keyframes pmHireGold{0%,100%{background-position:0% 50%;}50%{background-position:100% 50%;}}
+
+    .pm-hire__sub{margin:0 0 32px;max-width:560px;font-family:"Inter","Archivo",sans-serif;font-size:18px;line-height:1.65;color:rgba(58,42,16,0.68);font-weight:400;}
+
+    .pm-hire__bullets{list-style:none;margin:0 0 44px;padding:0;display:flex;flex-direction:column;gap:13px;}
+    .pm-hire__bullets li{display:flex;align-items:center;gap:14px;font-family:"Inter","Archivo",sans-serif;font-size:16px;color:rgba(58,42,16,0.85);font-weight:500;}
+    .pm-hire__check{flex:0 0 24px;width:24px;height:24px;border-radius:50%;background:#10243E;color:#fff;display:inline-flex;align-items:center;justify-content:center;}
+    .pm-hire__check svg{width:12px;height:12px;}
+
+    .pm-hire__cta{display:flex;flex-wrap:wrap;align-items:center;gap:18px 26px;margin-bottom:56px;}
+    .pm-hire__btn{position:relative;display:inline-flex;align-items:center;gap:12px;padding:18px 32px;border-radius:980px;font-family:"Inter","Archivo",sans-serif;font-weight:600;font-size:16px;letter-spacing:-.005em;color:#1a1306;text-decoration:none;background:linear-gradient(135deg,#f5d989 0%,#d6a84a 38%,#b88a36 70%,#d6a84a 100%);background-size:200% 200%;background-position:0% 0%;box-shadow:0 1px 0 rgba(255,255,255,0.65) inset, 0 0 0 1px rgba(139,106,46,0.32), 0 14px 32px -10px rgba(184,138,54,0.55), 0 4px 12px -2px rgba(184,138,54,0.4);transition:transform .25s cubic-bezier(.2,.7,.2,1), background-position .6s ease, box-shadow .25s ease;overflow:hidden;}
+    .pm-hire__btn::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,0.6) 50%,transparent 70%);transform:translateX(-100%);transition:transform .9s cubic-bezier(.2,.7,.2,1);pointer-events:none;}
+    .pm-hire__btn:hover{transform:translateY(-2px);background-position:100% 100%;box-shadow:0 1px 0 rgba(255,255,255,0.75) inset, 0 0 0 1px rgba(139,106,46,0.42), 0 20px 42px -10px rgba(184,138,54,0.65), 0 6px 16px -2px rgba(184,138,54,0.45);}
+    .pm-hire__btn:hover::after{transform:translateX(100%);}
+    .pm-hire__btn svg{transition:transform .25s ease;}
+    .pm-hire__btn:hover svg{transform:translateX(2px);}
+    .pm-hire__cta-meta{font-family:"Inter","Archivo",sans-serif;font-size:13px;color:rgba(58,42,16,0.55);letter-spacing:.005em;}
+
+    .pm-hire__socials{display:flex;align-items:center;gap:18px;}
+    .pm-hire__socials-label{font-family:"Inter","Archivo",sans-serif;font-size:13px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:rgba(58,42,16,0.55);}
+    .pm-hire__socials-row{display:flex;gap:12px;}
+    .pm-hire__social{width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid rgba(58,42,16,0.18);color:rgba(58,42,16,0.78);background:#fff;transition:transform .2s ease, color .2s ease, border-color .2s ease, background .2s ease;text-decoration:none;}
+    .pm-hire__social svg{width:18px;height:18px;}
+    .pm-hire__social:hover{transform:translateY(-2px);color:#10243E;border-color:#10243E;background:#fff;}
+
+    /* RIGHT */
+    .pm-hire__col-media{position:relative;min-height:740px;}
+    .pm-hire__glow{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);width:130%;aspect-ratio:1/1;border-radius:50%;background:radial-gradient(circle, rgba(245,217,137,0.30) 0%, rgba(214,168,74,0.12) 32%, rgba(214,168,74,0) 62%);pointer-events:none;z-index:0;filter:blur(10px);}
+    .pm-hire__dots{position:absolute;inset:-30px;background-image:radial-gradient(rgba(58,42,16,0.18) 1px, transparent 1px);background-size:18px 18px;-webkit-mask-image:radial-gradient(ellipse 70% 70% at 50% 50%, #000 35%, transparent 75%);mask-image:radial-gradient(ellipse 70% 70% at 50% 50%, #000 35%, transparent 75%);opacity:.5;pointer-events:none;z-index:0;}
+
+    .pm-hire__sparkle{position:absolute;pointer-events:none;z-index:5;animation:pmHireSparkle 4s ease-in-out infinite;}
+    .pm-hire__sparkle--1{top:8%;left:6%;width:24px;height:24px;color:#10243E;animation-delay:0s;}
+    .pm-hire__sparkle--2{top:38%;right:-2%;width:16px;height:16px;color:#d6a84a;animation-delay:1.2s;filter:drop-shadow(0 0 6px rgba(214,168,74,0.45));}
+    .pm-hire__sparkle--3{bottom:6%;left:18%;width:20px;height:20px;color:#3a2a10;animation-delay:2.4s;}
+    @keyframes pmHireSparkle{0%,100%{opacity:.85;transform:scale(1) rotate(0deg);}50%{opacity:.35;transform:scale(.7) rotate(45deg);}}
+
+    .pm-hire__photo{position:relative;width:100%;max-width:540px;margin:0 auto;aspect-ratio:9/10;border-radius:50% 50% 18px 18px / 42% 42% 18px 18px;overflow:hidden;box-shadow:0 1px 2px rgba(17,17,17,0.05), 0 30px 60px -20px rgba(17,17,17,0.18), 0 60px 120px -40px rgba(17,17,17,0.18);z-index:2;isolation:isolate;transform:translateZ(0);-webkit-mask-image:-webkit-radial-gradient(white,black);}
+    .pm-hire__photo img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 32%;}
+    .pm-hire__play{position:absolute;top:18px;right:18px;width:54px;height:54px;border-radius:50%;border:2px solid rgba(255,255,255,0.8);background:rgba(255,255,255,0.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .25s ease, background .25s ease;padding:0;}
+    .pm-hire__play svg{width:22px;height:22px;margin-left:3px;}
+    .pm-hire__play:hover{transform:scale(1.06);background:rgba(255,255,255,0.32);}
+
+    .pm-hire__chip{position:absolute;display:flex;align-items:center;gap:18px;padding:22px 28px;background:#fff;border:1px solid rgba(17,17,17,0.05);border-radius:24px;box-shadow:0 2px 4px rgba(17,17,17,0.025), 0 14px 28px -10px rgba(17,17,17,0.10), 0 32px 64px -20px rgba(17,17,17,0.18);z-index:6;font-family:"Inter","Archivo",sans-serif;}
+    .pm-hire__chip--top{top:6%;right:-8%;}
+    .pm-hire__chip--mid{bottom:30%;left:-14%;}
+    .pm-hire__chip--btm{bottom:30%;right:-6%;}
+
+    .pm-hire__chip-icon{flex:0 0 52px;width:52px;height:52px;border-radius:15px;display:inline-flex;align-items:center;justify-content:center;}
+    .pm-hire__chip-icon svg{width:26px;height:26px;}
+    .pm-hire__chip-icon--shield{background:linear-gradient(135deg,#FCE9C0,#F2D58A);color:#8b6a2e;}
+    .pm-hire__chip-icon--star{background:linear-gradient(135deg,#FCE9C0,#F2D58A);color:#b88a36;}
+    .pm-hire__chip-icon--lock{background:linear-gradient(135deg,#FCE9C0,#F2D58A);color:#8b6a2e;}
+    .pm-hire__chip-text{display:flex;flex-direction:column;gap:5px;min-width:0;}
+    .pm-hire__chip-title{font-size:18px;font-weight:600;color:#0a0a0a;letter-spacing:-.012em;line-height:1.2;}
+    .pm-hire__chip-meta{font-size:13px;font-weight:500;color:rgba(17,17,17,0.45);letter-spacing:.005em;line-height:1.3;}
+
+    /* WHY WORK WITH US */
+    .pm-hire__why{margin-top:140px;padding-top:80px;border-top:1px solid rgba(58,42,16,0.10);position:relative;}
+    .pm-hire__why-h{margin:0 0 64px;text-align:center;font-family:"Inter","Archivo",sans-serif;font-weight:700;font-size:clamp(36px,4.5vw,56px);line-height:1.05;color:#10243E;letter-spacing:-.028em;}
+    .pm-hire__why-row{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
+    .pm-hire__why-card{position:relative;background:#fff;border:1px solid rgba(17,17,17,0.06);border-radius:24px;padding:52px 36px 60px;text-align:center;display:flex;flex-direction:column;align-items:center;box-shadow:0 1px 2px rgba(17,17,17,0.04), 0 24px 48px -22px rgba(58,42,16,0.14);overflow:hidden;transition:transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s ease;}
+    .pm-hire__why-card::after{content:"";position:absolute;left:0;right:0;bottom:0;height:5px;background:linear-gradient(90deg,#8b6a2e 0%,#b88a36 22%,#d6a84a 50%,#f5d989 78%,#d6a84a 100%);opacity:0.92;}
+    .pm-hire__why-card:hover{transform:translateY(-6px);box-shadow:0 1px 2px rgba(17,17,17,0.05), 0 32px 60px -22px rgba(58,42,16,0.20);}
+    .pm-hire__why-icon{width:96px;height:96px;border-radius:24px;background:linear-gradient(135deg,#FCE9C0 0%,#F2D58A 100%);color:#8b6a2e;display:flex;align-items:center;justify-content:center;margin-bottom:32px;box-shadow:0 1px 0 rgba(255,255,255,0.65) inset, 0 14px 28px -10px rgba(184,138,54,0.30);}
+    .pm-hire__why-icon svg{width:46px;height:46px;}
+    .pm-hire__why-title{margin:0 0 16px;font-family:"Inter","Archivo",sans-serif;font-weight:700;font-size:24px;color:#10243E;letter-spacing:-.012em;}
+    .pm-hire__why-rule{display:block;width:42px;height:2px;background:linear-gradient(90deg,#b88a36 0%,#d6a84a 50%,#f5d989 100%);margin:0 auto 20px;border-radius:2px;}
+    .pm-hire__why-desc{margin:0;font-family:"Inter","Archivo",sans-serif;font-weight:500;font-size:15px;line-height:1.6;color:rgba(58,42,16,0.62);max-width:300px;}
+
+    /* DARK CTA STRIP */
+    .hr-cta{background:#0d1410;padding:120px 0;text-align:center;}
+    .hr-cta__inner{max-width:760px;margin:0 auto;padding:0 32px;}
+    .hr-cta__eyebrow{display:inline-block;padding:8px 16px;border:1px solid rgba(245,217,137,0.4);border-radius:980px;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:#f5d989;margin-bottom:32px;}
+    .hr-cta__h{margin:0 0 24px;font-weight:700;font-size:clamp(36px,4.5vw,56px);line-height:1.08;letter-spacing:-.028em;color:#fff;}
+    .hr-cta__sub{margin:0 0 40px;font-size:17px;line-height:1.6;color:rgba(255,255,255,0.65);}
+    .hr-cta__btn{display:inline-flex;align-items:center;gap:12px;padding:18px 36px;border-radius:980px;background:linear-gradient(135deg,#f5d989 0%,#d6a84a 38%,#b88a36 70%);color:#1a1306;font-weight:600;font-size:16px;text-decoration:none;box-shadow:0 14px 32px -10px rgba(184,138,54,0.55);transition:transform .25s ease, box-shadow .25s ease;}
+    .hr-cta__btn:hover{transform:translateY(-2px);box-shadow:0 20px 42px -10px rgba(184,138,54,0.70);}
+
+    /* FOOTER */
+    .hr-foot{background:#0d1410;border-top:1px solid rgba(255,255,255,0.08);padding:40px 32px;text-align:center;color:rgba(255,255,255,0.5);font-size:13px;}
+    .hr-foot a{color:rgba(255,255,255,0.7);text-decoration:none;margin:0 12px;}
+    .hr-foot a:hover{color:#fff;}
+
+    /* Responsive */
+    @media (max-width:1024px){
+      .pm-hire{padding:90px 0 110px;}
+      .pm-hire__why{margin-top:80px;padding-top:56px;}
+      .pm-hire__why-h{margin-bottom:40px;}
+      .pm-hire__why-row{grid-template-columns:1fr;gap:20px;}
+      .pm-hire__why-card{padding:40px 28px 48px;}
+      .pm-hire__why-icon{width:80px;height:80px;border-radius:20px;margin-bottom:24px;}
+      .pm-hire__why-icon svg{width:38px;height:38px;}
+      .pm-hire__grid{grid-template-columns:1fr;gap:64px;}
+      .pm-hire__col-media{min-height:auto;padding-top:30px;}
+      .pm-hire__chip--mid{left:-2%;}
+      .pm-hire__chip--top{right:0;}
+      .pm-hire__chip--btm{right:0;}
+      .hr-cta{padding:80px 0;}
+    }
+    @media (max-width:560px){
+      .pm-hire{padding:70px 0 90px;}
+      .pm-hire__h-main{font-size:clamp(40px,11vw,52px);}
+      .pm-hire__photo{width:92%;}
+      .pm-hire__chip{padding:14px 18px;border-radius:18px;gap:12px;}
+      .pm-hire__chip-icon{flex-basis:40px;width:40px;height:40px;border-radius:11px;}
+      .pm-hire__chip-icon svg{width:20px;height:20px;}
+      .pm-hire__chip-title{font-size:14px;}
+      .pm-hire__chip-meta{font-size:11.5px;}
+      .pm-hire__chip--top{top:0;right:-2%;}
+      .pm-hire__chip--mid{bottom:25%;left:-2%;}
+      .pm-hire__chip--btm{bottom:-2%;right:-2%;}
+      .pm-hire__cta{flex-direction:column;align-items:flex-start;gap:14px;}
+    }
+    @media (prefers-reduced-motion:reduce){
+      .pm-hire__chip,.pm-hire__sparkle,.pm-hire__h-bold{animation:none !important;}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO PORTAL CARD — Connect/Freelance reference, customized for PM -->
+  <section class="hr-portal" aria-labelledby="hr-portal-heading">
+    <div class="hr-portal__card">
+
+      <header class="hr-portal__nav">
+        <a class="hr-portal__brand" href="index.html" aria-label="Private Mentorship">
+          <span class="hr-portal__brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+          </span>
+          <span>Connect</span>
+        </a>
+        <ul class="hr-portal__links">
+          <li><a href="#open-roles">Open Roles</a></li>
+          <li><a href="#why">Why Join</a></li>
+          <li><a href="index.html">About</a></li>
+          <li><a href="#faqs">FAQs</a></li>
+        </ul>
+        <div class="hr-portal__actions">
+          <a class="hr-portal__login" href="index.html">Log in</a>
+          <a class="hr-portal__join" href="#apply">Join us</a>
+        </div>
+      </header>
+
+      <div class="hr-portal__hero">
+        <h1 class="hr-portal__h" id="hr-portal-heading">Assistant</h1>
+
+        <form class="hr-portal__search" role="search" onsubmit="return false;">
+          <svg class="hr-portal__search-icon" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.6"/><path d="m12.4 12.4 3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <input class="hr-portal__search-input" type="search" placeholder="Search for any role&hellip;" aria-label="Search roles">
+          <button class="hr-portal__search-mic" type="button" aria-label="Voice search">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="5" y="1.5" width="4" height="7.5" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M3 7.5a4 4 0 0 0 8 0M7 11.5v1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </button>
+          <button class="hr-portal__search-go" type="submit" aria-label="Search">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 7h8M11 7L7 3M11 7L7 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </form>
+
+        <div class="hr-portal__chips-row">
+          <span class="hr-portal__chips-label">Popular roles:</span>
+          <a class="hr-portal__chip" href="#mentorship">Mentorship</a>
+          <a class="hr-portal__chip" href="#tutoring">Tutoring</a>
+          <a class="hr-portal__chip" href="#daily-care">Daily care</a>
+          <a class="hr-portal__chip" href="#programs">Programs</a>
+        </div>
+
+        <p class="hr-portal__desc">A private network of experienced assistants who walk alongside families across Canada &mdash; education, life skills, and daily support, week over week.</p>
+
+        <div class="hr-portal__photo" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1573164713988-8665fc963095?w=900&amp;q=85&amp;auto=format&amp;fit=crop" alt="" loading="lazy" referrerpolicy="no-referrer">
+        </div>
+
+        <div class="hr-portal__discover" aria-hidden="true">
+          <svg class="hr-portal__discover-svg" viewBox="0 0 200 200">
+            <defs>
+              <path id="hrPortalDiscoverPath" d="M 100,100 m -78,0 a 78,78 0 1,1 156,0 a 78,78 0 1,1 -156,0"/>
+            </defs>
+            <text>
+              <textPath href="#hrPortalDiscoverPath" startOffset="0">discover more &middot; discover more &middot; </textPath>
+            </text>
+          </svg>
+          <span class="hr-portal__discover-dots">
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+          </span>
+        </div>
+
+        <div class="hr-portal__stats">
+          <div class="hr-portal__stats-head">
+            <span class="hr-portal__stats-label">Trusted Assistants</span>
+            <span class="hr-portal__stats-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          </div>
+          <div class="hr-portal__stats-body">
+            <div class="hr-portal__stats-avatars">
+              <span><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&amp;q=80&amp;auto=format&amp;fit=crop&amp;crop=faces" alt="" loading="lazy" referrerpolicy="no-referrer"></span>
+              <span><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&amp;q=80&amp;auto=format&amp;fit=crop&amp;crop=faces" alt="" loading="lazy" referrerpolicy="no-referrer"></span>
+              <span><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&amp;q=80&amp;auto=format&amp;fit=crop&amp;crop=faces" alt="" loading="lazy" referrerpolicy="no-referrer"></span>
+              <span><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&amp;q=80&amp;auto=format&amp;fit=crop&amp;crop=faces" alt="" loading="lazy" referrerpolicy="no-referrer"></span>
+            </div>
+            <div class="hr-portal__stats-num">
+              <span class="hr-portal__stats-big">100+</span>
+              <span class="hr-portal__stats-meta">Families Served</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hr-portal__profile">
+          <div class="hr-portal__profile-top">
+            <span class="hr-portal__profile-avatar"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=160&amp;q=80&amp;auto=format&amp;fit=crop&amp;crop=faces" alt="" loading="lazy" referrerpolicy="no-referrer"></span>
+            <div>
+              <div class="hr-portal__profile-name">@vincent</div>
+              <div class="hr-portal__profile-role">Family Assistant</div>
+            </div>
+          </div>
+          <div class="hr-portal__profile-row">
+            <span class="hr-portal__profile-icon" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none"><path d="M2 13c0-2.5 2.7-4 6-4s6 1.5 6 4M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            80+ families guided
+          </div>
+          <div class="hr-portal__profile-row">
+            <span class="hr-portal__profile-icon" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none"><path d="M8 2v12M11 5H6.5a2 2 0 0 0 0 4h3a2 2 0 0 1 0 4H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            $30+ per hour
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- POPULAR SERVICES — bento grid -->
+  <section class="hr-services" aria-labelledby="hr-services-h">
+    <div class="hr-services__inner">
+      <header class="hr-services__head">
+        <h2 class="hr-services__h" id="hr-services-h">Popular Services</h2>
+        <p class="hr-services__sub">Private Mentorship offers a deliberate range of long-term support &mdash; mentorship, tutoring, daily care, and program coordination &mdash; built around what your family actually needs.</p>
+      </header>
+
+      <div class="hr-services__grid">
+
+        <!-- ROW 1 — Mentorship TEXT, Tutoring PHOTO, Daily Care TEXT, Programs PHOTO -->
+        <article class="hr-services__cell hr-services__cell--text">
+          <div class="hr-services__cell-head">
+            <h3 class="hr-services__cell-title">Mentorship</h3>
+          </div>
+          <div class="hr-services__chips">
+            <span>1-on-1 sessions</span>
+            <span>Weekly check-ins</span>
+            <span>Goal setting</span>
+            <span>School support</span>
+          </div>
+          <a href="#mentorship" class="hr-services__cell-go" aria-label="Learn more about Mentorship">
+            <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 7h8M11 7L7 3M11 7L7 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </article>
+
+        <div class="hr-services__cell hr-services__cell--photo" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1497486751825-1233686d5d80?w=900&amp;q=85&amp;auto=format&amp;fit=crop" alt="" loading="lazy" referrerpolicy="no-referrer">
+        </div>
+
+        <article class="hr-services__cell hr-services__cell--text">
+          <div class="hr-services__cell-head">
+            <h3 class="hr-services__cell-title">Daily Care</h3>
+          </div>
+          <div class="hr-services__chips">
+            <span>Routines</span>
+            <span>Driving</span>
+            <span>Errands</span>
+            <span>Home support</span>
+          </div>
+          <a href="#daily-care" class="hr-services__cell-go" aria-label="Learn more about Daily Care">
+            <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 7h8M11 7L7 3M11 7L7 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </article>
+
+        <div class="hr-services__cell hr-services__cell--photo" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=900&amp;q=85&amp;auto=format&amp;fit=crop" alt="" loading="lazy" referrerpolicy="no-referrer">
+        </div>
+
+        <!-- ROW 2 — Mentorship PHOTO, Tutoring TEXT, Daily Care PHOTO, Programs TEXT -->
+        <div class="hr-services__cell hr-services__cell--photo" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=900&amp;q=85&amp;auto=format&amp;fit=crop" alt="" loading="lazy" referrerpolicy="no-referrer">
+        </div>
+
+        <article class="hr-services__cell hr-services__cell--text">
+          <div class="hr-services__cell-head">
+            <h3 class="hr-services__cell-title">Tutoring</h3>
+          </div>
+          <div class="hr-services__chips">
+            <span>Math &amp; reading</span>
+            <span>ESL</span>
+            <span>Vocational</span>
+            <span>Homework</span>
+          </div>
+          <a href="#tutoring" class="hr-services__cell-go" aria-label="Learn more about Tutoring">
+            <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 7h8M11 7L7 3M11 7L7 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </article>
+
+        <div class="hr-services__cell hr-services__cell--photo" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=900&amp;q=85&amp;auto=format&amp;fit=crop" alt="" loading="lazy" referrerpolicy="no-referrer">
+        </div>
+
+        <article class="hr-services__cell hr-services__cell--text">
+          <div class="hr-services__cell-head">
+            <h3 class="hr-services__cell-title">Programs</h3>
+          </div>
+          <div class="hr-services__chips">
+            <span>Applications</span>
+            <span>WorkBC</span>
+            <span>CLBC</span>
+            <span>Funding</span>
+          </div>
+          <a href="#programs" class="hr-services__cell-go" aria-label="Learn more about Programs">
+            <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 7h8M11 7L7 3M11 7L7 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY CHOOSE US — sage card with photo + 3 feature rows -->
+  <section class="hr-why-us" aria-labelledby="hr-why-us-h">
+    <div class="hr-why-us__card">
+      <header class="hr-why-us__head">
+        <h2 class="hr-why-us__h" id="hr-why-us-h">Why Choose Us?</h2>
+        <p class="hr-why-us__sub">Choose Private Mentorship for unmatched care, long-term commitment, and a private network built on trust &mdash; exceeding family expectations every time.</p>
+      </header>
+      <div class="hr-why-us__body">
+        <div class="hr-why-us__photo-wrap">
+          <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=1000&amp;q=85&amp;auto=format&amp;fit=crop" alt="" loading="lazy" referrerpolicy="no-referrer">
+          <div class="hr-why-us__seal" aria-hidden="true">
+            <svg class="hr-why-us__seal-svg" viewBox="0 0 200 200">
+              <defs>
+                <path id="hrWhyUsSealPath" d="M 100,100 m -68,0 a 68,68 0 1,1 136,0 a 68,68 0 1,1 -136,0"/>
+              </defs>
+              <text>
+                <textPath href="#hrWhyUsSealPath" startOffset="0">private mentorship &middot; trusted network &middot; </textPath>
+              </text>
+            </svg>
+            <span class="hr-why-us__seal-mark">Private<br>Network</span>
+          </div>
+        </div>
+        <div class="hr-why-us__features">
+
+          <a href="#trusted" class="hr-why-us__feature">
+            <span class="hr-why-us__feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 2.5L4.5 5.2v6.1c0 4.6 3.2 8.2 7.5 9.7 4.3-1.5 7.5-5.1 7.5-9.7V5.2L12 2.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8.6 12.2l2.4 2.4 4.4-4.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <div class="hr-why-us__feature-text">
+              <h3 class="hr-why-us__feature-title">Private &amp; Verified</h3>
+              <p class="hr-why-us__feature-desc">Every assistant is background-checked, reference-verified, and trained for long-term family work. Privacy is non-negotiable.</p>
+            </div>
+            <svg class="hr-why-us__feature-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+
+          <a href="#long-term" class="hr-why-us__feature">
+            <span class="hr-why-us__feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 21s-7.5-4.5-7.5-11A4.5 4.5 0 0 1 12 6a4.5 4.5 0 0 1 7.5 4c0 6.5-7.5 11-7.5 11z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></svg>
+            </span>
+            <div class="hr-why-us__feature-text">
+              <h3 class="hr-why-us__feature-title">Long-term Care</h3>
+              <p class="hr-why-us__feature-desc">We hire for character and follow-through. Assistants commit to one year minimum so families build trust, not turnover.</p>
+            </div>
+            <svg class="hr-why-us__feature-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+
+          <a href="#across-canada" class="hr-why-us__feature">
+            <span class="hr-why-us__feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-7 7-12a7 7 0 1 0-14 0c0 5 7 12 7 12z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="9" r="2.6" stroke="currentColor" stroke-width="1.7"/></svg>
+            </span>
+            <div class="hr-why-us__feature-text">
+              <h3 class="hr-why-us__feature-title">Across Canada</h3>
+              <p class="hr-why-us__feature-desc">In-home and in-community support coast to coast. Real assistants, real families, real outcomes &mdash; not a remote-only roster.</p>
+            </div>
+            <svg class="hr-why-us__feature-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WE'RE HIRING — RECRUITMENT SECTION (cream/gold premium variant) -->
+  <section class="pm-hire" aria-labelledby="pm-hire-heading">
+    <div class="pm-hire__bg" aria-hidden="true"></div>
+    <div class="pm-hire__inner">
+      <div class="pm-hire__grid">
+
+        <div class="pm-hire__col-text">
+          <h1 class="pm-hire__h" id="pm-hire-heading">
+            <span class="pm-hire__h-pre">We&rsquo;re Looking For</span>
+            <span class="pm-hire__h-main">
+              <span class="pm-hire__h-bold">Assistants</span>
+            </span>
+          </h1>
+
+          <p class="pm-hire__sub">Join a small, deliberate team of assistants who walk alongside families across Canada. We hire for character, follow-through, and the patience to do the long work &mdash; not for credentials alone.</p>
+
+          <ul class="pm-hire__bullets" aria-label="What we look for">
+            <li><span class="pm-hire__check" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6.5L5 9l4.5-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>3+ years working with youth, students, or families</li>
+            <li><span class="pm-hire__check" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6.5L5 9l4.5-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Driver&rsquo;s license, vehicle, clean record</li>
+            <li><span class="pm-hire__check" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6.5L5 9l4.5-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Long-term commitment &mdash; minimum one year</li>
+          </ul>
+
+          <div class="pm-hire__cta">
+            <a href="#apply" class="pm-hire__btn">
+              <span>Apply Now</span>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 7H11M11 7L7 3M11 7L7 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <span class="pm-hire__cta-meta">Limited roster &middot; reviewed in the order received</span>
+          </div>
+
+          <div class="pm-hire__socials">
+            <span class="pm-hire__socials-label">*Follow us</span>
+            <div class="pm-hire__socials-row">
+              <a class="pm-hire__social" href="#" aria-label="Instagram">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="3.7" stroke="currentColor" stroke-width="1.5"/><circle cx="17.4" cy="6.6" r="1.05" fill="currentColor"/></svg>
+              </a>
+              <a class="pm-hire__social" href="#" aria-label="LinkedIn">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M7.7 10.2v6.6M7.7 7.6v.05M11.2 16.8v-3.7c0-1.4.95-2.7 2.4-2.7 1.4 0 2 1.05 2 2.55v3.85M11.2 10.2v6.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </a>
+              <a class="pm-hire__social" href="#" aria-label="YouTube">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="3.2" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 9.5v5l4.2-2.5-4.2-2.5z" fill="currentColor"/></svg>
+              </a>
+              <a class="pm-hire__social" href="#" aria-label="TikTok">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 4v9.5a3.5 3.5 0 1 1-3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 4c.5 2.4 2.4 4.2 5 4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="pm-hire__col-media">
+          <div class="pm-hire__glow" aria-hidden="true"></div>
+          <div class="pm-hire__dots" aria-hidden="true"></div>
+
+          <svg class="pm-hire__sparkle pm-hire__sparkle--1" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.6 10.4 L24 12 L13.6 13.6 L12 24 L10.4 13.6 L0 12 L10.4 10.4 Z" fill="currentColor"/></svg>
+          <svg class="pm-hire__sparkle pm-hire__sparkle--2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.6 10.4 L24 12 L13.6 13.6 L12 24 L10.4 13.6 L0 12 L10.4 10.4 Z" fill="currentColor"/></svg>
+          <svg class="pm-hire__sparkle pm-hire__sparkle--3" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0 L13.6 10.4 L24 12 L13.6 13.6 L12 24 L10.4 13.6 L0 12 L10.4 10.4 Z" fill="currentColor"/></svg>
+
+          <div class="pm-hire__photo">
+            <img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=900&amp;q=85&amp;auto=format&amp;fit=crop" alt="Private Mentorship team" loading="lazy" referrerpolicy="no-referrer">
+            <button class="pm-hire__play" type="button" aria-label="Watch our story">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 6.5v11l9-5.5z"/></svg>
+            </button>
+          </div>
+
+          <div class="pm-hire__chip pm-hire__chip--mid">
+            <div class="pm-hire__chip-icon pm-hire__chip-icon--shield">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2.5L4.5 5.2v6.1c0 4.6 3.2 8.2 7.5 9.7 4.3-1.5 7.5-5.1 7.5-9.7V5.2L12 2.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.6 12.2l2.4 2.4 4.4-4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="pm-hire__chip-text">
+              <span class="pm-hire__chip-title">Verified Assistant</span>
+              <span class="pm-hire__chip-meta">Background &amp; reference checked</span>
+            </div>
+          </div>
+
+          <div class="pm-hire__chip pm-hire__chip--top">
+            <div class="pm-hire__chip-icon pm-hire__chip-icon--lock">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2.2" stroke="currentColor" stroke-width="1.6"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="15" r="1.3" fill="currentColor"/><path d="M12 15v2.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </div>
+            <div class="pm-hire__chip-text">
+              <span class="pm-hire__chip-title">100+ Families served</span>
+              <span class="pm-hire__chip-meta">Trusted private network</span>
+            </div>
+          </div>
+
+          <div class="pm-hire__chip pm-hire__chip--btm">
+            <div class="pm-hire__chip-icon pm-hire__chip-icon--star">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.95 6 6.6.95-4.78 4.66 1.13 6.55L12 17.55 6.1 20.66l1.13-6.55L2.45 9.45l6.6-.95L12 2.5z"/></svg>
+            </div>
+            <div class="pm-hire__chip-text">
+              <span class="pm-hire__chip-title">Top Rated</span>
+              <span class="pm-hire__chip-meta">4.96 / 5 family rating</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- WHY WORK WITH PRIVATE MENTORSHIP -->
+      <div class="pm-hire__why">
+        <h2 class="pm-hire__why-h">Why work with Private Mentorship</h2>
+        <div class="pm-hire__why-row">
+
+          <article class="pm-hire__why-card">
+            <div class="pm-hire__why-icon">
+              <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                <circle cx="16" cy="16" r="12" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M16 8.5v7.7l4.6 2.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="16" cy="16" r="1.4" fill="currentColor"/>
+              </svg>
+            </div>
+            <h3 class="pm-hire__why-title">Working Time</h3>
+            <span class="pm-hire__why-rule" aria-hidden="true"></span>
+            <p class="pm-hire__why-desc">Part-time, long-term roles. 8&ndash;24 hours per week with consistent families on a schedule that respects your life.</p>
+          </article>
+
+          <article class="pm-hire__why-card">
+            <div class="pm-hire__why-icon">
+              <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                <rect x="4.5" y="9" width="23" height="15" rx="3" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M4.5 14h23" stroke="currentColor" stroke-width="1.8"/>
+                <circle cx="22.5" cy="18.5" r="1.6" fill="currentColor"/>
+                <path d="M8 9V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.8"/>
+              </svg>
+            </div>
+            <h3 class="pm-hire__why-title">Compensation</h3>
+            <span class="pm-hire__why-rule" aria-hidden="true"></span>
+            <p class="pm-hire__why-desc">$30&ndash;$45 per hour based on plan tier, plus paid travel between sessions and a real benefits package.</p>
+          </article>
+
+          <article class="pm-hire__why-card">
+            <div class="pm-hire__why-icon">
+              <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                <path d="M16 28s10-8.4 10-15a10 10 0 1 0-20 0c0 6.6 10 15 10 15z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                <circle cx="16" cy="13" r="3.6" stroke="currentColor" stroke-width="1.8"/>
+              </svg>
+            </div>
+            <h3 class="pm-hire__why-title">Where You&rsquo;ll Work</h3>
+            <span class="pm-hire__why-rule" aria-hidden="true"></span>
+            <p class="pm-hire__why-desc">In-home and in-community across Canada &mdash; with the family, in real life. No remote-only roles.</p>
+          </article>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- DARK CTA STRIP -->
+  <section class="hr-cta" id="apply" aria-labelledby="hr-cta-heading">
+    <div class="hr-cta__inner">
+      <span class="hr-cta__eyebrow">2026 Roster</span>
+      <h2 class="hr-cta__h" id="hr-cta-heading">Ready to walk alongside a family?</h2>
+      <p class="hr-cta__sub">Send your r&eacute;sum&eacute; and a short note about yourself. Applications are reviewed in the order received and we respond within five business days.</p>
+      <a href="hiring-entry.html" class="hr-cta__btn">
+        <span>Start your application</span>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 7H11M11 7L7 3M11 7L7 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="hr-foot">
+    &copy; Private Mentorship &middot; <a href="index.html">Home</a> &middot; <a href="the-assistant.html">The Assistant</a> &middot; <a href="hiring-entry.html">Apply</a>
+  </footer>
+
+</body>
+</html>

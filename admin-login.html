@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Sign In — Private Mentorship</title>
+<meta name="description" content="Private Mentorship admin and owner sign-in." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,500;1,600&display=swap" />
+<link rel="stylesheet" href="js/auth-shell.css?v=20260507a" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  /* Slightly darker / more "official" treatment for the admin entrance. */
+  body{background:#0F172A;color:#E2E8F0;}
+  .auth-nav{
+    background:rgba(15,23,42,0.85);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .auth-nav__logo{color:#fff;}
+  .auth-nav__links a{color:rgba(226,232,240,0.7);}
+  .auth-nav__links a:hover{color:#fff;}
+  .auth-card{
+    background:#FAFAF8;color:#1d1d1f;
+    box-shadow:0 1px 2px rgba(0,0,0,0.2), 0 30px 70px -28px rgba(0,0,0,0.55);
+  }
+  .auth-icon{background:#0F172A;color:#fff;}
+  .admin-badge{
+    display:inline-block;
+    background:#0F172A;color:#fff;
+    font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+    padding:5px 10px;border-radius:999px;margin-bottom:14px;
+  }
+</style>
+</head>
+<body>
+
+<nav class="auth-nav">
+  <a class="auth-nav__logo" href="index.html">Private Mentorship</a>
+  <div class="auth-nav__links">
+    <a href="hiring.html">Hiring</a>
+    <a href="the-assistant.html">The Assistant</a>
+  </div>
+</nav>
+
+<main class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-icon-wrap">
+      <div class="auth-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+      <div><span class="admin-badge">Restricted</span></div>
+    </div>
+    <p class="auth-eyebrow">Owner &amp; Admin</p>
+    <h1 class="auth-title">Sign in to <em>review</em></h1>
+    <p class="auth-sub">Use your existing Private Mentorship admin or owner credentials.</p>
+
+    <div class="auth-error" id="adError"></div>
+
+    <form id="adForm" novalidate>
+      <label class="auth-label auth-label--top" for="adEmail">Email</label>
+      <input class="auth-input" id="adEmail" type="email" autocomplete="email" placeholder="you@privatementorship.com" required />
+
+      <label class="auth-label" for="adPassword">Password</label>
+      <input class="auth-input" id="adPassword" type="password" autocomplete="current-password" required />
+
+      <button type="submit" class="auth-btn" id="adSubmit">
+        <span id="adSubmitLabel">Sign in</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </form>
+
+    <p class="auth-foot" style="margin-top:18px;font-size:12.5px;">
+      This sign-in is for owners, admins, and superadmins only. Applicants should use the <a href="hiring-entry.html">applicant sign-in</a>.
+    </p>
+
+    <a class="auth-back" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Back to home
+    </a>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260507a"></script>
+<script src="js/hiring-service.js?v=20260507a"></script>
+<script>
+const form = document.getElementById('adForm');
+const errEl = document.getElementById('adError');
+const submitBtn = document.getElementById('adSubmit');
+const submitLabel = document.getElementById('adSubmitLabel');
+
+function showError(msg){ errEl.textContent = msg; errEl.classList.add('is-shown'); }
+function clearError(){ errEl.classList.remove('is-shown'); }
+
+(async () => {
+  // If already signed in AND already an admin/owner, fast-forward to dashboard.
+  const user = await window.pmHiring.getCurrentUser();
+  if (user) {
+    const isAdmin = await window.pmHiring.isCurrentUserAdminOrOwner();
+    if (isAdmin) { window.location.href = 'admin-dashboard.html'; return; }
+  }
+})();
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearError();
+
+  const email = document.getElementById('adEmail').value.trim();
+  const pw = document.getElementById('adPassword').value;
+  if (!email || !pw){ showError('Enter your email and password.'); return; }
+
+  submitBtn.disabled = true;
+  submitLabel.innerHTML = '<span class="auth-spinner"></span> Signing in…';
+
+  try {
+    await window.pmHiring.signInWithEmail({ email, password: pw });
+    const isAdmin = await window.pmHiring.isCurrentUserAdminOrOwner();
+    if (!isAdmin){
+      // Not an admin — sign them straight back out so they can't impersonate an applicant via this page.
+      await window.pmHiring.signOut();
+      showError('This account does not have admin or owner privileges. Use the applicant sign-in for applications.');
+      submitBtn.disabled = false;
+      submitLabel.textContent = 'Sign in';
+      return;
+    }
+    window.location.href = 'admin-dashboard.html';
+  } catch (err) {
+    console.error(err);
+    let msg = err?.message || 'Could not sign in.';
+    if (/invalid login|invalid_credentials/i.test(msg)) msg = 'Email or password is incorrect.';
+    showError(msg);
+    submitBtn.disabled = false;
+    submitLabel.textContent = 'Sign in';
+  }
+});
+</script>
+
+</body>
+</html>

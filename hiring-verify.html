@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Verify Your Email — Private Mentorship</title>
+<meta name="description" content="Confirm your email address to continue your application." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,500;1,600&display=swap" />
+<link rel="stylesheet" href="js/auth-shell.css?v=20260507a" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+</head>
+<body>
+
+<nav class="auth-nav">
+  <a class="auth-nav__logo" href="hiring.html">Private Mentorship</a>
+  <div class="auth-nav__links">
+    <a href="hiring.html">Hiring</a>
+    <a href="the-assistant.html">The Assistant</a>
+  </div>
+</nav>
+
+<main class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-icon-wrap"><div class="auth-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div></div>
+    <p class="auth-eyebrow">Confirm your email</p>
+    <h1 class="auth-title">Check your <em>inbox</em></h1>
+    <p class="auth-sub">We sent a confirmation link to <strong id="vyEmail">your email</strong>. Click it to verify your account, then return here.</p>
+
+    <div class="auth-error" id="vyError"></div>
+    <div class="auth-success" id="vySuccess"></div>
+
+    <button type="button" class="auth-btn auth-btn--ghost" id="vyResend">
+      <span id="vyResendLabel">Resend confirmation email</span>
+    </button>
+
+    <button type="button" class="auth-btn" id="vyContinue" style="margin-top:10px;display:none;">
+      <span>Continue to application</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+
+    <p class="auth-foot" style="margin-top:18px;">Didn't get it? Check your spam folder, or <a href="#" id="vyTryDifferent">try a different email</a>.</p>
+
+    <a class="auth-back" href="hiring-entry.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Back
+    </a>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260507a"></script>
+<script src="js/hiring-service.js?v=20260507a"></script>
+<script>
+const errEl = document.getElementById('vyError');
+const okEl = document.getElementById('vySuccess');
+const emailEl = document.getElementById('vyEmail');
+const resendBtn = document.getElementById('vyResend');
+const resendLabel = document.getElementById('vyResendLabel');
+const continueBtn = document.getElementById('vyContinue');
+
+const params = new URLSearchParams(window.location.search);
+const email = params.get('email') || '';
+if (email) emailEl.textContent = email;
+
+function showError(msg){ errEl.textContent = msg; errEl.classList.add('is-shown'); }
+function showSuccess(msg){ okEl.textContent = msg; okEl.classList.add('is-shown'); }
+function clearMessages(){ errEl.classList.remove('is-shown'); okEl.classList.remove('is-shown'); }
+
+// Listen for auth state changes — when the user clicks the email link in another tab,
+// supabase auto-detects the session in the URL hash and fires SIGNED_IN here.
+window.pmSupabase.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_IN' && session?.user) {
+    showSuccess('Email confirmed. Setting up your application…');
+    try { await window.pmHiring.ensureApplicantDraft(); } catch (_) {}
+    setTimeout(() => { window.location.href = 'hiring-apply.html'; }, 700);
+  }
+});
+
+// On load, if the user is already verified (e.g., they came back to this page later), forward.
+(async () => {
+  const user = await window.pmHiring.getCurrentUser();
+  if (user && user.email_confirmed_at) {
+    continueBtn.style.display = 'flex';
+    showSuccess('Your email is verified. You can continue.');
+  }
+})();
+
+continueBtn.addEventListener('click', async () => {
+  try { await window.pmHiring.ensureApplicantDraft(); } catch (_) {}
+  window.location.href = 'hiring-apply.html';
+});
+
+resendBtn.addEventListener('click', async () => {
+  if (!email) { showError('No email on file. Go back and start over.'); return; }
+  clearMessages();
+  resendBtn.disabled = true;
+  resendLabel.innerHTML = '<span class="auth-spinner" style="border-color:rgba(0,113,227,0.25);border-top-color:var(--accent);"></span> Sending…';
+  try {
+    await window.pmHiring.resendVerificationEmail(email);
+    showSuccess('Confirmation email sent. Check your inbox.');
+  } catch (err) {
+    console.error(err);
+    showError(err?.message || 'Could not resend email. Try again in a minute.');
+  } finally {
+    resendBtn.disabled = false;
+    resendLabel.textContent = 'Resend confirmation email';
+  }
+});
+
+document.getElementById('vyTryDifferent').addEventListener('click', (e) => {
+  e.preventDefault();
+  window.location.href = 'hiring-signup.html';
+});
+</script>
+
+</body>
+</html>

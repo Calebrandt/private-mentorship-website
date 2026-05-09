@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sign In — Private Mentorship</title>
+<meta name="description" content="Sign in to continue your assistant application." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,500;1,600&display=swap" />
+<link rel="stylesheet" href="js/auth-shell.css?v=20260507a" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+</head>
+<body>
+
+<nav class="auth-nav">
+  <a class="auth-nav__logo" href="hiring.html">Private Mentorship</a>
+  <div class="auth-nav__links">
+    <a href="hiring.html">Hiring</a>
+    <a href="the-assistant.html">The Assistant</a>
+  </div>
+</nav>
+
+<main class="auth-shell">
+  <div class="auth-card">
+    <p class="auth-eyebrow">Welcome back</p>
+    <h1 class="auth-title">Sign <em>in</em></h1>
+    <p class="auth-sub">Continue your application or check your status.</p>
+
+    <div class="auth-error" id="liError"></div>
+
+    <form id="liForm" novalidate>
+      <label class="auth-label auth-label--top" for="liEmail">Email</label>
+      <input class="auth-input" id="liEmail" type="email" autocomplete="email" placeholder="you@example.com" required />
+
+      <label class="auth-label" for="liPassword">Password</label>
+      <input class="auth-input" id="liPassword" type="password" autocomplete="current-password" required />
+
+      <button type="submit" class="auth-btn" id="liSubmit">
+        <span id="liSubmitLabel">Sign in</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </form>
+
+    <p class="auth-foot" style="margin-top:14px;"><a href="hiring-reset.html">Forgot your password?</a></p>
+
+    <div class="auth-divider">or</div>
+
+    <p class="auth-foot">No account yet? <a href="hiring-signup.html">Create one</a></p>
+
+    <a class="auth-back" href="hiring-entry.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Back
+    </a>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260507a"></script>
+<script src="js/hiring-service.js?v=20260507a"></script>
+<script>
+const form = document.getElementById('liForm');
+const errEl = document.getElementById('liError');
+const submitBtn = document.getElementById('liSubmit');
+const submitLabel = document.getElementById('liSubmitLabel');
+
+function showError(msg){ errEl.textContent = msg; errEl.classList.add('is-shown'); }
+function clearError(){ errEl.classList.remove('is-shown'); }
+
+(async () => {
+  const user = await window.pmHiring.getCurrentUser();
+  if (user) window.location.href = 'hiring-entry.html';
+})();
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearError();
+
+  const email = document.getElementById('liEmail').value.trim();
+  const pw = document.getElementById('liPassword').value;
+  if (!email || !pw) { showError('Please enter your email and password.'); return; }
+
+  submitBtn.disabled = true;
+  submitLabel.innerHTML = '<span class="auth-spinner"></span> Signing in…';
+
+  try {
+    await window.pmHiring.signInWithEmail({ email, password: pw });
+    try { await window.pmHiring.ensureApplicantDraft(); } catch (_) {}
+    const app = await window.pmHiring.fetchLatestApplicationForCurrentUser();
+    if (!app) { window.location.href = 'hiring-apply.html'; return; }
+    window.location.href = 'hiring-apply.html';
+  } catch (err) {
+    console.error(err);
+    let msg = err?.message || 'Could not sign in.';
+    if (/invalid login|invalid_credentials/i.test(msg)) {
+      msg = 'Email or password is incorrect.';
+    } else if (/email not confirmed/i.test(msg)) {
+      window.location.href = `hiring-verify.html?email=${encodeURIComponent(email)}`;
+      return;
+    }
+    showError(msg);
+    submitBtn.disabled = false;
+    submitLabel.textContent = 'Sign in';
+  }
+});
+</script>
+
+</body>
+</html>

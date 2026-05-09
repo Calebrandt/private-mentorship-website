@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Reset Password — Private Mentorship</title>
+<meta name="description" content="Reset your password to continue your application." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,500;1,600&display=swap" />
+<link rel="stylesheet" href="js/auth-shell.css?v=20260507a" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+</head>
+<body>
+
+<nav class="auth-nav">
+  <a class="auth-nav__logo" href="hiring.html">Private Mentorship</a>
+  <div class="auth-nav__links">
+    <a href="hiring.html">Hiring</a>
+    <a href="the-assistant.html">The Assistant</a>
+  </div>
+</nav>
+
+<main class="auth-shell">
+  <div class="auth-card">
+    <!-- REQUEST FORM (default) -->
+    <div id="rsRequestPanel">
+      <p class="auth-eyebrow">Reset password</p>
+      <h1 class="auth-title">Forgot your <em>password</em>?</h1>
+      <p class="auth-sub">We'll email you a link to set a new one.</p>
+
+      <div class="auth-error" id="rsError"></div>
+      <div class="auth-success" id="rsSuccess"></div>
+
+      <form id="rsRequestForm" novalidate>
+        <label class="auth-label auth-label--top" for="rsEmail">Email</label>
+        <input class="auth-input" id="rsEmail" type="email" autocomplete="email" placeholder="you@example.com" required />
+        <button type="submit" class="auth-btn" id="rsRequestBtn">
+          <span id="rsRequestLabel">Send reset link</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </form>
+
+      <p class="auth-foot" style="margin-top:18px;">Remembered it? <a href="hiring-login.html">Sign in</a></p>
+    </div>
+
+    <!-- UPDATE PASSWORD PANEL (shown when arriving from email link) -->
+    <div id="rsUpdatePanel" style="display:none;">
+      <p class="auth-eyebrow">Choose a new password</p>
+      <h1 class="auth-title">Set a new <em>password</em></h1>
+      <p class="auth-sub">Use 8+ characters. You'll be signed in automatically.</p>
+
+      <div class="auth-error" id="rsErrorB"></div>
+      <div class="auth-success" id="rsSuccessB"></div>
+
+      <form id="rsUpdateForm" novalidate>
+        <label class="auth-label auth-label--top" for="rsPassword">New password</label>
+        <input class="auth-input" id="rsPassword" type="password" autocomplete="new-password" required minlength="8" />
+        <label class="auth-label" for="rsPassword2">Confirm password</label>
+        <input class="auth-input" id="rsPassword2" type="password" autocomplete="new-password" required />
+        <button type="submit" class="auth-btn" id="rsUpdateBtn">
+          <span id="rsUpdateLabel">Save new password</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+      </form>
+    </div>
+
+    <a class="auth-back" href="hiring-login.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Back
+    </a>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260507a"></script>
+<script src="js/hiring-service.js?v=20260507a"></script>
+<script>
+const errEl = document.getElementById('rsError');
+const okEl = document.getElementById('rsSuccess');
+const errBEl = document.getElementById('rsErrorB');
+const okBEl = document.getElementById('rsSuccessB');
+
+function show(el, msg, on){ el.textContent = msg; el.classList.add('is-shown'); if(on) on.classList.remove('is-shown'); }
+
+// Detect recovery session — when user clicks the email link, Supabase puts the recovery
+// access_token in the URL hash and fires PASSWORD_RECOVERY.
+let inRecovery = false;
+window.pmSupabase.auth.onAuthStateChange((event) => {
+  if (event === 'PASSWORD_RECOVERY') {
+    inRecovery = true;
+    document.getElementById('rsRequestPanel').style.display = 'none';
+    document.getElementById('rsUpdatePanel').style.display = 'block';
+  }
+});
+
+document.getElementById('rsRequestForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('rsEmail').value.trim();
+  if (!email) { show(errEl, 'Enter your email.', okEl); return; }
+  const btn = document.getElementById('rsRequestBtn');
+  const lbl = document.getElementById('rsRequestLabel');
+  btn.disabled = true;
+  lbl.innerHTML = '<span class="auth-spinner"></span> Sending…';
+  try {
+    await window.pmHiring.sendPasswordReset(email);
+    show(okEl, 'If an account exists for that email, a reset link is on its way.', errEl);
+  } catch (err) {
+    show(errEl, err?.message || 'Could not send reset link.', okEl);
+  } finally {
+    btn.disabled = false;
+    lbl.textContent = 'Send reset link';
+  }
+});
+
+document.getElementById('rsUpdateForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const pw = document.getElementById('rsPassword').value;
+  const pw2 = document.getElementById('rsPassword2').value;
+  if (pw.length < 8) { show(errBEl, 'Password must be at least 8 characters.', okBEl); return; }
+  if (pw !== pw2) { show(errBEl, "Passwords don't match.", okBEl); return; }
+  const btn = document.getElementById('rsUpdateBtn');
+  const lbl = document.getElementById('rsUpdateLabel');
+  btn.disabled = true;
+  lbl.innerHTML = '<span class="auth-spinner"></span> Saving…';
+  try {
+    await window.pmHiring.updatePassword(pw);
+    show(okBEl, 'Password updated. Redirecting…', errBEl);
+    setTimeout(() => { window.location.href = 'hiring-apply.html'; }, 700);
+  } catch (err) {
+    show(errBEl, err?.message || 'Could not update password.', okBEl);
+    btn.disabled = false;
+    lbl.textContent = 'Save new password';
+  }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hiring Applications — Private Mentorship</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,500;1,600&display=swap" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  :root{
+    --bg:#F4F5F7; --paper:#FFFFFF; --ink:#0F172A; --ink-2:#1E293B; --ink-mute:#64748B; --ink-tert:#94A3B8;
+    --hair:#E2E8F0; --hair-light:#F1F5F9; --accent:#0071e3; --accent-deep:#0058b3; --accent-fade:#E8F2FD; --accent-border:#B3D0F5;
+    --warn-bg:#FEF3C7; --warn-ink:#92400E; --warn-border:#F59E0B;
+    --danger:#DC2626; --danger-fade:#FEE2E2;
+    --success:#10B981; --success-fade:#ECFDF5; --success-ink:#047857;
+    --indigo:#6366F1; --indigo-fade:#EEF2FF;
+    --sans:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;
+    --display:"Archivo","Inter",ui-sans-serif,system-ui,sans-serif;
+    --serif:"Playfair Display",Georgia,serif;
+    --ease:cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;}
+
+  .admin-top{
+    position:sticky;top:0;z-index:30;
+    background:rgba(15,23,42,0.96);color:#fff;
+    padding:14px 28px;
+    display:flex;align-items:center;justify-content:space-between;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .admin-top__brand{display:flex;align-items:center;gap:14px;}
+  .admin-top__logo{font-size:13px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#fff;text-decoration:none;}
+  .admin-top__badge{
+    background:#fff;color:#0F172A;padding:4px 10px;border-radius:999px;
+    font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  }
+  .admin-top__user{display:flex;align-items:center;gap:14px;font-size:12.5px;color:rgba(255,255,255,0.75);}
+  .admin-top__signout{
+    background:transparent;border:1px solid rgba(255,255,255,0.18);
+    color:#fff;padding:7px 14px;border-radius:999px;
+    font-size:12px;font-weight:600;cursor:pointer;
+    transition:all .18s var(--ease);
+  }
+  .admin-top__signout:hover{background:#fff;color:#0F172A;}
+
+  .admin-shell{
+    max-width:1280px;margin:0 auto;padding:36px 28px 80px;
+  }
+  .admin-head{margin-bottom:24px;}
+  .admin-head__h1{font-family:var(--display);font-size:32px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px;}
+  .admin-head__sub{font-size:14px;color:var(--ink-mute);margin:0;}
+
+  .admin-tabs{
+    display:flex;gap:4px;background:var(--paper);
+    border:1px solid var(--hair);border-radius:12px;padding:4px;
+    margin-bottom:18px;width:fit-content;
+  }
+  .admin-tab{
+    background:transparent;border:0;padding:9px 16px;border-radius:9px;
+    font-family:inherit;font-size:13px;font-weight:600;color:var(--ink-mute);
+    cursor:pointer;
+    transition:all .18s var(--ease);
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .admin-tab:hover{color:var(--ink);}
+  .admin-tab.is-active{background:var(--ink);color:#fff;}
+  .admin-tab__count{
+    background:rgba(255,255,255,0.18);color:inherit;
+    padding:1px 7px;border-radius:999px;font-size:11px;font-weight:700;
+  }
+  .admin-tab:not(.is-active) .admin-tab__count{background:var(--hair-light);color:var(--ink-mute);}
+
+  .admin-table{
+    background:var(--paper);
+    border:1px solid var(--hair);
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 1px 2px rgba(15,23,42,0.04);
+  }
+  .admin-table__row{
+    display:grid;
+    grid-template-columns:2.4fr 1fr 1fr 1fr 0.8fr 64px;
+    gap:14px;align-items:center;
+    padding:14px 22px;
+    border-bottom:1px solid var(--hair-light);
+    cursor:pointer;
+    transition:background .18s var(--ease);
+  }
+  .admin-table__row:hover{background:var(--hair-light);}
+  .admin-table__row--head{
+    background:var(--hair-light);
+    font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-mute);
+    cursor:default;
+  }
+  .admin-table__row--head:hover{background:var(--hair-light);}
+  .admin-table__row:last-child{border-bottom:none;}
+
+  .admin-cell-applicant{display:flex;align-items:center;gap:12px;min-width:0;}
+  .admin-cell-applicant__avatar{
+    flex:0 0 36px;width:36px;height:36px;border-radius:50%;
+    background:var(--accent-fade);color:var(--accent);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:13px;
+  }
+  .admin-cell-applicant__body{min-width:0;}
+  .admin-cell-applicant__email{
+    font-size:13.5px;font-weight:700;color:var(--ink);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .admin-cell-applicant__id{
+    font-size:11px;color:var(--ink-tert);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+
+  .admin-status{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:4px 10px;border-radius:999px;
+    font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  }
+  .admin-status::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;}
+  .admin-status--draft{background:var(--hair-light);color:var(--ink-mute);}
+  .admin-status--submitted{background:var(--accent-fade);color:var(--accent-deep);}
+  .admin-status--under_review{background:var(--indigo-fade);color:var(--indigo);}
+  .admin-status--correction_requested{background:var(--warn-bg);color:var(--warn-ink);}
+  .admin-status--waitlisted{background:#F1F5F9;color:#475569;}
+  .admin-status--accepted{background:var(--success-fade);color:var(--success-ink);}
+  .admin-status--rejected{background:var(--danger-fade);color:var(--danger);}
+  .admin-status--archived{background:#F1F5F9;color:#94A3B8;}
+
+  .admin-progress{
+    width:100%;height:6px;background:var(--hair-light);border-radius:999px;overflow:hidden;
+  }
+  .admin-progress__fill{height:100%;background:linear-gradient(90deg, var(--accent), var(--accent-deep));border-radius:999px;}
+  .admin-progress__num{font-size:11px;color:var(--ink-mute);font-weight:600;margin-top:3px;}
+
+  .admin-time{font-size:13px;color:var(--ink-2);}
+  .admin-time__ago{font-size:11px;color:var(--ink-tert);margin-top:2px;}
+
+  .admin-arrow{
+    flex:0 0 32px;width:32px;height:32px;border-radius:50%;
+    background:var(--ink);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .admin-arrow svg{width:12px;height:12px;}
+
+  .admin-empty{
+    background:var(--paper);
+    border:1px dashed var(--hair);
+    border-radius:14px;
+    padding:48px 32px;
+    text-align:center;
+  }
+  .admin-empty__icon{
+    width:54px;height:54px;border-radius:14px;background:var(--hair-light);color:var(--ink-mute);
+    display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px;
+  }
+  .admin-empty__title{font-family:var(--display);font-size:18px;font-weight:700;margin:0 0 4px;}
+  .admin-empty__sub{font-size:13px;color:var(--ink-mute);margin:0;}
+
+  .admin-loading{
+    text-align:center;padding:60px 20px;color:var(--ink-mute);
+  }
+  .admin-spinner{
+    width:18px;height:18px;border-radius:50%;
+    border:2.5px solid var(--hair);border-top-color:var(--accent);
+    animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;
+    margin-right:8px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  @media (max-width:880px){
+    .admin-table__row{grid-template-columns:1fr;gap:8px;padding:14px 18px;}
+    .admin-table__row--head{display:none;}
+    .admin-cell-progress, .admin-cell-time{display:none;}
+    .admin-arrow{justify-self:flex-end;margin-top:6px;}
+  }
+</style>
+<link rel="stylesheet" href="js/sidebar.css?v=20260508a" />
+</head>
+<body class="pm-has-sidebar">
+
+<!-- Sidebar mounts here -->
+<div id="pmSidebar"></div>
+
+<main class="admin-shell">
+  <div class="admin-head">
+    <h1 class="admin-head__h1">Hiring applications</h1>
+    <p class="admin-head__sub">Click any row to review the full dossier.</p>
+  </div>
+
+  <div class="admin-tabs" id="adminTabs">
+    <button type="button" class="admin-tab is-active" data-tab="active">Active <span class="admin-tab__count" data-count="active">0</span></button>
+    <button type="button" class="admin-tab" data-tab="under_review">Under review <span class="admin-tab__count" data-count="under_review">0</span></button>
+    <button type="button" class="admin-tab" data-tab="correction_requested">Corrections <span class="admin-tab__count" data-count="correction_requested">0</span></button>
+    <button type="button" class="admin-tab" data-tab="accepted">Accepted <span class="admin-tab__count" data-count="accepted">0</span></button>
+    <button type="button" class="admin-tab" data-tab="rejected">Rejected <span class="admin-tab__count" data-count="rejected">0</span></button>
+    <button type="button" class="admin-tab" data-tab="all">All <span class="admin-tab__count" data-count="all">0</span></button>
+  </div>
+
+  <div id="adminListArea">
+    <div class="admin-loading"><span class="admin-spinner"></span> Loading applications…</div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260508a"></script>
+<script src="js/hiring-service.js?v=20260508a"></script>
+<script src="js/sidebar.js?v=20260508a"></script>
+<script>
+let allApps = [];
+let emailMap = {};
+let activeTab = 'active';
+
+document.querySelectorAll('.admin-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    activeTab = tab.dataset.tab;
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.toggle('is-active', t === tab));
+    renderList();
+  });
+});
+
+function timeAgo(iso){
+  if (!iso) return '—';
+  const ms = Date.now() - new Date(iso).getTime();
+  const m = Math.round(ms/60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.round(m/60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.round(h/24);
+  if (d < 30) return `${d}d ago`;
+  return new Date(iso).toLocaleDateString();
+}
+function fmtDate(iso){ return iso ? new Date(iso).toLocaleString() : '—'; }
+function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[c])); }
+
+function statusGroup(s){
+  if (['submitted','under_review','correction_requested','waitlisted'].includes(s)) return 'active';
+  return s;
+}
+
+function applyFilter(apps, tab){
+  if (tab === 'all') return apps;
+  if (tab === 'active') return apps.filter(a => ['submitted','under_review','correction_requested','waitlisted'].includes(a.status));
+  return apps.filter(a => a.status === tab);
+}
+
+function renderList(){
+  const filtered = applyFilter(allApps, activeTab);
+  const area = document.getElementById('adminListArea');
+  if (!filtered.length){
+    area.innerHTML = `<div class="admin-empty">
+      <div class="admin-empty__icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+      <p class="admin-empty__title">No applications in this view</p>
+      <p class="admin-empty__sub">Try a different tab, or check back when an applicant submits.</p>
+    </div>`;
+    return;
+  }
+  const rows = filtered.map(a => {
+    const email = emailMap[a.applicant_id] || '—';
+    const initials = (email.split('@')[0] || 'A').slice(0,2).toUpperCase();
+    return `<a class="admin-table__row" href="admin-application.html?id=${encodeURIComponent(a.id)}">
+      <div class="admin-cell-applicant">
+        <div class="admin-cell-applicant__avatar">${escapeHtml(initials)}</div>
+        <div class="admin-cell-applicant__body">
+          <div class="admin-cell-applicant__email">${escapeHtml(email)}</div>
+          <div class="admin-cell-applicant__id">${a.id.slice(0,8)} · PMA-${a.id.slice(0,8).toUpperCase()}</div>
+        </div>
+      </div>
+      <div><span class="admin-status admin-status--${a.status}">${a.status.replace('_',' ')}</span></div>
+      <div class="admin-cell-progress">
+        <div class="admin-progress"><div class="admin-progress__fill" style="width:${a.progress_percent || 0}%"></div></div>
+        <div class="admin-progress__num">${a.progress_percent || 0}% · ${(a.current_step_key || '').replace(/_/g,' ').toLowerCase()}</div>
+      </div>
+      <div class="admin-cell-time admin-time">
+        ${a.submitted_at ? fmtDate(a.submitted_at).split(',')[0] : 'Not submitted'}
+        <div class="admin-time__ago">${timeAgo(a.submitted_at || a.updated_at)}</div>
+      </div>
+      <div></div>
+      <div class="admin-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+    </a>`;
+  }).join('');
+  area.innerHTML = `<div class="admin-table">
+    <div class="admin-table__row admin-table__row--head">
+      <div>Applicant</div>
+      <div>Status</div>
+      <div>Progress</div>
+      <div>Submitted</div>
+      <div></div>
+      <div></div>
+    </div>
+    ${rows}
+  </div>`;
+}
+
+function refreshTabCounts(){
+  const groupCounts = { active:0, under_review:0, correction_requested:0, accepted:0, rejected:0, all: allApps.length };
+  allApps.forEach(a => {
+    if (['submitted','under_review','correction_requested','waitlisted'].includes(a.status)) groupCounts.active++;
+    if (a.status === 'under_review') groupCounts.under_review++;
+    if (a.status === 'correction_requested') groupCounts.correction_requested++;
+    if (a.status === 'accepted') groupCounts.accepted++;
+    if (a.status === 'rejected') groupCounts.rejected++;
+  });
+  Object.entries(groupCounts).forEach(([k,v]) => {
+    const el = document.querySelector(`[data-count="${k}"]`);
+    if (el) el.textContent = v;
+  });
+}
+
+(async function init(){
+  // Auth + role gate.
+  const user = await window.pmHiring.getCurrentUser();
+  if (!user){ window.location.href = 'signin.html'; return; }
+  const isAdmin = await window.pmHiring.isCurrentUserAdminOrOwner();
+  if (!isAdmin){
+    await window.pmHiring.signOut();
+    window.location.href = 'signin.html?notauthorized=1';
+    return;
+  }
+  // (sidebar handles user email + sign-out display)
+
+  // Load all applications (use 'all' so tab counts are meaningful).
+  try {
+    allApps = await window.pmHiring.adminListApplications({ status: 'all' });
+  } catch (e){
+    console.error('list applications failed', e);
+    document.getElementById('adminListArea').innerHTML = `<div class="admin-empty"><p class="admin-empty__title">Couldn't load applications</p><p class="admin-empty__sub">${escapeHtml(e?.message || '')}</p></div>`;
+    return;
+  }
+
+  // Resolve applicant emails.
+  const ids = [...new Set(allApps.map(a => a.applicant_id).filter(Boolean))];
+  try { emailMap = await window.pmHiring.adminLookupApplicantEmails(ids); }
+  catch (e){ console.warn('email lookup failed', e); }
+
+  refreshTabCounts();
+  renderList();
+})();
+</script>
+
+</body>
+</html>

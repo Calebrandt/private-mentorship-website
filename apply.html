@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apply — Private Mentorship</title>
+<meta name="description" content="Begin your Private Mentorship application. Tell us about your family and the support you need." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,500;1,600&display=swap">
+<style>
+  :root{
+    --bg:#f5f5f7;
+    --paper:#FAFAF8;
+    --surface:#FFFFFF;
+    --ink:#1d1d1f;
+    --ink-2:#2a2a2c;
+    --ink-mute:#6e6e73;
+    --ink-tert:#aeaeb2;
+    --hair:#d2d2d7;
+    --hair-light:#e8e8ed;
+    --input-bg:#f5f5f7;
+    --accent:#0071e3;
+    --accent-deep:#0058b3;
+    --accent-fade:#e8f2fd;
+    --accent-border:#b3d0f5;
+    --danger:#ff3b30;
+    --danger-fade:#fff1f0;
+    --success:#10B981;
+    --sans:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --display:"Archivo","Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;
+    --serif:"Playfair Display",Georgia,serif;
+    --ease-out:cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;}
+  body{min-height:100vh;}
+  a{color:inherit;}
+
+  /* ─── NAV ─── */
+  .ap-nav{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 40px;
+    background:rgba(245,245,247,0.85);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--hair-light);
+  }
+  .ap-nav__logo{font-size:13px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--ink);text-decoration:none;}
+  .ap-nav__links{display:flex;gap:28px;align-items:center;}
+  .ap-nav__links a{font-size:13px;font-weight:500;color:var(--ink-mute);text-decoration:none;}
+  .ap-nav__links a:hover{color:var(--ink);}
+
+  /* ─── HERO ─── */
+  .ap-hero{
+    padding:140px 32px 36px;
+    text-align:center;
+    max-width:880px;
+    margin:0 auto;
+  }
+  .ap-hero__eyebrow{font-size:11px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;}
+  .ap-hero__title{
+    font-family:var(--display);font-size:clamp(40px,6vw,68px);font-weight:800;letter-spacing:-0.04em;line-height:0.98;color:var(--ink);margin:0 0 16px;
+  }
+  .ap-hero__title em{font-family:var(--serif);font-style:italic;font-weight:500;color:var(--ink-mute);letter-spacing:-0.02em;}
+  .ap-hero__sub{font-size:16px;font-weight:400;line-height:1.55;color:var(--ink-mute);max-width:560px;margin:0 auto;}
+
+  /* ─── STEPPER BAR ─── */
+  .ap-stepper{
+    max-width:760px;margin:36px auto 24px;padding:0 32px;
+  }
+  .ap-stepper__dots{
+    display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:18px;
+  }
+  .ap-stepper__dot-wrap{display:flex;align-items:center;}
+  .ap-stepper__dot{
+    width:32px;height:32px;border-radius:50%;
+    background:var(--surface);border:2px solid var(--hair);
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:700;color:var(--ink-tert);
+    transition:all .25s var(--ease-out);
+  }
+  .ap-stepper__dot.is-current{
+    background:var(--accent);border-color:var(--accent);color:#FFF;
+    box-shadow:0 0 0 6px rgba(0,113,227,0.12);
+  }
+  .ap-stepper__dot.is-done{
+    background:var(--accent);border-color:var(--accent);color:#FFF;
+  }
+  .ap-stepper__line{
+    width:48px;height:2px;background:var(--hair);margin:0 6px;
+    transition:background .25s var(--ease-out);
+  }
+  .ap-stepper__line.is-done{background:var(--accent);}
+  .ap-stepper__eyebrow{
+    text-align:center;font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;
+  }
+  .ap-stepper__title{
+    text-align:center;font-family:var(--display);font-size:28px;font-weight:800;letter-spacing:-0.02em;color:var(--ink);margin:0 0 6px;
+  }
+  .ap-stepper__sub{text-align:center;font-size:14px;color:var(--ink-mute);margin:0 auto;max-width:560px;line-height:1.5;}
+
+  /* ─── FORM SHELL ─── */
+  .ap-form-wrap{
+    max-width:760px;margin:0 auto 100px;padding:0 32px;
+  }
+  .ap-step{display:none;}
+  .ap-step.is-active{display:block;}
+
+  /* ─── CARDS ─── */
+  .ap-card{
+    background:var(--surface);
+    border:1px solid var(--hair-light);
+    border-radius:16px;
+    padding:28px 28px 24px;
+    margin-bottom:20px;
+    box-shadow:0 1px 2px rgba(10,10,10,0.02);
+  }
+  .ap-card__head{margin-bottom:18px;}
+  .ap-card__title{font-size:17px;font-weight:700;letter-spacing:-0.01em;color:var(--ink);margin:0 0 4px;}
+  .ap-card__sub{font-size:13px;color:var(--ink-mute);margin:0;line-height:1.5;}
+
+  .ap-divider{height:1px;background:var(--hair-light);margin:24px 0;}
+
+  /* ─── FIELDS ─── */
+  .ap-label{
+    display:block;font-size:12px;font-weight:600;color:var(--ink);
+    margin:18px 0 8px;letter-spacing:.01em;
+  }
+  .ap-label--top{margin-top:0;}
+  .ap-hint{font-size:12px;color:var(--ink-mute);margin:0 0 10px;line-height:1.5;}
+
+  .ap-input,
+  .ap-textarea,
+  .ap-select{
+    width:100%;background:var(--input-bg);
+    border:1px solid var(--hair);border-radius:10px;
+    padding:13px 14px;
+    font-family:var(--sans);font-size:14px;font-weight:400;color:var(--ink);
+    transition:border-color .18s var(--ease-out), box-shadow .18s var(--ease-out), background .18s var(--ease-out);
+    -webkit-appearance:none;appearance:none;
+  }
+  .ap-input::placeholder,.ap-textarea::placeholder{color:var(--ink-tert);}
+  .ap-input:focus,.ap-textarea:focus,.ap-select:focus{
+    outline:none;border-color:var(--accent);background:#FFF;
+    box-shadow:0 0 0 4px rgba(0,113,227,0.12);
+  }
+  .ap-input--light{background:#FFF;border-color:var(--hair-light);}
+  .ap-textarea{resize:vertical;min-height:96px;line-height:1.55;}
+
+  .ap-row{display:flex;gap:12px;flex-wrap:wrap;}
+  .ap-row > *{flex:1;min-width:0;}
+  .ap-row--narrow > .ap-row__small{flex:0.4;}
+
+  /* ─── SEGMENTED TOGGLE ─── */
+  .ap-toggle{
+    display:flex;background:var(--input-bg);
+    border:1px solid var(--hair-light);border-radius:10px;
+    padding:3px;gap:3px;
+  }
+  .ap-toggle__btn{
+    flex:1;background:transparent;border:0;
+    padding:9px 12px;
+    font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink-mute);
+    border-radius:8px;cursor:pointer;
+    transition:background .18s var(--ease-out), color .18s var(--ease-out), box-shadow .18s var(--ease-out);
+  }
+  .ap-toggle__btn.is-active{
+    background:var(--surface);color:var(--ink);
+    box-shadow:0 1px 3px rgba(10,10,10,0.08);
+  }
+
+  /* ─── PILLS (multi or single chip) ─── */
+  .ap-pills{display:flex;flex-wrap:wrap;gap:8px;}
+  .ap-pill{
+    background:var(--surface);
+    border:1px solid var(--hair);
+    border-radius:999px;
+    padding:9px 16px;
+    font-family:var(--sans);font-size:13px;font-weight:500;color:var(--ink);
+    cursor:pointer;user-select:none;
+    transition:all .18s var(--ease-out);
+  }
+  .ap-pill:hover{border-color:var(--accent-border);}
+  .ap-pill.is-active{
+    background:var(--accent-fade);
+    color:var(--accent-deep);
+    border-color:var(--accent-border);
+    font-weight:600;
+  }
+
+  /* ─── DAY CHIPS (smaller, square-rounded) ─── */
+  .ap-daychips{display:flex;flex-wrap:wrap;gap:6px;}
+  .ap-daychip{
+    background:var(--surface);
+    border:1px solid var(--hair);
+    border-radius:8px;
+    padding:8px 12px;
+    font-family:var(--sans);font-size:12px;font-weight:600;color:var(--ink-mute);
+    cursor:pointer;user-select:none;min-width:46px;text-align:center;
+    transition:all .18s var(--ease-out);
+  }
+  .ap-daychip.is-active{background:var(--accent);color:#FFF;border-color:var(--accent);}
+
+  /* ─── CHECKLIST ─── */
+  .ap-checklist{display:flex;flex-direction:column;gap:2px;}
+  .ap-check-row{
+    display:flex;align-items:center;gap:12px;
+    padding:10px 4px;cursor:pointer;user-select:none;
+  }
+  .ap-checkbox{
+    width:22px;height:22px;border-radius:6px;
+    border:1.5px solid var(--hair);
+    background:var(--surface);
+    display:flex;align-items:center;justify-content:center;
+    transition:all .14s var(--ease-out);
+    flex-shrink:0;
+  }
+  .ap-checkbox.is-active{background:var(--accent);border-color:var(--accent);color:#FFF;}
+  .ap-checkbox svg{width:13px;height:13px;display:none;}
+  .ap-checkbox.is-active svg{display:block;}
+  .ap-check-label{font-size:14px;color:var(--ink);}
+
+  /* ─── CALLOUT ─── */
+  .ap-callout{
+    background:var(--accent-fade);
+    border:1px solid var(--accent-border);
+    border-radius:12px;
+    padding:16px 18px;
+    margin:14px 0 0;
+  }
+  .ap-callout__title{font-size:13px;font-weight:700;color:var(--accent-deep);margin:0 0 6px;}
+  .ap-callout__body{font-size:13px;color:var(--ink-2);margin:0;line-height:1.55;}
+
+  /* ─── PERSON CARD ─── */
+  .ap-person{
+    background:var(--surface);
+    border:1px solid var(--hair-light);
+    border-radius:16px;overflow:hidden;
+    margin-bottom:20px;
+  }
+  .ap-person__head{
+    padding:24px 28px;
+    background:linear-gradient(180deg,#fafafb,#f5f5f7);
+    border-bottom:1px solid var(--hair-light);
+  }
+  .ap-person__head-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;}
+  .ap-person__eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);}
+  .ap-person__title{font-size:18px;font-weight:700;color:var(--ink);margin-top:2px;}
+  .ap-person__remove{
+    background:transparent;border:0;color:var(--danger);
+    font-size:13px;font-weight:600;cursor:pointer;padding:4px 8px;
+  }
+  .ap-person__remove:hover{text-decoration:underline;}
+  .ap-person__body{padding:24px 28px;}
+  .ap-person__footer{padding:24px 28px;border-top:1px solid var(--hair-light);background:#fafafb;}
+
+  /* ─── SERVICE BLOCK ─── */
+  .ap-service{margin-bottom:14px;}
+  .ap-service__toggle{
+    width:100%;
+    display:flex;align-items:flex-start;gap:14px;
+    padding:16px 18px;
+    background:var(--input-bg);
+    border:1px solid var(--hair-light);border-radius:12px;
+    cursor:pointer;user-select:none;font-family:inherit;
+    transition:all .18s var(--ease-out);
+  }
+  .ap-service__toggle.is-active{
+    background:var(--accent-fade);border-color:var(--accent-border);
+  }
+  .ap-service__check{
+    width:22px;height:22px;border-radius:6px;
+    border:1.5px solid var(--hair);background:var(--surface);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;margin-top:2px;
+    transition:all .14s var(--ease-out);
+  }
+  .ap-service__toggle.is-active .ap-service__check{background:var(--accent);border-color:var(--accent);color:#FFF;}
+  .ap-service__check svg{width:13px;height:13px;display:none;}
+  .ap-service__toggle.is-active .ap-service__check svg{display:block;}
+  .ap-service__title{font-size:15px;font-weight:700;color:var(--ink);}
+  .ap-service__sub{font-size:13px;color:var(--ink-mute);margin-top:2px;}
+
+  .ap-service__config{
+    margin-top:12px;padding:18px;background:#fafafb;border-radius:12px;border:1px solid var(--hair-light);
+    display:none;
+  }
+  .ap-service__toggle.is-active + .ap-service__config{display:block;}
+  .ap-config-card{
+    background:var(--surface);border:1px solid var(--hair-light);border-radius:10px;
+    padding:18px;margin-bottom:14px;
+  }
+  .ap-config-card:last-child{margin-bottom:0;}
+  .ap-config-card__title{font-size:14px;font-weight:700;color:var(--ink);margin:0 0 4px;}
+  .ap-config-card__sub{font-size:12px;color:var(--ink-mute);margin:0 0 12px;line-height:1.5;}
+
+  /* ─── SCHEDULE SLOT ─── */
+  .ap-slot{
+    background:var(--input-bg);border:1px solid var(--hair-light);border-radius:10px;
+    padding:14px;margin-bottom:10px;
+  }
+  .ap-slot__row{display:flex;gap:10px;align-items:center;margin-top:10px;}
+  .ap-slot__row > *{flex:1;}
+  .ap-slot__remove{
+    flex:0 0 36px;width:36px;height:36px;border-radius:8px;
+    background:var(--danger-fade);color:var(--danger);
+    border:0;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;
+  }
+  .ap-add-slot{
+    width:100%;background:var(--surface);
+    border:1px dashed var(--hair);border-radius:10px;
+    padding:11px;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--accent);
+    cursor:pointer;transition:all .18s var(--ease-out);
+  }
+  .ap-add-slot:hover{background:var(--accent-fade);border-color:var(--accent-border);}
+
+  /* ─── ADD PERSON ─── */
+  .ap-add-person{
+    width:100%;background:var(--surface);
+    border:1.5px dashed var(--accent-border);border-radius:14px;
+    padding:18px;font-family:var(--sans);font-size:14px;font-weight:700;color:var(--accent);
+    cursor:pointer;margin-bottom:24px;
+    transition:all .18s var(--ease-out);
+  }
+  .ap-add-person:hover{background:var(--accent-fade);}
+
+  /* ─── BUTTONS / NAV ─── */
+  .ap-actions{
+    display:flex;gap:12px;align-items:center;margin-top:24px;
+  }
+  .ap-actions--single{justify-content:flex-end;}
+  .ap-btn-back{
+    background:var(--surface);border:1px solid var(--hair);
+    color:var(--ink);
+    border-radius:14px;padding:14px 22px;
+    font-family:var(--sans);font-size:14px;font-weight:600;
+    cursor:pointer;
+    transition:all .18s var(--ease-out);
+  }
+  .ap-btn-back:hover{background:#fafafb;border-color:var(--hair);}
+  .ap-btn-primary{
+    flex:1;border:0;border-radius:14px;
+    padding:16px 24px;
+    font-family:var(--sans);font-size:14px;font-weight:700;letter-spacing:-0.01em;color:#FFF;
+    background:linear-gradient(90deg,var(--accent),var(--accent-deep));
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    box-shadow:0 6px 18px -6px rgba(0,113,227,0.55);
+    transition:transform .14s var(--ease-out), box-shadow .14s var(--ease-out), opacity .14s var(--ease-out);
+  }
+  .ap-btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 24px -6px rgba(0,113,227,0.65);}
+  .ap-btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+  .ap-btn-primary svg{width:16px;height:16px;}
+  .ap-btn-save{
+    background:var(--surface);border:1px solid var(--hair);
+    color:var(--ink-mute);
+    border-radius:14px;padding:14px 20px;
+    font-family:var(--sans);font-size:13px;font-weight:600;
+    cursor:pointer;white-space:nowrap;
+    transition:all .18s var(--ease-out);
+  }
+  .ap-btn-save:hover{background:#fafafb;color:var(--ink);border-color:var(--accent-border);}
+  .ap-btn-save.is-saved{color:#047857;border-color:#10B981;background:#ECFDF5;}
+
+  /* ─── RESUME BANNER ─── */
+  .ap-resume-banner{
+    background:#EEF2FF;border:1px solid #C7D2FE;border-radius:14px;
+    padding:14px 18px;margin-bottom:22px;
+    display:flex;align-items:center;gap:14px;
+    font-size:13px;color:#3730A3;line-height:1.5;
+  }
+  .ap-resume-banner__msg{flex:1;}
+  .ap-resume-banner__msg strong{color:#1E1B4B;}
+  .ap-resume-banner__btn{
+    background:transparent;border:1px solid #C7D2FE;color:#3730A3;
+    padding:8px 14px;border-radius:9px;font-size:12px;font-weight:600;
+    cursor:pointer;white-space:nowrap;
+  }
+  .ap-resume-banner__btn:hover{background:#fff;}
+  .ap-saved-indicator{
+    position:fixed;right:24px;bottom:24px;
+    background:#0F172A;color:#fff;padding:11px 18px;border-radius:10px;
+    font-size:13px;font-weight:600;letter-spacing:-0.005em;
+    box-shadow:0 12px 28px -10px rgba(0,0,0,0.35);
+    opacity:0;transform:translateY(8px);pointer-events:none;
+    transition:opacity .22s var(--ease-out), transform .22s var(--ease-out);
+    z-index:1200;
+  }
+  .ap-saved-indicator.is-visible{opacity:1;transform:translateY(0);}
+
+  /* ─── LEAD-THE-SESSION CHIP ─── */
+  .ap-lead-chip{
+    display:inline-flex;align-items:center;gap:10px;
+    padding:10px 14px;border:1px solid var(--hair-light);
+    border-radius:10px;background:var(--surface);
+    cursor:pointer;user-select:none;
+    margin:6px 0 14px;
+    font-size:13px;font-weight:600;color:var(--ink-2);
+    transition:all .18s var(--ease-out);
+  }
+  .ap-lead-chip:hover{border-color:var(--accent-border);}
+  .ap-lead-chip.is-active{
+    background:var(--accent-fade);border-color:var(--accent-border);
+    color:var(--accent-deep);
+  }
+  .ap-textarea--disabled{opacity:.45;pointer-events:none;background:#F5F5F7 !important;}
+
+  /* ─── WARNING CALLOUT (amber) ─── */
+  .ap-callout--warn{
+    background:#FEF3C7;border-color:#F59E0B;
+  }
+  .ap-callout--warn .ap-callout__title{color:#92400E;}
+  .ap-callout--warn .ap-callout__body{color:#78350F;}
+
+  /* ─── AGREEMENT ROW ─── */
+  .ap-agree{
+    display:flex;align-items:flex-start;gap:14px;
+    padding:14px 0;cursor:pointer;user-select:none;
+  }
+  .ap-agree__text{font-size:14px;color:var(--ink);line-height:1.55;}
+
+  /* ─── SUCCESS STATE ─── */
+  .ap-success{display:none;text-align:center;padding:36px 24px;background:var(--surface);border:1px solid var(--hair-light);border-radius:16px;}
+  .ap-success.is-visible{display:block;}
+  .ap-success__icon{
+    width:72px;height:72px;border-radius:50%;
+    background:var(--accent-fade);color:var(--accent);
+    display:inline-flex;align-items:center;justify-content:center;margin-bottom:24px;
+  }
+  .ap-success__icon svg{width:32px;height:32px;}
+  .ap-success__title{
+    font-family:var(--display);font-size:30px;font-weight:800;letter-spacing:-0.02em;color:var(--ink);margin:0 0 12px;
+  }
+  .ap-success__body{font-size:15px;color:var(--ink-mute);line-height:1.6;max-width:440px;margin:0 auto;}
+
+  /* ─── FOOTER ─── */
+  .ap-footer{border-top:1px solid var(--hair-light);padding:32px;text-align:center;font-size:12px;color:var(--ink-tert);letter-spacing:.04em;}
+  .ap-footer a{color:var(--ink-mute);text-decoration:none;margin:0 14px;}
+  .ap-footer a:hover{color:var(--ink);}
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width:680px){
+    .ap-nav{padding:14px 18px;}
+    .ap-nav__links{gap:14px;}
+    .ap-nav__links a:not(.ap-nav__cta){display:none;}
+    .ap-hero{padding:120px 22px 26px;}
+    .ap-form-wrap{padding:0 18px;margin-bottom:60px;}
+    .ap-stepper{padding:0 18px;}
+    .ap-stepper__line{width:24px;}
+    .ap-card{padding:22px 20px;border-radius:14px;}
+    .ap-person__head,.ap-person__body,.ap-person__footer{padding:20px;}
+    .ap-row{flex-direction:column;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="ap-nav">
+  <a class="ap-nav__logo" href="index.html">Private Mentorship</a>
+  <div class="ap-nav__links">
+    <a href="index.html#how">How It Works</a>
+    <a href="the-assistant.html">The Assistant</a>
+    <a href="index.html#plans">Plans</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="ap-hero">
+  <div class="ap-hero__eyebrow">Apply Now</div>
+  <h1 class="ap-hero__title">Begin your <em>application</em>.</h1>
+  <p class="ap-hero__sub">Three steps. Tell us about your family, map the support each person needs, then describe the assistant who would fit best.</p>
+</header>
+
+<!-- STEPPER -->
+<div class="ap-stepper">
+  <div class="ap-stepper__dots">
+    <div class="ap-stepper__dot-wrap">
+      <div class="ap-stepper__dot is-current" data-step-dot="1">1</div>
+      <div class="ap-stepper__line" data-step-line="1"></div>
+    </div>
+    <div class="ap-stepper__dot-wrap">
+      <div class="ap-stepper__dot" data-step-dot="2">2</div>
+      <div class="ap-stepper__line" data-step-line="2"></div>
+    </div>
+    <div class="ap-stepper__dot-wrap">
+      <div class="ap-stepper__dot" data-step-dot="3">3</div>
+    </div>
+  </div>
+  <div class="ap-stepper__eyebrow" id="apStepEyebrow">Step 1 of 3</div>
+  <h2 class="ap-stepper__title" id="apStepTitle">Logistics &amp; Contact</h2>
+  <p class="ap-stepper__sub" id="apStepSub">Establish the operational details and schedule your initial meet-and-greet.</p>
+</div>
+
+<!-- FORM -->
+<div class="ap-form-wrap">
+  <form id="apForm" novalidate>
+
+    <!-- ═══ STEP 1 ═══ -->
+    <div class="ap-step is-active" data-step="1">
+
+      <!-- Intro Meeting -->
+      <div class="ap-card">
+        <div class="ap-card__head">
+          <h3 class="ap-card__title">Intro Meeting</h3>
+          <p class="ap-card__sub">Schedule a preliminary meet-and-greet before any formal commitment.</p>
+        </div>
+
+        <label class="ap-label ap-label--top">Preferred Format</label>
+        <div class="ap-toggle" data-toggle="meetingType">
+          <button type="button" class="ap-toggle__btn is-active" data-value="In Person">In Person</button>
+          <button type="button" class="ap-toggle__btn" data-value="Zoom">Zoom</button>
+        </div>
+
+        <label class="ap-label">Meeting Location</label>
+        <input class="ap-input" type="text" name="introLocation" placeholder="e.g. Our home, local library, or Zoom link…">
+
+        <div class="ap-row">
+          <div>
+            <label class="ap-label">Available Date</label>
+            <input class="ap-input" type="date" name="date" required>
+          </div>
+          <div>
+            <label class="ap-label">Available Time</label>
+            <input class="ap-input" type="time" name="time" required>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plan & Timing -->
+      <div class="ap-card">
+        <div class="ap-card__head">
+          <h3 class="ap-card__title">Plan &amp; Timing</h3>
+          <p class="ap-card__sub">What size contract are you looking for?</p>
+        </div>
+
+        <label class="ap-label ap-label--top">Plan Duration</label>
+        <div class="ap-toggle" data-toggle="planDuration">
+          <button type="button" class="ap-toggle__btn is-active" data-value="1 Month">1 Month</button>
+          <button type="button" class="ap-toggle__btn" data-value="2 Months">2 Months</button>
+        </div>
+
+        <label class="ap-label">Plan Hours</label>
+        <div class="ap-toggle" data-toggle="planHours">
+          <button type="button" class="ap-toggle__btn is-active" data-value="24 Hours">24 Hours</button>
+          <button type="button" class="ap-toggle__btn" data-value="40 Hours">40 Hours</button>
+        </div>
+
+        <label class="ap-label">Start Timing</label>
+        <div class="ap-toggle" data-toggle="startTiming">
+          <button type="button" class="ap-toggle__btn is-active" data-value="Immediately">Immediately</button>
+          <button type="button" class="ap-toggle__btn" data-value="1–2 Weeks">1–2 Weeks</button>
+          <button type="button" class="ap-toggle__btn" data-value="Flexible">Flexible</button>
+        </div>
+      </div>
+
+      <!-- Family Profile & Residency -->
+      <div class="ap-card">
+        <div class="ap-card__head">
+          <h3 class="ap-card__title">Family Profile &amp; Residency</h3>
+        </div>
+
+        <label class="ap-label ap-label--top">Primary Contact Name</label>
+        <input class="ap-input" type="text" name="familyName" placeholder="Full name" required>
+
+        <div class="ap-row">
+          <div>
+            <label class="ap-label">Email Address</label>
+            <input class="ap-input" type="email" name="email" placeholder="address@email.com" required>
+          </div>
+          <div>
+            <label class="ap-label">Phone Number</label>
+            <input class="ap-input" type="tel" name="phone" placeholder="(555) 000-0000">
+          </div>
+        </div>
+
+        <div class="ap-row ap-row--narrow">
+          <div class="ap-row__small">
+            <label class="ap-label">Street No.</label>
+            <input class="ap-input" type="text" name="streetNumber" placeholder="123" inputmode="numeric">
+          </div>
+          <div>
+            <label class="ap-label">Street Name</label>
+            <input class="ap-input" type="text" name="streetName" placeholder="Main Street">
+          </div>
+        </div>
+
+        <div class="ap-row">
+          <div>
+            <label class="ap-label">City</label>
+            <input class="ap-input" type="text" name="city" placeholder="Richmond">
+          </div>
+          <div>
+            <label class="ap-label">Postal Code</label>
+            <input class="ap-input" type="text" name="postalCode" placeholder="V6Y 1T8" style="text-transform:uppercase;">
+          </div>
+        </div>
+
+        <label class="ap-label">Residency Status</label>
+        <div class="ap-toggle" data-toggle="citizenship">
+          <button type="button" class="ap-toggle__btn is-active" data-value="Citizen / PR">Citizen / PR</button>
+          <button type="button" class="ap-toggle__btn" data-value="Work / Study Visa">Work / Study Visa</button>
+        </div>
+        <div id="visaDetailsWrap" style="display:none;">
+          <input class="ap-input" type="text" name="visaDetails" placeholder="Visa type and any travel plans relevant to the service period…" style="margin-top:10px;">
+        </div>
+
+        <div class="ap-divider"></div>
+
+        <div class="ap-card__head" style="margin-bottom:14px;">
+          <h3 class="ap-card__title">Household Environment</h3>
+          <p class="ap-card__sub">Operational context the assistant needs before entering your home.</p>
+        </div>
+
+        <div class="ap-row">
+          <div>
+            <label class="ap-label ap-label--top">Pets in Home?</label>
+            <div class="ap-toggle" data-toggle="householdPets">
+              <button type="button" class="ap-toggle__btn is-active" data-value="No">No</button>
+              <button type="button" class="ap-toggle__btn" data-value="Yes">Yes</button>
+            </div>
+          </div>
+          <div>
+            <label class="ap-label ap-label--top">Smoking?</label>
+            <div class="ap-toggle" data-toggle="householdSmoking">
+              <button type="button" class="ap-toggle__btn is-active" data-value="No">No</button>
+              <button type="button" class="ap-toggle__btn" data-value="Yes">Yes</button>
+            </div>
+          </div>
+        </div>
+        <div class="ap-row">
+          <div>
+            <label class="ap-label">Transit Access?</label>
+            <div class="ap-toggle" data-toggle="transitAccess">
+              <button type="button" class="ap-toggle__btn is-active" data-value="Yes">Yes</button>
+              <button type="button" class="ap-toggle__btn" data-value="No">No</button>
+            </div>
+          </div>
+          <div>
+            <label class="ap-label">Parking?</label>
+            <div class="ap-toggle" data-toggle="parkingAvailable">
+              <button type="button" class="ap-toggle__btn is-active" data-value="Yes">Yes</button>
+              <button type="button" class="ap-toggle__btn" data-value="No">No</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ap-actions">
+        <button type="button" class="ap-btn-save" data-action="save-draft">Save &amp; Finish Later</button>
+        <button type="button" class="ap-btn-primary" data-action="next">
+          Continue to Service Mapping
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══ STEP 2 ═══ -->
+    <div class="ap-step" data-step="2">
+
+      <div class="ap-callout">
+        <p class="ap-callout__title">How this works</p>
+        <p class="ap-callout__body">Our assistants are trained across Education, Life Skills, and Lifestyle Support — all three are included in your plan. This section maps which areas apply to each family member so we can match you with exactly the right person.</p>
+      </div>
+
+      <div id="apPeople" style="margin-top:20px;"></div>
+
+      <button type="button" class="ap-add-person" data-action="add-person">+ Add Another Recipient</button>
+
+      <div class="ap-actions">
+        <button type="button" class="ap-btn-back" data-action="back">← Back</button>
+        <button type="button" class="ap-btn-save" data-action="save-draft">Save &amp; Finish Later</button>
+        <button type="button" class="ap-btn-primary" data-action="next">
+          Continue to Matching
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══ STEP 3 ═══ -->
+    <div class="ap-step" data-step="3">
+
+      <!-- Overall Strategy -->
+      <div class="ap-card">
+        <div class="ap-card__head">
+          <h3 class="ap-card__title">Overall Strategy</h3>
+          <p class="ap-card__sub">How should the assistant prioritize their focus across the contract?</p>
+        </div>
+
+        <label class="ap-label ap-label--top">Global Service Balance</label>
+        <p class="ap-hint">Select the overarching focus for this engagement.</p>
+        <div class="ap-pills" data-pills="serviceBalance" data-single="true">
+          <button type="button" class="ap-pill" data-value="Mostly Education">Mostly Education</button>
+          <button type="button" class="ap-pill" data-value="Mostly Life Skills">Mostly Life Skills</button>
+          <button type="button" class="ap-pill" data-value="Mostly Lifestyle">Mostly Lifestyle</button>
+          <button type="button" class="ap-pill is-active" data-value="Balanced">Balanced</button>
+        </div>
+
+        <label class="ap-label">Immediate Priority</label>
+        <p class="ap-hint">What area needs the most urgent attention right now?</p>
+        <div class="ap-pills" data-pills="priorityLevel" data-single="true">
+          <button type="button" class="ap-pill" data-value="Academic Improvement">Academic Improvement</button>
+          <button type="button" class="ap-pill" data-value="Social Development">Social Development</button>
+          <button type="button" class="ap-pill" data-value="Daily Life Support">Daily Life Support</button>
+          <button type="button" class="ap-pill" data-value="Family Support">Family Support</button>
+          <button type="button" class="ap-pill is-active" data-value="Mixed">Mixed</button>
+        </div>
+      </div>
+
+      <!-- Parent Expectations -->
+      <div class="ap-card">
+        <div class="ap-card__head">
+          <h3 class="ap-card__title">Parent Expectations</h3>
+          <p class="ap-card__sub">Your answers define the exact metrics the assistant will work toward.</p>
+        </div>
+
+        <label class="ap-label ap-label--top">Communication Preference</label>
+        <p class="ap-hint">How often do you want updates from the assistant?</p>
+        <div class="ap-toggle" data-toggle="communicationFreq">
+          <button type="button" class="ap-toggle__btn" data-value="After every session">After every session</button>
+          <button type="button" class="ap-toggle__btn is-active" data-value="Weekly summary">Weekly summary</button>
+          <button type="button" class="ap-toggle__btn" data-value="Minimal updates">Minimal updates</button>
+        </div>
+
+        <label class="ap-label">Preferred Contact Channel</label>
+        <p class="ap-hint">How should the assistant reach you for routine updates?</p>
+        <div class="ap-pills" data-pills="contactChannel" data-single="true">
+          <button type="button" class="ap-pill" data-value="Text Message">Text Message</button>
+          <button type="button" class="ap-pill" data-value="Phone">Phone</button>
+          <button type="button" class="ap-pill" data-value="Email">Email</button>
+          <button type="button" class="ap-pill is-active" data-value="All — Communicate Freely">All — Communicate Freely</button>
+        </div>
+        <div id="emailOnlyWarning" class="ap-callout ap-callout--warn" style="display:none;">
+          <p class="ap-callout__title">Heads up about urgent matters</p>
+          <p class="ap-callout__body">Even with email selected, the assistant may text or call for time-sensitive items — schedule changes, day-of pickups, last-minute requests, or anything that can't wait for an email reply.</p>
+        </div>
+
+        <label class="ap-label">What would a wildly successful first month look like?</label>
+        <textarea class="ap-input ap-textarea" name="successVision" placeholder="e.g. Homework battles have stopped. My child completes school work independently and has a consistent morning routine."></textarea>
+
+        <label class="ap-label">What recurring frustration do you hope we can resolve?</label>
+        <textarea class="ap-input ap-textarea" name="frustrationRelief" placeholder="e.g. Constant arguments about homework. No structure after school. Difficulty managing afternoon logistics."></textarea>
+      </div>
+
+      <!-- Assistant Preferences -->
+      <div class="ap-card">
+        <div class="ap-card__head">
+          <h3 class="ap-card__title">Assistant Preferences</h3>
+          <p class="ap-card__sub">Help us understand who fits your family dynamic best.</p>
+        </div>
+
+        <label class="ap-label ap-label--top">Gender Preference</label>
+        <div class="ap-toggle" data-toggle="prefGender">
+          <button type="button" class="ap-toggle__btn" data-value="Male">Male</button>
+          <button type="button" class="ap-toggle__btn" data-value="Female">Female</button>
+          <button type="button" class="ap-toggle__btn is-active" data-value="No Preference">No Preference</button>
+        </div>
+
+        <label class="ap-label">Driver Required?</label>
+        <div class="ap-toggle" data-toggle="prefDriver">
+          <button type="button" class="ap-toggle__btn is-active" data-value="Required">Required</button>
+          <button type="button" class="ap-toggle__btn" data-value="Not Required">Not Required</button>
+        </div>
+
+        <label class="ap-label">Preferred Personality Traits</label>
+        <p class="ap-hint">Select all that match your family's needs.</p>
+        <div class="ap-checklist" data-multilist="prefPersonality">
+          <div class="ap-check-row" data-value="Calm">
+            <div class="ap-checkbox is-active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <span class="ap-check-label">Calm</span>
+          </div>
+          <div class="ap-check-row" data-value="Structured">
+            <div class="ap-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <span class="ap-check-label">Structured</span>
+          </div>
+          <div class="ap-check-row" data-value="Energetic">
+            <div class="ap-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <span class="ap-check-label">Energetic</span>
+          </div>
+          <div class="ap-check-row" data-value="Adaptable">
+            <div class="ap-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <span class="ap-check-label">Adaptable</span>
+          </div>
+        </div>
+
+        <label class="ap-label">Required Core Strengths</label>
+        <p class="ap-hint">What must the assistant be exceptional at?</p>
+        <div class="ap-checklist" data-multilist="prefStrength">
+          <div class="ap-check-row" data-value="High Academic">
+            <div class="ap-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <span class="ap-check-label">High Academic</span>
+          </div>
+          <div class="ap-check-row" data-value="Relational Mentor">
+            <div class="ap-checkbox is-active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <span class="ap-check-label">Relational Mentor</span>
+          </div>
+          <div class="ap-check-row" data-value="Household Ops">
+            <div class="ap-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <span class="ap-check-label">Household Ops</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agreements & Submission -->
+      <div class="ap-card">
+        <div class="ap-card__head">
+          <h3 class="ap-card__title">Agreements &amp; Submission</h3>
+          <p class="ap-card__sub">Review and confirm before your application is submitted.</p>
+        </div>
+
+        <div class="ap-callout">
+          <p class="ap-callout__title">Bring to the Intro Meeting</p>
+          <p class="ap-callout__body">Please prepare any relevant academic assessments, report cards, IEPs, or medical documentation. Sharing these at the intro meeting allows us to build a far more accurate support framework.</p>
+        </div>
+
+        <div class="ap-agree" data-agreement="agreedPrep">
+          <div class="ap-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span class="ap-agree__text">I will bring relevant documentation to the intro meeting.</span>
+        </div>
+        <div class="ap-agree" data-agreement="agreedTruth">
+          <div class="ap-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span class="ap-agree__text">I confirm this application is accurate and consent to securely sharing it with Private Mentorship for matching purposes.</span>
+        </div>
+
+        <div class="ap-actions">
+          <button type="button" class="ap-btn-back" data-action="back">← Back</button>
+          <button type="button" class="ap-btn-save" data-action="save-draft">Save &amp; Finish Later</button>
+          <button type="submit" class="ap-btn-primary" id="apSubmit" disabled>
+            Submit Application
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- SUCCESS -->
+  <div class="ap-success" id="apSuccess" aria-live="polite">
+    <div class="ap-success__icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h2 class="ap-success__title">Application received.</h2>
+    <p class="ap-success__body">Thank you. A member of the Private Mentorship team will review your application and contact you to schedule your intro meeting within 1–2 business days.</p>
+  </div>
+</div>
+
+<footer class="ap-footer">
+  <a href="index.html">Home</a>
+  <a href="the-assistant.html">The Assistant</a>
+  <a href="index.html#how">How It Works</a>
+  <a href="index.html#plans">Plans</a>
+  <div style="margin-top:14px;color:var(--ink-tert);">© Private Mentorship · Vancouver, BC</div>
+</footer>
+
+<!-- Person template (used by JS) -->
+<template id="apPersonTpl">
+  <div class="ap-person" data-person>
+    <div class="ap-person__head">
+      <div class="ap-person__head-row">
+        <div>
+          <div class="ap-person__eyebrow" data-eyebrow>RECIPIENT 1</div>
+          <div class="ap-person__title">Identity &amp; Role</div>
+        </div>
+        <button type="button" class="ap-person__remove" data-remove style="display:none;">Remove</button>
+      </div>
+
+      <label class="ap-label ap-label--top">Role in Family</label>
+      <div class="ap-pills" data-person-pills="role" data-single="true">
+        <button type="button" class="ap-pill is-active" data-value="Child">Child</button>
+        <button type="button" class="ap-pill" data-value="Teen">Teen</button>
+        <button type="button" class="ap-pill" data-value="Adult">Adult</button>
+        <button type="button" class="ap-pill" data-value="Parent">Parent</button>
+      </div>
+
+      <div class="ap-row" style="margin-top:14px;">
+        <div>
+          <label class="ap-label ap-label--top">Name / Initial</label>
+          <input class="ap-input ap-input--light" type="text" data-field="name" placeholder="e.g. Alex">
+        </div>
+        <div style="flex:0.4;">
+          <label class="ap-label ap-label--top">Age</label>
+          <input class="ap-input ap-input--light" type="number" data-field="age" placeholder="14" inputmode="numeric">
+        </div>
+        <div style="flex:0.5;" data-grade-wrap>
+          <label class="ap-label ap-label--top">Grade</label>
+          <input class="ap-input ap-input--light" type="text" data-field="grade" placeholder="7">
+        </div>
+      </div>
+    </div>
+
+    <div class="ap-person__body">
+      <h4 style="font-size:15px;font-weight:700;color:var(--ink);margin:0 0 4px;">Service Layers</h4>
+      <p style="font-size:13px;color:var(--ink-mute);margin:0 0 18px;line-height:1.5;">Activate each service this person needs. A dedicated configuration section will open for each selection.</p>
+
+      <div data-services></div>
+    </div>
+
+    <div class="ap-person__footer">
+      <h4 style="font-size:15px;font-weight:700;color:var(--ink);margin:0 0 4px;">Health &amp; Safety</h4>
+      <p style="font-size:13px;color:var(--ink-mute);margin:0 0 18px;line-height:1.5;">This information is tied specifically to <span data-person-name>this person</span> — not shared across the family profile.</p>
+
+      <label class="ap-label ap-label--top">Allergies?</label>
+      <div class="ap-toggle" data-person-toggle="hasAllergies">
+        <button type="button" class="ap-toggle__btn is-active" data-value="No">No</button>
+        <button type="button" class="ap-toggle__btn" data-value="Yes">Yes</button>
+      </div>
+      <div data-cond="allergyDetails" style="display:none;">
+        <input class="ap-input ap-input--light" type="text" data-field="allergyDetails" placeholder="e.g. Severe peanut allergy — carries an EpiPen at all times." style="margin-top:10px;">
+      </div>
+
+      <label class="ap-label">Medical Conditions?</label>
+      <div class="ap-toggle" data-person-toggle="hasMedical">
+        <button type="button" class="ap-toggle__btn is-active" data-value="No">No</button>
+        <button type="button" class="ap-toggle__btn" data-value="Yes">Yes</button>
+      </div>
+      <div data-cond="medicalDetails" style="display:none;">
+        <input class="ap-input ap-input--light" type="text" data-field="medicalDetails" placeholder="e.g. Asthma — requires inhaler before outdoor activity." style="margin-top:10px;">
+      </div>
+
+      <label class="ap-label">Disability or Special Needs?</label>
+      <div class="ap-toggle" data-person-toggle="hasSpecialNeeds">
+        <button type="button" class="ap-toggle__btn is-active" data-value="No">No</button>
+        <button type="button" class="ap-toggle__btn" data-value="Yes">Yes</button>
+      </div>
+      <div data-cond="specialNeedsDetails" style="display:none;">
+        <input class="ap-input ap-input--light" type="text" data-field="specialNeedsDetails" placeholder="e.g. Autism Spectrum Disorder — prefers low-stimulation environments." style="margin-top:10px;">
+      </div>
+
+      <label class="ap-label">Dietary Restrictions</label>
+      <input class="ap-input ap-input--light" type="text" data-field="dietary" placeholder="e.g. Halal, Vegan, Nut-free">
+
+      <label class="ap-label">Additional Safety &amp; Behaviour Context</label>
+      <textarea class="ap-input ap-input--light ap-textarea" data-field="safetyContext" placeholder="e.g. History of elopement — doors must remain locked. Non-verbal — uses AAC device. Responds poorly to sudden changes in routine."></textarea>
+    </div>
+  </div>
+</template>
+
+<!-- Service block template -->
+<template id="apServiceTpl">
+  <div class="ap-service" data-service-block>
+    <button type="button" class="ap-service__toggle" data-service-toggle>
+      <div class="ap-service__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div style="flex:1;text-align:left;">
+        <div class="ap-service__title" data-service-name></div>
+        <div class="ap-service__sub" data-service-desc></div>
+      </div>
+    </button>
+    <div class="ap-service__config">
+      <!-- Focus areas -->
+      <div class="ap-config-card">
+        <h5 class="ap-config-card__title">Specific Focus Areas</h5>
+        <p class="ap-config-card__sub" data-focus-sub>Select all areas this assistant should actively support.</p>
+        <div class="ap-checklist" data-focus-list></div>
+        <div data-other-wrap style="display:none;margin-top:8px;">
+          <textarea class="ap-input ap-input--light ap-textarea" data-field="otherFocus" placeholder="Please specify…" style="min-height:60px;"></textarea>
+        </div>
+      </div>
+
+      <!-- Education-only fields -->
+      <div class="ap-config-card" data-education-only style="display:none;">
+        <h5 class="ap-config-card__title">Academic Context</h5>
+        <p class="ap-config-card__sub">Current abilities, programs enrolled in, and study history — so the assistant arrives prepared.</p>
+        <label class="ap-label ap-label--top">Current Abilities &amp; Programs</label>
+        <textarea class="ap-input ap-input--light ap-textarea" data-field="currentAbilities" placeholder="e.g. Enrolled in French tutoring. Reads at Grade 4 level. Struggles with math word problems."></textarea>
+        <div class="ap-row" style="margin-top:14px;">
+          <div>
+            <label class="ap-label ap-label--top">Past Tutors</label>
+            <input class="ap-input ap-input--light" type="number" data-field="pastTutors" value="0" min="0" inputmode="numeric">
+          </div>
+          <div>
+            <label class="ap-label ap-label--top">Enjoys Studying?</label>
+            <div class="ap-toggle" data-service-toggle-field="likesToStudy">
+              <button type="button" class="ap-toggle__btn is-active" data-value="Yes">Yes</button>
+              <button type="button" class="ap-toggle__btn" data-value="No">No</button>
+              <button type="button" class="ap-toggle__btn" data-value="Mixed">Mixed</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Schedule -->
+      <div class="ap-config-card">
+        <h5 class="ap-config-card__title">Session Schedule</h5>
+        <p class="ap-config-card__sub">How often and when should these sessions occur?</p>
+        <div class="ap-toggle" data-service-toggle-field="scheduleType">
+          <button type="button" class="ap-toggle__btn is-active" data-value="Permanent">Permanent</button>
+          <button type="button" class="ap-toggle__btn" data-value="Flexible">Flexible</button>
+        </div>
+        <div data-flexible-callout style="display:none;">
+          <div class="ap-callout"><p class="ap-callout__body">Sessions will adapt to weekly needs rather than a fixed calendar. The assistant will coordinate timing week by week.</p></div>
+        </div>
+        <div data-permanent-wrap style="margin-top:14px;">
+          <div data-slots></div>
+          <button type="button" class="ap-add-slot" data-add-slot>+ Add Time Slot</button>
+        </div>
+      </div>
+
+      <!-- Expectations -->
+      <div class="ap-config-card">
+        <h5 class="ap-config-card__title">Session Expectations</h5>
+        <p class="ap-config-card__sub" data-expect-sub>What should the assistant actually do during a typical session? Specificity here prevents misalignment from day one.</p>
+        <div class="ap-lead-chip" data-lead-chip>
+          <div class="ap-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span>Let the assistant lead — I trust their judgement to set the agenda</span>
+        </div>
+        <textarea class="ap-input ap-input--light ap-textarea" data-field="expectation" placeholder="e.g. Stay indoors, work 1-on-1 at the kitchen table. Focus on math first, then reading for the final 30 minutes."></textarea>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- Schedule slot template -->
+<template id="apSlotTpl">
+  <div class="ap-slot" data-slot>
+    <div class="ap-daychips" data-day-chips>
+      <button type="button" class="ap-daychip is-active" data-day="Monday">Mon</button>
+      <button type="button" class="ap-daychip" data-day="Tuesday">Tue</button>
+      <button type="button" class="ap-daychip" data-day="Wednesday">Wed</button>
+      <button type="button" class="ap-daychip" data-day="Thursday">Thu</button>
+      <button type="button" class="ap-daychip" data-day="Friday">Fri</button>
+      <button type="button" class="ap-daychip" data-day="Saturday">Sat</button>
+      <button type="button" class="ap-daychip" data-day="Sunday">Sun</button>
+    </div>
+    <div class="ap-slot__row">
+      <input class="ap-input ap-input--light" type="time" data-field="time" value="16:00">
+      <input class="ap-input ap-input--light" type="text" data-field="duration" value="2 Hours" placeholder="Duration">
+      <button type="button" class="ap-slot__remove" data-remove-slot title="Remove">✕</button>
+    </div>
+  </div>
+</template>
+
+<script>
+(function(){
+  // ─── CONSTANTS ───
+  const FOCUS_OPTIONS = {
+    'Education':   ['Homework Support', 'Language Learning', 'Academic Tutoring', 'Study Habits', 'Executive Functioning'],
+    'Life Skills': ['Social Skills', 'Confidence', 'Emotional Regulation', 'Routine Building', 'Independence', 'Communication', 'Mentorship'],
+    'Lifestyle':   ['Transportation', 'Appointments', 'Note Taking', 'Email / Admin', 'Business Support', 'Household', 'Organization', 'Community Outings'],
+  };
+  const SERVICE_DESCRIPTIONS = {
+    'Education':   'Tutoring, homework, language learning',
+    'Life Skills': 'Confidence, social skills, routine building',
+    'Lifestyle':   'Transportation, appointments, daily tasks',
+  };
+  const EXPECT_CONFIG = {
+    'Education': {
+      placeholder: 'e.g. Stay indoors, work 1-on-1 at the kitchen table. Focus on math first, then reading for the final 30 minutes.',
+      subTpl: 'What should the assistant actually do during a typical session with {name}? Specificity here prevents misalignment from day one.'
+    },
+    'Life Skills': {
+      placeholder: 'e.g. Practice ordering at a coffee shop, then debrief together. Role-play job-interview answers. Walk through a calm-down technique when frustration spikes.',
+      subTpl: 'What life-skill scenarios should the assistant work through with {name}? Real situations and target behaviours matter more than theory.'
+    },
+    'Lifestyle': {
+      placeholder: 'e.g. Drive to appointments, help organize the closet, take notes on phone calls, run errands, prep dinner together.',
+      subTpl: 'What lifestyle support should the assistant provide for {name}? Be specific about which tasks need handling and how hands-on you want them.'
+    }
+  };
+  const STEP_META = [
+    { eyebrow:'Step 1 of 3', title:'Logistics & Contact', sub:'Establish the operational details and schedule your initial meet-and-greet.' },
+    { eyebrow:'Step 2 of 3', title:'Service Mapping',     sub:'Define exactly who needs support, what services, and map their schedule.' },
+    { eyebrow:'Step 3 of 3', title:'The Perfect Match',   sub:'Share your expectations so we can find the ideal assistant for your family.' },
+  ];
+
+  // ─── STATE ───
+  let currentStep = 1;
+  let people = []; // each person has its own DOM ref + state read directly from DOM
+  let personSeq = 0;
+  const formState = {
+    meetingType:'In Person', planDuration:'1 Month', planHours:'24 Hours', startTiming:'Immediately',
+    citizenship:'Citizen / PR',
+    householdPets:'No', householdSmoking:'No', transitAccess:'Yes', parkingAvailable:'Yes',
+    serviceBalance:'Balanced', priorityLevel:'Mixed',
+    communicationFreq:'Weekly summary',
+    contactChannel:'All — Communicate Freely',
+    prefGender:'No Preference', prefDriver:'Required',
+    prefPersonality:['Calm'], prefStrength:['Relational Mentor'],
+    agreedPrep:false, agreedTruth:false,
+  };
+
+  // ─── HELPERS ───
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $$(sel, root){ return Array.from((root||document).querySelectorAll(sel)); }
+
+  // ─── STEP NAV ───
+  function setStep(n){
+    if(n < 1 || n > 3) return;
+    if(n === 2 && currentStep === 1){
+      // validate step 1 minimum
+      const f = $('#apForm');
+      const required = ['date','time','familyName','email'];
+      for(const name of required){
+        const el = f.querySelector(`[name="${name}"]`);
+        if(!el || !el.value){
+          alert('Please fill out Intro Date, Time, Name, and Email before continuing.');
+          el?.focus();
+          return;
+        }
+      }
+      // ensure at least one person exists
+      if(people.length === 0) addPerson();
+    }
+    currentStep = n;
+    $$('.ap-step').forEach(s => s.classList.toggle('is-active', s.getAttribute('data-step') === String(n)));
+    // update stepper
+    $$('[data-step-dot]').forEach(d => {
+      const dn = parseInt(d.getAttribute('data-step-dot'), 10);
+      d.classList.toggle('is-current', dn === n);
+      d.classList.toggle('is-done', dn < n);
+      d.textContent = dn < n ? '✓' : String(dn);
+    });
+    $$('[data-step-line]').forEach(l => {
+      const ln = parseInt(l.getAttribute('data-step-line'), 10);
+      l.classList.toggle('is-done', ln < n);
+    });
+    const meta = STEP_META[n-1];
+    $('#apStepEyebrow').textContent = meta.eyebrow;
+    $('#apStepTitle').textContent = meta.title;
+    $('#apStepSub').textContent = meta.sub;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ─── TOGGLE GROUPS (segmented controls) ───
+  function wireToggleGroup(root, onChange){
+    $$('.ap-toggle', root).forEach(group => {
+      const key = group.getAttribute('data-toggle') || group.getAttribute('data-person-toggle') || group.getAttribute('data-service-toggle-field');
+      $$('.ap-toggle__btn', group).forEach(btn => {
+        btn.addEventListener('click', () => {
+          $$('.ap-toggle__btn', group).forEach(b => b.classList.remove('is-active'));
+          btn.classList.add('is-active');
+          onChange && onChange(key, btn.getAttribute('data-value'), group);
+        });
+      });
+    });
+  }
+
+  // ─── PILLS ───
+  function wirePillGroup(root){
+    $$('.ap-pills', root).forEach(group => {
+      const key = group.getAttribute('data-pills') || group.getAttribute('data-person-pills');
+      const single = group.getAttribute('data-single') === 'true';
+      $$('.ap-pill', group).forEach(btn => {
+        btn.addEventListener('click', () => {
+          if(single){
+            $$('.ap-pill', group).forEach(b => b.classList.remove('is-active'));
+            btn.classList.add('is-active');
+            if(key in formState) formState[key] = btn.getAttribute('data-value');
+          } else {
+            btn.classList.toggle('is-active');
+          }
+          // for person role, trigger grade visibility
+          if(group.getAttribute('data-person-pills') === 'role'){
+            const personEl = group.closest('[data-person]');
+            updateGradeVisibility(personEl);
+            updatePersonName(personEl);
+          }
+        });
+      });
+    });
+  }
+
+  // ─── CHECKLIST (multi) ───
+  function wireChecklist(root){
+    $$('.ap-checklist[data-multilist]', root).forEach(list => {
+      const key = list.getAttribute('data-multilist');
+      $$('.ap-check-row', list).forEach(row => {
+        row.addEventListener('click', () => {
+          const cb = row.querySelector('.ap-checkbox');
+          cb.classList.toggle('is-active');
+          // sync formState
+          const selected = $$('.ap-check-row', list)
+            .filter(r => r.querySelector('.ap-checkbox').classList.contains('is-active'))
+            .map(r => r.getAttribute('data-value'));
+          formState[key] = selected;
+        });
+      });
+    });
+  }
+
+  // ─── AGREEMENTS ───
+  function wireAgreements(){
+    $$('.ap-agree').forEach(row => {
+      const key = row.getAttribute('data-agreement');
+      row.addEventListener('click', () => {
+        const cb = row.querySelector('.ap-checkbox');
+        cb.classList.toggle('is-active');
+        formState[key] = cb.classList.contains('is-active');
+        $('#apSubmit').disabled = !(formState.agreedPrep && formState.agreedTruth);
+      });
+    });
+  }
+
+  // ─── PEOPLE / RECIPIENTS ───
+  function addPerson(){
+    personSeq++;
+    const tpl = document.getElementById('apPersonTpl');
+    const node = tpl.content.firstElementChild.cloneNode(true);
+    node.setAttribute('data-person-id', String(personSeq));
+
+    // Wire role pills + person toggles + grade visibility
+    wirePillGroup(node);
+    wireToggleGroup(node, (key, val, group) => {
+      if(group.hasAttribute('data-person-toggle')){
+        const cond = node.querySelector(`[data-cond="${key.replace('has','').toLowerCase()}Details"]`);
+        // map hasAllergies -> allergyDetails, hasMedical -> medicalDetails, hasSpecialNeeds -> specialNeedsDetails
+        const map = { hasAllergies:'allergyDetails', hasMedical:'medicalDetails', hasSpecialNeeds:'specialNeedsDetails' };
+        const condEl = node.querySelector(`[data-cond="${map[key]}"]`);
+        if(condEl) condEl.style.display = val === 'Yes' ? '' : 'none';
+      }
+    });
+
+    // Build service blocks
+    const servicesWrap = node.querySelector('[data-services]');
+    ['Education','Life Skills','Lifestyle'].forEach(svc => {
+      const svcNode = buildServiceBlock(node, svc);
+      servicesWrap.appendChild(svcNode);
+    });
+
+    // Wire inputs to update person name display
+    node.querySelectorAll('[data-field="name"]').forEach(inp => {
+      inp.addEventListener('input', () => updatePersonName(node));
+    });
+
+    // Remove button
+    node.querySelector('[data-remove]').addEventListener('click', () => {
+      removePerson(node);
+    });
+
+    people.push(node);
+    document.getElementById('apPeople').appendChild(node);
+    refreshPersonNumbering();
+    updateGradeVisibility(node);
+    updatePersonName(node);
+  }
+
+  function removePerson(node){
+    if(people.length <= 1) return;
+    node.remove();
+    people = people.filter(p => p !== node);
+    refreshPersonNumbering();
+  }
+
+  function refreshPersonNumbering(){
+    people.forEach((p, i) => {
+      p.querySelector('[data-eyebrow]').textContent = `Recipient ${i+1}`;
+      p.querySelector('[data-remove]').style.display = people.length > 1 ? '' : 'none';
+    });
+  }
+
+  function updateGradeVisibility(personEl){
+    const role = personEl.querySelector('[data-person-pills="role"] .ap-pill.is-active')?.getAttribute('data-value');
+    const gradeWrap = personEl.querySelector('[data-grade-wrap]');
+    if(gradeWrap) gradeWrap.style.display = (role === 'Child' || role === 'Teen') ? '' : 'none';
+  }
+
+  function updatePersonName(personEl){
+    const name = personEl.querySelector('[data-field="name"]')?.value || 'this person';
+    personEl.querySelectorAll('[data-person-name]').forEach(s => { s.textContent = name; });
+    personEl.querySelectorAll('[data-focus-sub]').forEach(s => { s.textContent = `Select all areas this assistant should actively support for ${name}.`; });
+    // Service-specific expectations sub text
+    personEl.querySelectorAll('[data-service-block]').forEach(svc => {
+      const svcName = svc.getAttribute('data-service');
+      const cfg = EXPECT_CONFIG[svcName];
+      if(!cfg) return;
+      const sub = svc.querySelector('[data-expect-sub]');
+      if(sub) sub.textContent = cfg.subTpl.replace('{name}', name);
+    });
+  }
+
+  // ─── SERVICE BLOCK ───
+  function buildServiceBlock(personEl, serviceName){
+    const tpl = document.getElementById('apServiceTpl');
+    const node = tpl.content.firstElementChild.cloneNode(true);
+    node.setAttribute('data-service', serviceName);
+    node.querySelector('[data-service-name]').textContent = serviceName + ' Support';
+    node.querySelector('[data-service-desc]').textContent = SERVICE_DESCRIPTIONS[serviceName];
+
+    // Education-only block visibility
+    if(serviceName === 'Education'){
+      node.querySelector('[data-education-only]').style.display = '';
+      // Past Tutors clamp — never below 0
+      const ptInput = node.querySelector('[data-field="pastTutors"]');
+      if(ptInput){
+        const clamp = () => {
+          let v = parseInt(ptInput.value, 10);
+          if(isNaN(v) || v < 0) v = 0;
+          ptInput.value = String(v);
+        };
+        ptInput.addEventListener('input', clamp);
+        ptInput.addEventListener('blur', clamp);
+      }
+    }
+
+    // Service-specific Session Expectations text
+    const expectCfg = EXPECT_CONFIG[serviceName];
+    if(expectCfg){
+      const ta = node.querySelector('[data-field="expectation"]');
+      if(ta) ta.setAttribute('placeholder', expectCfg.placeholder);
+    }
+
+    // "Let the assistant lead" chip
+    const leadChip = node.querySelector('[data-lead-chip]');
+    if(leadChip){
+      leadChip.addEventListener('click', () => {
+        const cb = leadChip.querySelector('.ap-checkbox');
+        cb.classList.toggle('is-active');
+        leadChip.classList.toggle('is-active');
+        const ta = node.querySelector('[data-field="expectation"]');
+        const isLed = cb.classList.contains('is-active');
+        if(ta){
+          ta.classList.toggle('ap-textarea--disabled', isLed);
+          if(isLed) ta.value = '';
+        }
+        scheduleAutoSave();
+      });
+    }
+
+    // Toggle service active
+    const toggleBtn = node.querySelector('[data-service-toggle]');
+    toggleBtn.addEventListener('click', () => {
+      toggleBtn.classList.toggle('is-active');
+    });
+
+    // Build focus checklist
+    const focusList = node.querySelector('[data-focus-list]');
+    FOCUS_OPTIONS[serviceName].concat(['Other']).forEach(opt => {
+      const row = document.createElement('div');
+      row.className = 'ap-check-row';
+      row.setAttribute('data-value', opt);
+      row.innerHTML = `<div class="ap-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="ap-check-label">${opt}</span>`;
+      row.addEventListener('click', () => {
+        const cb = row.querySelector('.ap-checkbox');
+        cb.classList.toggle('is-active');
+        if(opt === 'Other'){
+          node.querySelector('[data-other-wrap]').style.display = cb.classList.contains('is-active') ? '' : 'none';
+        }
+      });
+      focusList.appendChild(row);
+    });
+
+    // Wire schedule type toggle
+    wireToggleGroup(node, (key, val) => {
+      if(key === 'scheduleType'){
+        node.querySelector('[data-flexible-callout]').style.display = val === 'Flexible' ? '' : 'none';
+        node.querySelector('[data-permanent-wrap]').style.display = val === 'Permanent' ? '' : 'none';
+      }
+    });
+
+    // Add initial slot
+    addSlot(node);
+    node.querySelector('[data-add-slot]').addEventListener('click', () => addSlot(node));
+
+    return node;
+  }
+
+  function addSlot(serviceNode){
+    const tpl = document.getElementById('apSlotTpl');
+    const slot = tpl.content.firstElementChild.cloneNode(true);
+    // Day chip toggling (single-select per slot)
+    $$('.ap-daychip', slot).forEach(chip => {
+      chip.addEventListener('click', () => {
+        $$('.ap-daychip', slot).forEach(c => c.classList.remove('is-active'));
+        chip.classList.add('is-active');
+      });
+    });
+    // Remove
+    slot.querySelector('[data-remove-slot]').addEventListener('click', () => {
+      const slotsWrap = slot.parentElement;
+      if(slotsWrap.children.length > 1) slot.remove();
+    });
+    serviceNode.querySelector('[data-slots]').appendChild(slot);
+  }
+
+  // ─── INIT (wire global controls) ───
+  wireToggleGroup(document, (key, val) => {
+    if(key && key in formState) formState[key] = val;
+    if(key === 'citizenship'){
+      $('#visaDetailsWrap').style.display = val === 'Work / Study Visa' ? '' : 'none';
+    }
+    scheduleAutoSave();
+  });
+  wirePillGroup(document);
+  wireChecklist(document);
+  wireAgreements();
+
+  // Email-only contact warning
+  function updateEmailWarning(){
+    const warn = document.getElementById('emailOnlyWarning');
+    if(warn) warn.style.display = formState.contactChannel === 'Email' ? '' : 'none';
+  }
+  $$('.ap-pills[data-pills="contactChannel"] .ap-pill').forEach(btn => {
+    btn.addEventListener('click', () => { updateEmailWarning(); scheduleAutoSave(); });
+  });
+
+  $$('[data-action="next"]').forEach(b => b.addEventListener('click', () => setStep(currentStep + 1)));
+  $$('[data-action="back"]').forEach(b => b.addEventListener('click', () => setStep(currentStep - 1)));
+  $$('[data-action="add-person"]').forEach(b => b.addEventListener('click', () => { addPerson(); scheduleAutoSave(); }));
+  $$('[data-action="save-draft"]').forEach(b => b.addEventListener('click', () => saveDraft({silent:false})));
+
+  // ─── DRAFT PERSISTENCE ───
+  const DRAFT_KEY = 'pmApplyDraft_v1';
+  let saveTimer = null;
+  let savedToastEl = null;
+
+  function ensureSavedToast(){
+    if(savedToastEl) return savedToastEl;
+    savedToastEl = document.createElement('div');
+    savedToastEl.className = 'ap-saved-indicator';
+    document.body.appendChild(savedToastEl);
+    return savedToastEl;
+  }
+  function flashSavedToast(msg){
+    const t = ensureSavedToast();
+    t.textContent = msg;
+    t.classList.add('is-visible');
+    clearTimeout(t._h);
+    t._h = setTimeout(() => t.classList.remove('is-visible'), 1700);
+  }
+
+  function captureTopLevelInputs(){
+    const out = {};
+    $$('input[name], textarea[name]').forEach(el => {
+      if(el.closest('[data-person]')) return;
+      out[el.name] = el.value;
+    });
+    return out;
+  }
+  function captureDraft(){
+    return {
+      version: 1,
+      formState: { ...formState },
+      inputs: captureTopLevelInputs(),
+      people: people.map(p => collectPerson(p)),
+      currentStep,
+      savedAt: Date.now(),
+    };
+  }
+  function saveDraft(opts){
+    opts = opts || {};
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(captureDraft()));
+      if(!opts.silent){
+        flashSavedToast('Draft saved — you can close and return any time on this device.');
+        $$('[data-action="save-draft"]').forEach(b => {
+          if(!b.dataset._origText) b.dataset._origText = b.textContent;
+          b.classList.add('is-saved');
+          b.textContent = 'Saved ✓';
+          clearTimeout(b._h);
+          b._h = setTimeout(() => {
+            b.classList.remove('is-saved');
+            b.textContent = b.dataset._origText;
+          }, 1700);
+        });
+      }
+    } catch(e){
+      console.warn('[Apply] save failed', e);
+    }
+  }
+  function scheduleAutoSave(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => saveDraft({silent:true}), 700);
+  }
+  function loadDraft(){
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if(!raw) return null;
+      const d = JSON.parse(raw);
+      return d && d.version === 1 ? d : null;
+    } catch(e){ return null; }
+  }
+  function clearDraft(){
+    try { localStorage.removeItem(DRAFT_KEY); } catch(e){}
+  }
+
+  // Auto-save on any user input
+  $('#apForm').addEventListener('input', scheduleAutoSave);
+  $('#apForm').addEventListener('click', (e) => {
+    if(e.target.closest('.ap-toggle__btn, .ap-pill, .ap-check-row, .ap-agree, .ap-daychip, .ap-service__toggle, [data-lead-chip], [data-add-slot], [data-remove-slot], [data-remove]')) {
+      scheduleAutoSave();
+    }
+  });
+
+  function showResumeBanner(draft){
+    const banner = document.createElement('div');
+    banner.className = 'ap-resume-banner';
+    const dt = new Date(draft.savedAt || Date.now());
+    const dateStr = dt.toLocaleDateString() + ' at ' + dt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    banner.innerHTML = `
+      <div class="ap-resume-banner__msg">Welcome back. We restored your draft from <strong>${dateStr}</strong>.</div>
+      <button type="button" class="ap-resume-banner__btn" data-clear-draft>Start fresh</button>
+    `;
+    banner.querySelector('[data-clear-draft]').addEventListener('click', () => {
+      if(confirm('Start fresh? Your saved draft on this device will be deleted.')){
+        clearDraft();
+        window.location.reload();
+      }
+    });
+    const formWrap = $('.ap-form-wrap');
+    formWrap.insertBefore(banner, formWrap.firstElementChild);
+  }
+
+  function applyFormStateToUI(){
+    $$('.ap-toggle[data-toggle]').forEach(group => {
+      const key = group.getAttribute('data-toggle');
+      const val = formState[key];
+      if(val == null) return;
+      $$('.ap-toggle__btn', group).forEach(b => {
+        b.classList.toggle('is-active', b.getAttribute('data-value') === val);
+      });
+    });
+    $$('.ap-pills[data-pills]').forEach(group => {
+      const key = group.getAttribute('data-pills');
+      const val = formState[key];
+      if(val == null) return;
+      const single = group.getAttribute('data-single') === 'true';
+      if(single){
+        $$('.ap-pill', group).forEach(b => {
+          b.classList.toggle('is-active', b.getAttribute('data-value') === val);
+        });
+      } else if(Array.isArray(val)){
+        $$('.ap-pill', group).forEach(b => {
+          b.classList.toggle('is-active', val.includes(b.getAttribute('data-value')));
+        });
+      }
+    });
+    $$('.ap-checklist[data-multilist]').forEach(list => {
+      const key = list.getAttribute('data-multilist');
+      const val = formState[key];
+      if(!Array.isArray(val)) return;
+      $$('.ap-check-row', list).forEach(row => {
+        row.querySelector('.ap-checkbox').classList.toggle('is-active', val.includes(row.getAttribute('data-value')));
+      });
+    });
+    $$('.ap-agree').forEach(row => {
+      const key = row.getAttribute('data-agreement');
+      const cb = row.querySelector('.ap-checkbox');
+      cb.classList.toggle('is-active', !!formState[key]);
+    });
+    if(formState.citizenship === 'Work / Study Visa') $('#visaDetailsWrap').style.display = '';
+    updateEmailWarning();
+    $('#apSubmit').disabled = !(formState.agreedPrep && formState.agreedTruth);
+  }
+
+  function applyPersonState(personEl, p){
+    const setVal = (sel, v) => { const el = personEl.querySelector(sel); if(el && v != null) el.value = v; };
+    $$('[data-person-pills="role"] .ap-pill', personEl).forEach(b => {
+      b.classList.toggle('is-active', b.getAttribute('data-value') === p.role);
+    });
+    updateGradeVisibility(personEl);
+    setVal('[data-field="name"]', p.name);
+    setVal('[data-field="age"]', p.age);
+    setVal('[data-field="grade"]', p.grade);
+    setVal('[data-field="dietary"]', p.dietary);
+    setVal('[data-field="safetyContext"]', p.safetyContext);
+
+    const setPersonToggle = (key, val) => {
+      const group = personEl.querySelector(`[data-person-toggle="${key}"]`);
+      if(!group || val == null) return;
+      $$('.ap-toggle__btn', group).forEach(b => {
+        b.classList.toggle('is-active', b.getAttribute('data-value') === val);
+      });
+    };
+    setPersonToggle('hasAllergies', p.hasAllergies);
+    setPersonToggle('hasMedical', p.hasMedical);
+    setPersonToggle('hasSpecialNeeds', p.hasSpecialNeeds);
+    const condMap = {
+      hasAllergies: 'allergyDetails',
+      hasMedical: 'medicalDetails',
+      hasSpecialNeeds: 'specialNeedsDetails',
+    };
+    Object.entries(condMap).forEach(([k, name]) => {
+      const condEl = personEl.querySelector(`[data-cond="${name}"]`);
+      if(condEl) condEl.style.display = p[k] === 'Yes' ? '' : 'none';
+    });
+    setVal('[data-field="allergyDetails"]', p.allergyDetails);
+    setVal('[data-field="medicalDetails"]', p.medicalDetails);
+    setVal('[data-field="specialNeedsDetails"]', p.specialNeedsDetails);
+
+    if(Array.isArray(p.services)){
+      p.services.forEach(svcData => {
+        const svcBlock = personEl.querySelector(`[data-service-block][data-service="${svcData.service}"]`);
+        if(!svcBlock) return;
+        svcBlock.querySelector('[data-service-toggle]').classList.add('is-active');
+        $$('.ap-check-row', svcBlock.querySelector('[data-focus-list]')).forEach(row => {
+          const v = row.getAttribute('data-value');
+          if((svcData.focuses || []).includes(v)){
+            row.querySelector('.ap-checkbox').classList.add('is-active');
+          }
+        });
+        if(svcData.otherFocus){
+          const w = svcBlock.querySelector('[data-other-wrap]');
+          if(w) w.style.display = '';
+          const ot = svcBlock.querySelector('[data-field="otherFocus"]');
+          if(ot) ot.value = svcData.otherFocus;
+        }
+        const stGroup = svcBlock.querySelector('[data-service-toggle-field="scheduleType"]');
+        if(stGroup && svcData.scheduleType){
+          $$('.ap-toggle__btn', stGroup).forEach(b => {
+            b.classList.toggle('is-active', b.getAttribute('data-value') === svcData.scheduleType);
+          });
+        }
+        svcBlock.querySelector('[data-flexible-callout]').style.display = svcData.scheduleType === 'Flexible' ? '' : 'none';
+        svcBlock.querySelector('[data-permanent-wrap]').style.display = svcData.scheduleType === 'Permanent' ? '' : 'none';
+
+        if(Array.isArray(svcData.schedule) && svcData.schedule.length){
+          const slotsWrap = svcBlock.querySelector('[data-slots]');
+          slotsWrap.innerHTML = '';
+          svcData.schedule.forEach(s => {
+            addSlot(svcBlock);
+            const slot = slotsWrap.lastElementChild;
+            $$('.ap-daychip', slot).forEach(c => c.classList.remove('is-active'));
+            const dayBtn = slot.querySelector(`.ap-daychip[data-day="${s.day}"]`);
+            if(dayBtn) dayBtn.classList.add('is-active');
+            const ti = slot.querySelector('[data-field="time"]');
+            const du = slot.querySelector('[data-field="duration"]');
+            if(ti && s.time) ti.value = s.time;
+            if(du && s.duration) du.value = s.duration;
+          });
+        }
+        if(svcData.letAssistantLead){
+          const chip = svcBlock.querySelector('[data-lead-chip]');
+          if(chip){
+            chip.classList.add('is-active');
+            chip.querySelector('.ap-checkbox').classList.add('is-active');
+          }
+          const ta = svcBlock.querySelector('[data-field="expectation"]');
+          if(ta){ ta.value = ''; ta.classList.add('ap-textarea--disabled'); }
+        } else if(svcData.expectation){
+          const ta = svcBlock.querySelector('[data-field="expectation"]');
+          if(ta) ta.value = svcData.expectation;
+        }
+        if(svcData.service === 'Education'){
+          const ca = svcBlock.querySelector('[data-field="currentAbilities"]');
+          if(ca && svcData.currentAbilities) ca.value = svcData.currentAbilities;
+          const pt = svcBlock.querySelector('[data-field="pastTutors"]');
+          if(pt && svcData.pastTutors != null) pt.value = svcData.pastTutors;
+          const lkGroup = svcBlock.querySelector('[data-service-toggle-field="likesToStudy"]');
+          if(lkGroup && svcData.likesToStudy){
+            $$('.ap-toggle__btn', lkGroup).forEach(b => {
+              b.classList.toggle('is-active', b.getAttribute('data-value') === svcData.likesToStudy);
+            });
+          }
+        }
+      });
+    }
+    updatePersonName(personEl);
+  }
+
+  function restoreDraft(draft){
+    Object.assign(formState, draft.formState || {});
+    if(draft.inputs){
+      Object.entries(draft.inputs).forEach(([name, val]) => {
+        const el = document.querySelector(`[name="${name}"]`);
+        if(el) el.value = val;
+      });
+    }
+    applyFormStateToUI();
+    if(Array.isArray(draft.people) && draft.people.length){
+      draft.people.forEach(p => {
+        addPerson();
+        applyPersonState(people[people.length - 1], p);
+      });
+    } else {
+      addPerson();
+    }
+    if(draft.currentStep && draft.currentStep > 1){
+      // Bypass step-1 validation when restoring (already passed before save)
+      currentStep = 2;
+      setStep(draft.currentStep);
+    }
+  }
+
+  // Boot: restore draft if present, else add a fresh person
+  const _draft = loadDraft();
+  if(_draft){
+    showResumeBanner(_draft);
+    restoreDraft(_draft);
+  } else {
+    addPerson();
+  }
+
+  // ─── SUBMIT ───
+  $('#apForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    if(!formState.agreedPrep || !formState.agreedTruth){
+      alert('Please confirm both agreements before submitting.');
+      return;
+    }
+    const submit = $('#apSubmit');
+    submit.disabled = true;
+    submit.textContent = 'Sending…';
+
+    // Collect payload
+    const f = e.target;
+    const payload = {
+      ...formState,
+      introLocation: f.introLocation.value,
+      date: f.date.value, time: f.time.value,
+      familyName: f.familyName.value, email: f.email.value, phone: f.phone.value,
+      streetNumber: f.streetNumber.value, streetName: f.streetName.value,
+      city: f.city.value, postalCode: f.postalCode.value,
+      visaDetails: f.visaDetails.value,
+      successVision: f.successVision.value, frustrationRelief: f.frustrationRelief.value,
+      people: people.map(p => collectPerson(p)),
+      submittedAt: new Date().toISOString()
+    };
+
+    // TODO: replace with real submission (Supabase, Formspree, your API).
+    console.log('[Apply] dossier payload', payload);
+
+    setTimeout(() => {
+      clearDraft();
+      $('#apForm').style.display = 'none';
+      $('#apSuccess').classList.add('is-visible');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 600);
+  });
+
+  function collectPerson(node){
+    const role = node.querySelector('[data-person-pills="role"] .ap-pill.is-active')?.getAttribute('data-value');
+    const get = (sel) => node.querySelector(sel)?.value || '';
+    const services = $$('[data-service-block]', node).map(svc => {
+      const active = svc.querySelector('[data-service-toggle]').classList.contains('is-active');
+      if(!active) return null;
+      const name = svc.getAttribute('data-service');
+      const focuses = $$('.ap-check-row', svc.querySelector('[data-focus-list]'))
+        .filter(r => r.querySelector('.ap-checkbox').classList.contains('is-active'))
+        .map(r => r.getAttribute('data-value'));
+      const scheduleType = svc.querySelector('[data-service-toggle-field="scheduleType"] .ap-toggle__btn.is-active')?.getAttribute('data-value');
+      const slots = $$('[data-slot]', svc).map(slot => ({
+        day: slot.querySelector('.ap-daychip.is-active')?.getAttribute('data-day'),
+        time: slot.querySelector('[data-field="time"]').value,
+        duration: slot.querySelector('[data-field="duration"]').value,
+      }));
+      const leadActive = !!svc.querySelector('[data-lead-chip] .ap-checkbox.is-active');
+      const out = {
+        service: name, focuses,
+        otherFocus: svc.querySelector('[data-field="otherFocus"]')?.value || '',
+        scheduleType, schedule: scheduleType === 'Permanent' ? slots : [],
+        letAssistantLead: leadActive,
+        expectation: leadActive ? '' : (svc.querySelector('[data-field="expectation"]')?.value || ''),
+      };
+      if(name === 'Education'){
+        out.currentAbilities = svc.querySelector('[data-field="currentAbilities"]')?.value || '';
+        out.pastTutors = svc.querySelector('[data-field="pastTutors"]')?.value || '';
+        out.likesToStudy = svc.querySelector('[data-service-toggle-field="likesToStudy"] .ap-toggle__btn.is-active')?.getAttribute('data-value');
+      }
+      return out;
+    }).filter(Boolean);
+
+    const getToggle = (k) => node.querySelector(`[data-person-toggle="${k}"] .ap-toggle__btn.is-active`)?.getAttribute('data-value');
+
+    return {
+      role,
+      name: get('[data-field="name"]'),
+      age: get('[data-field="age"]'),
+      grade: get('[data-field="grade"]'),
+      services,
+      hasAllergies: getToggle('hasAllergies'),
+      allergyDetails: get('[data-field="allergyDetails"]'),
+      hasMedical: getToggle('hasMedical'),
+      medicalDetails: get('[data-field="medicalDetails"]'),
+      hasSpecialNeeds: getToggle('hasSpecialNeeds'),
+      specialNeedsDetails: get('[data-field="specialNeedsDetails"]'),
+      dietary: get('[data-field="dietary"]'),
+      safetyContext: get('[data-field="safetyContext"]'),
+    };
+  }
+})();
+</script>
+
+</body>
+</html>

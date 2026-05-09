@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Schedule — Private Mentorship</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
+<link rel="stylesheet" href="js/sidebar.css?v=20260508c" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#F1F5F9;color:#1F2937;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+  :root{
+    --bg:#F1F5F9;--card:#FFFFFF;--border:#E2E8F0;--border-soft:#EEF2F7;
+    --ink:#1F2937;--ink-2:#0F172A;--ink-mute:#64748B;--ink-tert:#94A3B8;
+    --icon-green:#22C55E;--icon-orange:#FB923C;--icon-purple:#8B5CF6;--icon-blue:#38BDF8;
+    --primary:#5750F1;--primary-soft:#EEF1FB;
+    --green-soft:#DCFCE7;--orange-soft:#FFF1E2;--purple-soft:#EDE9FE;--blue-soft:#E0F2FE;
+    --red:#EF4444;--red-soft:#FEE2E2;
+  }
+
+  /* Top bar */
+  .nx-topbar{background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:14px 26px;gap:16px;position:sticky;top:0;z-index:20;}
+  .nx-search{flex:1;max-width:520px;position:relative;}
+  .nx-search input{width:100%;background:#F1F5F9;border:1px solid transparent;border-radius:10px;padding:10px 14px 10px 38px;font:500 13.5px Inter,sans-serif;color:var(--ink);transition:border-color .15s ease, background .15s ease;}
+  .nx-search input::placeholder{color:var(--ink-tert);font-weight:400;}
+  .nx-search input:focus{outline:none;border-color:var(--primary);background:#fff;}
+  .nx-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--ink-tert);}
+  .nx-userpod{display:flex;align-items:center;gap:10px;padding:5px 12px 5px 5px;border:1px solid var(--border);border-radius:9999px;background:#fff;}
+  .nx-userpod__avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#5750F1 0%,#0ABEF9 100%);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px -1px rgba(87,80,241,0.35);}
+  .nx-userpod__name{font-size:13.5px;font-weight:700;color:var(--ink);letter-spacing:-.005em;}
+
+  /* Shell */
+  .nx-shell{padding:32px 28px 80px;max-width:1380px;margin:0 auto;}
+  .nx-head{margin-bottom:28px;display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;}
+  .nx-head__body{flex:1;min-width:240px;}
+  .nx-h1{font-size:32px;font-weight:800;letter-spacing:-.025em;margin:0 0 8px;color:var(--ink-2);line-height:1.05;}
+  .nx-sub{font-size:14.5px;color:var(--ink-mute);margin:0;font-weight:500;letter-spacing:-.005em;}
+
+  /* Generic card */
+  .nx-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:26px;box-shadow:0 1px 2px rgba(15,23,42,0.04);}
+  .nx-card__head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+  .nx-card__title{font-size:20px;font-weight:700;letter-spacing:-.018em;margin:0;color:var(--ink-2);line-height:1.15;}
+  .nx-card__sub{font-size:13px;color:var(--ink-mute);margin:5px 0 0;font-weight:500;}
+
+  .nx-row{display:grid;gap:18px;margin-bottom:24px;}
+  .nx-row--5050{grid-template-columns:1fr 1fr;}
+
+  /* Hub action cards — primary entry points for cancel / reschedule / additional */
+  .nx-hub{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:18px;
+    margin-bottom:28px;
+  }
+  .nx-hub__card{
+    background:#fff;border:1px solid var(--border);border-radius:18px;
+    padding:28px;cursor:pointer;
+    text-align:left;font-family:inherit;
+    display:flex;flex-direction:column;gap:16px;
+    transition:transform .22s cubic-bezier(.22,1,.36,1), box-shadow .22s ease, border-color .22s ease;
+    position:relative;overflow:hidden;
+    box-shadow:0 1px 2px rgba(15,23,42,0.04);
+    min-height:200px;
+  }
+  .nx-hub__card:hover{transform:translateY(-4px);box-shadow:0 18px 36px -14px rgba(15,23,42,0.18);border-color:#C7D2FE;}
+  .nx-hub__card[disabled]{cursor:not-allowed;opacity:.55;}
+  .nx-hub__card[disabled]:hover{transform:none;box-shadow:0 1px 2px rgba(15,23,42,0.04);border-color:var(--border);}
+  .nx-hub__card::after{
+    content:'';position:absolute;top:-40%;right:-30%;
+    width:55%;height:160%;
+    background:radial-gradient(closest-side,var(--hub-glow,rgba(87,80,241,0.10)),transparent 70%);
+    pointer-events:none;opacity:0;transition:opacity .22s ease;
+  }
+  .nx-hub__card:hover::after{opacity:1;}
+  .nx-hub__icon{
+    width:54px;height:54px;border-radius:14px;
+    display:flex;align-items:center;justify-content:center;color:#fff;
+    box-shadow:inset 0 -2px 6px rgba(0,0,0,0.10), 0 8px 18px -6px var(--hub-shadow,rgba(87,80,241,0.4));
+  }
+  .nx-hub__icon svg{width:24px;height:24px;stroke-width:2.4;}
+  .nx-hub__card--reschedule{--hub-glow:rgba(87,80,241,0.10);--hub-shadow:rgba(87,80,241,0.4);}
+  .nx-hub__card--reschedule .nx-hub__icon{background:linear-gradient(135deg,#5750F1,#0ABEF9);}
+  .nx-hub__card--cancel{--hub-glow:rgba(239,68,68,0.08);--hub-shadow:rgba(220,38,38,0.4);}
+  .nx-hub__card--cancel .nx-hub__icon{background:linear-gradient(135deg,#DC2626,#EF4444);}
+  .nx-hub__card--extra{--hub-glow:rgba(34,197,94,0.10);--hub-shadow:rgba(22,163,74,0.4);}
+  .nx-hub__card--extra .nx-hub__icon{background:linear-gradient(135deg,#16A34A,#22C55E);}
+  .nx-hub__title{font-size:20px;font-weight:800;color:var(--ink-2);margin:0;letter-spacing:-.022em;line-height:1.15;}
+  .nx-hub__sub{font-size:14px;color:var(--ink-mute);margin:0;line-height:1.5;font-weight:500;letter-spacing:-.005em;flex:1;}
+  .nx-hub__cta{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:13px;font-weight:700;color:var(--ink-2);
+    margin-top:auto;letter-spacing:-.005em;
+  }
+  .nx-hub__cta svg{width:13px;height:13px;stroke-width:2.6;transition:transform .18s ease;}
+  .nx-hub__card:hover .nx-hub__cta svg{transform:translateX(3px);}
+
+  /* Contract summary — premium horizontal layout */
+  .nx-contract{display:flex;flex-direction:column;gap:24px;}
+  .nx-contract__top{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+  .nx-contract__left{display:flex;align-items:center;gap:18px;min-width:0;flex:1;}
+  .nx-contract__icon{
+    width:52px;height:52px;border-radius:13px;flex-shrink:0;
+    background:linear-gradient(135deg,#5750F1,#0ABEF9);
+    color:#fff;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 18px -6px rgba(87,80,241,0.40);
+  }
+  .nx-contract__icon svg{width:22px;height:22px;stroke-width:2.4;}
+  .nx-contract__name{font-size:18px;font-weight:800;color:var(--ink-2);margin:0;letter-spacing:-.018em;line-height:1.15;}
+  .nx-contract__meta{font-size:13.5px;color:var(--ink-mute);margin:5px 0 0;font-weight:500;letter-spacing:-.005em;}
+  .nx-contract__status{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:12.5px;font-weight:600;color:#16A34A;letter-spacing:-.005em;
+  }
+  .nx-contract__status::before{
+    content:'';width:7px;height:7px;border-radius:50%;background:#22C55E;
+    box-shadow:0 0 0 3px rgba(34,197,94,0.18);
+  }
+  .nx-contract__status--manual{color:#EA580C;}
+  .nx-contract__status--manual::before{background:#FB923C;box-shadow:0 0 0 3px rgba(251,146,60,0.18);}
+  .nx-contract__remaining{
+    text-align:right;flex-shrink:0;
+  }
+  .nx-contract__remaining-num{
+    font-size:42px;font-weight:800;color:var(--ink-2);margin:0;
+    letter-spacing:-.035em;line-height:1;font-variant-numeric:tabular-nums;
+  }
+  .nx-contract__remaining-num small{font-size:18px;font-weight:700;color:var(--ink-mute);margin-left:6px;letter-spacing:-.015em;}
+  .nx-contract__remaining-label{font-size:12px;color:var(--ink-mute);margin:6px 0 0;font-weight:600;letter-spacing:-.005em;}
+
+  .nx-progress{margin-top:4px;}
+  .nx-progress__bar{height:7px;background:#F1F5F9;border-radius:9999px;overflow:hidden;}
+  .nx-progress__fill{height:100%;background:linear-gradient(90deg,#5750F1 0%,#0ABEF9 100%);border-radius:9999px;transition:width .4s cubic-bezier(.22,1,.36,1);}
+  .nx-progress__row{display:flex;justify-content:space-between;margin-top:10px;}
+  .nx-progress__used{font-size:13px;color:var(--ink-mute);margin:0;font-weight:500;letter-spacing:-.005em;}
+  .nx-progress__used strong{color:var(--ink-2);font-weight:700;}
+  .nx-progress__renew{font-size:13px;color:var(--ink-mute);margin:0;font-weight:500;letter-spacing:-.005em;}
+
+  /* Weekly grid */
+  .nx-week{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;}
+  .nx-day{
+    background:#FAFBFC;border:1px solid var(--border);border-radius:13px;
+    padding:18px 12px 14px;min-height:170px;
+    display:flex;flex-direction:column;gap:10px;
+    transition:border-color .15s ease;
+  }
+  .nx-day:hover{border-color:#CBD5E1;}
+  .nx-day--has-slot{background:linear-gradient(180deg,#EEF1FB 0%,#FAFBFC 60%);border-color:#C7D2FE;}
+  .nx-day--has-slot:hover{border-color:#A5B4FC;}
+  .nx-day--today{
+    background:linear-gradient(180deg,#5750F1 0%,#3B82F6 100%);
+    border-color:#5750F1;color:#fff;
+    box-shadow:0 12px 24px -10px rgba(87,80,241,0.45);
+  }
+  .nx-day--today .nx-day__name,.nx-day--today .nx-day__date{color:#fff;}
+  .nx-day--today .nx-day__head{border-bottom-color:rgba(255,255,255,0.18);}
+  .nx-day--today .nx-slot{background:rgba(255,255,255,0.96);border-color:transparent;}
+  .nx-day__head{text-align:center;border-bottom:1px solid var(--border-soft);padding-bottom:10px;}
+  .nx-day__name{font-size:11px;font-weight:800;color:var(--ink-mute);letter-spacing:.16em;text-transform:uppercase;margin:0 0 4px;}
+  .nx-day__date{font-size:24px;font-weight:800;color:var(--ink-2);margin:0;letter-spacing:-.025em;font-variant-numeric:tabular-nums;line-height:1;}
+  .nx-slot{
+    background:#fff;border:1px solid #C7D2FE;border-radius:10px;
+    padding:10px 12px;
+    box-shadow:0 2px 4px rgba(15,23,42,0.06);
+  }
+  .nx-slot__time{font-size:13px;font-weight:800;color:var(--primary);margin:0;letter-spacing:-.012em;}
+  .nx-slot__dur{font-size:11px;color:var(--ink-mute);margin:3px 0 0;font-weight:600;letter-spacing:-.005em;}
+  .nx-day--today .nx-slot__time{color:var(--primary);}
+  .nx-day--today .nx-slot__dur{color:var(--ink-mute);}
+  .nx-day__empty{font-size:13px;color:var(--ink-tert);text-align:center;margin:auto;font-weight:600;}
+  .nx-day--today .nx-day__empty{color:rgba(255,255,255,0.55);}
+
+  /* Session row */
+  .nx-sess{
+    display:flex;align-items:center;gap:18px;
+    padding:18px 20px;border:1px solid var(--border);border-radius:14px;background:#fff;
+    transition:border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+  }
+  .nx-sess:hover{border-color:#C7D2FE;transform:translateY(-1px);box-shadow:0 8px 18px -8px rgba(15,23,42,0.10);}
+  .nx-sess__date{
+    flex-shrink:0;width:64px;text-align:center;
+    background:linear-gradient(180deg,#FAFBFC 0%,#F1F5F9 100%);
+    border:1px solid var(--border);border-radius:11px;padding:10px 4px;
+  }
+  .nx-sess__day{font-size:10.5px;font-weight:800;letter-spacing:.14em;color:var(--ink-mute);text-transform:uppercase;margin:0 0 4px;}
+  .nx-sess__num{font-size:22px;font-weight:800;color:var(--ink-2);margin:0;letter-spacing:-.028em;line-height:1;font-variant-numeric:tabular-nums;}
+  .nx-sess__body{flex:1;min-width:0;}
+  .nx-sess__time{font-size:15px;font-weight:700;color:var(--ink-2);margin:0 0 4px;letter-spacing:-.012em;}
+  .nx-sess__with{font-size:13px;color:var(--ink-mute);margin:0;font-weight:500;letter-spacing:-.005em;}
+  .nx-sess__right{display:flex;align-items:center;gap:14px;flex-shrink:0;}
+
+  /* Inline status — typography first, no chunky pills */
+  .nx-status{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:13px;font-weight:600;letter-spacing:-.005em;
+  }
+  .nx-status::before{
+    content:'';width:7px;height:7px;border-radius:50%;flex-shrink:0;
+  }
+  .nx-status--scheduled{color:#1E40AF;}
+  .nx-status--scheduled::before{background:#3B82F6;box-shadow:0 0 0 3px rgba(59,130,246,0.18);}
+  .nx-status--completed{color:#16A34A;}
+  .nx-status--completed::before{background:#22C55E;box-shadow:0 0 0 3px rgba(34,197,94,0.18);}
+  .nx-status--cancelled{color:#64748B;}
+  .nx-status--cancelled::before{background:#94A3B8;}
+  .nx-status--late{color:#EA580C;}
+  .nx-status--late::before{background:#FB923C;box-shadow:0 0 0 3px rgba(251,146,60,0.18);}
+  .nx-status--noshow{color:#DC2626;}
+  .nx-status--noshow::before{background:#EF4444;box-shadow:0 0 0 3px rgba(239,68,68,0.18);}
+  .nx-iconbtn{
+    width:32px;height:32px;border-radius:8px;background:#fff;border:1px solid var(--border);
+    color:var(--ink-mute);display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    transition:background .12s ease, color .12s ease, border-color .12s ease;
+  }
+  .nx-iconbtn:hover{background:#F1F5F9;color:var(--ink-2);border-color:#CBD5E1;}
+  .nx-iconbtn[disabled]{cursor:not-allowed;opacity:.45;}
+  .nx-iconbtn[disabled]:hover{background:#fff;color:var(--ink-mute);border-color:var(--border);}
+  .nx-iconbtn svg{width:14px;height:14px;stroke-width:2.2;}
+  .nx-iconbtn--danger:hover{background:var(--red-soft);color:#991B1B;border-color:#FCA5A5;}
+
+  /* Pending change indicator — inline, refined */
+  .nx-pending-badge{
+    display:inline-flex;align-items:center;gap:7px;
+    color:#92400E;
+    font-size:13px;font-weight:600;letter-spacing:-.005em;
+  }
+  .nx-pending-badge::before{
+    content:'';width:7px;height:7px;border-radius:50%;background:#F59E0B;
+    box-shadow:0 0 0 3px rgba(245,158,11,0.20);
+    flex-shrink:0;
+  }
+  .nx-pending-badge svg{display:none;}
+
+  /* Modal */
+  .nx-modal{
+    position:fixed;inset:0;z-index:1000;display:none;
+    align-items:center;justify-content:center;padding:18px;
+    background:rgba(15,23,42,0.55);backdrop-filter:blur(3px);
+    animation:nxFade .15s ease both;
+  }
+  .nx-modal.is-shown{display:flex;}
+  @keyframes nxFade{from{opacity:0;}to{opacity:1;}}
+  .nx-modal__card{
+    background:#fff;border:1px solid var(--border);border-radius:16px;
+    width:100%;max-width:480px;
+    box-shadow:0 28px 60px -16px rgba(15,23,42,0.5);
+    padding:26px;
+    animation:nxPop .18s cubic-bezier(.22,1,.36,1) both;
+  }
+  @keyframes nxPop{from{transform:scale(.96) translateY(8px);opacity:0;}to{transform:none;opacity:1;}}
+  .nx-modal__head{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;}
+  .nx-modal__icon{
+    width:42px;height:42px;border-radius:11px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;color:#fff;
+    box-shadow:inset 0 -2px 5px rgba(0,0,0,0.12);
+  }
+  .nx-modal__icon svg{width:20px;height:20px;stroke-width:2.4;}
+  .nx-modal__icon--cancel{background:linear-gradient(135deg,#DC2626,#EF4444);}
+  .nx-modal__icon--resched{background:linear-gradient(135deg,#5750F1,#0ABEF9);}
+  .nx-modal__body{flex:1;min-width:0;}
+  .nx-modal__title{font-size:18px;font-weight:800;color:var(--ink-2);margin:0;letter-spacing:-.018em;line-height:1.2;}
+  .nx-modal__subtitle{font-size:13px;color:var(--ink-mute);margin:5px 0 0;font-weight:500;line-height:1.45;}
+  .nx-modal__warn{
+    background:var(--orange-soft);color:#9A3412;
+    padding:10px 12px;border-radius:9px;
+    font-size:12.5px;font-weight:600;line-height:1.4;
+    margin-bottom:14px;
+    display:flex;align-items:flex-start;gap:8px;
+  }
+  .nx-modal__warn[hidden]{display:none;}
+  .nx-modal__warn svg{flex-shrink:0;width:14px;height:14px;margin-top:2px;}
+  .nx-modal__field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .nx-modal__label{font-size:12px;font-weight:700;color:var(--ink-2);letter-spacing:-.005em;}
+  .nx-modal__input,.nx-modal__textarea{
+    width:100%;background:#F8FAFC;border:1px solid var(--border);border-radius:9px;
+    padding:10px 12px;font:500 13.5px Inter,sans-serif;color:var(--ink-2);
+    transition:border-color .12s ease, background .12s ease;
+  }
+  .nx-modal__input:focus,.nx-modal__textarea:focus{outline:none;border-color:var(--primary);background:#fff;box-shadow:0 0 0 3px rgba(87,80,241,0.12);}
+  .nx-modal__textarea{min-height:80px;resize:vertical;font-family:inherit;}
+  .nx-modal__row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .nx-modal__actions{display:flex;justify-content:flex-end;gap:10px;margin-top:6px;}
+  .nx-btn{
+    border:none;font:700 13px Inter,sans-serif;padding:10px 18px;border-radius:9999px;
+    cursor:pointer;transition:transform .12s ease, background .15s ease;
+    letter-spacing:-.005em;
+  }
+  .nx-btn--ghost{background:#F1F5F9;color:var(--ink-2);}
+  .nx-btn--ghost:hover{background:#E2E8F0;}
+  .nx-btn--danger{background:linear-gradient(135deg,#DC2626,#EF4444);color:#fff;box-shadow:0 6px 14px -4px rgba(220,38,38,0.4);}
+  .nx-btn--danger:hover{transform:translateY(-1px);}
+  .nx-btn--primary{background:linear-gradient(135deg,#5750F1,#0ABEF9);color:#fff;box-shadow:0 6px 14px -4px rgba(87,80,241,0.4);}
+  .nx-btn--primary:hover{transform:translateY(-1px);}
+  .nx-btn[disabled]{opacity:.55;cursor:not-allowed;transform:none;}
+
+  /* Toast */
+  .nx-toast{
+    position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);
+    z-index:1100;background:var(--ink-2);color:#fff;
+    padding:13px 22px;border-radius:9999px;
+    font:600 13.5px Inter,sans-serif;letter-spacing:-.005em;
+    box-shadow:0 16px 36px -10px rgba(15,23,42,0.55);
+    opacity:0;pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease;
+    display:flex;align-items:center;gap:10px;
+  }
+  .nx-toast.is-shown{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
+  .nx-toast--success{background:linear-gradient(135deg,#16A34A,#22C55E);}
+  .nx-toast--error{background:linear-gradient(135deg,#DC2626,#EF4444);}
+  .nx-toast svg{width:14px;height:14px;stroke-width:2.6;}
+
+  .nx-list{display:flex;flex-direction:column;gap:10px;max-height:560px;overflow-y:auto;padding-right:4px;}
+  .nx-list::-webkit-scrollbar{width:6px;}
+  .nx-list::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:3px;}
+
+  .nx-empty{padding:32px;text-align:center;color:var(--ink-mute);font-size:13.5px;border:1px dashed var(--border);border-radius:11px;}
+  .nx-empty__hint{font-size:12px;color:var(--ink-tert);margin:6px 0 0;}
+
+  .nx-skel{background:linear-gradient(90deg,#F1F5F9 25%,#E2E8F0 50%,#F1F5F9 75%);background-size:200% 100%;animation:nxshim 1.4s ease-in-out infinite;border-radius:6px;display:inline-block;height:1em;}
+  @keyframes nxshim{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
+  @media (max-width:1080px){
+    .nx-row--5050{grid-template-columns:1fr;}
+    .nx-contract{grid-template-columns:1fr 1fr;}
+    .nx-contract__main{grid-column:span 2;}
+  }
+  @media (max-width:760px){
+    .nx-week{grid-template-columns:repeat(2,1fr);}
+  }
+  @media (max-width:560px){
+    .nx-shell{padding:20px 16px 60px;}
+    .nx-h1{font-size:24px;}
+    .nx-topbar{padding:12px 16px;}
+    .nx-search{display:none;}
+    .nx-week{grid-template-columns:1fr;}
+    .nx-contract{grid-template-columns:1fr;}
+    .nx-contract__main{grid-column:span 1;}
+  }
+</style>
+</head>
+<body class="pm-has-sidebar">
+
+<div id="pmSidebar"></div>
+
+<header class="nx-topbar">
+  <div class="nx-search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="search" placeholder="Search sessions…" />
+  </div>
+  <div class="nx-userpod">
+    <span class="nx-userpod__avatar" id="nxUserAvatar">C</span>
+    <span class="nx-userpod__name" id="nxUserName">Client</span>
+  </div>
+</header>
+
+<main class="nx-shell">
+
+  <header class="nx-head">
+    <div class="nx-head__body">
+      <h1 class="nx-h1">Schedule</h1>
+      <p class="nx-sub" id="nxSub">Your reserved time slots, upcoming sessions, and history.</p>
+    </div>
+  </header>
+
+  <!-- Appointment hub — three primary actions -->
+  <section class="nx-hub">
+    <button class="nx-hub__card nx-hub__card--reschedule" type="button" id="hubReschedule">
+      <div class="nx-hub__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      </div>
+      <h3 class="nx-hub__title">Reschedule a session</h3>
+      <p class="nx-hub__sub">Move an upcoming session to a new date or time. Your admin will confirm the change.</p>
+      <span class="nx-hub__cta">Choose a session
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </span>
+    </button>
+
+    <button class="nx-hub__card nx-hub__card--cancel" type="button" id="hubCancel">
+      <div class="nx-hub__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+      </div>
+      <h3 class="nx-hub__title">Cancel a session</h3>
+      <p class="nx-hub__sub">Cancel an upcoming session. Cancellations within 24 hours may apply a late-cancel fee.</p>
+      <span class="nx-hub__cta">Choose a session
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </span>
+    </button>
+
+    <button class="nx-hub__card nx-hub__card--extra" type="button" id="hubExtra">
+      <div class="nx-hub__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </div>
+      <h3 class="nx-hub__title">Request additional session</h3>
+      <p class="nx-hub__sub">Ask for a session outside your recurring slots. Your admin will check availability.</p>
+      <span class="nx-hub__cta">Open request
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </span>
+    </button>
+  </section>
+
+  <!-- Active contract summary -->
+  <section class="nx-card" style="margin-bottom:22px;">
+    <div id="contractWrap">
+      <div class="nx-empty">Loading your contract…</div>
+    </div>
+  </section>
+
+  <!-- Weekly recurring pattern -->
+  <section class="nx-card" style="margin-bottom:22px;">
+    <div class="nx-card__head">
+      <div>
+        <h2 class="nx-card__title">Your weekly schedule</h2>
+        <p class="nx-card__sub" id="weekSub">Reserved time slots from your active contract</p>
+      </div>
+    </div>
+    <div id="weekWrap">
+      <div class="nx-empty">Loading…</div>
+    </div>
+  </section>
+
+  <!-- Upcoming + Past -->
+  <section class="nx-row nx-row--5050">
+
+    <div class="nx-card">
+      <div class="nx-card__head">
+        <div>
+          <h2 class="nx-card__title">Upcoming sessions</h2>
+          <p class="nx-card__sub">Next 30 days</p>
+        </div>
+      </div>
+      <div id="upcomingWrap"><div class="nx-empty">Loading…</div></div>
+    </div>
+
+    <div class="nx-card">
+      <div class="nx-card__head">
+        <div>
+          <h2 class="nx-card__title">Recent history</h2>
+          <p class="nx-card__sub">Last 60 days</p>
+        </div>
+      </div>
+      <div id="pastWrap"><div class="nx-empty">Loading…</div></div>
+    </div>
+
+  </section>
+
+</main>
+
+<!-- Cancel modal -->
+<div class="nx-modal" id="cancelModal">
+  <div class="nx-modal__card">
+    <div class="nx-modal__head">
+      <div class="nx-modal__icon nx-modal__icon--cancel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+      <div class="nx-modal__body">
+        <h3 class="nx-modal__title">Cancel this session?</h3>
+        <p class="nx-modal__subtitle" id="cancelSubtitle">Your admin will review and confirm the cancellation.</p>
+      </div>
+    </div>
+    <div class="nx-modal__warn" id="cancelLateWarn" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12" y2="17"/></svg>
+      <span>This session is within 24 hours. Per your contract policy, a late-cancel fee may apply.</span>
+    </div>
+    <div class="nx-modal__field">
+      <label class="nx-modal__label" for="cancelReason">Reason <span style="color:var(--ink-tert);font-weight:500;">(optional)</span></label>
+      <textarea class="nx-modal__textarea" id="cancelReason" placeholder="Anything we should know? e.g. sick, scheduling conflict…"></textarea>
+    </div>
+    <div class="nx-modal__actions">
+      <button class="nx-btn nx-btn--ghost" type="button" id="cancelClose">Keep session</button>
+      <button class="nx-btn nx-btn--danger" type="button" id="cancelSubmit">Submit cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reschedule modal -->
+<div class="nx-modal" id="rescheduleModal">
+  <div class="nx-modal__card">
+    <div class="nx-modal__head">
+      <div class="nx-modal__icon nx-modal__icon--resched">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      </div>
+      <div class="nx-modal__body">
+        <h3 class="nx-modal__title">Reschedule this session?</h3>
+        <p class="nx-modal__subtitle" id="reschedSubtitle">Pick a new date and time. Your admin will review and confirm.</p>
+      </div>
+    </div>
+    <div class="nx-modal__row">
+      <div class="nx-modal__field">
+        <label class="nx-modal__label" for="reschedDate">New date</label>
+        <input class="nx-modal__input" id="reschedDate" type="date" />
+      </div>
+      <div class="nx-modal__field">
+        <label class="nx-modal__label" for="reschedTime">New time</label>
+        <input class="nx-modal__input" id="reschedTime" type="time" />
+      </div>
+    </div>
+    <div class="nx-modal__field">
+      <label class="nx-modal__label" for="reschedReason">Reason <span style="color:var(--ink-tert);font-weight:500;">(optional)</span></label>
+      <textarea class="nx-modal__textarea" id="reschedReason" placeholder="Anything your admin should know?"></textarea>
+    </div>
+    <div class="nx-modal__actions">
+      <button class="nx-btn nx-btn--ghost" type="button" id="reschedClose">Cancel</button>
+      <button class="nx-btn nx-btn--primary" type="button" id="reschedSubmit">Submit reschedule</button>
+    </div>
+  </div>
+</div>
+
+<!-- Request Additional Session modal -->
+<div class="nx-modal" id="extraModal">
+  <div class="nx-modal__card">
+    <div class="nx-modal__head">
+      <div class="nx-modal__icon" style="background:linear-gradient(135deg,#16A34A,#22C55E);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </div>
+      <div class="nx-modal__body">
+        <h3 class="nx-modal__title">Request an additional session</h3>
+        <p class="nx-modal__subtitle">Ask for a session outside your recurring slots. Your admin will review and confirm availability.</p>
+      </div>
+    </div>
+    <div class="nx-modal__row">
+      <div class="nx-modal__field">
+        <label class="nx-modal__label" for="extraDate">Preferred date</label>
+        <input class="nx-modal__input" id="extraDate" type="date" />
+      </div>
+      <div class="nx-modal__field">
+        <label class="nx-modal__label" for="extraTime">Preferred time</label>
+        <input class="nx-modal__input" id="extraTime" type="time" />
+      </div>
+    </div>
+    <div class="nx-modal__field">
+      <label class="nx-modal__label" for="extraDuration">Duration</label>
+      <select class="nx-modal__input" id="extraDuration">
+        <option value="30">30 minutes</option>
+        <option value="60" selected>60 minutes</option>
+        <option value="90">90 minutes</option>
+        <option value="120">120 minutes</option>
+      </select>
+    </div>
+    <div class="nx-modal__field">
+      <label class="nx-modal__label" for="extraReason">What would you like to focus on? <span style="color:var(--ink-tert);font-weight:500;">(optional)</span></label>
+      <textarea class="nx-modal__textarea" id="extraReason" placeholder="A bit of context helps your admin schedule you with the right assistant."></textarea>
+    </div>
+    <div class="nx-modal__actions">
+      <button class="nx-btn nx-btn--ghost" type="button" id="extraClose">Cancel</button>
+      <button class="nx-btn" type="button" id="extraSubmit" style="background:linear-gradient(135deg,#16A34A,#22C55E);color:#fff;box-shadow:0 6px 14px -4px rgba(22,163,74,0.4);">Submit request</button>
+    </div>
+  </div>
+</div>
+
+<!-- Session picker modal (when entering Reschedule/Cancel from the hub) -->
+<div class="nx-modal" id="pickerModal">
+  <div class="nx-modal__card" style="max-width:540px;">
+    <div class="nx-modal__head">
+      <div class="nx-modal__icon" id="pickerIcon" style="background:linear-gradient(135deg,#5750F1,#0ABEF9);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <div class="nx-modal__body">
+        <h3 class="nx-modal__title" id="pickerTitle">Pick a session</h3>
+        <p class="nx-modal__subtitle" id="pickerSubtitle">Choose which session you'd like to act on.</p>
+      </div>
+    </div>
+    <div id="pickerList" style="display:flex;flex-direction:column;gap:8px;max-height:380px;overflow-y:auto;margin-bottom:14px;padding-right:2px;"></div>
+    <div class="nx-modal__actions">
+      <button class="nx-btn nx-btn--ghost" type="button" id="pickerClose">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="nx-toast" id="nxToast"><span id="nxToastText">Done</span></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260508d"></script>
+<script src="js/hiring-service.js?v=20260508e"></script>
+<script src="js/sidebar.js?v=20260508c"></script>
+<script>
+(async () => {
+  const $ = id => document.getElementById(id);
+  function esc(s){return (s||'').toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
+  const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  function fmtTime(timeStr){
+    if (!timeStr) return '—';
+    // Accept HH:MM or HH:MM:SS
+    const [h,m] = String(timeStr).split(':');
+    const hh = Number(h), mm = Number(m||0);
+    const period = hh >= 12 ? 'PM' : 'AM';
+    const h12 = ((hh + 11) % 12) + 1;
+    return `${h12}:${String(mm).padStart(2,'0')} ${period}`;
+  }
+  function fmtTimeRange(startTime, durationMin){
+    const start = fmtTime(startTime);
+    if (!durationMin) return start;
+    const [h,m] = String(startTime).split(':');
+    const endTotal = (Number(h)*60 + Number(m||0)) + Number(durationMin);
+    const eh = Math.floor(endTotal/60) % 24, em = endTotal % 60;
+    const period = eh >= 12 ? 'PM' : 'AM';
+    const h12 = ((eh + 11) % 12) + 1;
+    return `${start} – ${h12}:${String(em).padStart(2,'0')} ${period}`;
+  }
+  function fmtDate(iso, opts){return iso ? new Date(iso).toLocaleDateString('en-CA', opts || { month:'short', day:'numeric', year:'numeric' }) : '—';}
+  function fmtTimeOnly(iso){return iso ? new Date(iso).toLocaleTimeString('en-CA',{hour:'numeric',minute:'2-digit'}) : '';}
+
+  // ─── Demo mode ────────────────────────────────────────────────
+  if (new URLSearchParams(location.search).get('demo') === '1') {
+    const now = Date.now();
+    window.pmHiring = {
+      getCurrentUser: async () => ({ id:'cstub', email:'jane@example.com' }),
+      fetchCurrentUserProfile: async () => ({ full_name:'Jane Demo', role:'CLIENT' }),
+      isCurrentUserAdminOrOwner: async () => false,
+      signOut: async () => { location.href = 'index.html'; },
+      fetchMyClientRecord: async () => ({ id:'c1', full_name:'Jane Demo', hours_balance:18.5 }),
+      fetchMyActiveContract: async () => ({
+        id:'k2', client_id:'c1', status:'active',
+        start_at: '2026-02-15', end_at: '2026-08-15',
+        included_minutes: 40 * 60,
+        renewal_mode: 'auto',
+        assistant_name: 'Sarah Chen',
+      }),
+      fetchMyRecurringPattern: async () => [
+        { id:'p1', day_of_week: 1, start_time_local:'16:00:00', duration_minutes: 60, assistant_name:'Sarah Chen' },
+        { id:'p2', day_of_week: 3, start_time_local:'17:00:00', duration_minutes: 90, assistant_name:'Sarah Chen' },
+        { id:'p3', day_of_week: 6, start_time_local:'10:00:00', duration_minutes: 60, assistant_name:'Mark Hayes' },
+      ],
+      fetchMyAppointments: async ({ statuses, fromDate, toDate, ascending } = {}) => {
+        // Generate demo upcoming + past appointments
+        const upcoming = [
+          { id:'a1', status:'scheduled', starts_at:new Date(now + 2*86400000 + 16*3600000).toISOString(), ends_at:null, kind:'Session', title:'Math', assistant_id:'aid1' },
+          { id:'a2', status:'scheduled', starts_at:new Date(now + 4*86400000 + 17*3600000).toISOString(), ends_at:null, kind:'Session', title:'Reading', assistant_id:'aid1' },
+          { id:'a3', status:'scheduled', starts_at:new Date(now + 9*86400000 + 16*3600000).toISOString(), ends_at:null, kind:'Session', title:'Math', assistant_id:'aid1' },
+          { id:'a4', status:'scheduled', starts_at:new Date(now + 11*86400000 + 17*3600000).toISOString(), ends_at:null, kind:'Session', title:'Essay coaching', assistant_id:'aid1' },
+          { id:'a5', status:'scheduled', starts_at:new Date(now + 13*86400000 + 10*3600000).toISOString(), ends_at:null, kind:'Check-in', title:'Saturday review', assistant_id:'aid2' },
+        ];
+        const past = [
+          { id:'p1', status:'completed', starts_at:new Date(now - 2*86400000 + 16*3600000).toISOString(), kind:'Session', title:'Math',     assistant_id:'aid1' },
+          { id:'p2', status:'completed', starts_at:new Date(now - 5*86400000 + 17*3600000).toISOString(), kind:'Session', title:'Reading',  assistant_id:'aid1' },
+          { id:'p3', status:'late_cancelled', starts_at:new Date(now - 7*86400000 + 16*3600000).toISOString(), kind:'Session', title:'Math', assistant_id:'aid1' },
+          { id:'p4', status:'completed', starts_at:new Date(now - 9*86400000 + 17*3600000).toISOString(), kind:'Session', title:'Essay',    assistant_id:'aid1' },
+          { id:'p5', status:'no_show',  starts_at:new Date(now - 14*86400000 + 16*3600000).toISOString(), kind:'Session', title:'Math',     assistant_id:'aid1' },
+          { id:'p6', status:'completed', starts_at:new Date(now - 18*86400000 + 16*3600000).toISOString(), kind:'Session', title:'Math',     assistant_id:'aid1' },
+          { id:'p7', status:'cancelled', starts_at:new Date(now - 22*86400000 + 16*3600000).toISOString(), kind:'Session', title:'Math',    assistant_id:'aid1' },
+        ];
+        if (statuses?.includes('scheduled')) return ascending ? upcoming.slice(0, 30) : upcoming;
+        return past;
+      },
+      fetchAssistantNamesByIds: async (ids) => Object.fromEntries(ids.map(id => [id, id === 'aid1' ? 'Sarah Chen' : 'Mark Hayes'])),
+      // Phase 2: cancel + reschedule via schedule_change_requests
+      isLateCancellation: (iso) => {
+        if (!iso) return false;
+        return (new Date(iso).getTime() - Date.now()) / 3600000 < 24;
+      },
+      fetchMyPendingScheduleRequests: async () => [
+        // Pre-existing pending request on the 4th upcoming appointment (a4) so badge shows up
+        { id:'sr-demo-1', appointment_id:'a4', request_type:'reschedule', status:'pending', created_at: new Date(Date.now() - 3600000).toISOString() },
+      ],
+      submitCancelRequest: async ({ appointmentId }) => {
+        await new Promise(r => setTimeout(r, 600));
+        return { id: 'sr-demo-' + Math.random().toString(36).slice(2,8), appointment_id: appointmentId, request_type:'cancel', status:'pending' };
+      },
+      submitRescheduleRequest: async ({ appointmentId }) => {
+        await new Promise(r => setTimeout(r, 600));
+        return { id: 'sr-demo-' + Math.random().toString(36).slice(2,8), appointment_id: appointmentId, request_type:'reschedule', status:'pending' };
+      },
+      submitExtraAppointmentRequest: async () => {
+        await new Promise(r => setTimeout(r, 600));
+        return { id: 'sr-demo-' + Math.random().toString(36).slice(2,8), request_type:'extra', status:'pending' };
+      },
+    };
+    document.addEventListener('DOMContentLoaded', () => {
+      const bar = document.createElement('div');
+      bar.textContent = 'Demo mode — fake data, not from your account. Remove ?demo=1 from the URL to exit.';
+      bar.style.cssText = 'position:fixed;bottom:14px;right:14px;z-index:9999;background:#5750F1;color:#fff;font:600 12px Inter,sans-serif;padding:10px 14px;border-radius:9999px;box-shadow:0 8px 24px -6px rgba(87,80,241,0.45);';
+      document.body.appendChild(bar);
+    });
+  }
+
+  // Auth gate
+  const user = await window.pmHiring.getCurrentUser();
+  if (!user) { window.location.href = 'signin.html'; return; }
+
+  const profile = await window.pmHiring.fetchCurrentUserProfile().catch(() => null);
+  const fullName = profile?.full_name || user.email?.split('@')[0] || 'Client';
+  const firstName = fullName.split(' ')[0];
+  $('nxUserName').textContent = firstName;
+  $('nxUserAvatar').textContent = (firstName[0] || 'C').toUpperCase();
+
+  // Pull data
+  const [client, contract] = await Promise.all([
+    window.pmHiring.fetchMyClientRecord().catch(()=>null),
+    window.pmHiring.fetchMyActiveContract().catch(()=>null),
+  ]);
+
+  const nowDate = new Date();
+  const in30 = new Date(nowDate.getTime() + 30*86400000);
+  const past60 = new Date(nowDate.getTime() - 60*86400000);
+
+  let [pattern, upcoming, past, pendingReqs] = await Promise.all([
+    contract ? window.pmHiring.fetchMyRecurringPattern(contract.id).catch(()=>[]) : Promise.resolve([]),
+    window.pmHiring.fetchMyAppointments({ statuses:['scheduled'], fromDate: nowDate.toISOString(), toDate: in30.toISOString(), limit: 30, ascending: true }).catch(()=>[]),
+    window.pmHiring.fetchMyAppointments({ statuses:['completed','cancelled','late_cancelled','no_show'], fromDate: past60.toISOString(), toDate: nowDate.toISOString(), limit: 30, ascending: false }).catch(()=>[]),
+    window.pmHiring.fetchMyPendingScheduleRequests().catch(()=>[]),
+  ]);
+
+  // Build a map: appointment_id → pending request type (for badges)
+  function buildPendingMap(reqs){
+    const map = {};
+    (reqs || []).forEach(r => {
+      if (r.appointment_id) map[r.appointment_id] = r;
+    });
+    return map;
+  }
+  let pendingByApt = buildPendingMap(pendingReqs);
+
+  // ─── Contract summary ─────────────────────────────────────────
+  const cWrap = $('contractWrap');
+  if (!contract) {
+    cWrap.innerHTML = `<div class="nx-empty">No active contract.<p class="nx-empty__hint">Once you start a service plan, your contract details and schedule will appear here.</p></div>`;
+  } else {
+    const includedHours = (contract.included_minutes || 0) / 60;
+    const usedHours = Math.max(0, includedHours - Number(client?.hours_balance || 0));
+    const usedPct = includedHours > 0 ? Math.min(100, (usedHours/includedHours) * 100) : 0;
+    const start = fmtDate(contract.start_at);
+    const end = fmtDate(contract.end_at);
+    const daysLeft = contract.end_at ? Math.max(0, Math.ceil((new Date(contract.end_at).getTime() - Date.now()) / 86400000)) : 0;
+    const renewalPill = String(contract.renewal_mode || '').toLowerCase() === 'auto'
+      ? '<span class="nx-pill nx-pill--auto">Auto-renew</span>'
+      : '<span class="nx-pill nx-pill--manual">Manual renewal</span>';
+    const isAuto = String(contract.renewal_mode || '').toLowerCase() === 'auto';
+    const statusLabel = isAuto
+      ? `Auto-renews · ${daysLeft} days left`
+      : `Manual renewal · ${daysLeft} days left`;
+    const remaining = Number(client?.hours_balance || 0);
+    const formatNum = (n) => Number.isInteger(n) ? String(n) : n.toFixed(1);
+    cWrap.innerHTML = `<div class="nx-contract">
+      <div class="nx-contract__top">
+        <div class="nx-contract__left">
+          <div class="nx-contract__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div style="min-width:0;">
+            <p class="nx-contract__name">Active contract</p>
+            <p class="nx-contract__meta">${esc(start)} – ${esc(end)}${contract.assistant_name ? ' · with ' + esc(contract.assistant_name) : ''}</p>
+            <p class="nx-contract__meta" style="margin-top:8px;"><span class="nx-contract__status${isAuto ? '' : ' nx-contract__status--manual'}">${esc(statusLabel)}</span></p>
+          </div>
+        </div>
+        <div class="nx-contract__remaining">
+          <p class="nx-contract__remaining-num">${formatNum(remaining)}<small>hours</small></p>
+          <p class="nx-contract__remaining-label">remaining</p>
+        </div>
+      </div>
+      <div class="nx-progress">
+        <div class="nx-progress__bar"><div class="nx-progress__fill" style="width:${usedPct.toFixed(1)}%"></div></div>
+        <div class="nx-progress__row">
+          <p class="nx-progress__used"><strong>${formatNum(usedHours)}</strong> of ${formatNum(includedHours)} hours used</p>
+          <p class="nx-progress__renew">${usedPct.toFixed(0)}% complete</p>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ─── Weekly recurring pattern ─────────────────────────────────
+  // Build a 7-day grid showing CURRENT WEEK (Sun..Sat) with reserved slots from contract_recurring_patterns
+  const startOfWeek = new Date(nowDate); startOfWeek.setDate(nowDate.getDate() - nowDate.getDay()); startOfWeek.setHours(0,0,0,0);
+  const todayDayIdx = nowDate.getDay();
+  const slotsByDay = {};
+  (pattern || []).forEach(p => {
+    const dow = Number(p.day_of_week);
+    if (dow >= 0 && dow <= 6) {
+      slotsByDay[dow] = slotsByDay[dow] || [];
+      slotsByDay[dow].push(p);
+    }
+  });
+  const weekHtml = Array.from({length:7}).map((_, i) => {
+    const dayDate = new Date(startOfWeek); dayDate.setDate(startOfWeek.getDate() + i);
+    const slots = slotsByDay[i] || [];
+    const hasSlot = slots.length > 0;
+    return `<div class="nx-day${hasSlot ? ' nx-day--has-slot' : ''}${i === todayDayIdx ? ' nx-day--today' : ''}">
+      <div class="nx-day__head">
+        <p class="nx-day__name">${DAY_NAMES[i]}</p>
+        <p class="nx-day__date">${dayDate.getDate()}</p>
+      </div>
+      ${slots.length ? slots.map(s => `<div class="nx-slot">
+        <p class="nx-slot__time">${esc(fmtTimeRange(s.start_time_local, s.duration_minutes))}</p>
+        <p class="nx-slot__dur">${esc(String(s.duration_minutes))} min${s.assistant_name ? ' · ' + esc(s.assistant_name) : ''}</p>
+      </div>`).join('') : '<p class="nx-day__empty">—</p>'}
+    </div>`;
+  }).join('');
+  $('weekWrap').innerHTML = `<div class="nx-week">${weekHtml}</div>`;
+  $('weekSub').textContent = pattern.length
+    ? `${pattern.length} reserved slot${pattern.length === 1 ? '' : 's'} per week · this week of ${fmtDate(startOfWeek)}`
+    : 'No recurring slots reserved yet';
+
+  // ─── Sessions list renderer ───────────────────────────────────
+  // Resolve assistant names for both lists
+  const allIds = [...new Set([...(upcoming||[]), ...(past||[])].map(a => a.assistant_id).filter(Boolean))];
+  const nameMap = await window.pmHiring.fetchAssistantNamesByIds(allIds).catch(()=>({}));
+
+  function statusPill(status){
+    const s = String(status || '').toLowerCase();
+    if (s === 'completed') return `<span class="nx-status nx-status--completed">Attended</span>`;
+    if (s === 'scheduled') return `<span class="nx-status nx-status--scheduled">Scheduled</span>`;
+    if (s === 'cancelled') return `<span class="nx-status nx-status--cancelled">Cancelled</span>`;
+    if (s === 'late_cancelled') return `<span class="nx-status nx-status--late">Late cancel</span>`;
+    if (s === 'no_show') return `<span class="nx-status nx-status--noshow">No-show</span>`;
+    return `<span class="nx-status nx-status--cancelled">${esc(s)}</span>`;
+  }
+
+  function renderSession(a, allowActions) {
+    const d = new Date(a.starts_at);
+    const day = d.toLocaleDateString('en-CA', { weekday:'short' }).toUpperCase();
+    const num = d.getDate();
+    const time = fmtTimeOnly(a.starts_at);
+    const dateLabel = d.toLocaleDateString('en-CA', { month:'long', day:'numeric' });
+    const assistantName = nameMap[a.assistant_id] || 'TBD';
+    const cancelIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    const reschedIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>';
+    const clockIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+    const pending = pendingByApt[a.id];
+    const pendingLabel = pending ? (pending.request_type === 'cancel' ? 'Cancel pending' : 'Reschedule pending') : null;
+    const buttonsDisabled = !!pending;
+    return `<div class="nx-sess" data-apt-id="${esc(a.id)}">
+      <div class="nx-sess__date">
+        <p class="nx-sess__day">${esc(day)}</p>
+        <p class="nx-sess__num">${num}</p>
+      </div>
+      <div class="nx-sess__body">
+        <p class="nx-sess__time">${esc(dateLabel)} · ${esc(time)}</p>
+        <p class="nx-sess__with">with ${esc(assistantName)}${a.title ? ' · ' + esc(a.title) : ''}</p>
+      </div>
+      <div class="nx-sess__right">
+        ${pendingLabel ? `<span class="nx-pending-badge">${clockIcon}${pendingLabel}</span>` : statusPill(a.status)}
+        ${allowActions ? `
+          <button class="nx-iconbtn" type="button" data-action="reschedule" data-apt-id="${esc(a.id)}" title="${pending ? 'Awaiting admin review' : 'Request reschedule'}" ${buttonsDisabled ? 'disabled' : ''}>${reschedIcon}</button>
+          <button class="nx-iconbtn nx-iconbtn--danger" type="button" data-action="cancel" data-apt-id="${esc(a.id)}" title="${pending ? 'Awaiting admin review' : 'Request cancel'}" ${buttonsDisabled ? 'disabled' : ''}>${cancelIcon}</button>
+        ` : ''}
+      </div>
+    </div>`;
+  }
+
+  // ─── Upcoming ─────────────────────────────────────────────────
+  const upWrap = $('upcomingWrap');
+  if (!upcoming.length) {
+    upWrap.innerHTML = `<div class="nx-empty">No upcoming sessions in the next 30 days.<p class="nx-empty__hint">Sessions will appear here once they're scheduled.</p></div>`;
+  } else {
+    upWrap.innerHTML = `<div class="nx-list">${upcoming.map(a => renderSession(a, true)).join('')}</div>`;
+  }
+
+  // ─── Past ─────────────────────────────────────────────────────
+  const pastWrap = $('pastWrap');
+  if (!past.length) {
+    pastWrap.innerHTML = `<div class="nx-empty">No sessions in the last 60 days.<p class="nx-empty__hint">Past sessions will show here with their status.</p></div>`;
+  } else {
+    pastWrap.innerHTML = `<div class="nx-list">${past.map(a => renderSession(a, false)).join('')}</div>`;
+  }
+
+  // ─── Toast helper ─────────────────────────────────────────────
+  let toastTimer = null;
+  function showToast(text, kind='success'){
+    const t = $('nxToast');
+    $('nxToastText').textContent = text;
+    t.classList.remove('nx-toast--error','nx-toast--success');
+    t.classList.add(kind === 'error' ? 'nx-toast--error' : 'nx-toast--success');
+    t.classList.add('is-shown');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('is-shown'), 3500);
+  }
+
+  // ─── Modal open / close ───────────────────────────────────────
+  let activeAppointment = null;
+
+  function openCancelModal(apt){
+    activeAppointment = apt;
+    const d = new Date(apt.starts_at);
+    const dateLabel = d.toLocaleDateString('en-CA', { weekday:'long', month:'long', day:'numeric' });
+    const time = fmtTimeOnly(apt.starts_at);
+    $('cancelSubtitle').textContent = `${dateLabel} at ${time} — submit a request and your admin will confirm.`;
+    $('cancelLateWarn').hidden = !window.pmHiring.isLateCancellation(apt.starts_at);
+    $('cancelReason').value = '';
+    $('cancelSubmit').disabled = false;
+    $('cancelSubmit').textContent = 'Submit cancel';
+    $('cancelModal').classList.add('is-shown');
+  }
+  function closeCancelModal(){ $('cancelModal').classList.remove('is-shown'); activeAppointment = null; }
+
+  function openReschedModal(apt){
+    activeAppointment = apt;
+    const d = new Date(apt.starts_at);
+    const dateLabel = d.toLocaleDateString('en-CA', { weekday:'long', month:'long', day:'numeric' });
+    const time = fmtTimeOnly(apt.starts_at);
+    $('reschedSubtitle').textContent = `Currently ${dateLabel} at ${time}. Choose a new time below.`;
+    // Default new date+time = current appointment + 1 day
+    const next = new Date(d.getTime() + 86400000);
+    $('reschedDate').value = next.toISOString().split('T')[0];
+    $('reschedTime').value = next.toTimeString().slice(0,5);
+    $('reschedReason').value = '';
+    $('reschedSubmit').disabled = false;
+    $('reschedSubmit').textContent = 'Submit reschedule';
+    $('rescheduleModal').classList.add('is-shown');
+  }
+  function closeReschedModal(){ $('rescheduleModal').classList.remove('is-shown'); activeAppointment = null; }
+
+  $('cancelClose').addEventListener('click', closeCancelModal);
+  $('reschedClose').addEventListener('click', closeReschedModal);
+  // Click outside the card closes
+  $('cancelModal').addEventListener('click', e => { if (e.target.id === 'cancelModal') closeCancelModal(); });
+  $('rescheduleModal').addEventListener('click', e => { if (e.target.id === 'rescheduleModal') closeReschedModal(); });
+  // ESC
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeCancelModal(); closeReschedModal(); }
+  });
+
+  // ─── Submit handlers ──────────────────────────────────────────
+  $('cancelSubmit').addEventListener('click', async () => {
+    if (!activeAppointment) return;
+    const apt = activeAppointment;
+    const reason = $('cancelReason').value;
+    const btn = $('cancelSubmit');
+    btn.disabled = true; btn.textContent = 'Submitting…';
+    try {
+      const created = await window.pmHiring.submitCancelRequest({
+        appointmentId: apt.id, appointment: apt, reason,
+      });
+      // Update local state — mark appointment as having pending cancel
+      pendingByApt[apt.id] = { id: created?.id, appointment_id: apt.id, request_type: 'cancel', status: 'pending' };
+      // Re-render upcoming list
+      upWrap.innerHTML = `<div class="nx-list">${upcoming.map(a => renderSession(a, true)).join('')}</div>`;
+      bindActionButtons();
+      closeCancelModal();
+      showToast('Cancel request submitted — your admin will review.');
+    } catch (e) {
+      btn.disabled = false; btn.textContent = 'Submit cancel';
+      showToast(e?.message || 'Failed to submit cancel request', 'error');
+    }
+  });
+
+  $('reschedSubmit').addEventListener('click', async () => {
+    if (!activeAppointment) return;
+    const apt = activeAppointment;
+    const date = $('reschedDate').value;
+    const time = $('reschedTime').value;
+    const reason = $('reschedReason').value;
+    if (!date || !time) { showToast('Please pick a new date and time', 'error'); return; }
+    const newStart = new Date(`${date}T${time}:00`);
+    if (Number.isNaN(newStart.getTime())) { showToast('Invalid date/time', 'error'); return; }
+    if (newStart.getTime() < Date.now()) { showToast('New time must be in the future', 'error'); return; }
+    const btn = $('reschedSubmit');
+    btn.disabled = true; btn.textContent = 'Submitting…';
+    try {
+      // Compute duration from current appointment if available
+      let durationMin = 60;
+      if (apt.ends_at) {
+        durationMin = Math.round((new Date(apt.ends_at).getTime() - new Date(apt.starts_at).getTime()) / 60000);
+      }
+      const created = await window.pmHiring.submitRescheduleRequest({
+        appointmentId: apt.id, appointment: apt,
+        newStartIso: newStart.toISOString(),
+        durationMin, reason,
+      });
+      pendingByApt[apt.id] = { id: created?.id, appointment_id: apt.id, request_type: 'reschedule', status: 'pending' };
+      upWrap.innerHTML = `<div class="nx-list">${upcoming.map(a => renderSession(a, true)).join('')}</div>`;
+      bindActionButtons();
+      closeReschedModal();
+      showToast('Reschedule request submitted — your admin will review.');
+    } catch (e) {
+      btn.disabled = false; btn.textContent = 'Submit reschedule';
+      showToast(e?.message || 'Failed to submit reschedule request', 'error');
+    }
+  });
+
+  // ─── Bind action buttons (re-bind after re-render) ────────────
+  function bindActionButtons(){
+    document.querySelectorAll('#upcomingWrap .nx-iconbtn[data-action]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.disabled) return;
+        const aptId = btn.dataset.aptId;
+        const apt = (upcoming || []).find(x => x.id === aptId);
+        if (!apt) return;
+        if (btn.dataset.action === 'cancel') openCancelModal(apt);
+        else if (btn.dataset.action === 'reschedule') openReschedModal(apt);
+      });
+    });
+  }
+  bindActionButtons();
+
+  // ─── Hub: session picker (for Reschedule + Cancel) ────────────
+  function openPicker(mode){
+    const eligible = (upcoming || []).filter(a => !pendingByApt[a.id]);
+    if (!eligible.length) {
+      showToast(mode === 'cancel' ? 'No sessions available to cancel.' : 'No sessions available to reschedule.', 'error');
+      return;
+    }
+    const isCancel = mode === 'cancel';
+    $('pickerTitle').textContent = isCancel ? 'Pick a session to cancel' : 'Pick a session to reschedule';
+    $('pickerSubtitle').textContent = isCancel
+      ? 'Choose which upcoming session you want to cancel.'
+      : 'Choose which upcoming session you want to move.';
+    $('pickerIcon').style.background = isCancel
+      ? 'linear-gradient(135deg,#DC2626,#EF4444)'
+      : 'linear-gradient(135deg,#5750F1,#0ABEF9)';
+    $('pickerList').innerHTML = eligible.map(a => {
+      const d = new Date(a.starts_at);
+      const day = d.toLocaleDateString('en-CA', { weekday:'short' }).toUpperCase();
+      const num = d.getDate();
+      const time = fmtTimeOnly(a.starts_at);
+      const dateLabel = d.toLocaleDateString('en-CA', { month:'long', day:'numeric' });
+      const assistantName = nameMap[a.assistant_id] || 'TBD';
+      return `<button class="nx-sess" type="button" data-pick-id="${esc(a.id)}" style="cursor:pointer;text-align:left;width:100%;font-family:inherit;">
+        <div class="nx-sess__date"><p class="nx-sess__day">${esc(day)}</p><p class="nx-sess__num">${num}</p></div>
+        <div class="nx-sess__body">
+          <p class="nx-sess__time">${esc(dateLabel)} · ${esc(time)}</p>
+          <p class="nx-sess__with">with ${esc(assistantName)}${a.title ? ' · ' + esc(a.title) : ''}</p>
+        </div>
+        <div class="nx-sess__right">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink-tert);"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </button>`;
+    }).join('');
+    $('pickerList').querySelectorAll('[data-pick-id]').forEach(el => {
+      el.addEventListener('click', () => {
+        const apt = eligible.find(x => x.id === el.dataset.pickId);
+        if (!apt) return;
+        $('pickerModal').classList.remove('is-shown');
+        if (isCancel) openCancelModal(apt); else openReschedModal(apt);
+      });
+    });
+    $('pickerModal').classList.add('is-shown');
+  }
+  $('pickerClose').addEventListener('click', () => $('pickerModal').classList.remove('is-shown'));
+  $('pickerModal').addEventListener('click', e => { if (e.target.id === 'pickerModal') $('pickerModal').classList.remove('is-shown'); });
+
+  $('hubReschedule').addEventListener('click', () => openPicker('reschedule'));
+  $('hubCancel').addEventListener('click', () => openPicker('cancel'));
+
+  // ─── Hub: request additional session ──────────────────────────
+  function openExtraModal(){
+    const tomorrow = new Date(Date.now() + 86400000);
+    $('extraDate').value = tomorrow.toISOString().split('T')[0];
+    $('extraTime').value = '17:00';
+    $('extraDuration').value = '60';
+    $('extraReason').value = '';
+    $('extraSubmit').disabled = false;
+    $('extraSubmit').textContent = 'Submit request';
+    $('extraModal').classList.add('is-shown');
+  }
+  function closeExtraModal(){ $('extraModal').classList.remove('is-shown'); }
+  $('hubExtra').addEventListener('click', openExtraModal);
+  $('extraClose').addEventListener('click', closeExtraModal);
+  $('extraModal').addEventListener('click', e => { if (e.target.id === 'extraModal') closeExtraModal(); });
+
+  $('extraSubmit').addEventListener('click', async () => {
+    const date = $('extraDate').value;
+    const time = $('extraTime').value;
+    const dur = Number($('extraDuration').value || 60);
+    const reason = $('extraReason').value;
+    if (!date || !time) { showToast('Please pick a date and time', 'error'); return; }
+    const newStart = new Date(`${date}T${time}:00`);
+    if (Number.isNaN(newStart.getTime())) { showToast('Invalid date/time', 'error'); return; }
+    if (newStart.getTime() < Date.now()) { showToast('Time must be in the future', 'error'); return; }
+    const btn = $('extraSubmit');
+    btn.disabled = true; btn.textContent = 'Submitting…';
+    try {
+      await window.pmHiring.submitExtraAppointmentRequest({
+        newStartIso: newStart.toISOString(), durationMin: dur, reason,
+      });
+      closeExtraModal();
+      showToast('Additional session request submitted — your admin will review.');
+    } catch (e) {
+      btn.disabled = false; btn.textContent = 'Submit request';
+      showToast(e?.message || 'Failed to submit request', 'error');
+    }
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hours &amp; Billing — Private Mentorship</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
+<link rel="stylesheet" href="js/sidebar.css?v=20260508c" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#F1F5F9;color:#1F2937;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+  :root{
+    --bg:#F1F5F9;--card:#FFFFFF;--border:#E2E8F0;--border-soft:#EEF2F7;
+    --ink:#1F2937;--ink-2:#0F172A;--ink-mute:#64748B;--ink-tert:#94A3B8;
+    --icon-green:#22C55E;--icon-orange:#FB923C;--icon-purple:#8B5CF6;--icon-blue:#38BDF8;
+    --primary:#5750F1;--primary-soft:#EEF1FB;
+    --green-soft:#DCFCE7;--orange-soft:#FFF1E2;--red:#EF4444;--red-soft:#FEE2E2;
+  }
+
+  /* Top bar */
+  .nx-topbar{background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:14px 26px;gap:16px;position:sticky;top:0;z-index:20;}
+  .nx-search{flex:1;max-width:520px;position:relative;}
+  .nx-search input{width:100%;background:#F1F5F9;border:1px solid transparent;border-radius:10px;padding:10px 14px 10px 38px;font:500 13.5px Inter,sans-serif;color:var(--ink);transition:border-color .15s ease, background .15s ease;}
+  .nx-search input::placeholder{color:var(--ink-tert);font-weight:400;}
+  .nx-search input:focus{outline:none;border-color:var(--primary);background:#fff;}
+  .nx-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--ink-tert);}
+  .nx-userpod{display:flex;align-items:center;gap:10px;padding:5px 12px 5px 5px;border:1px solid var(--border);border-radius:9999px;background:#fff;}
+  .nx-userpod__avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#5750F1 0%,#0ABEF9 100%);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px -1px rgba(87,80,241,0.35);}
+  .nx-userpod__name{font-size:13.5px;font-weight:700;color:var(--ink);letter-spacing:-.005em;}
+
+  /* Shell */
+  .nx-shell{padding:32px 28px 80px;max-width:1380px;margin:0 auto;}
+  .nx-head{margin-bottom:28px;}
+  .nx-h1{font-size:32px;font-weight:800;letter-spacing:-.025em;margin:0 0 8px;color:var(--ink-2);line-height:1.05;}
+  .nx-sub{font-size:14.5px;color:var(--ink-mute);margin:0;font-weight:500;letter-spacing:-.005em;}
+
+  /* KPI cards */
+  .nx-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:24px;}
+  .nx-kpi{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:26px 24px;box-shadow:0 1px 2px rgba(15,23,42,0.04);transition:box-shadow .2s ease, transform .2s ease;}
+  .nx-kpi:hover{box-shadow:0 12px 28px -10px rgba(15,23,42,0.14);transform:translateY(-2px);}
+  .nx-kpi__icon{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:inset 0 -2px 6px rgba(0,0,0,0.10);}
+  .nx-kpi__icon svg{width:24px;height:24px;color:#fff;stroke-width:2.4;}
+  .nx-kpi__icon--blue{background:var(--icon-blue);}
+  .nx-kpi__icon--green{background:var(--icon-green);}
+  .nx-kpi__icon--orange{background:var(--icon-orange);}
+  .nx-kpi__icon--purple{background:var(--icon-purple);}
+  .nx-kpi__bot{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;}
+  .nx-kpi__num{font-size:38px;font-weight:800;letter-spacing:-.03em;margin:0;color:var(--ink-2);line-height:1;font-variant-numeric:tabular-nums;}
+  .nx-kpi__label{font-size:14px;color:var(--ink-mute);margin:10px 0 0;font-weight:500;letter-spacing:-.005em;}
+
+  /* Generic card */
+  .nx-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:26px;box-shadow:0 1px 2px rgba(15,23,42,0.04);}
+  .nx-card__head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:20px;}
+  .nx-card__title{font-size:20px;font-weight:700;letter-spacing:-.018em;margin:0;color:var(--ink-2);line-height:1.15;}
+  .nx-card__sub{font-size:13px;color:var(--ink-mute);margin:5px 0 0;font-weight:500;}
+  .nx-card__cta{font-size:13px;font-weight:600;color:var(--primary);text-decoration:none;letter-spacing:-.005em;}
+  .nx-card__cta:hover{text-decoration:underline;}
+
+  .nx-row{display:grid;gap:18px;margin-bottom:24px;}
+  .nx-row--5050{grid-template-columns:1fr 1fr;}
+
+  /* Hours ledger TABLE */
+  .nx-table{width:100%;border-collapse:collapse;}
+  .nx-table thead th{
+    text-align:left;font-size:11px;font-weight:800;letter-spacing:.10em;text-transform:uppercase;
+    color:var(--ink-tert);padding:10px 12px;border-bottom:1px solid var(--border);
+  }
+  .nx-table tbody td{
+    padding:14px 12px;border-bottom:1px solid var(--border-soft);
+    font-size:13.5px;color:var(--ink);font-weight:500;
+  }
+  .nx-table tbody tr:last-child td{border-bottom:0;}
+  .nx-table tbody tr:hover{background:#FAFBFC;}
+  .nx-amount{font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.005em;}
+  .nx-amount--add{color:#16A34A;}
+  .nx-amount--use{color:#DC2626;}
+  .nx-tag{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:4px 10px;border-radius:9999px;
+    font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  }
+  .nx-tag--add{background:var(--green-soft);color:#166534;}
+  .nx-tag--use{background:var(--red-soft);color:#991B1B;}
+  .nx-tag--adj{background:var(--orange-soft);color:#9A3412;}
+  .nx-tag svg{width:11px;height:11px;}
+
+  /* Invoice / receipt rows */
+  .nx-list{display:flex;flex-direction:column;gap:10px;}
+  .nx-listrow{
+    display:flex;align-items:center;gap:14px;
+    padding:14px 16px;border:1px solid var(--border);border-radius:11px;background:#FAFBFC;
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .nx-listrow:hover{border-color:#B3D0F5;transform:translateY(-1px);}
+  .nx-listrow__icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;box-shadow:inset 0 -2px 5px rgba(0,0,0,0.08);}
+  .nx-listrow__icon--paid{background:linear-gradient(135deg,#16A34A,#22C55E);}
+  .nx-listrow__icon--open{background:linear-gradient(135deg,#F59E0B,#FB923C);}
+  .nx-listrow__icon--receipt{background:linear-gradient(135deg,#5750F1,#0ABEF9);}
+  .nx-listrow__icon svg{width:18px;height:18px;stroke-width:2.4;}
+  .nx-listrow__body{flex:1;min-width:0;}
+  .nx-listrow__title{font-size:14.5px;font-weight:700;color:var(--ink-2);margin:0;letter-spacing:-.005em;}
+  .nx-listrow__sub{font-size:12px;color:var(--ink-mute);margin:3px 0 0;font-weight:500;}
+  .nx-listrow__right{text-align:right;flex-shrink:0;}
+  .nx-listrow__amount{font-size:18px;font-weight:800;color:var(--ink-2);margin:0;letter-spacing:-.018em;font-variant-numeric:tabular-nums;}
+  .nx-listrow__pill{
+    display:inline-block;margin-top:4px;padding:3px 10px;border-radius:9999px;
+    font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  }
+  .nx-pill--paid{background:var(--green-soft);color:#166534;}
+  .nx-pill--open{background:var(--orange-soft);color:#9A3412;}
+  .nx-pill--void{background:#F1F5F9;color:#64748B;}
+
+  .nx-empty{padding:32px;text-align:center;color:var(--ink-mute);font-size:13.5px;border:1px dashed var(--border);border-radius:11px;}
+  .nx-empty__hint{font-size:12px;color:var(--ink-tert);margin:6px 0 0;}
+
+  .nx-skel{background:linear-gradient(90deg,#F1F5F9 25%,#E2E8F0 50%,#F1F5F9 75%);background-size:200% 100%;animation:nxshim 1.4s ease-in-out infinite;border-radius:6px;display:inline-block;height:1em;}
+  @keyframes nxshim{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
+  @media (max-width:1080px){
+    .nx-kpis{grid-template-columns:repeat(2,1fr);}
+    .nx-row--5050{grid-template-columns:1fr;}
+  }
+  @media (max-width:560px){
+    .nx-shell{padding:20px 16px 60px;}
+    .nx-h1{font-size:24px;}
+    .nx-topbar{padding:12px 16px;}
+    .nx-search{display:none;}
+    .nx-kpis{grid-template-columns:1fr;}
+    .nx-table thead{display:none;}
+    .nx-table tbody td{display:block;border:0;padding:6px 0;}
+    .nx-table tbody tr{display:block;padding:14px 0;border-bottom:1px solid var(--border-soft);}
+  }
+</style>
+</head>
+<body class="pm-has-sidebar">
+
+<div id="pmSidebar"></div>
+
+<header class="nx-topbar">
+  <div class="nx-search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="search" placeholder="Search invoices, transactions…" />
+  </div>
+  <div class="nx-userpod">
+    <span class="nx-userpod__avatar" id="nxUserAvatar">C</span>
+    <span class="nx-userpod__name" id="nxUserName">Client</span>
+  </div>
+</header>
+
+<main class="nx-shell">
+
+  <header class="nx-head">
+    <h1 class="nx-h1">Hours &amp; billing</h1>
+    <p class="nx-sub" id="nxSub">Your transaction history, invoices, and receipts.</p>
+  </header>
+
+  <!-- KPIs -->
+  <section class="nx-kpis">
+    <div class="nx-kpi">
+      <div class="nx-kpi__icon nx-kpi__icon--green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div class="nx-kpi__bot"><div>
+        <p class="nx-kpi__num" id="kpiHours"><span class="nx-skel" style="width:60px;"></span></p>
+        <p class="nx-kpi__label">Hours remaining</p>
+      </div></div>
+    </div>
+    <div class="nx-kpi">
+      <div class="nx-kpi__icon nx-kpi__icon--orange">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      </div>
+      <div class="nx-kpi__bot"><div>
+        <p class="nx-kpi__num" id="kpiUsed"><span class="nx-skel" style="width:60px;"></span></p>
+        <p class="nx-kpi__label">Hours used (all time)</p>
+      </div></div>
+    </div>
+    <div class="nx-kpi">
+      <div class="nx-kpi__icon nx-kpi__icon--purple">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+      <div class="nx-kpi__bot"><div>
+        <p class="nx-kpi__num" id="kpiTotalPaid"><span class="nx-skel" style="width:80px;"></span></p>
+        <p class="nx-kpi__label">Total paid (12 mo)</p>
+      </div></div>
+    </div>
+    <div class="nx-kpi">
+      <div class="nx-kpi__icon nx-kpi__icon--blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      </div>
+      <div class="nx-kpi__bot"><div>
+        <p class="nx-kpi__num" id="kpiInvoiceOpen"><span class="nx-skel" style="width:50px;"></span></p>
+        <p class="nx-kpi__label">Open invoices</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- Hours ledger -->
+  <section class="nx-card" style="margin-bottom:22px;">
+    <div class="nx-card__head">
+      <div>
+        <h2 class="nx-card__title">Hours ledger</h2>
+        <p class="nx-card__sub">Every hour added or used on your account</p>
+      </div>
+    </div>
+    <div id="ledgerWrap"><div class="nx-empty">Loading…</div></div>
+  </section>
+
+  <!-- Invoices + receipts side by side -->
+  <section class="nx-row nx-row--5050">
+
+    <div class="nx-card">
+      <div class="nx-card__head">
+        <div>
+          <h2 class="nx-card__title">Invoices</h2>
+          <p class="nx-card__sub">Issued invoices and their status</p>
+        </div>
+      </div>
+      <div id="invoicesWrap"><div class="nx-empty">Loading…</div></div>
+    </div>
+
+    <div class="nx-card">
+      <div class="nx-card__head">
+        <div>
+          <h2 class="nx-card__title">Receipts</h2>
+          <p class="nx-card__sub">Payment confirmations</p>
+        </div>
+      </div>
+      <div id="receiptsWrap"><div class="nx-empty">Loading…</div></div>
+    </div>
+
+  </section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260508d"></script>
+<script src="js/hiring-service.js?v=20260508d"></script>
+<script src="js/sidebar.js?v=20260508c"></script>
+<script>
+(async () => {
+  const $ = id => document.getElementById(id);
+  function esc(s){return (s||'').toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
+  function fmtMoney(amount){
+    const v = Number(amount || 0);
+    return '$' + v.toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function fmtMoneyCents(cents){
+    return '$' + ((cents || 0)/100).toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function fmtDate(iso){ return iso ? new Date(iso).toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'}) : '—'; }
+  function fmtDateTime(iso){ return iso ? new Date(iso).toLocaleString('en-CA',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}) : '—'; }
+
+  // ─── Demo mode ────────────────────────────────────────────────
+  if (new URLSearchParams(location.search).get('demo') === '1') {
+    const now = Date.now();
+    window.pmHiring = {
+      getCurrentUser: async () => ({ id:'cstub', email:'jane@example.com' }),
+      fetchCurrentUserProfile: async () => ({ full_name:'Jane Demo', role:'CLIENT' }),
+      isCurrentUserAdminOrOwner: async () => false,
+      signOut: async () => { location.href = 'index.html'; },
+      fetchMyClientRecord: async () => ({ id:'c1', full_name:'Jane Demo', hours_balance:18.5, active_plan_id:'plan-x', created_at:'2025-08-15T00:00:00Z' }),
+      fetchMyHoursLedger: async () => {
+        const txns = [
+          { id:'l1', delta_hours:-1.0, reason:'Session attended — Math tutoring',     created_at: new Date(now - 1000*60*60*24*1).toISOString() },
+          { id:'l2', delta_hours:-1.5, reason:'Session attended — Reading',           created_at: new Date(now - 1000*60*60*24*4).toISOString() },
+          { id:'l3', delta_hours:-1.0, reason:'Session attended — Math tutoring',     created_at: new Date(now - 1000*60*60*24*7).toISOString() },
+          { id:'l4', delta_hours:-0.5, reason:'Session attended — Quick check-in',    created_at: new Date(now - 1000*60*60*24*10).toISOString() },
+          { id:'l5', delta_hours:-1.5, reason:'Session attended — Essay coaching',    created_at: new Date(now - 1000*60*60*24*14).toISOString() },
+          { id:'l6', delta_hours:+40,  reason:'Renewal #1 — 40 hour package added',   created_at: '2026-02-15T09:00:00Z' },
+          { id:'l7', delta_hours:-1.0, reason:'Session attended — Math',              created_at: '2026-02-08T17:00:00Z' },
+          { id:'l8', delta_hours:-2.0, reason:'Session attended — Long session',      created_at: '2026-01-22T16:00:00Z' },
+        ];
+        let added = 0, used = 0;
+        txns.forEach(t => { const d = Number(t.delta_hours); if (d > 0) added += d; else used += Math.abs(d); });
+        return { transactions: txns, totalAdded:+added.toFixed(1), totalUsed:+used.toFixed(1) };
+      },
+      fetchMyInvoices: async () => {
+        const months = [10,11,0,1,3,4];
+        const years  = [2025,2025,2026,2026,2026,2026];
+        const amounts = [120000,120000,120000,200000,200000,200000];
+        return months.map((m,i) => ({
+          id:'i'+i,
+          invoice_number: 'INV-' + String(2025001 + i),
+          status: i === months.length - 1 ? 'open' : 'paid',
+          invoice_date: new Date(years[i], m, 5).toISOString().split('T')[0],
+          total_cents: amounts[i],
+          amount_paid_cents: i === months.length - 1 ? 0 : amounts[i],
+        }));
+      },
+      fetchMySalesReceipts: async () => [
+        { id:'r1', receipt_number:'RCT-002034', receipt_date:'2026-04-06', total_amount: 2000.00, payment_mode:'Card',     reference:'Stripe' },
+        { id:'r2', receipt_number:'RCT-001998', receipt_date:'2026-03-08', total_amount: 2000.00, payment_mode:'E-transfer',reference:null },
+        { id:'r3', receipt_number:'RCT-001963', receipt_date:'2026-02-08', total_amount: 1200.00, payment_mode:'Card',     reference:'Stripe' },
+        { id:'r4', receipt_number:'RCT-001920', receipt_date:'2026-01-09', total_amount: 1200.00, payment_mode:'Card',     reference:'Stripe' },
+      ],
+    };
+    document.addEventListener('DOMContentLoaded', () => {
+      const bar = document.createElement('div');
+      bar.textContent = 'Demo mode — fake data, not from your account. Remove ?demo=1 from the URL to exit.';
+      bar.style.cssText = 'position:fixed;bottom:14px;right:14px;z-index:9999;background:#5750F1;color:#fff;font:600 12px Inter,sans-serif;padding:10px 14px;border-radius:9999px;box-shadow:0 8px 24px -6px rgba(87,80,241,0.45);';
+      document.body.appendChild(bar);
+    });
+  }
+
+  // Auth gate
+  const user = await window.pmHiring.getCurrentUser();
+  if (!user) { window.location.href = 'signin.html'; return; }
+
+  const profile = await window.pmHiring.fetchCurrentUserProfile().catch(() => null);
+  const fullName = profile?.full_name || user.email?.split('@')[0] || 'Client';
+  const firstName = fullName.split(' ')[0];
+  $('nxUserName').textContent = firstName;
+  $('nxUserAvatar').textContent = (firstName[0] || 'C').toUpperCase();
+
+  // Pull data
+  const [client, ledger, invoices, receipts] = await Promise.all([
+    window.pmHiring.fetchMyClientRecord().catch(()=>null),
+    window.pmHiring.fetchMyHoursLedger({ limit: 50 }).catch(()=>({transactions:[],totalAdded:0,totalUsed:0})),
+    window.pmHiring.fetchMyInvoices(12).catch(()=>[]),
+    window.pmHiring.fetchMySalesReceipts({ limit: 30 }).catch(()=>[]),
+  ]);
+
+  // KPIs
+  $('kpiHours').textContent = Number(client?.hours_balance || 0).toFixed(1);
+  $('kpiUsed').textContent = (ledger.totalUsed || 0).toFixed(1);
+  const totalPaidCents = (invoices || []).filter(i => i.status === 'paid').reduce((s,i) => s + (i.amount_paid_cents || 0), 0);
+  $('kpiTotalPaid').textContent = (totalPaidCents/100).toLocaleString('en-CA', {style:'currency',currency:'CAD',maximumFractionDigits:0});
+  const openInvCount = (invoices || []).filter(i => i.status === 'open').length;
+  $('kpiInvoiceOpen').textContent = openInvCount;
+
+  // ─── Hours ledger table ──────────────────────────────────────
+  const txns = ledger.transactions || [];
+  const wrap = $('ledgerWrap');
+  if (!txns.length) {
+    wrap.innerHTML = `<div class="nx-empty">No hours transactions yet.<p class="nx-empty__hint">When hours are added or used, they'll show here.</p></div>`;
+  } else {
+    // Compute running balance from the OLDEST forward, then display newest-first
+    const oldestFirst = [...txns].reverse();
+    let bal = 0;
+    const withBal = oldestFirst.map(t => { bal += Number(t.delta_hours || 0); return { ...t, _balance: bal }; });
+    const newestFirst = [...withBal].reverse();
+    wrap.innerHTML = `<table class="nx-table">
+      <thead><tr>
+        <th>Date</th><th>Description</th><th>Type</th><th style="text-align:right;">Hours</th><th style="text-align:right;">Balance</th>
+      </tr></thead>
+      <tbody>
+        ${newestFirst.map(t => {
+          const isAdd = Number(t.delta_hours) > 0;
+          const tagCls = isAdd ? 'nx-tag--add' : 'nx-tag--use';
+          const amtCls = isAdd ? 'nx-amount--add' : 'nx-amount--use';
+          const arrow = isAdd ? '↑' : '↓';
+          return `<tr>
+            <td>${esc(fmtDate(t.created_at))}</td>
+            <td>${esc(t.reason || '—')}</td>
+            <td><span class="nx-tag ${tagCls}">${arrow} ${isAdd ? 'Added' : 'Used'}</span></td>
+            <td class="nx-amount ${amtCls}" style="text-align:right;">${(isAdd ? '+' : '')}${Number(t.delta_hours).toFixed(1)}</td>
+            <td class="nx-amount" style="text-align:right;">${Number(t._balance).toFixed(1)}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+  }
+
+  // ─── Invoices ─────────────────────────────────────────────────
+  const invWrap = $('invoicesWrap');
+  if (!invoices.length) {
+    invWrap.innerHTML = `<div class="nx-empty">No invoices yet.<p class="nx-empty__hint">Invoices issued by Private Mentorship will appear here.</p></div>`;
+  } else {
+    const sorted = [...invoices].sort((a,b) => new Date(b.invoice_date).getTime() - new Date(a.invoice_date).getTime());
+    invWrap.innerHTML = `<div class="nx-list">${sorted.map(inv => {
+      const status = String(inv.status || '').toLowerCase();
+      const tone = status === 'paid' ? 'paid' : (status === 'void' ? 'open' : 'open');
+      const docIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
+      return `<div class="nx-listrow">
+        <div class="nx-listrow__icon nx-listrow__icon--${tone}">${docIcon}</div>
+        <div class="nx-listrow__body">
+          <p class="nx-listrow__title">${esc(inv.invoice_number || ('Invoice ' + inv.id.slice(0,8)))}</p>
+          <p class="nx-listrow__sub">${esc(fmtDate(inv.invoice_date))}</p>
+        </div>
+        <div class="nx-listrow__right">
+          <p class="nx-listrow__amount">${esc(fmtMoneyCents(inv.total_cents))}</p>
+          <span class="nx-listrow__pill nx-pill--${esc(status)}">${esc(status || 'unknown')}</span>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+  }
+
+  // ─── Receipts ─────────────────────────────────────────────────
+  const rWrap = $('receiptsWrap');
+  if (!receipts.length) {
+    rWrap.innerHTML = `<div class="nx-empty">No receipts yet.<p class="nx-empty__hint">Payment receipts will appear here.</p></div>`;
+  } else {
+    const checkIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    rWrap.innerHTML = `<div class="nx-list">${receipts.map(r => `
+      <div class="nx-listrow">
+        <div class="nx-listrow__icon nx-listrow__icon--receipt">${checkIcon}</div>
+        <div class="nx-listrow__body">
+          <p class="nx-listrow__title">${esc(r.receipt_number || ('Receipt ' + r.id.slice(0,8)))}</p>
+          <p class="nx-listrow__sub">${esc(fmtDate(r.receipt_date))} · ${esc(r.payment_mode || 'Payment')}${r.reference ? ' · ' + esc(r.reference) : ''}</p>
+        </div>
+        <div class="nx-listrow__right">
+          <p class="nx-listrow__amount">${esc(fmtMoney(r.total_amount))}</p>
+          <span class="nx-listrow__pill nx-pill--paid">Received</span>
+        </div>
+      </div>`).join('')}</div>`;
+  }
+})();
+</script>
+</body>
+</html>

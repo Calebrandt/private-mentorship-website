@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Application Review — Private Mentorship</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,500;1,600&display=swap" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  :root{
+    --bg:#F4F5F7; --paper:#FFFFFF; --ink:#0F172A; --ink-2:#1E293B; --ink-mute:#64748B; --ink-tert:#94A3B8;
+    --hair:#E2E8F0; --hair-light:#F1F5F9; --accent:#0071e3; --accent-deep:#0058b3; --accent-fade:#E8F2FD; --accent-border:#B3D0F5;
+    --warn-bg:#FEF3C7; --warn-ink:#92400E; --warn-border:#F59E0B;
+    --danger:#DC2626; --danger-fade:#FEE2E2;
+    --success:#10B981; --success-fade:#ECFDF5; --success-ink:#047857;
+    --indigo:#6366F1; --indigo-fade:#EEF2FF;
+    --sans:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;
+    --display:"Archivo","Inter",ui-sans-serif,system-ui,sans-serif;
+    --serif:"Playfair Display",Georgia,serif;
+    --ease:cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;}
+
+  .admin-top{
+    position:sticky;top:0;z-index:30;background:rgba(15,23,42,0.96);color:#fff;
+    padding:14px 28px;display:flex;align-items:center;justify-content:space-between;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .admin-top__brand{display:flex;align-items:center;gap:14px;}
+  .admin-top__logo{font-size:13px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#fff;text-decoration:none;}
+  .admin-top__badge{background:#fff;color:#0F172A;padding:4px 10px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;}
+  .admin-top__user{display:flex;align-items:center;gap:14px;font-size:12.5px;color:rgba(255,255,255,0.75);}
+  .admin-top__signout{background:transparent;border:1px solid rgba(255,255,255,0.18);color:#fff;padding:7px 14px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;}
+  .admin-top__signout:hover{background:#fff;color:#0F172A;}
+
+  .admin-shell{max-width:1080px;margin:0 auto;padding:24px 28px 80px;}
+  .admin-back{
+    display:inline-flex;align-items:center;gap:6px;
+    color:var(--ink-mute);text-decoration:none;font-size:13px;font-weight:600;margin-bottom:18px;
+  }
+  .admin-back:hover{color:var(--ink);}
+  .admin-back svg{width:14px;height:14px;}
+
+  /* HEADER */
+  .review-head{
+    background:var(--paper);border:1px solid var(--hair);border-radius:18px;
+    padding:28px 32px;margin-bottom:18px;
+    box-shadow:0 1px 2px rgba(15,23,42,0.04);
+  }
+  .review-head__top{display:flex;align-items:flex-start;gap:18px;margin-bottom:18px;flex-wrap:wrap;}
+  .review-head__avatar{
+    flex:0 0 64px;width:64px;height:64px;border-radius:50%;
+    background:var(--accent-fade);color:var(--accent);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--display);font-size:22px;font-weight:800;
+  }
+  .review-head__body{flex:1;min-width:0;}
+  .review-head__email{font-family:var(--display);font-size:24px;font-weight:800;letter-spacing:-.015em;margin:0 0 4px;color:var(--ink);}
+  .review-head__name{font-size:14px;color:var(--ink-mute);margin:0 0 8px;}
+  .review-head__meta{display:flex;flex-wrap:wrap;gap:16px;font-size:12.5px;color:var(--ink-mute);}
+  .review-head__meta strong{color:var(--ink);font-weight:600;}
+  .review-head__status{display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
+  .review-head__ref{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--ink-tert);}
+
+  .admin-status{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:5px 11px;border-radius:999px;
+    font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  }
+  .admin-status::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;}
+  .admin-status--draft{background:var(--hair-light);color:var(--ink-mute);}
+  .admin-status--submitted{background:var(--accent-fade);color:var(--accent-deep);}
+  .admin-status--under_review{background:var(--indigo-fade);color:var(--indigo);}
+  .admin-status--correction_requested{background:var(--warn-bg);color:var(--warn-ink);}
+  .admin-status--waitlisted{background:#F1F5F9;color:#475569;}
+  .admin-status--accepted{background:var(--success-fade);color:var(--success-ink);}
+  .admin-status--rejected{background:var(--danger-fade);color:var(--danger);}
+  .admin-status--archived{background:#F1F5F9;color:#94A3B8;}
+
+  /* ACTION BAR */
+  .review-actions{
+    display:flex;flex-wrap:wrap;gap:10px;
+    padding-top:18px;border-top:1px solid var(--hair-light);
+  }
+  .review-action-btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:11px 18px;border-radius:10px;
+    font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;
+    transition:all .18s var(--ease);
+    border:1px solid var(--hair);background:var(--paper);color:var(--ink);
+  }
+  .review-action-btn:hover{border-color:var(--ink);background:var(--ink);color:#fff;}
+  .review-action-btn svg{width:14px;height:14px;}
+  .review-action-btn--review{border-color:var(--indigo);color:var(--indigo);}
+  .review-action-btn--review:hover{background:var(--indigo);color:#fff;border-color:var(--indigo);}
+  .review-action-btn--accept{border-color:var(--success);color:var(--success-ink);}
+  .review-action-btn--accept:hover{background:var(--success);color:#fff;border-color:var(--success);}
+  .review-action-btn--reject{border-color:var(--danger);color:var(--danger);}
+  .review-action-btn--reject:hover{background:var(--danger);color:#fff;border-color:var(--danger);}
+  .review-action-btn--correction{border-color:var(--warn-border);color:var(--warn-ink);}
+  .review-action-btn--correction:hover{background:var(--warn-border);color:#fff;border-color:var(--warn-border);}
+  .review-action-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+  /* SECTIONS */
+  .review-section{
+    background:var(--paper);border:1px solid var(--hair);border-radius:16px;
+    padding:24px 28px;margin-bottom:14px;
+    box-shadow:0 1px 2px rgba(15,23,42,0.04);
+  }
+  .review-section__head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px;}
+  .review-section__title{font-family:var(--display);font-size:18px;font-weight:800;letter-spacing:-.01em;margin:0;color:var(--ink);}
+  .review-section__sub{font-size:12px;color:var(--ink-mute);margin:0;}
+  .review-section__pill{
+    font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-mute);background:var(--hair-light);padding:4px 10px;border-radius:999px;
+  }
+
+  .field-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px 24px;}
+  .field-row{display:flex;flex-direction:column;gap:3px;min-width:0;}
+  .field-label{font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-tert);}
+  .field-value{font-size:14px;color:var(--ink);font-weight:500;word-break:break-word;line-height:1.5;}
+  .field-value--mute{color:var(--ink-tert);font-style:italic;}
+  .field-value--ack{display:inline-flex;align-items:center;gap:6px;}
+  .field-value--ack.is-yes{color:var(--success-ink);}
+  .field-value--ack.is-no{color:var(--ink-tert);}
+  .field-value--long{grid-column:1/-1;}
+
+  .field-pill-list{display:flex;flex-wrap:wrap;gap:6px;}
+  .field-pill{
+    background:var(--accent-fade);color:var(--accent-deep);border:1px solid var(--accent-border);
+    padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;
+  }
+
+  /* DOCUMENT LIST */
+  .doc-list{display:flex;flex-direction:column;gap:10px;}
+  .doc-item{
+    display:flex;align-items:center;gap:14px;
+    padding:12px 16px;border:1px solid var(--hair);border-radius:12px;
+    background:var(--hair-light);
+  }
+  .doc-item__icon{
+    flex:0 0 38px;width:38px;height:38px;border-radius:10px;background:var(--paper);
+    color:var(--accent);
+    display:flex;align-items:center;justify-content:center;border:1px solid var(--hair);
+  }
+  .doc-item__icon svg{width:18px;height:18px;}
+  .doc-item__body{flex:1;min-width:0;}
+  .doc-item__type{font-size:12px;font-weight:700;color:var(--ink);text-transform:uppercase;letter-spacing:.04em;margin:0 0 2px;}
+  .doc-item__name{font-size:13px;color:var(--ink-mute);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .doc-item__view{
+    background:var(--ink);color:#fff;padding:9px 16px;border-radius:999px;
+    text-decoration:none;font-size:12px;font-weight:700;letter-spacing:.04em;
+    transition:all .18s var(--ease);
+  }
+  .doc-item__view:hover{background:var(--accent);}
+  .doc-item__verified{
+    font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+    padding:3px 8px;border-radius:999px;
+  }
+  .doc-item__verified.is-pending{background:var(--warn-bg);color:var(--warn-ink);}
+  .doc-item__verified.is-verified{background:var(--success-fade);color:var(--success-ink);}
+  .doc-item__verified.is-rejected{background:var(--danger-fade);color:var(--danger);}
+
+  .sig-box{
+    background:var(--paper);border:1px dashed var(--hair);border-radius:12px;padding:14px;
+    text-align:center;
+  }
+  .sig-box img{max-width:100%;max-height:160px;display:block;margin:0 auto;}
+  .sig-box__caption{font-size:12px;color:var(--ink-mute);margin-top:8px;font-style:italic;}
+
+  /* CORRECTIONS */
+  .corr-list{display:flex;flex-direction:column;gap:10px;}
+  .corr-item{
+    background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:12px;
+    padding:14px 18px;
+  }
+  .corr-item__head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .corr-item__status{
+    font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+    padding:3px 10px;border-radius:999px;
+    background:var(--warn-ink);color:#fff;
+  }
+  .corr-item__status.is-closed{background:var(--success-ink);}
+  .corr-item__date{font-size:11px;color:var(--warn-ink);font-weight:600;}
+  .corr-item__msg{font-size:13.5px;color:var(--ink-2);margin:0;white-space:pre-wrap;line-height:1.55;}
+  .corr-item__resolved{margin-top:8px;font-size:12px;color:var(--success-ink);}
+
+  /* LOADING / ERROR */
+  .review-loading{text-align:center;padding:80px 20px;color:var(--ink-mute);}
+  .review-spinner{width:18px;height:18px;border-radius:50%;border:2.5px solid var(--hair);border-top-color:var(--accent);animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* CORRECTION MODAL */
+  .modal{
+    display:none;position:fixed;inset:0;z-index:80;
+    background:rgba(15,23,42,0.55);
+    align-items:center;justify-content:center;padding:24px;
+  }
+  .modal.is-shown{display:flex;}
+  .modal__panel{
+    background:var(--paper);border-radius:16px;padding:28px;max-width:520px;width:100%;
+    box-shadow:0 30px 70px -20px rgba(15,23,42,0.5);
+  }
+  .modal__title{font-family:var(--display);font-size:20px;font-weight:800;margin:0 0 6px;}
+  .modal__sub{font-size:13.5px;color:var(--ink-mute);margin:0 0 16px;line-height:1.5;}
+  .modal__label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-mute);margin:14px 0 6px;display:block;}
+  .modal__input,.modal__textarea,.modal__select{
+    width:100%;padding:12px 14px;border:1px solid var(--hair);border-radius:10px;
+    font-family:inherit;font-size:14px;color:var(--ink);background:var(--paper);
+  }
+  .modal__textarea{min-height:120px;resize:vertical;}
+  .modal__actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
+  .modal__btn{padding:11px 20px;border-radius:10px;border:1px solid var(--hair);background:var(--paper);color:var(--ink);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;}
+  .modal__btn--primary{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .modal__btn--primary:hover{background:var(--accent);border-color:var(--accent);}
+
+  @media (max-width:720px){
+    .field-grid{grid-template-columns:1fr;}
+    .review-head__top{flex-direction:column;}
+    .review-head__status{align-items:flex-start;}
+  }
+</style>
+<link rel="stylesheet" href="js/sidebar.css?v=20260508a" />
+</head>
+<body class="pm-has-sidebar">
+
+<!-- Sidebar mounts here -->
+<div id="pmSidebar"></div>
+
+<main class="admin-shell">
+  <a class="admin-back" href="admin-dashboard.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back to applications
+  </a>
+  <div id="reviewArea">
+    <div class="review-loading"><span class="review-spinner"></span> Loading dossier…</div>
+  </div>
+</main>
+
+<!-- CORRECTION MODAL -->
+<div class="modal" id="corrModal">
+  <div class="modal__panel">
+    <h3 class="modal__title">Request a correction</h3>
+    <p class="modal__sub">The applicant will be notified, the application will be unlocked, and they can resubmit after addressing the issue.</p>
+    <label class="modal__label" for="corrStep">Step (optional)</label>
+    <select class="modal__select" id="corrStep">
+      <option value="">— Whole application —</option>
+    </select>
+    <label class="modal__label" for="corrMsg">Message to applicant</label>
+    <textarea class="modal__textarea" id="corrMsg" placeholder="What needs to be corrected? Be specific."></textarea>
+    <div class="modal__actions">
+      <button type="button" class="modal__btn" id="corrCancel">Cancel</button>
+      <button type="button" class="modal__btn modal__btn--primary" id="corrSend">Send correction request</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260508a"></script>
+<script src="js/hiring-service.js?v=20260508a"></script>
+<script src="js/sidebar.js?v=20260508a"></script>
+<script>
+const FIELD_LABELS = {
+  legalName:'Full legal name', preferredName:'Preferred name', phone:'Phone', dob:'Date of birth',
+  addressLine1:'Address line 1', addressLine2:'Address line 2', city:'City', province:'Province', postalCode:'Postal code',
+  hasCar:'Has consistent vehicle access', willingTransit:'Willing to use transit', canDriveClients:'Willing to drive clients', validLicense:'Valid driver\'s license',
+  locAssistantHome:'Hosts at own home', locClientHome:'Travels to client home', locOnline:'Hosts online', locCommunity:'Hosts at community location',
+  homeShareStatus:'Home share status', homeSubstanceFree:'Home is smoke-free / substance-free during sessions', homeEnvDescription:'Workspace description',
+  availWeekdays:'Weekdays', availEvenings:'Evenings', availWeekends:'Weekends', minHoursPerWeek:'Minimum hours / week',
+  workRole:'Most relevant role', workYears:'Years experience', workSummary:'Work summary',
+  childAges_0_5:'Ages 0–5', childAges_6_12:'Ages 6–12', childAges_13_18:'Ages 13–18', childExpSummary:'Experience summary',
+  valPatience:'Patience', valStructure:'Structure & routine', valAccountability:'Accountability', valSafety:'Emotional safety', valAcademic:'Academic focus', valIndependence:'Independence coaching', valSummary:'Approach',
+  formatSelection:'Session format', serviceTypes:'Service types',
+  contractorAck1:'Understands independent-contractor status', contractorAck2:'Responsible for own taxes', contractorAck3:'Income depends on contracts',
+  welcomeAck:'Welcome acknowledgement', consentShare:'Consents to profile sharing', consentReview:'Consents to verification & review',
+  backgroundInfoAck:'Will obtain PIC-VS', certsInfoAck:'Certificates are authentic',
+  boundaryAck1:'Not a replacement parent / therapist', boundaryAck2:'No medical, legal, or disciplinary authority', boundaryAck3:'Families may end services', boundaryAck4:'Will follow PM communication protocols',
+  confidentialityAck1:'No outside discussion', confidentialityAck2:'No social-media posts', confidentialityAck3:'Understands consequences',
+  legalAck1:'Acknowledges access to sensitive data', legalAck2:'Understands criminal liability for misuse', legalAck3:'Accepts full legal liability',
+  confirmTruth:'Information is accurate', confirmBackground:'Understands background-check requirement',
+};
+
+const STEP_FIELDS = {
+  WELCOME:['welcomeAck'], CONSENT:['consentShare','consentReview'],
+  POSITION_STRATEGY:['formatSelection','serviceTypes'], EARNINGS:['contractorAck1','contractorAck2','contractorAck3'],
+  IDENTITY:['legalName','preferredName','phone','dob'], ADDRESS:['addressLine1','addressLine2','city','province','postalCode'],
+  TRANSPORTATION:['hasCar','willingTransit','canDriveClients','validLicense'],
+  WORK_ENV:['locAssistantHome','locClientHome','locOnline','locCommunity','homeShareStatus','homeSubstanceFree','homeEnvDescription'],
+  AVAILABILITY:['availWeekdays','availEvenings','availWeekends','minHoursPerWeek'],
+  WORK_HISTORY:['workRole','workYears','workSummary'],
+  CHILD_EXP:['childAges_0_5','childAges_6_12','childAges_13_18','childExpSummary'],
+  VALUES:['valPatience','valStructure','valAccountability','valSafety','valAcademic','valIndependence','valSummary'],
+  BACKGROUND_INFO:['backgroundInfoAck'], CERTS_INFO:['certsInfoAck'],
+  BOUNDARIES:['boundaryAck1','boundaryAck2','boundaryAck3','boundaryAck4'],
+  CONFIDENTIALITY:['confidentialityAck1','confidentialityAck2','confidentialityAck3'],
+  LEGAL_LIABILITY:['legalAck1','legalAck2','legalAck3','legalSigDataUrl'],
+  FINAL_REVIEW:['confirmTruth','confirmBackground'],
+};
+
+const STEP_LABELS = {
+  WELCOME:'Welcome', CONSENT:'Transparency', POSITION_STRATEGY:'The work', EARNINGS:'Pay & terms',
+  IDENTITY:'Identity', ADDRESS:'Address', TRANSPORTATION:'Transportation', WORK_ENV:'Work environment',
+  AVAILABILITY:'Availability', WORK_HISTORY:'Work history', CHILD_EXP:'Child experience', VALUES:'Strengths',
+  BACKGROUND_INFO:'Background check info', CERTS_INFO:'Certificates info',
+  BOUNDARIES:'Boundaries', CONFIDENTIALITY:'Confidentiality', LEGAL_LIABILITY:'Legal liability',
+  FINAL_REVIEW:'Final review',
+};
+
+const params = new URLSearchParams(window.location.search);
+const applicationId = params.get('id');
+
+let dossier = null;
+let applicantInfo = null;
+let applicantEmail = '';
+let corrections = [];
+
+function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[c])); }
+function fmtDate(iso){ return iso ? new Date(iso).toLocaleString() : '—'; }
+function valueToString(field, val){
+  if (val === undefined || val === null || val === '') return null;
+  if (typeof val === 'boolean') return val ? 'Yes' : 'No';
+  if (Array.isArray(val)) return val.length === 0 ? null : val.map(v => v.toString()).join(', ');
+  return val.toString();
+}
+
+function combineStateFromDossier(d){
+  const s = {};
+  (d.steps || []).forEach(row => {
+    if (row.data && typeof row.data === 'object') Object.assign(s, row.data);
+  });
+  return s;
+}
+
+function renderField(state, field){
+  const label = FIELD_LABELS[field] || field;
+  const raw = state[field];
+  const isAck = typeof raw === 'boolean';
+  let html;
+  if (isAck){
+    html = `<span class="field-value field-value--ack ${raw ? 'is-yes' : 'is-no'}">${raw ? '✓ Acknowledged' : '— Not acknowledged'}</span>`;
+  } else if (Array.isArray(raw)){
+    if (!raw.length){ html = `<span class="field-value field-value--mute">— None selected</span>`; }
+    else {
+      html = `<div class="field-pill-list">${raw.map(v => `<span class="field-pill">${escapeHtml(v)}</span>`).join('')}</div>`;
+    }
+  } else {
+    const str = valueToString(field, raw);
+    html = str ? `<span class="field-value">${escapeHtml(str)}</span>` : `<span class="field-value field-value--mute">— Not provided</span>`;
+  }
+  const longField = ['workSummary','childExpSummary','valSummary','homeEnvDescription'].includes(field);
+  return `<div class="field-row${longField ? ' field-value--long' : ''}">
+    <div class="field-label">${escapeHtml(label)}</div>
+    ${html}
+  </div>`;
+}
+
+function renderStepGroup(title, stepKeys, state){
+  const fields = stepKeys.flatMap(k => STEP_FIELDS[k] || []).filter(f => f !== 'legalSigDataUrl');
+  return `<div class="review-section">
+    <div class="review-section__head"><h2 class="review-section__title">${escapeHtml(title)}</h2><span class="review-section__pill">${stepKeys.length} step${stepKeys.length>1?'s':''}</span></div>
+    <div class="field-grid">${fields.map(f => renderField(state, f)).join('')}</div>
+  </div>`;
+}
+
+async function renderDocuments(){
+  const docs = dossier.documents || [];
+  if (!docs.length){
+    return `<div class="review-section">
+      <div class="review-section__head"><h2 class="review-section__title">Documents</h2></div>
+      <p style="color:var(--ink-mute);margin:0;font-size:13.5px;">No documents uploaded yet.</p>
+    </div>`;
+  }
+  const TYPE_LABELS = {
+    ID_PHOTO:'Government photo ID', RESUME:'Résumé',
+    CRIMINAL_RECORD_CHECK:'Criminal record check (PIC-VS)',
+    CERT_FIRST_AID:'First Aid certificate',
+    HOME_WORKSPACE_PHOTO:'Home workspace photo',
+  };
+  const items = await Promise.all(docs.map(async d => {
+    let signedUrl = null;
+    try { signedUrl = await window.pmHiring.getDocumentSignedUrl({ storagePath: d.storage_path, bucket: d.storage_bucket || 'hiring_docs' }); } catch (e){}
+    const label = TYPE_LABELS[d.doc_type] || (d.doc_type.startsWith('CERT_OTHER') ? 'Other certificate' : d.doc_type);
+    return `<div class="doc-item">
+      <div class="doc-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+      <div class="doc-item__body">
+        <p class="doc-item__type">${escapeHtml(label)}</p>
+        <p class="doc-item__name">${escapeHtml(d.original_filename || d.storage_path)} · ${d.file_size ? (d.file_size/1024).toFixed(0) + ' KB' : ''}</p>
+      </div>
+      <span class="doc-item__verified is-${d.verified_status || 'pending'}">${escapeHtml(d.verified_status || 'pending')}</span>
+      ${signedUrl ? `<a href="${signedUrl}" target="_blank" rel="noopener" class="doc-item__view">View</a>` : '<span style="color:var(--danger);font-size:12px;">No signed URL</span>'}
+    </div>`;
+  }));
+  return `<div class="review-section">
+    <div class="review-section__head"><h2 class="review-section__title">Documents</h2><span class="review-section__pill">${docs.length} file${docs.length>1?'s':''}</span></div>
+    <div class="doc-list">${items.join('')}</div>
+  </div>`;
+}
+
+function renderScenarios(){
+  const responses = dossier.responses || [];
+  if (!responses.length){
+    return `<div class="review-section"><div class="review-section__head"><h2 class="review-section__title">Scenarios</h2></div><p style="color:var(--ink-mute);font-size:13.5px;margin:0;">Not answered yet.</p></div>`;
+  }
+  const items = responses.map(r => `<div style="margin-bottom:18px;">
+    <div class="field-label">${escapeHtml(r.scenario_key.replace('_',' ').toLowerCase())} · ${r.word_count || 0} words${r.is_complete ? ' · ✓ meets minimum' : ' · below minimum'}</div>
+    <div class="field-value" style="white-space:pre-wrap;background:var(--hair-light);border-radius:10px;padding:12px 14px;margin-top:6px;">${escapeHtml(r.response_text || '')}</div>
+  </div>`).join('');
+  return `<div class="review-section">
+    <div class="review-section__head"><h2 class="review-section__title">Scenarios</h2></div>
+    ${items}
+  </div>`;
+}
+
+function renderSignature(state){
+  const sig = state.legalSigDataUrl;
+  if (!sig) return '';
+  return `<div class="review-section">
+    <div class="review-section__head"><h2 class="review-section__title">Signature</h2><span class="review-section__pill">Legal liability</span></div>
+    <div class="sig-box">
+      <img src="${sig}" alt="Applicant signature" />
+      <p class="sig-box__caption">Applicant signed the legal liability acknowledgements.</p>
+    </div>
+  </div>`;
+}
+
+function renderCorrections(){
+  if (!corrections.length){
+    return `<div class="review-section">
+      <div class="review-section__head"><h2 class="review-section__title">Correction history</h2></div>
+      <p style="color:var(--ink-mute);font-size:13.5px;margin:0;">No correction requests have been issued for this application.</p>
+    </div>`;
+  }
+  const items = corrections.map(c => `<div class="corr-item">
+    <div class="corr-item__head">
+      <span class="corr-item__status ${c.status === 'closed' ? 'is-closed' : ''}">${escapeHtml(c.status)}</span>
+      <span class="corr-item__date">${fmtDate(c.created_at)}${c.step_key ? ' · Step: ' + escapeHtml(STEP_LABELS[c.step_key] || c.step_key) : ''}</span>
+    </div>
+    <p class="corr-item__msg">${escapeHtml(c.message || '')}</p>
+    ${c.resolved_at ? `<p class="corr-item__resolved">Resolved ${fmtDate(c.resolved_at)}${c.resolved_note ? ' — ' + escapeHtml(c.resolved_note) : ''}</p>` : ''}
+  </div>`).join('');
+  return `<div class="review-section">
+    <div class="review-section__head"><h2 class="review-section__title">Correction history</h2><span class="review-section__pill">${corrections.length}</span></div>
+    <div class="corr-list">${items}</div>
+  </div>`;
+}
+
+function renderHeader(state){
+  const app = dossier.application;
+  const ref = 'PMA-' + (app.id || '').slice(0,8).toUpperCase();
+  const initials = (applicantEmail.split('@')[0] || 'A').slice(0,2).toUpperCase();
+  const name = state.legalName || state.preferredName || '—';
+  const phone = state.phone || '—';
+  const loc = [state.city, state.province].filter(Boolean).join(', ') || '—';
+  return `<div class="review-head">
+    <div class="review-head__top">
+      <div class="review-head__avatar">${escapeHtml(initials)}</div>
+      <div class="review-head__body">
+        <h1 class="review-head__email">${escapeHtml(applicantEmail || 'Unknown applicant')}</h1>
+        <p class="review-head__name">${escapeHtml(name)}</p>
+        <div class="review-head__meta">
+          <span><strong>Phone:</strong> ${escapeHtml(phone)}</span>
+          <span><strong>Location:</strong> ${escapeHtml(loc)}</span>
+          <span><strong>Submitted:</strong> ${fmtDate(app.submitted_at)}</span>
+          <span><strong>Last activity:</strong> ${fmtDate(app.last_activity_at)}</span>
+        </div>
+      </div>
+      <div class="review-head__status">
+        <span class="admin-status admin-status--${app.status}">${escapeHtml(app.status.replace('_',' '))}</span>
+        <span class="review-head__ref">${ref}</span>
+      </div>
+    </div>
+    <div class="review-actions">
+      <button type="button" class="review-action-btn review-action-btn--review" data-status-action="under_review" ${app.status === 'under_review' ? 'disabled' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Mark under review</button>
+      <button type="button" class="review-action-btn review-action-btn--accept" data-status-action="accepted"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Accept</button>
+      <button type="button" class="review-action-btn review-action-btn--reject" data-status-action="rejected"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Reject</button>
+      <button type="button" class="review-action-btn review-action-btn--correction" id="reqCorrBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg> Request correction</button>
+    </div>
+  </div>`;
+}
+
+async function renderAll(){
+  const state = combineStateFromDossier(dossier);
+  const headerHtml = renderHeader(state);
+  const docsHtml = await renderDocuments();
+  const html = headerHtml +
+    renderStepGroup('Personal & contact', ['IDENTITY','ADDRESS'], state) +
+    renderStepGroup('Logistics', ['TRANSPORTATION','AVAILABILITY','WORK_ENV'], state) +
+    renderStepGroup('Service profile', ['POSITION_STRATEGY','EARNINGS'], state) +
+    renderStepGroup('Experience', ['WORK_HISTORY','CHILD_EXP','VALUES'], state) +
+    docsHtml +
+    renderScenarios() +
+    renderStepGroup('Acknowledgements', ['WELCOME','CONSENT','BACKGROUND_INFO','CERTS_INFO','BOUNDARIES','CONFIDENTIALITY','LEGAL_LIABILITY','FINAL_REVIEW'], state) +
+    renderSignature(state) +
+    renderCorrections();
+
+  document.getElementById('reviewArea').innerHTML = html;
+  wireActions();
+}
+
+function wireActions(){
+  document.querySelectorAll('[data-status-action]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const next = btn.dataset.statusAction;
+      const labelMap = { under_review:'mark this application Under Review', accepted:'ACCEPT this application', rejected:'REJECT this application' };
+      if (next === 'rejected' || next === 'accepted'){
+        if (!confirm(`Are you sure you want to ${labelMap[next]}? This action will be logged.`)) return;
+      }
+      btn.disabled = true;
+      try {
+        await window.pmHiring.adminUpdateApplicationStatus({ applicationId, nextStatus: next });
+        await reload();
+      } catch (e){
+        console.error('status update failed', e);
+        alert('Could not update status: ' + (e?.message || e));
+        btn.disabled = false;
+      }
+    });
+  });
+  const reqCorrBtn = document.getElementById('reqCorrBtn');
+  if (reqCorrBtn) reqCorrBtn.addEventListener('click', openCorrModal);
+}
+
+// Correction modal wiring.
+const corrModal = document.getElementById('corrModal');
+function openCorrModal(){
+  // Populate the step picker from the current dossier.
+  const sel = document.getElementById('corrStep');
+  sel.innerHTML = '<option value="">— Whole application —</option>' +
+    Object.entries(STEP_LABELS).map(([k,l]) => `<option value="${k}">${escapeHtml(l)}</option>`).join('');
+  document.getElementById('corrMsg').value = '';
+  corrModal.classList.add('is-shown');
+}
+document.getElementById('corrCancel').addEventListener('click', () => corrModal.classList.remove('is-shown'));
+corrModal.addEventListener('click', e => { if (e.target === corrModal) corrModal.classList.remove('is-shown'); });
+document.getElementById('corrSend').addEventListener('click', async () => {
+  const msg = document.getElementById('corrMsg').value.trim();
+  const step = document.getElementById('corrStep').value || null;
+  if (msg.length < 10){ alert('Please write a clearer correction note (at least 10 characters).'); return; }
+  const btn = document.getElementById('corrSend');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    await window.pmHiring.adminCreateCorrection({ applicationId, message: msg, stepKey: step });
+    corrModal.classList.remove('is-shown');
+    await reload();
+  } catch (e){
+    console.error('correction failed', e);
+    alert('Could not send correction: ' + (e?.message || e));
+  } finally {
+    btn.disabled = false; btn.textContent = 'Send correction request';
+  }
+});
+
+async function reload(){
+  document.getElementById('reviewArea').innerHTML = '<div class="review-loading"><span class="review-spinner"></span> Refreshing…</div>';
+  dossier = await window.pmHiring.adminFetchDossier(applicationId);
+  corrections = await window.pmHiring.adminListCorrectionsForApplication(applicationId);
+  applicantInfo = await window.pmHiring.adminFetchApplicantInfo(dossier.application.applicant_id);
+  if (applicantInfo?.profile?.email) applicantEmail = applicantInfo.profile.email;
+  if (applicantInfo?.applicant?.email) applicantEmail = applicantInfo.applicant.email;
+  if (!applicantEmail){
+    const map = await window.pmHiring.adminLookupApplicantEmails([dossier.application.applicant_id]);
+    applicantEmail = map[dossier.application.applicant_id] || '';
+  }
+  await renderAll();
+}
+
+// (sidebar handles sign-out)
+
+(async function init(){
+  if (!applicationId){
+    document.getElementById('reviewArea').innerHTML = '<div class="review-loading">No application id provided.</div>';
+    return;
+  }
+  const user = await window.pmHiring.getCurrentUser();
+  if (!user){ window.location.href = 'admin-login.html'; return; }
+  const isAdmin = await window.pmHiring.isCurrentUserAdminOrOwner();
+  if (!isAdmin){
+    await window.pmHiring.signOut();
+    window.location.href = 'admin-login.html?notauthorized=1';
+    return;
+  }
+  // (sidebar handles user email display)
+
+  try { await reload(); }
+  catch (e){
+    console.error('failed to load', e);
+    document.getElementById('reviewArea').innerHTML = `<div class="review-loading">Failed to load: ${escapeHtml(e?.message || '')}</div>`;
+  }
+})();
+</script>
+
+</body>
+</html>
