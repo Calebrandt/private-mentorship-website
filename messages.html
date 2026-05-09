@@ -911,15 +911,18 @@
     position:relative;border-radius:18px;overflow:hidden;
     background:linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015));
     border:1px solid rgba(255,255,255,0.06);
-    display:flex;align-items:center;justify-content:center;
     aspect-ratio:16/10;
     box-shadow:0 24px 60px -28px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04);
   }
   .pm-call-tile video{
-    width:100%;height:100%;object-fit:cover;background:#000;display:block;
+    position:absolute;inset:0;
+    width:100%;height:100%;object-fit:cover;background:#000;display:none;
+    z-index:2;
   }
   .pm-call-tile__placeholder{
-    display:flex;flex-direction:column;align-items:center;gap:14px;color:rgba(255,255,255,0.62);
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:rgba(255,255,255,0.62);
+    z-index:1;
   }
   .pm-call-tile__avatar-lg{
     width:104px;height:104px;border-radius:50%;
@@ -1294,7 +1297,7 @@
 <script src="js/supabase-client.js?v=20260509c"></script>
 <script src="js/hiring-service.js?v=20260508d"></script>
 <script src="js/messages-service.js?v=20260509a"></script>
-<script src="js/calls-service.js?v=20260509e"></script>
+<script src="js/calls-service.js?v=20260509f"></script>
 <script src="js/push-service.js?v=20260509a"></script>
 <script>
 // Demo-mode pre-stub: must run BEFORE sidebar.js (which redirects on no auth)
@@ -1839,21 +1842,36 @@ if (new URLSearchParams(location.search).get('demo') === '1') {
       </div>`;
     }).join('');
 
-    // Bind tracks (real Stream tracks; demo has none and falls back to placeholder)
+    // Always bind every participant — Stream's bindVideoElement is what
+    // actually triggers the SFU to send their tracks. Without binding,
+    // remote video never arrives. The placeholder is shown until the
+    // <video> element starts playing actual frames.
     callTilesEl.querySelectorAll('.pm-call-tile').forEach((tile, i) => {
       const p = participants[i]; if (!p) return;
       const videoEl = tile.querySelector('video');
       const fb = tile.querySelector('[data-fallback]');
-      const hasVideo = !!(p.videoStream && (p.videoStream.getVideoTracks?.().length || p.videoStream instanceof MediaStream));
-      if (hasVideo) {
-        _videoBindCleanup.push(C.bindVideo(videoEl, p));
-        videoEl.style.display = 'block';
-        if (fb) fb.style.display = 'none';
-      } else {
+
+      if (videoEl) {
+        // Start hidden — show only when 'playing' fires (i.e., real
+        // frames are arriving). The placeholder (avatar) sits behind.
         videoEl.style.display = 'none';
         if (fb) fb.style.display = 'flex';
+        videoEl.addEventListener('playing', () => {
+          videoEl.style.display = 'block';
+          if (fb) fb.style.display = 'none';
+        });
+        const hide = () => {
+          videoEl.style.display = 'none';
+          if (fb) fb.style.display = 'flex';
+        };
+        videoEl.addEventListener('emptied', hide);
+        videoEl.addEventListener('pause', hide);
+        videoEl.addEventListener('ended', hide);
+        _videoBindCleanup.push(C.bindVideo(videoEl, p));
       }
-      if (!p.isLocalParticipant && p.audioStream) {
+
+      // Bind audio for every remote participant unconditionally
+      if (!p.isLocalParticipant) {
         const audioEl = document.createElement('audio');
         audioSinks.appendChild(audioEl);
         _videoBindCleanup.push(C.bindAudio(audioEl, p));
