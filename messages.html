@@ -524,17 +524,15 @@
   }
   .pm-msg-composer__send svg{width:15px;height:15px;}
 
-  /* ─── Active thread = SAME dark space, composer pinned to the bottom ─── */
-  /* The 21px bottom padding lines the composer's bottom edge up with
-     the sidebar account avatar (the "J" near the bottom of the
-     sidebar), since the thread pane extends ~13px past the viewport.
-     flex-end keeps the messages list at the top of the available
-     height and the composer sits at the bottom — the user gets the
-     most vertical room for messages. */
+  /* ─── Active thread = SAME dark space, composer pinned near the bottom ─── */
+  /* flex-end keeps the messages list at the top of the available
+     height and the composer sits low, but we leave ~40px of breathing
+     room below so the composer doesn't feel jammed against the
+     viewport edge. */
   .pm-msg-thread:not(.is-empty){
     display:flex;flex-direction:column;
     justify-content:flex-end;align-items:center;
-    padding:24px 28px 21px;gap:14px;
+    padding:24px 28px 40px;gap:14px;
     position:relative;
   }
 
@@ -577,8 +575,8 @@
     display:flex;flex-direction:column;justify-content:flex-end;
     gap:2px;
     scroll-behavior:smooth;
-    -webkit-mask-image:linear-gradient(180deg, transparent 0%, #000 36px, #000 100%);
-            mask-image:linear-gradient(180deg, transparent 0%, #000 36px, #000 100%);
+    -webkit-mask-image:linear-gradient(180deg, transparent 0%, #000 18px, #000 100%);
+            mask-image:linear-gradient(180deg, transparent 0%, #000 18px, #000 100%);
   }
   .pm-msg-thread:not(.is-empty) .pm-msg-thread__list::-webkit-scrollbar{width:6px;}
   .pm-msg-thread:not(.is-empty) .pm-msg-thread__list::-webkit-scrollbar-thumb{
