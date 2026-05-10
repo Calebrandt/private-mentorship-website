@@ -138,6 +138,30 @@
       status: 'ringing',
     });
 
+    // Fan out an OS-level Web Push so recipients with the entire
+    // browser closed still get a system notification ringing in.
+    // Click on the OS notification → opens the browser → lands on
+    // messages.html with auto-accept params (handled by the IIFE
+    // there). Fire-and-forget; failure must not block the call.
+    if (recipientUserIds.length) {
+      const pushBody = `${callType === 'video' ? 'Video' : 'Voice'} call`;
+      sb.functions.invoke('send-web-push', {
+        body: {
+          source: 'direct',
+          userIds: recipientUserIds,
+          title: 'Incoming call',
+          body: pushBody,
+          type: 'call',
+          data: {
+            conversationId,
+            callId,
+            callType,
+            url: `/messages.html?incomingCall=${encodeURIComponent(callId)}&callType=${encodeURIComponent(callType)}&conversationId=${encodeURIComponent(conversationId)}`,
+          },
+        },
+      }).catch((e) => console.warn('[calls] push fan-out failed (non-fatal)', e?.message || e));
+    }
+
     // If SDK load or client connect fails, the call_log is already
     // ringing on the receiver's side. Clean it up so we don't strand
     // them with a "ghost" incoming call.

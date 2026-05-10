@@ -52,29 +52,54 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
-  const url = event.notification.data?.url || '/messages.html';
-  const target = new URL(url, self.location.origin).href;
+  const data = event.notification.data || {};
+  // Decline action just dismisses — the caller's call_log will time
+  // out on its own. (No DB call from the SW; it doesn't have an auth
+  // session.)
+  if (event.action === 'decline') return;
+
+  const isCall = data.type === 'call' && data.callId;
+  // For accept (or main click on a call notification): always go to
+  // messages.html with the auto-accept params so the call joins
+  // immediately on landing.
+  let target;
+  if (isCall) {
+    const params = new URLSearchParams({
+      incomingCall: data.callId,
+      callType: data.callType || 'audio',
+      conversationId: data.conversationId || '',
+    });
+    target = new URL(`/messages.html?${params.toString()}`, self.location.origin).href;
+  } else {
+    target = new URL(data.url || '/messages.html', self.location.origin).href;
+  }
 
   event.waitUntil((async () => {
     const allClients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    // If a tab is already open on messages.html, focus it
+    // For call accepts, navigate any existing client to the auto-accept
+    // URL so it joins. For messages, focus an existing tab if found.
     for (const client of allClients) {
       try {
         const cu = new URL(client.url);
         if (cu.pathname === '/messages.html' || cu.pathname.endsWith('/messages.html')) {
+          if (isCall) {
+            // Force navigation so URL params trigger auto-join
+            await client.focus();
+            await client.navigate(target);
+            return;
+          }
           client.focus();
-          // Let the page know which conversation to open
-          if (event.notification.data?.conversationId) {
+          if (data.conversationId) {
             client.postMessage({
               type: 'PM_OPEN_CONVERSATION',
-              conversationId: event.notification.data.conversationId,
+              conversationId: data.conversationId,
             });
           }
           return;
         }
       } catch (_) { /* skip */ }
     }
-    // Otherwise open a fresh tab
+    // No existing PM tab — open a fresh one.
     if (self.clients.openWindow) {
       await self.clients.openWindow(target);
     }
