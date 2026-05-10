@@ -2311,17 +2311,28 @@
      layout doesn't try to render at 414px wide.
      ════════════════════════════════════════════════════════════ */
   @media (max-width: 760px){
-    /* 1. Drop scroll-jacking + horizontal flex from the wrapper. */
-    .pm-book-scroll{ min-height:auto !important; }
-    .pm-book-scroll .pm-book{
+    /* 1. Drop scroll-jacking + horizontal flex from the wrapper.
+          Target .pm-book BOTH directly and via .pm-book-scroll so the
+          override wins regardless of which rule the cascade picks. */
+    .pm-book-scroll,
+    #pm-book-scroll{ min-height:auto !important; height:auto !important; }
+    .pm-book-scroll .pm-book,
+    #pm-book-scroll .pm-book,
+    #pm-book,
+    .pm-book{
       position:relative !important;
       top:auto !important;
       display:block !important;
       flex-direction:column !important;
       height:auto !important;
       max-height:none !important;
+      width:100% !important;
+      max-width:100% !important;
       gap:0 !important;
       padding:0 16px !important;
+      margin:0 !important;
+      box-sizing:border-box !important;
+      overflow:visible !important;
     }
     .pm-book-scroll .pm-book__stage,
     .pm-book__stage{
@@ -2331,17 +2342,36 @@
       min-height:0 !important;
       max-height:none !important;
       margin:0 !important;
+      padding:0 !important;
+      display:block !important;
+      position:relative !important;
     }
     .pm-book__head,
     .pm-book-scroll .pm-book__head{ display:none !important; }
     .pm-book-scroll__progress{ display:none !important; }
 
-    /* 2. Hide the page-flip chrome — no cover, pager, close, rail. */
+    /* 2. Hide the page-flip chrome — no cover, pager, close, rail.
+          Forced display:none + height:0 + visibility:hidden so the
+          element absolutely cannot influence layout even if some
+          other CSS tries to revive `display`. */
     .pm-book__cover,
     .pm-book__pager,
     .pm-book__close,
     .pm-book__chapters,
-    .pm-book-scroll .pm-book__chapters{ display:none !important; }
+    .pm-book-scroll .pm-book__chapters,
+    #pm-book .pm-book__chapters,
+    nav.pm-book__chapters{
+      display:none !important;
+      height:0 !important;
+      width:0 !important;
+      padding:0 !important;
+      margin:0 !important;
+      border:0 !important;
+      overflow:hidden !important;
+      visibility:hidden !important;
+      position:absolute !important;
+      pointer-events:none !important;
+    }
 
     /* 3. Each chapter renders as a tall, distinct section. */
     .pm-book__page,
@@ -2874,6 +2904,33 @@
     .pm-book-hero__lede{ font-size:15px; margin-bottom:28px; }
     .pm-book-hero__actions{ margin-bottom:36px; }
     .pm-book-hero__btn{ width:100%; justify-content:center; }
+  }
+  /* MOBILE: force the gold hero title to wrap. Desktop uses
+     `white-space: nowrap` so each line ("One Assistant.", etc.) sits
+     on its own row at large widths. On a phone that overflows the
+     viewport. Allow normal wrap + cap font-size so the line actually
+     fits inside 414px. */
+  @media (max-width: 760px){
+    .pm-book-hero__title{
+      font-size:30px !important;
+      letter-spacing:-0.024em !important;
+      line-height:1.1 !important;
+      padding:0 6px !important;
+      margin:0 0 22px !important;
+    }
+    .pm-book-hero__title-line{
+      white-space:normal !important;
+      display:block !important;
+      animation:none !important;
+      filter:none !important;
+      /* keep the gold gradient text-fill, just kill the heavy filter
+         drop-shadow that was repainting every frame */
+    }
+    .pm-book-hero__lede{
+      font-size:14.5px !important;
+      line-height:1.6 !important;
+      padding:0 6px !important;
+    }
   }
 </style>
 
