@@ -472,7 +472,28 @@ margin-bottom: 24px;
       margin: 0 0 12px 4px;
     }
 
-    .nav-mobile__nav { display: flex; flex-direction: column; gap: 2px; }
+    /* CRITICAL: shared.css applies `nav { position:fixed; height:68px;
+       backdrop-filter:blur(...); border-bottom:1px solid; }` to EVERY
+       <nav> element. The drawer's inner <nav class="nav-mobile__nav">
+       was inheriting that — which is why every link was being squashed
+       into a 68px-tall fixed bar at the top of the panel and stacking
+       on top of each other. Reset all of those properties here. */
+    .nav-mobile__nav {
+      position: static;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 2px;
+      height: auto;
+      padding: 0;
+      margin: 0;
+      background: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border: 0;
+      box-shadow: none;
+    }
     .nav-mobile__link {
       display: flex; align-items: center; justify-content: space-between;
       padding: 14px 14px 14px 16px;
