@@ -1030,9 +1030,17 @@
       <li><a href="apply.html" class="nav-cta nav-cta--gold">Apply Now</a></li>
       <li style="margin-left:8px;"><a href="hiring.html" class="nav-cta">Hiring Now</a></li>
     </ul>
+
+    <!-- Mobile hamburger — hidden on desktop, shown ≤760px. -->
+    <button type="button" class="nav-hamburger" id="navHamburger" aria-expanded="false" aria-controls="navMobileMenu" aria-label="Open menu">
+      <span class="nav-hamburger__bar"></span>
+      <span class="nav-hamburger__bar"></span>
+      <span class="nav-hamburger__bar"></span>
+    </button>
+
     <script>
       (function(){
-        var navChapterLinks = document.querySelectorAll('.nav-links a[data-nav-chapter]');
+        var navChapterLinks = document.querySelectorAll('.nav-links a[data-nav-chapter], #navMobileMenu a[data-nav-chapter]');
         navChapterLinks.forEach(function(link){
           link.addEventListener('click', function(e){
             e.preventDefault();
@@ -1051,6 +1059,132 @@
       })();
     </script>
   </nav>
+
+  <!-- ───────── MOBILE MENU DRAWER (slides in from the right) ─────────
+       Mirrors every nav link plus the Sign In / Apply Now / Hiring Now
+       CTAs, organized into clean sections. Hidden by default; toggled
+       open by the hamburger button. -->
+  <div class="nav-mobile" id="navMobileMenu" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="navMobileTitle">
+    <button type="button" class="nav-mobile__backdrop" aria-label="Close menu" data-nav-close></button>
+    <aside class="nav-mobile__panel" role="document">
+      <header class="nav-mobile__head">
+        <a href="#" class="nav-mobile__logo" aria-label="Private Mentorship home">
+          <img src="assets/logos/pm-logo.png" alt="Private Mentorship" />
+        </a>
+        <button type="button" class="nav-mobile__close" aria-label="Close menu" data-nav-close>
+          <svg viewBox="0 0 14 14" width="14" height="14" fill="none" aria-hidden="true">
+            <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </header>
+
+      <h2 id="navMobileTitle" class="nav-mobile__sr">Site menu</h2>
+
+      <nav class="nav-mobile__nav" aria-label="Main navigation">
+        <span class="nav-mobile__group-label">Explore</span>
+        <a class="nav-mobile__link" href="the-assistant.html">
+          <span class="nav-mobile__link-text">The Assistant</span>
+          <span class="nav-mobile__link-arrow" aria-hidden="true">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M5 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+        </a>
+        <a class="nav-mobile__link" href="#" data-open-ages data-nav-close-after>
+          <span class="nav-mobile__link-text">By Age &amp; Stage</span>
+          <span class="nav-mobile__link-arrow" aria-hidden="true">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M5 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+        </a>
+        <a class="nav-mobile__link" href="#pm-book" data-nav-chapter="2" data-nav-close-after>
+          <span class="nav-mobile__link-text">How It Works</span>
+          <span class="nav-mobile__link-arrow" aria-hidden="true">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M5 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+        </a>
+        <a class="nav-mobile__link" href="#pm-book" data-nav-chapter="3" data-nav-close-after>
+          <span class="nav-mobile__link-text">Plans</span>
+          <span class="nav-mobile__link-arrow" aria-hidden="true">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M5 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+        </a>
+      </nav>
+
+      <div class="nav-mobile__divider" aria-hidden="true"></div>
+
+      <div class="nav-mobile__account">
+        <span class="nav-mobile__group-label">Your account</span>
+        <a class="nav-mobile__signin" href="signin.html">
+          <span class="nav-mobile__signin-icon" aria-hidden="true">
+            <svg viewBox="0 0 18 18" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 13l4-4-4-4"/><path d="M15 9H6"/><path d="M9 17H4a1 1 0 01-1-1V2a1 1 0 011-1h5"/>
+            </svg>
+          </span>
+          <span class="nav-mobile__signin-text">
+            <span class="nav-mobile__signin-title">Sign In</span>
+            <span class="nav-mobile__signin-meta">Existing client portal</span>
+          </span>
+        </a>
+      </div>
+
+      <div class="nav-mobile__cta-stack">
+        <a class="nav-mobile__cta nav-mobile__cta--gold" href="apply.html">
+          <span>Apply Now</span>
+          <svg viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a class="nav-mobile__cta nav-mobile__cta--blue" href="hiring.html">
+          <span>Hiring Now</span>
+          <svg viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+
+      <footer class="nav-mobile__foot">
+        <span>Private Mentorship · Canada-wide</span>
+      </footer>
+    </aside>
+  </div>
+
+  <script>
+    /* Hamburger ↔ mobile menu drawer.
+       Open/close, scroll-lock body, ESC to close, link taps close
+       the drawer (so navigation feels native). */
+    (function(){
+      var hb = document.getElementById('navHamburger');
+      var menu = document.getElementById('navMobileMenu');
+      if(!hb || !menu) return;
+
+      function open(){
+        menu.classList.add('is-open');
+        menu.setAttribute('aria-hidden','false');
+        hb.setAttribute('aria-expanded','true');
+        hb.classList.add('is-active');
+        document.body.classList.add('nav-mobile-lock');
+      }
+      function close(){
+        menu.classList.remove('is-open');
+        menu.setAttribute('aria-hidden','true');
+        hb.setAttribute('aria-expanded','false');
+        hb.classList.remove('is-active');
+        document.body.classList.remove('nav-mobile-lock');
+      }
+      function toggle(){ menu.classList.contains('is-open') ? close() : open(); }
+
+      hb.addEventListener('click', toggle);
+      menu.querySelectorAll('[data-nav-close]').forEach(function(btn){
+        btn.addEventListener('click', close);
+      });
+      // Tapping any link inside the drawer closes it (so the user
+      // sees the navigation happen instead of the drawer staying up).
+      menu.querySelectorAll('a').forEach(function(a){
+        a.addEventListener('click', function(){
+          // tiny delay so click handlers (smooth-scroll, modal openers)
+          // run on the actual link first, then we close.
+          setTimeout(close, 80);
+        });
+      });
+      document.addEventListener('keydown', function(e){
+        if(e.key === 'Escape' && menu.classList.contains('is-open')) close();
+      });
+    })();
+  </script>
 
   <!-- IDENTITY HERO -->
   <section class="identity-hero" aria-label="Identity">
