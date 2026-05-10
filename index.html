@@ -2707,8 +2707,60 @@
     .pm-book__page-body .pm-ed__block-sub{ font-size:13px !important; line-height:1.55 !important; }
     .pm-book__page-body .pm-ed__block-count{ display:none !important; }
 
-    /* Inner cards (donut card, bars-card, pillar, area, etc.) get
-       proper mobile padding and spacing. */
+    /* ════════════════════════════════════════════════════════════
+       PREMIUM CHAPTER REDESIGN (mobile only)
+       Goal: every chapter inside the book feels as polished as the
+       sections the user singled out as good — The Assistant, Who
+       this fits, Hiring section. Uniform card system, centered
+       narrative, consistent type ramp, chapter-color accents.
+       ════════════════════════════════════════════════════════════ */
+
+    /* ── Block-head (the narrative intro inside each chapter) ── */
+    .pm-book__page-body .pm-ed__block-head{
+      display:flex !important;
+      flex-direction:column !important;
+      align-items:center !important;
+      text-align:center !important;
+      gap:12px !important;
+      margin:6px 0 28px !important;
+      padding:0 4px !important;
+    }
+    .pm-book__page-body .pm-ed__block-head-left{
+      display:flex !important;
+      flex-direction:column !important;
+      align-items:center !important;
+      gap:10px !important;
+    }
+    /* Hide the BIG roman in the block-head — the chapter header
+       above already shows the roman in the painted chapter color.
+       Two romans stacked on top of each other looked redundant. */
+    .pm-book__page-body .pm-ed__block-roman{ display:none !important; }
+    .pm-book__page-body .pm-ed__block-eyebrow{
+      font: 700 10px/1 'Inter', sans-serif !important;
+      letter-spacing: 0.22em !important;
+      text-transform: uppercase !important;
+      color: var(--chapter-color, #0E7C82) !important;
+      opacity: 0.85 !important;
+    }
+    .pm-book__page-body .pm-ed__block-title{
+      font: 700 21px/1.18 'Inter', sans-serif !important;
+      letter-spacing: -0.020em !important;
+      text-transform: none !important;
+      color: #0E1721 !important;
+      margin: 0 !important;
+      max-width: 320px !important;
+      text-wrap: balance !important;
+    }
+    .pm-book__page-body .pm-ed__block-sub{
+      font: 500 13.5px/1.6 'Inter', sans-serif !important;
+      color: rgba(14,23,33,0.65) !important;
+      margin: 0 !important;
+      max-width: 320px !important;
+      letter-spacing: -0.005em !important;
+    }
+    .pm-book__page-body .pm-ed__block-count{ display:none !important; }
+
+    /* ── Universal card chrome inside any chapter body ── */
     .pm-book__page-body .pm-ed__donut-card,
     .pm-book__page-body .pm-ed__bars-card,
     .pm-book__page-body .pm-ed__plan,
@@ -2716,36 +2768,330 @@
     .pm-book__page-body .pm-ed__step,
     .pm-book__page-body .pm-ed__scene,
     .pm-book__page-body .pm-ed__area{
-      padding:16px 14px !important;
-      transform:none !important;
-      opacity:1 !important;
+      background: #fff !important;
+      border: 1px solid rgba(14,23,33,0.08) !important;
+      border-radius: 16px !important;
+      padding: 20px 18px !important;
+      box-shadow: 0 1px 2px rgba(14,23,33,0.04), 0 12px 24px -18px rgba(14,23,33,0.18) !important;
+      transform: none !important;
+      opacity: 1 !important;
+      text-align: left !important;
+      width: 100% !important;
     }
-    /* The "areas" buttons (Education / Life Skills / Personal Support
-       in chapter 1) — clean stack with bigger touch targets. */
+
+    /* ════════ CHAPTER 01 — The Service ════════ */
+
+    /* Donut card — centered, clean */
+    .pm-book__page-body .pm-ed__donut-card{
+      text-align: center !important;
+      padding: 24px 18px 28px !important;
+      margin-bottom: 14px !important;
+    }
+    .pm-book__page-body .pm-ed__donut-eyebrow{
+      font: 700 9.5px/1 'Inter', sans-serif !important;
+      letter-spacing: 0.22em !important;
+      text-transform: uppercase !important;
+      color: rgba(14,23,33,0.50) !important;
+      margin-bottom: 6px !important;
+      display: block !important;
+    }
+    .pm-book__page-body .pm-ed__donut-title{
+      font: 700 16px/1.2 'Inter', sans-serif !important;
+      letter-spacing: -0.012em !important;
+      color: #0E1721 !important;
+      margin-bottom: 16px !important;
+    }
+    .pm-book__page-body .pm-ed__donut{
+      width: 200px !important;
+      height: 200px !important;
+      margin: 0 auto !important;
+    }
+
+    /* Areas (Education / Life Skills / Personal Support) — premium row cards */
     .pm-book__page-body .pm-ed__areas{
-      display:flex !important;
-      flex-direction:column !important;
-      gap:10px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 12px !important;
+      margin-top: 4px !important;
     }
     .pm-book__page-body .pm-ed__area{
-      display:grid !important;
-      grid-template-columns:auto 1fr auto auto !important;
-      gap:10px !important;
-      align-items:center !important;
+      display: grid !important;
+      grid-template-columns: 44px 1fr auto !important;
+      grid-template-rows: auto auto !important;
+      column-gap: 14px !important;
+      row-gap: 4px !important;
+      align-items: center !important;
+      padding: 16px 16px !important;
     }
-    .pm-book__page-body .pm-ed__area-roman{ font-size:18px !important; width:34px !important; height:34px !important; }
-    .pm-book__page-body .pm-ed__area-title{ font-size:15px !important; }
-    .pm-book__page-body .pm-ed__area-meta{ font-size:12px !important; line-height:1.45 !important; }
-    .pm-book__page-body .pm-ed__area-pct{ font-size:14px !important; }
-    .pm-book__page-body .pm-ed__area-pct small{ font-size:9px !important; }
+    .pm-book__page-body .pm-ed__area-roman{
+      grid-row: 1 / span 2 !important;
+      width: 40px !important;
+      height: 40px !important;
+      font: 800 16px/1 'Inter', sans-serif !important;
+      letter-spacing: -0.020em !important;
+      border-radius: 12px !important;
+      background: var(--area-color, var(--chapter-color, #0E7C82)) !important;
+      color: #fff !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      flex-shrink: 0 !important;
+    }
+    .pm-book__page-body .pm-ed__area-text{
+      grid-column: 2 !important;
+      grid-row: 1 / span 2 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 4px !important;
+      min-width: 0 !important;
+    }
+    .pm-book__page-body .pm-ed__area-title{
+      font: 700 16px/1.18 'Inter', sans-serif !important;
+      letter-spacing: -0.014em !important;
+      color: #0E1721 !important;
+    }
+    .pm-book__page-body .pm-ed__area-meta{
+      font: 500 12.5px/1.5 'Inter', sans-serif !important;
+      color: rgba(14,23,33,0.62) !important;
+      letter-spacing: -0.003em !important;
+    }
+    .pm-book__page-body .pm-ed__area-pct{
+      grid-column: 3 !important;
+      grid-row: 1 / span 2 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: flex-end !important;
+      font: 800 18px/1 'Inter', sans-serif !important;
+      color: var(--area-color, var(--chapter-color, #0E7C82)) !important;
+      letter-spacing: -0.020em !important;
+    }
+    .pm-book__page-body .pm-ed__area-pct small{
+      font: 700 8.5px/1 'Inter', sans-serif !important;
+      letter-spacing: 0.16em !important;
+      text-transform: uppercase !important;
+      color: rgba(14,23,33,0.40) !important;
+      margin-top: 4px !important;
+    }
+    .pm-book__page-body .pm-ed__area-arrow{ display: none !important; }
 
-    /* Inside Chapter 03: hide the interactive calculator + its modal
-       on mobile; show the new <section class="pm-mp"> plan cards
-       instead so users see prices up front instead of having to
-       fiddle with the calculator on a small screen. */
-    .pm-book__page-body [data-pm-calc]{ display:none !important; }
-    .pm-book__page-body .pm-calc-modal{ display:none !important; }
-    .pm-mp{ display:block !important; }
+    /* ════════ CHAPTER 02 — How It Works ════════ */
+
+    /* The 4 steps — convert grid to clean stacked column */
+    .pm-book__page-body .pm-ed__journey,
+    .pm-book__page-body .pm-ed__journey--four{
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+    .pm-book__page-body .pm-ed__step{
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 12px !important;
+      padding: 22px 20px !important;
+      text-align: left !important;
+      cursor: pointer !important;
+      position: relative !important;
+    }
+    .pm-book__page-body .pm-ed__step-disc{
+      width: 40px !important;
+      height: 40px !important;
+      border-radius: 12px !important;
+      font: 800 15px/1 'Inter', sans-serif !important;
+      letter-spacing: -0.018em !important;
+      color: #fff !important;
+      background: var(--step-color, var(--chapter-color, #0E7C82)) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      box-shadow: 0 4px 12px -4px var(--step-color, var(--chapter-color, #0E7C82)) !important;
+      margin: 0 0 4px !important;
+    }
+    .pm-book__page-body .pm-ed__step-eyebrow{
+      font: 700 9.5px/1 'Inter', sans-serif !important;
+      letter-spacing: 0.20em !important;
+      text-transform: uppercase !important;
+      color: var(--step-color, var(--chapter-color, #0E7C82)) !important;
+      opacity: 0.95 !important;
+    }
+    .pm-book__page-body .pm-ed__step-title{
+      font: 700 18px/1.18 'Inter', sans-serif !important;
+      letter-spacing: -0.018em !important;
+      color: #0E1721 !important;
+      margin: -6px 0 0 !important;
+    }
+    .pm-book__page-body .pm-ed__step-meta{
+      font: 500 13px/1.6 'Inter', sans-serif !important;
+      color: rgba(14,23,33,0.66) !important;
+      letter-spacing: -0.003em !important;
+    }
+    .pm-book__page-body .pm-ed__step-bullets{
+      list-style: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 8px !important;
+    }
+    .pm-book__page-body .pm-ed__step-bullets li,
+    .pm-book__page-body .pm-ed__plan-line{
+      position: relative !important;
+      padding-left: 22px !important;
+      font: 500 13px/1.5 'Inter', sans-serif !important;
+      color: rgba(14,23,33,0.78) !important;
+      letter-spacing: -0.003em !important;
+    }
+    .pm-book__page-body .pm-ed__step-bullets li::before,
+    .pm-book__page-body .pm-ed__plan-line::before{
+      content: '' !important;
+      position: absolute !important;
+      left: 0 !important;
+      top: 8px !important;
+      width: 14px !important;
+      height: 2px !important;
+      border-radius: 2px !important;
+      background: var(--step-color, var(--chapter-color, #0E7C82)) !important;
+      opacity: 0.65 !important;
+    }
+    .pm-book__page-body .pm-ed__step-bullets li strong{
+      color: #0E1721 !important;
+      font-weight: 700 !important;
+    }
+    .pm-book__page-body .pm-ed__plan-line span{ display: inline !important; }
+    .pm-book__page-body .pm-ed__plan-line--quiet{ opacity: 0.7 !important; }
+    .pm-book__page-body .pm-ed__step-link{
+      font: 700 12.5px/1 'Inter', sans-serif !important;
+      letter-spacing: -0.005em !important;
+      color: var(--step-color, var(--chapter-color, #0E7C82)) !important;
+      margin-top: 2px !important;
+      align-self: flex-start !important;
+      text-decoration: none !important;
+    }
+
+    /* Step 03 (Submit Application) — primary CTA treatment */
+    .pm-book__page-body .pm-ed__step--apply{
+      background: linear-gradient(180deg, #fff 0%, #fff7ed 100%) !important;
+      border: 1.5px solid var(--step-color, #E68A3D) !important;
+    }
+    .pm-book__page-body .pm-ed__step-cta{
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      align-self: flex-start !important;
+      padding: 12px 18px !important;
+      border-radius: 999px !important;
+      background: linear-gradient(180deg, #F5A057 0%, #E68A3D 100%) !important;
+      color: #fff !important;
+      font: 700 13px/1 'Inter', sans-serif !important;
+      letter-spacing: -0.005em !important;
+      box-shadow: 0 6px 14px -4px rgba(230,138,61,0.55) !important;
+      text-decoration: none !important;
+      margin-top: 6px !important;
+    }
+    .pm-book__page-body .pm-ed__step-cta svg{ width:13px !important; height:13px !important; }
+    .pm-book__page-body .pm-ed__step-fineprint{
+      font: 500 11px/1.5 'Inter', sans-serif !important;
+      color: rgba(14,23,33,0.50) !important;
+      letter-spacing: -0.003em !important;
+      margin-top: 2px !important;
+    }
+    .pm-book__page-body .pm-ed__step-fineprint em{
+      font-style: italic !important;
+    }
+
+    /* ════════ CHAPTER 03 — Your Plan (Choose-your-plan cards already
+       handled by .pm-mp). Hide the interactive calculator on mobile. */
+    .pm-book__page-body [data-pm-calc]{ display: none !important; }
+    .pm-book__page-body .pm-calc-modal{ display: none !important; }
+    .pm-mp{ display: block !important; }
+
+    /* ════════ CHAPTER 04 — Sessions Begin (5 scenes) ════════ */
+    .pm-book__page-body .pm-ed__scenes{
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+    .pm-book__page-body .pm-ed__scene{
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 8px !important;
+      padding: 22px 20px !important;
+      position: relative !important;
+    }
+    /* Scene 5 (longer arc) gets a distinct treatment */
+    .pm-book__page-body .pm-ed__scene--feature,
+    .pm-book__page-body .pm-ed__scene:nth-child(5){
+      background: linear-gradient(180deg, #fff 0%, #fff5ec 100%) !important;
+      border: 1.5px solid rgba(221,84,64,0.35) !important;
+    }
+    .pm-book__page-body .pm-ed__scene-eyebrow{
+      font: 700 9.5px/1 'Inter', sans-serif !important;
+      letter-spacing: 0.20em !important;
+      text-transform: uppercase !important;
+      color: var(--chapter-color, #DD5440) !important;
+      margin-bottom: 2px !important;
+    }
+    .pm-book__page-body .pm-ed__scene-title{
+      font: 700 17px/1.18 'Inter', sans-serif !important;
+      letter-spacing: -0.016em !important;
+      color: #0E1721 !important;
+      margin: 0 !important;
+    }
+    .pm-book__page-body .pm-ed__scene-meta{
+      font: 500 13px/1.6 'Inter', sans-serif !important;
+      color: rgba(14,23,33,0.66) !important;
+      letter-spacing: -0.003em !important;
+    }
+
+    /* ════════ CHAPTER 05 — Our Promise (5 pillars) ════════ */
+    .pm-book__page-body .pm-ed__pillars{
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 12px !important;
+    }
+    .pm-book__page-body .pm-ed__pillar{
+      display: grid !important;
+      grid-template-columns: auto 1fr !important;
+      column-gap: 16px !important;
+      row-gap: 6px !important;
+      padding: 20px 18px !important;
+      align-items: start !important;
+    }
+    .pm-book__page-body .pm-ed__pillar-letter,
+    .pm-book__page-body .pm-ed__plan-letter{
+      grid-row: 1 / span 2 !important;
+      width: 40px !important;
+      height: 40px !important;
+      border-radius: 12px !important;
+      font: 800 14px/1 'Inter', sans-serif !important;
+      letter-spacing: 0 !important;
+      color: #fff !important;
+      background: var(--chapter-color, #0E7C82) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+    .pm-book__page-body .pm-ed__pillar-eyebrow{
+      grid-column: 2 !important;
+      font: 700 9.5px/1 'Inter', sans-serif !important;
+      letter-spacing: 0.22em !important;
+      text-transform: uppercase !important;
+      color: var(--chapter-color, #0E7C82) !important;
+      align-self: end !important;
+    }
+    .pm-book__page-body .pm-ed__pillar-title{
+      grid-column: 2 !important;
+      font: 700 16px/1.2 'Inter', sans-serif !important;
+      letter-spacing: -0.014em !important;
+      color: #0E1721 !important;
+      margin: 0 !important;
+    }
+    .pm-book__page-body .pm-ed__pillar-meta{
+      grid-column: 1 / -1 !important;
+      font: 500 13px/1.55 'Inter', sans-serif !important;
+      color: rgba(14,23,33,0.66) !important;
+      letter-spacing: -0.003em !important;
+      margin: 4px 0 0 !important;
+    }
   }
 
   /* ──────────────────────────────────────────────────────────────
