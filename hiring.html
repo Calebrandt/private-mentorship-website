@@ -284,86 +284,91 @@
     .jd-sidecard__share a:hover{background:#0f1a14;color:#fff;}
     .jd-sidecard__share svg{width:13px;height:13px;}
 
-    /* Main column — Indeed-style single document */
-    .jd-main{display:flex;flex-direction:column;gap:12px;min-width:0;}
+    /* Main column — compact HR-portal cards (VRS aesthetic) */
+    .jd-main{display:flex;flex-direction:column;gap:10px;min-width:0;}
 
-    .jd-doc{
-      background:#fff;border:1px solid #e5e7eb;border-radius:10px;
-      padding:8px 28px;
+    .jd-card{
+      background:#fff;border:1px solid #e5e7eb;border-radius:8px;
+      padding:16px 20px;
     }
-    .jd-sec{
-      padding:22px 0;
-      border-bottom:1px solid #f0f0f1;
+    .jd-card__h{
+      margin:0 0 8px;font-family:"Inter",sans-serif;font-weight:700;
+      font-size:15.5px;line-height:1.25;letter-spacing:-.005em;color:#0f1a14;
     }
-    .jd-sec:last-child{border-bottom:none;}
-    .jd-sec__h{
-      margin:0 0 10px;font-family:"Inter",sans-serif;font-weight:700;
-      font-size:17px;line-height:1.25;letter-spacing:-.008em;color:#0f1a14;
+    .jd-card p{
+      margin:0 0 7px;font-family:"Inter",sans-serif;font-size:13.5px;line-height:1.55;color:#3f3f46;
     }
-    .jd-sec p{
-      margin:0 0 10px;font-family:"Inter",sans-serif;font-size:14px;line-height:1.6;color:#3f3f46;
+    .jd-card p strong{color:#0f1a14;font-weight:600;}
+    .jd-card p:last-child{margin-bottom:0;}
+    .jd-card p a{color:#0f1a14;text-decoration:underline;text-underline-offset:3px;}
+    .jd-card__sub{
+      margin:12px 0 4px;font-family:"Inter",sans-serif;font-weight:600;
+      font-size:12.5px;letter-spacing:-.002em;color:#0f1a14;
     }
-    .jd-sec p strong{color:#0f1a14;font-weight:600;}
-    .jd-sec p:last-child{margin-bottom:0;}
-    .jd-sec p a{color:#0f1a14;text-decoration:underline;text-underline-offset:3px;}
-    .jd-sec__sub{
-      margin:14px 0 6px;font-family:"Inter",sans-serif;font-weight:600;
-      font-size:13.5px;letter-spacing:-.003em;color:#0f1a14;
+    .jd-card__sub:first-child{margin-top:0;}
+    .jd-card ul{margin:0;padding:0;list-style:none;}
+    .jd-card ul li{
+      position:relative;padding:2px 0 2px 14px;
+      font-family:"Inter",sans-serif;font-size:13px;line-height:1.5;color:#3f3f46;
     }
-    .jd-sec__sub:first-child{margin-top:0;}
-    .jd-sec ul{margin:0 0 4px;padding:0;list-style:none;}
-    .jd-sec ul li{
-      position:relative;padding:3px 0 3px 16px;
-      font-family:"Inter",sans-serif;font-size:13.5px;line-height:1.55;color:#3f3f46;
+    .jd-card ul li::before{
+      content:"";position:absolute;left:3px;top:10px;
+      width:3px;height:3px;border-radius:50%;background:#9ca3af;
     }
-    .jd-sec ul li::before{
-      content:"";position:absolute;left:4px;top:11px;
-      width:3px;height:3px;border-radius:50%;background:#71717a;
-    }
-    .jd-sec ul li strong{color:#0f1a14;font-weight:600;}
+    .jd-card ul li strong{color:#0f1a14;font-weight:600;}
 
-    /* Inline gold tag for founding section */
+    /* Inline gold tag for founding card */
     .jd-tag-gold{
-      display:inline-flex;align-items:center;gap:5px;
-      padding:2px 8px;border-radius:4px;
+      display:inline-flex;align-items:center;
+      padding:2px 7px;border-radius:4px;
       background:#3a2a10;color:#f5d989;
-      font-family:"Inter",sans-serif;font-size:10px;font-weight:700;
-      letter-spacing:.12em;text-transform:uppercase;
-      vertical-align:middle;margin-left:8px;
+      font-family:"Inter",sans-serif;font-size:9.5px;font-weight:700;
+      letter-spacing:.1em;text-transform:uppercase;
+      vertical-align:middle;margin-left:7px;position:relative;top:-1px;
     }
 
-    /* Inline pay row */
-    .jd-payrow{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
-    .jd-payrow__big{font-family:"Inter",sans-serif;font-weight:700;font-size:22px;letter-spacing:-.018em;color:#0f1a14;}
-    .jd-payrow__meta{font-family:"Inter",sans-serif;font-size:13px;color:#71717a;}
+    /* Inline pay row — compact, not hero */
+    .jd-payrow{
+      display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
+      margin:0 0 8px;padding:8px 12px;
+      background:#fafaf9;border-radius:6px;
+    }
+    .jd-payrow__big{font-family:"Inter",sans-serif;font-weight:700;font-size:15px;letter-spacing:-.005em;color:#0f1a14;}
+    .jd-payrow__meta{font-family:"Inter",sans-serif;font-size:12px;color:#71717a;}
 
     /* Inline note */
     .jd-note{
-      margin-top:14px;padding:10px 14px;
+      margin-top:10px !important;padding:8px 12px;
       border-left:2px solid #d4d4d8;
-      background:#fafaf9;border-radius:0 6px 6px 0;
-      font-family:"Inter",sans-serif;font-size:12.5px;line-height:1.55;color:#52525b;
+      background:#fafaf9;border-radius:0 4px 4px 0;
+      font-family:"Inter",sans-serif;font-size:12px !important;line-height:1.5;color:#52525b !important;
     }
     .jd-note strong{color:#0f1a14;font-weight:600;}
 
-    /* Inline apply row at the end of doc */
-    .jd-applyrow{
-      display:flex;align-items:center;justify-content:space-between;gap:18px;
-      padding:18px 0 4px;border-top:1px solid #f0f0f1;margin-top:6px;
+    /* Two-column inside cards (qualifications / docs) */
+    .jd-cols{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;}
+    @media (max-width:680px){.jd-cols{grid-template-columns:1fr;gap:0;}}
+
+    /* Apply card — flat, simple */
+    .jd-apply-card{
+      background:#fff;border:1px solid #e5e7eb;border-radius:8px;
+      padding:14px 20px;
+      display:flex;align-items:center;justify-content:space-between;gap:16px;
     }
-    .jd-applyrow__text{font-family:"Inter",sans-serif;font-size:13px;color:#52525b;}
-    .jd-applyrow__btn{
-      display:inline-flex;align-items:center;gap:7px;
-      padding:10px 20px;border-radius:8px;background:#0f1a14;color:#fff;
-      font-family:"Inter",sans-serif;font-size:13px;font-weight:600;letter-spacing:-.003em;
+    .jd-apply-card__text{font-family:"Inter",sans-serif;font-size:12.5px;color:#52525b;line-height:1.45;}
+    .jd-apply-card__text strong{color:#0f1a14;font-weight:600;display:block;margin-bottom:1px;font-size:13px;}
+    .jd-apply-card__btn{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:9px 18px;border-radius:7px;background:#0f1a14;color:#fff;
+      font-family:"Inter",sans-serif;font-size:12.5px;font-weight:600;letter-spacing:-.003em;
       text-decoration:none;flex-shrink:0;
       transition:background .18s ease;
     }
-    .jd-applyrow__btn:hover{background:#1c2a22;}
-    .jd-applyrow__btn svg{width:12px;height:12px;}
+    .jd-apply-card__btn:hover{background:#1c2a22;}
+    .jd-apply-card__btn svg{width:11px;height:11px;}
     @media (max-width:560px){
-      .jd-applyrow{flex-direction:column;align-items:stretch;text-align:center;}
-      .jd-applyrow__btn{justify-content:center;}
+      .jd-apply-card{flex-direction:column;align-items:stretch;text-align:center;}
+      .jd-apply-card__btn{justify-content:center;}
     }
 
     /* 3 R's row */
@@ -651,138 +656,145 @@
 
       <!-- RIGHT MAIN COLUMN -->
       <main class="jd-main">
-        <div class="jd-doc">
 
-          <section class="jd-sec">
-            <h2 class="jd-sec__h">Job Description</h2>
-            <p>A <strong>Private Family Assistant</strong> works alongside the same family for the long term — supporting one client through education, life skills, and personal support across the rooms and programs that matter to them. You become the constant: in classrooms, at appointments, in the home, on outings.</p>
-            <p>This isn't a short-term gig. The clients we serve have been with Private Mentorship since 2023 and they're still here. We're hiring people who want to do this as a real career — not a stopgap.</p>
-            <p>You'll work as a self-employed contractor, set your own schedule with each family, and oscillate between in-person and online sessions across a flexible week.</p>
-          </section>
+        <article class="jd-card">
+          <h2 class="jd-card__h">Job Description</h2>
+          <p>A <strong>Private Family Assistant</strong> works alongside the same family for the long term — supporting one client through education, life skills, and personal support across the rooms and programs that matter to them. You become the constant: in classrooms, at appointments, in the home, on outings.</p>
+          <p>This isn't a short-term gig. The clients we serve have been with Private Mentorship since 2023 and they're still here. We're hiring people who want to do this as a real career — not a stopgap.</p>
+          <p>You'll work as a self-employed contractor, set your own schedule with each family, and oscillate between in-person and online sessions across a flexible week.</p>
+        </article>
 
-          <section class="jd-sec">
-            <h2 class="jd-sec__h">How the Role Works</h2>
-            <p>Three functions a Private Family Assistant carries that nobody else in the family's life provides at once.</p>
-            <h3 class="jd-sec__sub">Representation</h3>
-            <p>You sit in the rooms — classrooms, WorkBC intakes, CLBC facilitator meetings, psychological assessments, workplace shifts — and speak for the client when they can't.</p>
-            <h3 class="jd-sec__sub">Resourcing</h3>
-            <p>You find the programs, fill the funding applications, and build the support network the family didn't know existed — provincial, federal, community.</p>
-            <h3 class="jd-sec__sub">Reinforcement</h3>
-            <p>You take notes in the room, write a clear report home to the family, then run a follow-up session with the client to re-teach what didn't land. The loop closes with you.</p>
-          </section>
+        <article class="jd-card">
+          <h2 class="jd-card__h">How the Role Works</h2>
+          <p>Three functions a Private Family Assistant carries that nobody else in the family's life provides at once.</p>
+          <h3 class="jd-card__sub">Representation</h3>
+          <p>You sit in the rooms — classrooms, WorkBC intakes, CLBC facilitator meetings, psychological assessments, workplace shifts — and speak for the client when they can't.</p>
+          <h3 class="jd-card__sub">Resourcing</h3>
+          <p>You find the programs, fill the funding applications, and build the support network the family didn't know existed — provincial, federal, community.</p>
+          <h3 class="jd-card__sub">Reinforcement</h3>
+          <p>You take notes in the room, write a clear report home to the family, then run a follow-up session with the client to re-teach what didn't land. The loop closes with you.</p>
+        </article>
 
-          <section class="jd-sec">
-            <h2 class="jd-sec__h">Key Duties &amp; Responsibilities</h2>
-            <h3 class="jd-sec__sub">Education</h3>
-            <ul>
-              <li>One-on-one teaching across school subjects, ESL, post-secondary prep, or hard skills the client is working on</li>
-              <li>Sit in on classes and programs (with consent), take structured notes, write a family-facing report</li>
-              <li>Re-teach material in a follow-up session so concepts stick</li>
-              <li>Coordinate with teachers, instructors, and program coordinators on the client's behalf</li>
-              <li>Help with applications: school, programs, scholarships, funding</li>
-            </ul>
-            <h3 class="jd-sec__sub">Life Skills</h3>
-            <ul>
-              <li>Communication, socialization, conflict resolution — modeled in real situations, not lectures</li>
-              <li>Outings into the community: appointments, events, transit practice, leisure</li>
-              <li>Job search support: applications, interview prep, workplace check-ins with managers</li>
-              <li>Volunteer placement and ongoing support at the placement</li>
-              <li>Positive role-modeling across every interaction — this is the throughline of the role</li>
-            </ul>
-            <h3 class="jd-sec__sub">Personal Support</h3>
-            <ul>
-              <li>Grocery shopping with or for the client; errands; transit support</li>
-              <li>Light home tasks (dishes, laundry, tidying, occasional cleaning) as part of daily living support</li>
-              <li>Family coordination — calendar, paperwork, communicating with siblings, parents, caseworkers</li>
-              <li>Medication <em>reminders</em> — never administering, no needles, no dosing decisions</li>
-              <li>Simple supportive tasks if requested by the family — never clinical procedures</li>
-            </ul>
-            <p class="jd-note"><strong>Scope of this role.</strong> A Private Family Assistant is a supportive presence in a family's daily life — not a nurse or care aide. Some families ask for help with personal-care tasks beyond what's listed above. Those requests are handled privately, on a case-by-case basis, never as a default expectation of the role.</p>
-          </section>
+        <article class="jd-card">
+          <h2 class="jd-card__h">Key Duties &amp; Responsibilities</h2>
+          <h3 class="jd-card__sub">Education</h3>
+          <ul>
+            <li>One-on-one teaching across school subjects, ESL, post-secondary prep, or hard skills the client is working on</li>
+            <li>Sit in on classes and programs (with consent), take structured notes, write a family-facing report</li>
+            <li>Re-teach material in a follow-up session so concepts stick</li>
+            <li>Coordinate with teachers, instructors, and program coordinators on the client's behalf</li>
+            <li>Help with applications: school, programs, scholarships, funding</li>
+          </ul>
+          <h3 class="jd-card__sub">Life Skills</h3>
+          <ul>
+            <li>Communication, socialization, conflict resolution — modeled in real situations, not lectures</li>
+            <li>Outings into the community: appointments, events, transit practice, leisure</li>
+            <li>Job search support: applications, interview prep, workplace check-ins with managers</li>
+            <li>Volunteer placement and ongoing support at the placement</li>
+            <li>Positive role-modeling across every interaction — this is the throughline of the role</li>
+          </ul>
+          <h3 class="jd-card__sub">Personal Support</h3>
+          <ul>
+            <li>Grocery shopping with or for the client; errands; transit support</li>
+            <li>Light home tasks (dishes, laundry, tidying, occasional cleaning) as part of daily living support</li>
+            <li>Family coordination — calendar, paperwork, communicating with siblings, parents, caseworkers</li>
+            <li>Medication <em>reminders</em> — never administering, no needles, no dosing decisions</li>
+            <li>Simple supportive tasks if requested by the family — never clinical procedures</li>
+          </ul>
+          <p class="jd-note"><strong>Scope of this role.</strong> A Private Family Assistant is a supportive presence in a family's daily life — not a nurse or care aide. Some families ask for help with personal-care tasks beyond what's listed above. Those requests are handled privately, on a case-by-case basis, never as a default expectation of the role.</p>
+        </article>
 
-          <section class="jd-sec">
-            <h2 class="jd-sec__h">Schedule &amp; Pay</h2>
-            <div class="jd-payrow">
-              <span class="jd-payrow__big">$21 – $45 / hour</span>
-              <span class="jd-payrow__meta">depending on contract tier and tenure</span>
-            </div>
-            <p>You and the client co-create the weekly schedule, and you can reschedule within the contract period. Most sessions run <strong>2–3 hours</strong>. A common day looks like one client 8–10 AM, another 12–2 PM, an evening online session 7–8:30 PM. You can hold a 9–5 elsewhere and run evening sessions online — many assistants do.</p>
-            <h3 class="jd-sec__sub">What's included</h3>
-            <ul>
-              <li><strong>Outings are not your expense.</strong> Family pays for outings, transit, tickets, meals, and the assistant's portion when applicable. It's written into the contract.</li>
-              <li><strong>Raises and bonuses</strong> after a 3-month probation, based on dedication and consistency.</li>
-              <li><strong>Long client relationships.</strong> Most clients have been with us since 2023 — you'll see seasons, holidays, and milestones with the same family.</li>
-              <li><strong>In-person and online flexibility</strong> — education and life-skills sessions can run remotely when needed.</li>
-            </ul>
-          </section>
-
-          <section class="jd-sec">
-            <h2 class="jd-sec__h">Founding Assistant Opportunity <span class="jd-tag-gold">Founding Team</span></h2>
-            <p>You're applying at the moment Private Mentorship opens its hiring program. The first five hires are the face of this business. After probation, founding assistants may earn the <strong>full contract rate ($30–$45/hr)</strong> on selected contracts — not the standard split — as recognition for taking the leap before there was a track record to point to.</p>
-          </section>
-
-          <section class="jd-sec">
-            <h2 class="jd-sec__h">Qualifications</h2>
-            <h3 class="jd-sec__sub">Education &amp; Experience</h3>
-            <ul>
-              <li>Grade 12 / Canadian high school diploma (minimum)</li>
-              <li>1+ year of relevant experience: education, mentorship, tutoring, caregiving, coaching, or similar</li>
-              <li>Hard skills are valuable however you got them — degrees, diplomas, or self-taught with proof</li>
-              <li>Tell us what you can teach. Music, language, trades, sports, software, art, finance — it counts</li>
-            </ul>
-            <h3 class="jd-sec__sub">Skills &amp; Abilities</h3>
-            <ul>
-              <li>Strong written and verbal communication — you'll be writing reports families read</li>
-              <li>Reliable, organized, able to adapt when a session shifts mid-day</li>
-              <li>Comfortable around schools, government caseworkers, and other professionals</li>
-              <li>Positive role-modeling as a default — clients pick up your tone before your words</li>
-              <li>Discretion. Families share private things; that stays private</li>
-            </ul>
-          </section>
-
-          <section class="jd-sec">
-            <h2 class="jd-sec__h">Required Documentation</h2>
-            <ul>
-              <li>Government-issued photo ID</li>
-              <li>Résumé</li>
-              <li>Criminal Record Check with PIC-VS (Vulnerable Sector)</li>
-              <li>Standard First Aid + CPR-C certification (current)</li>
-              <li>Three character references — one must be a past employer</li>
-              <li>MCFD (Ministry of Children &amp; Family Development) clearance</li>
-              <li>Work authorization: PR card, Citizenship, or valid work permit</li>
-              <li>Banking details for contractor payment</li>
-            </ul>
-          </section>
-
-          <section class="jd-sec">
-            <h2 class="jd-sec__h">Assets (Nice to Have)</h2>
-            <ul>
-              <li>Class 4 or 5 driver's license</li>
-              <li>Driver's abstract</li>
-              <li>Reliable transportation</li>
-              <li>Food Safe Level 1</li>
-              <li>TB test / immunization records</li>
-              <li>Second language</li>
-              <li>Subject matter expertise in any field (music, trades, software, sports, etc.)</li>
-              <li>Coaching or instructional background</li>
-            </ul>
-          </section>
-
-          <section class="jd-sec">
-            <h2 class="jd-sec__h">About Private Mentorship</h2>
-            <p>Private Mentorship places one consented professional inside every room and program a vulnerable client must navigate, and brings all of it back to a family that can no longer run that coordination alone. We bridge gaps families face when the parents are aging, the siblings are stretched, and the existing system isn't built to assemble itself around one person.</p>
-            <p>We've supported clients through schools, WorkBC, CLBC, Back in Motion, psychological assessments, federal and provincial funding applications, and workplace placements. The same families have stayed with us since the business started.</p>
-          </section>
-
-          <div class="jd-applyrow" id="apply">
-            <span class="jd-applyrow__text">Ready to apply? About 10–15 minutes. You can save and come back.</span>
-            <a class="jd-applyrow__btn" href="hiring-entry.html">
-              Apply for this role
-              <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 7h8M11 7L7 3M11 7L7 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
+        <article class="jd-card">
+          <h2 class="jd-card__h">Schedule &amp; Pay</h2>
+          <div class="jd-payrow">
+            <span class="jd-payrow__big">$21 – $45 / hour</span>
+            <span class="jd-payrow__meta">depending on contract tier and tenure</span>
           </div>
+          <p>You and the client co-create the weekly schedule, and you can reschedule within the contract period. Most sessions run <strong>2–3 hours</strong>. A common day looks like one client 8–10 AM, another 12–2 PM, an evening online session 7–8:30 PM. You can hold a 9–5 elsewhere and run evening sessions online — many assistants do.</p>
+          <h3 class="jd-card__sub">What's included</h3>
+          <ul>
+            <li><strong>Outings are not your expense.</strong> Family pays for outings, transit, tickets, meals, and the assistant's portion when applicable. It's written into the contract.</li>
+            <li><strong>Raises and bonuses</strong> after a 3-month probation, based on dedication and consistency.</li>
+            <li><strong>Long client relationships.</strong> Most clients have been with us since 2023 — you'll see seasons, holidays, and milestones with the same family.</li>
+            <li><strong>In-person and online flexibility</strong> — education and life-skills sessions can run remotely when needed.</li>
+          </ul>
+        </article>
 
+        <article class="jd-card">
+          <h2 class="jd-card__h">Founding Assistant Opportunity <span class="jd-tag-gold">Founding Team</span></h2>
+          <p>You're applying at the moment Private Mentorship opens its hiring program. The first five hires are the face of this business. After probation, founding assistants may earn the <strong>full contract rate ($30–$45/hr)</strong> on selected contracts — not the standard split — as recognition for taking the leap before there was a track record to point to.</p>
+        </article>
+
+        <article class="jd-card">
+          <h2 class="jd-card__h">Qualifications</h2>
+          <div class="jd-cols">
+            <div>
+              <h3 class="jd-card__sub">Education &amp; Experience</h3>
+              <ul>
+                <li>Grade 12 / Canadian high school diploma (minimum)</li>
+                <li>1+ year of relevant experience: education, mentorship, tutoring, caregiving, coaching, or similar</li>
+                <li>Hard skills are valuable however you got them — degrees, diplomas, or self-taught with proof</li>
+                <li>Tell us what you can teach: music, language, trades, sports, software, art, finance</li>
+              </ul>
+            </div>
+            <div>
+              <h3 class="jd-card__sub">Skills &amp; Abilities</h3>
+              <ul>
+                <li>Strong written and verbal communication — you'll be writing reports families read</li>
+                <li>Reliable, organized, able to adapt when a session shifts mid-day</li>
+                <li>Comfortable around schools, caseworkers, and other professionals</li>
+                <li>Positive role-modeling as a default — clients pick up your tone before your words</li>
+                <li>Discretion — families share private things; that stays private</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <article class="jd-card">
+          <h2 class="jd-card__h">Required Documentation</h2>
+          <ul class="jd-cols">
+            <li>Government-issued photo ID</li>
+            <li>Résumé</li>
+            <li>Criminal Record Check with PIC-VS</li>
+            <li>Standard First Aid + CPR-C (current)</li>
+            <li>Three character references (one past employer)</li>
+            <li>MCFD clearance</li>
+            <li>Work authorization (PR / Citizenship / permit)</li>
+            <li>Banking details for contractor payment</li>
+          </ul>
+        </article>
+
+        <article class="jd-card">
+          <h2 class="jd-card__h">Assets (Nice to Have)</h2>
+          <ul class="jd-cols">
+            <li>Class 4 or 5 driver's license</li>
+            <li>Driver's abstract</li>
+            <li>Reliable transportation</li>
+            <li>Food Safe Level 1</li>
+            <li>TB test / immunization records</li>
+            <li>Second language</li>
+            <li>Subject matter expertise in any field</li>
+            <li>Coaching or instructional background</li>
+          </ul>
+        </article>
+
+        <article class="jd-card">
+          <h2 class="jd-card__h">About Private Mentorship</h2>
+          <p>Private Mentorship places one consented professional inside every room and program a vulnerable client must navigate, and brings all of it back to a family that can no longer run that coordination alone. We bridge gaps families face when the parents are aging, the siblings are stretched, and the existing system isn't built to assemble itself around one person.</p>
+          <p>We've supported clients through schools, WorkBC, CLBC, Back in Motion, psychological assessments, federal and provincial funding applications, and workplace placements. The same families have stayed with us since the business started.</p>
+        </article>
+
+        <div class="jd-apply-card" id="apply">
+          <div class="jd-apply-card__text">
+            <strong>Ready to apply?</strong>
+            About 10–15 minutes. You can save and come back.
+          </div>
+          <a class="jd-apply-card__btn" href="hiring-entry.html">
+            Apply for this role
+            <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 7h8M11 7L7 3M11 7L7 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
         </div>
+
       </main>
     </div>
   </section>
