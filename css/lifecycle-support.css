@@ -302,60 +302,93 @@
      edge of the sidebar makes no sense in a horizontal pill bar. */
   .agi-nav-indicator { display: none !important; }
 
-  /* MAIN CONTENT */
+  /* MAIN CONTENT — generous bottom padding so the description pod
+     never gets clipped at the bottom of the modal. */
   .agi-main-content {
-    padding: 22px 18px 26px !important;
-    gap: 22px !important;
+    padding: 20px 16px 32px !important;
+    gap: 18px !important;
     justify-content: flex-start !important;
   }
 
-  /* Top row — stack vertically so the role nodes + preview don't fight. */
+  /* Top row — preview on TOP (smaller), role nav BELOW it. Both
+     centered so the layout feels intentional, not jammed. */
   .agi-top-row {
-    flex-direction: column !important;
-    gap: 16px !important;
+    flex-direction: column-reverse !important;
+    gap: 14px !important;
     align-items: stretch !important;
   }
+
+  /* Role nav (Education ─── Life Skills ─── Support).
+     Center the row, give it room on both sides, and shrink everything
+     so the 03/Support node is fully visible inside its rounded
+     container. The previous `space-between` was forcing the third
+     node hard against the right edge so the pill background got
+     clipped. `justify-content: center` + tighter dot/font sizes lets
+     the 3 nodes sit centered with margin around them. */
   .agi-top-nav {
-    padding: 10px 14px !important;
-    gap: 10px !important;
-    align-self: stretch !important;
-    justify-content: space-between !important;
+    padding: 9px 10px !important;
+    gap: 6px !important;
+    align-self: center !important;
+    justify-content: center !important;
     flex-wrap: nowrap !important;
+    max-width: 100% !important;
   }
-  .agi-role-node { gap: 6px !important; }
+  .agi-role-node {
+    gap: 6px !important;
+    flex: 0 0 auto !important;
+  }
   .agi-role-node .agi-auth-tag {
-    font-size: 9px !important;
+    font-size: 8.5px !important;
     padding: 0 !important;
     border: 0 !important;
+    letter-spacing: 0.08em !important;
   }
   .agi-role-dot {
-    width: 22px !important;
-    height: 22px !important;
-    font-size: 9px !important;
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 8.5px !important;
     border-width: 1px !important;
+    flex: 0 0 20px !important;
   }
   .agi-role-line {
-    width: 14px !important;
-    flex: 0 0 14px !important;
+    width: 12px !important;
+    flex: 0 0 12px !important;
   }
 
-  /* Preview card */
+  /* Preview card — smaller and tighter so it feels like a tasteful
+     accent, not the focal point. */
   .agi-preview-card {
     width: 100% !important;
-    max-width: 320px !important;
+    max-width: 240px !important;
     margin: 0 auto !important;
+    border-radius: 16px !important;
   }
-  .agi-preview-img { height: 100px !important; }
-  .agi-preview-meta { padding: 10px 12px 12px !important; }
-  .agi-preview-label { font-size: 9px !important; margin-bottom: 3px !important; }
-  .agi-preview-title { font-size: 12.5px !important; }
+  .agi-preview-img { height: 78px !important; }
+  .agi-preview-meta { padding: 8px 11px 10px !important; }
+  .agi-preview-label { font-size: 8.5px !important; margin-bottom: 2px !important; letter-spacing: 0.12em !important; }
+  .agi-preview-title { font-size: 12px !important; }
 
-  /* Description pod */
+  /* Description pod — the big content card. Two important fixes:
+       (a) Don't let our base `transform: translateY(...) !important`
+           override the active state's translate(0). The pod animates
+           in via .active; when our base !important wins it stays
+           pushed down 40px and the bottom gets clipped under the
+           modal edge. Keep transform un-!importanted; the .active
+           rule (translateY(0)) will win cleanly.
+       (b) Real bottom margin so the pod has breathing room from the
+           modal's bottom edge — user wanted a "nice bit of the
+           bottom showing." Plus rounder corners. */
   .agi-description-pod {
-    padding: 20px 18px 22px !important;
-    border-radius: 18px !important;
+    padding: 22px 18px 26px !important;
+    border-radius: 24px !important;
     max-width: none !important;
-    transform: translateY(40px) !important;
+    margin-bottom: 18px !important;
+  }
+  .agi-description-pod:not(.active) {
+    transform: translateY(40px);
+  }
+  .agi-description-pod.active {
+    transform: translateY(0) !important;
   }
   .agi-description-pod h3 {
     font-size: 22px !important;
