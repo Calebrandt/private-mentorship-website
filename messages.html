@@ -2515,10 +2515,33 @@ if (new URLSearchParams(location.search).get('demo') === '1') {
   }
 
   // ?c=<id> from a notification click → open that conversation on load
-  const wantedConvoId = new URLSearchParams(location.search).get('c');
+  const _params = new URLSearchParams(location.search);
+  const wantedConvoId = _params.get('c') || _params.get('conversationId');
   if (wantedConvoId) {
     // Wait a tick so convos are loaded
     setTimeout(() => { openConversation(wantedConvoId); }, 200);
+  }
+
+  // ?incomingCall=<callId>&callType=<audio|video> arrives from the
+  // site-wide ring overlay (incoming-call-ring.js on dashboard etc.).
+  // Auto-accept the call so the user lands directly in the call modal.
+  const incomingCallId = _params.get('incomingCall');
+  const incomingCallType = _params.get('callType') || 'audio';
+  if (!isDemo && incomingCallId && me?.id && C) {
+    setTimeout(async () => {
+      try {
+        const callerName = activeConvo?.title || 'Caller';
+        openCallModal({ name: callerName, callType: incomingCallType });
+        await C.acceptIncoming({
+          callId: incomingCallId,
+          callType: incomingCallType,
+          userId: me.id,
+        });
+      } catch (e) {
+        console.error('[ring] auto-accept failed', e);
+        try { closeCallModal(); } catch (_) {}
+      }
+    }, 350);
   }
 
   // Cursor-follow glow — barely visible, follows mouse like the 21st.dev reference
