@@ -56,6 +56,105 @@
     html, body { overflow-x: clip; max-width: 100vw; }
   }
 
+  /* ────────────────────────────────────────────────────────────
+     MOBILE PERFORMANCE — kill the expensive repaint properties
+     that make iOS Safari stutter, especially when scrolling up
+     (when the URL bar reappears, viewport height changes, and the
+     entire page needs to re-composite — every backdrop-filter +
+     mix-blend-mode + drop-shadow burns frames).
+
+     This is a deliberate trade: the page is a hair less glassy on
+     phones, but it scrolls smoothly in both directions. Desktop
+     keeps every effect untouched.
+
+     Targets in order of mobile Safari pain:
+       1. backdrop-filter / -webkit-backdrop-filter → biggest cost
+       2. mix-blend-mode → forces a stacking-context repaint
+       3. filter: drop-shadow / blur → composite-layer expensive
+       4. infinite keyframe animations (shimmers, sparkles, pulses)
+          on decorative elements → run on the GPU forever
+     ──────────────────────────────────────────────────────────── */
+  @media (max-width: 760px){
+    /* 1 — Nuke backdrop-filter everywhere on mobile. */
+    *,
+    *::before,
+    *::after{
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+    /* 2 — Disable mix-blend-mode (forces own stacking context +
+       per-frame composite on iOS). Decorative shimmer / overlay
+       layers degrade gracefully to plain layers. */
+    *{ mix-blend-mode: normal !important; }
+    /* 3 — Heavy drop-shadow stacks on big gold-shimmer headlines —
+       the shadow is recomputed every frame the gradient animation
+       runs. Drop the chained drop-shadows on mobile. */
+    .journey__title-main,
+    .journey__end-head,
+    .hof__title-main,
+    .pm-hire__h-bold,
+    #spotlight h2,
+    #faq h2{
+      filter: none !important;
+    }
+    /* 4 — Pause decorative infinite animations on mobile. They
+       still animate when scrolled past on desktop, but on a phone
+       they sit there cooking the GPU. We keep functional motion
+       (the made-for cycle, the chapter transitions) and only kill
+       infinite cosmetic effects. */
+    .pm-shader__shimmer,
+    .pm-calc-hero__shimmer,
+    .journey__shimmer,
+    .journey__title-main,
+    .journey__end-head,
+    .hof__title-main,
+    .pm-hire__h-bold,
+    .pm-hire__sparkle,
+    .pm-ed__chip svg,
+    [class*="pmBookShimmer"],
+    [class*="pmBookPulse"],
+    [class*="pmBookRomanShine"],
+    [class*="pmBookBadgeShimmer"],
+    [class*="pmBookBadgeSparkle"],
+    [class*="pmBookDonutGlow"],
+    [class*="pmBookDonutShine"],
+    [class*="pmBookDonutSparkle"],
+    [class*="pm-ed-shimmer"],
+    [class*="pm-ed-sparkle"]{
+      animation: none !important;
+    }
+    /* 5 — Marquee testimonials still loop, but the will-change
+       transform pile-up was costing memory. Keep animation, drop
+       the will-change so iOS recycles the layer between cycles. */
+    .pm-testi-light .pm-testi-track{ will-change: auto !important; }
+    /* 6 — `position: fixed` elements that rely on backdrop blur
+       become solid-ish on mobile so they don't trigger composite
+       work every frame. They were the per-frame repaint trigger
+       on every scroll. */
+    .pm-calc__check-cta,
+    .ages-modal__panel,
+    .tr-info-modal__panel{
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06), 0 8px 24px -16px rgba(0,0,0,0.18) !important;
+    }
+    /* 7 — iOS Safari URL-bar fix: this is the REAL cause of the
+       "scroll up feels weird / stutters" complaint. When the user
+       scrolls down, Safari hides the URL bar — viewport gets taller.
+       When they scroll up, the URL bar re-appears — viewport shrinks
+       again. Every sticky/pinned element using `100vh` re-measures,
+       triggering a full relayout mid-scroll, which feels like a jerk.
+       Switch sticky pins to `svh` (small viewport, ignores URL bar)
+       so their height stays constant regardless of the bar state. */
+    .pm-shader{ height: 360svh !important; }
+    .pm-shader__sticky{ height: 100svh !important; }
+    .journey__pin{ height: 100svh !important; }
+    .pm-book-scroll .pm-book{ height: calc(100svh - 116px) !important; }
+    /* spotlight #sp-sticky has its height set inline by script.js
+       (`calc(100vh - NAV_H)`) — override that to small-viewport so
+       the photo gallery pin doesn't re-measure when the URL bar
+       toggles. !important beats normal inline styles. */
+    #sp-sticky{ height: calc(100svh - 72px) !important; top: 72px !important; }
+  }
+
   /* ===========================================================
      MODAL — premium frosted-glass sheet (v16)
      Matches the editorial section: cool palette, SF Pro,
