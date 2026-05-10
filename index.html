@@ -2738,7 +2738,240 @@
     .pm-book__page-body .pm-ed__area-meta{ font-size:12px !important; line-height:1.45 !important; }
     .pm-book__page-body .pm-ed__area-pct{ font-size:14px !important; }
     .pm-book__page-body .pm-ed__area-pct small{ font-size:9px !important; }
+
+    /* Inside Chapter 03: hide the interactive calculator + its modal
+       on mobile; show the new <section class="pm-mp"> plan cards
+       instead so users see prices up front instead of having to
+       fiddle with the calculator on a small screen. */
+    .pm-book__page-body [data-pm-calc]{ display:none !important; }
+    .pm-book__page-body .pm-calc-modal{ display:none !important; }
+    .pm-mp{ display:block !important; }
   }
+
+  /* ──────────────────────────────────────────────────────────────
+     Mobile membership-style plan cards (.pm-mp).
+     Hidden on desktop by default; shown on mobile via the rule
+     inside the book mobile @media block above. Visual language
+     mirrors the logged-in client-membership.html plan picker so
+     a user landing here sees prices in the same premium frame
+     they'd see after signing in.
+     ────────────────────────────────────────────────────────────── */
+  .pm-mp{ display:none; }
+
+  .pm-mp__head{
+    text-align:center;
+    margin: 6px 0 16px;
+  }
+  .pm-mp__eyebrow{
+    display:block;
+    font: 800 11px/1 'Inter', sans-serif;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #5750F1;
+    margin-bottom: 6px;
+  }
+  .pm-mp__sub{
+    font: 500 13px/1.55 'Inter', sans-serif;
+    color: rgba(15,23,42,0.62);
+    margin: 0;
+    letter-spacing: -.005em;
+  }
+
+  /* Term toggle (1 Month / 2 Months) — pill switcher */
+  .pm-mp__toggle{
+    display:inline-flex;
+    align-self:center;
+    background:#F8FAFC;
+    border:1px solid #E2E8F0;
+    border-radius:999px;
+    padding:4px;
+    margin: 0 auto 18px;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.04);
+  }
+  .pm-mp{ display:none; flex-direction: column; }
+  /* center the toggle row */
+  .pm-mp > .pm-mp__toggle{
+    margin-left:auto;
+    margin-right:auto;
+  }
+  .pm-mp__pill{
+    background:transparent;
+    border:0;
+    cursor:pointer;
+    padding: 9px 18px;
+    border-radius: 999px;
+    font: 700 12.5px 'Inter', sans-serif;
+    color: rgba(15,23,42,0.55);
+    letter-spacing: -.005em;
+    transition: color .18s ease, background .18s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pm-mp__pill.is-active{
+    background: linear-gradient(180deg, #5B82F8 0%, #5750F1 50%, #4338CA 100%);
+    color: #fff;
+    box-shadow: 0 6px 14px -4px rgba(87,80,241,0.45), inset 0 -2px 4px rgba(0,0,0,0.10);
+  }
+
+  /* Cards */
+  .pm-mp__cards{
+    display:flex;
+    flex-direction:column;
+    gap: 14px;
+    margin-top: 4px;
+  }
+  .pm-mp__card{
+    position:relative;
+    background:#fff;
+    border:1px solid #E2E8F0;
+    border-radius: 18px;
+    padding: 22px 18px 22px;
+    text-align:left;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.04);
+    display:flex;
+    flex-direction:column;
+  }
+  .pm-mp__card--popular{
+    border: 2px solid #5750F1;
+    background: linear-gradient(180deg, #EEF1FB 0%, #F8FAFF 60%);
+    box-shadow: 0 18px 36px -16px rgba(87,80,241,0.32);
+  }
+  .pm-mp__top{
+    display:flex; align-items:flex-start; justify-content:space-between;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .pm-mp__title{
+    font: 800 22px/1.05 'Inter', sans-serif;
+    letter-spacing: -.025em;
+    color: #0F172A;
+    margin: 0;
+  }
+  .pm-mp__pop{
+    background: linear-gradient(180deg, #5B82F8, #4338CA);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font: 700 10.5px/1 'Inter', sans-serif;
+    letter-spacing: -.005em;
+    flex-shrink:0;
+    box-shadow: 0 4px 10px -3px rgba(67,56,202,0.40);
+  }
+  .pm-mp__desc{
+    font: 500 13px/1.5 'Inter', sans-serif;
+    color: rgba(15,23,42,0.60);
+    margin: 0 0 16px;
+    letter-spacing: -.005em;
+  }
+  .pm-mp__price-row{
+    display:flex; align-items:baseline; gap: 6px;
+    margin-bottom: 4px;
+  }
+  .pm-mp__currency{
+    font: 800 18px/1 'Inter', sans-serif;
+    color: #0F172A;
+    letter-spacing: -.020em;
+  }
+  .pm-mp__price{
+    font: 800 38px/1 'Inter', sans-serif;
+    color: #0F172A;
+    letter-spacing: -.030em;
+    font-variant-numeric: tabular-nums;
+  }
+  .pm-mp__period{
+    font: 600 14px/1 'Inter', sans-serif;
+    color: rgba(15,23,42,0.55);
+    letter-spacing: -.012em;
+  }
+  .pm-mp__hint{
+    font: 500 11.5px/1.4 'Inter', sans-serif;
+    color: rgba(15,23,42,0.55);
+    margin: 0 0 18px;
+    letter-spacing: -.005em;
+  }
+  .pm-mp__hint strong{
+    color: #0F172A;
+    font-weight: 700;
+  }
+
+  .pm-mp__btn{
+    display:flex; align-items:center; justify-content:center;
+    width:100%;
+    padding: 13px 18px;
+    border-radius: 12px;
+    font: 700 14px 'Inter', sans-serif;
+    letter-spacing: -.012em;
+    text-decoration: none;
+    margin-bottom: 18px;
+    transition: transform .15s ease, box-shadow .18s ease, filter .15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pm-mp__btn--primary{
+    background: linear-gradient(180deg, #5B82F8 0%, #5750F1 50%, #4338CA 100%);
+    color: #fff;
+    box-shadow: 0 12px 24px -10px rgba(87,80,241,0.55), inset 0 -2px 4px rgba(0,0,0,0.10);
+    border: 1px solid rgba(255,255,255,0.18);
+  }
+  .pm-mp__btn--ghost{
+    background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
+    color: #fff;
+    box-shadow: 0 12px 24px -10px rgba(15,23,42,0.50), inset 0 -2px 4px rgba(0,0,0,0.20);
+    border: 1px solid rgba(255,255,255,0.10);
+  }
+  .pm-mp__btn:active{ transform: translateY(1px); filter: brightness(1.04); }
+
+  .pm-mp__features{
+    display:flex; flex-direction:column; gap: 12px;
+    padding: 16px 0 0;
+    border-top: 1px solid rgba(15,23,42,0.10);
+  }
+  .pm-mp__feat{
+    display:flex; align-items:flex-start; gap: 12px;
+    font: 500 13px/1.45 'Inter', sans-serif;
+    color: #1F2937;
+    letter-spacing: -.005em;
+  }
+  .pm-mp__feat strong{ color: #0F172A; font-weight: 700; }
+  .pm-mp__feat-icon{
+    flex-shrink:0;
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: #F1F5F9;
+    color: #0F172A;
+    display:flex; align-items:center; justify-content:center;
+    margin-top: 1px;
+  }
+  .pm-mp__feat-icon svg{ width: 14px; height: 14px; stroke-width: 2.2; }
+  .pm-mp__feat-text{ flex:1; }
+
+  .pm-mp__includes{
+    display:flex; flex-direction:column; gap: 8px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(15,23,42,0.10);
+  }
+  .pm-mp__includes-title{
+    font: 700 12.5px/1.3 'Inter', sans-serif;
+    color: #0F172A;
+    margin: 0 0 4px;
+    letter-spacing: -.010em;
+  }
+  .pm-mp__inc{
+    display:flex; align-items:flex-start; gap: 10px;
+    font: 500 12.5px/1.45 'Inter', sans-serif;
+    color: #1F2937;
+    letter-spacing: -.005em;
+  }
+  .pm-mp__inc-check{
+    flex-shrink:0;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: #EFF6FF;
+    border: 1px solid #5750F1;
+    color: #5750F1;
+    display:flex; align-items:center; justify-content:center;
+    margin-top: 1px;
+  }
+  .pm-mp__inc-check svg{ width: 11px; height: 11px; stroke-width: 2.6; }
 
   /* reduced motion */
   @media (prefers-reduced-motion: reduce){
@@ -3379,6 +3612,164 @@
           </div>
         </div>
       </div>
+
+      <!-- ──────────────────────────────────────────────────────────
+           MOBILE PLAN CARDS — replaces the interactive calculator
+           on phones with a clean two-card "Choose Your Plan" layout
+           that mirrors the logged-in client membership page. Users
+           see the actual prices ($720 / $1,200) up front instead of
+           having to fiddle with a calculator on a tiny screen.
+
+           Hidden on desktop via CSS (.pm-mp { display:none }).
+           The calculator below it is hidden on mobile via CSS in
+           the book mobile @media block further down.
+           ────────────────────────────────────────────────────────── -->
+      <section class="pm-mp" aria-label="Choose your plan">
+        <header class="pm-mp__head">
+          <span class="pm-mp__eyebrow">Choose your plan</span>
+          <p class="pm-mp__sub">Pick a term, pick your hours. Switch any time.</p>
+        </header>
+
+        <!-- Term toggle (1 month vs 2 months) -->
+        <div class="pm-mp__toggle" role="radiogroup" aria-label="Plan term">
+          <button type="button" class="pm-mp__pill is-active" data-pm-term="1mo" role="radio" aria-checked="true">1 Month</button>
+          <button type="button" class="pm-mp__pill" data-pm-term="2mo" role="radio" aria-checked="false">2 Months</button>
+        </div>
+
+        <div class="pm-mp__cards">
+
+          <!-- 24 Hour Plan -->
+          <article class="pm-mp__card" data-tier="24h">
+            <div class="pm-mp__top">
+              <h4 class="pm-mp__title">24 Hour Plan</h4>
+            </div>
+            <p class="pm-mp__desc">Steady support &mdash; 24 reserved hours per month.</p>
+            <div class="pm-mp__price-row">
+              <span class="pm-mp__currency">$</span>
+              <span class="pm-mp__price" data-pm-price-24>720</span>
+              <span class="pm-mp__period">/mo</span>
+            </div>
+            <p class="pm-mp__hint" data-pm-hint-24>
+              <strong data-pm-hint-strong-24>$720/month</strong> billed monthly &middot; CAD
+            </p>
+            <a class="pm-mp__btn pm-mp__btn--ghost" href="apply.html">Choose this plan</a>
+            <div class="pm-mp__features">
+              <div class="pm-mp__feat">
+                <span class="pm-mp__feat-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                </span>
+                <span class="pm-mp__feat-text"><strong>24 reserved hours</strong> per month &mdash; up to 3 sessions per week</span>
+              </div>
+              <div class="pm-mp__feat">
+                <span class="pm-mp__feat-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                <span class="pm-mp__feat-text">Dedicated assistant matched to your goals</span>
+              </div>
+              <div class="pm-mp__feat">
+                <span class="pm-mp__feat-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </span>
+                <span class="pm-mp__feat-text"><strong data-pm-rate-24>$30/hour</strong> blended rate, locked for the full term</span>
+              </div>
+            </div>
+            <div class="pm-mp__includes">
+              <p class="pm-mp__includes-title">Standard membership includes:</p>
+              <div class="pm-mp__inc"><span class="pm-mp__inc-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Hours protected by contract</span></div>
+              <div class="pm-mp__inc"><span class="pm-mp__inc-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>24h advance cancel/reschedule</span></div>
+              <div class="pm-mp__inc"><span class="pm-mp__inc-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Monthly progress review</span></div>
+            </div>
+          </article>
+
+          <!-- 40 Hour Plan (Popular) -->
+          <article class="pm-mp__card pm-mp__card--popular" data-tier="40h">
+            <div class="pm-mp__top">
+              <h4 class="pm-mp__title">40 Hour Plan</h4>
+              <span class="pm-mp__pop">Popular</span>
+            </div>
+            <p class="pm-mp__desc">Premium intensive &mdash; 40 reserved hours per month with priority access.</p>
+            <div class="pm-mp__price-row">
+              <span class="pm-mp__currency">$</span>
+              <span class="pm-mp__price" data-pm-price-40>1,200</span>
+              <span class="pm-mp__period">/mo</span>
+            </div>
+            <p class="pm-mp__hint" data-pm-hint-40>
+              <strong data-pm-hint-strong-40>$1,200/month</strong> billed monthly &middot; CAD
+            </p>
+            <a class="pm-mp__btn pm-mp__btn--primary" href="apply.html">Choose this plan</a>
+            <div class="pm-mp__features">
+              <div class="pm-mp__feat">
+                <span class="pm-mp__feat-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                </span>
+                <span class="pm-mp__feat-text"><strong>40 reserved hours</strong> per month &mdash; up to 4 sessions per week</span>
+              </div>
+              <div class="pm-mp__feat">
+                <span class="pm-mp__feat-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                <span class="pm-mp__feat-text">Priority assistant matching with senior tier mentors</span>
+              </div>
+              <div class="pm-mp__feat">
+                <span class="pm-mp__feat-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </span>
+                <span class="pm-mp__feat-text"><strong data-pm-rate-40>$30/hour</strong> blended rate, locked for the full term</span>
+              </div>
+            </div>
+            <div class="pm-mp__includes">
+              <p class="pm-mp__includes-title">Everything in Standard, plus:</p>
+              <div class="pm-mp__inc"><span class="pm-mp__inc-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Priority scheduling window</span></div>
+              <div class="pm-mp__inc"><span class="pm-mp__inc-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Same-day rescheduling on Mon&ndash;Thu</span></div>
+              <div class="pm-mp__inc"><span class="pm-mp__inc-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Quarterly progress review with the team</span></div>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <script>
+        /* Term toggle for the mobile plan cards.
+           Mirrors the pricing table from client-membership.html:
+             1-month term: $30/hr → 24h=$720, 40h=$1,200
+             2-month term: $45/hr → 24h=$1,080, 40h=$1,800
+           Updates: prices, hint strings ("$X/month billed..."),
+           and the rate line inside each card. */
+        (function(){
+          var TERMS = {
+            '1mo': { rate: 30, p24: 720,  p40: 1200 },
+            '2mo': { rate: 45, p24: 1080, p40: 1800 }
+          };
+          var pills = document.querySelectorAll('.pm-mp__pill[data-pm-term]');
+          if(!pills.length) return;
+          var fmt = function(n){ return n.toLocaleString('en-CA'); };
+          function setTerm(key){
+            var t = TERMS[key]; if(!t) return;
+            // Pills
+            pills.forEach(function(p){
+              var on = p.getAttribute('data-pm-term') === key;
+              p.classList.toggle('is-active', on);
+              p.setAttribute('aria-checked', on ? 'true' : 'false');
+            });
+            // Prices
+            var p24 = document.querySelector('[data-pm-price-24]');
+            var p40 = document.querySelector('[data-pm-price-40]');
+            var h24 = document.querySelector('[data-pm-hint-strong-24]');
+            var h40 = document.querySelector('[data-pm-hint-strong-40]');
+            var r24 = document.querySelector('[data-pm-rate-24]');
+            var r40 = document.querySelector('[data-pm-rate-40]');
+            if(p24) p24.textContent = fmt(t.p24);
+            if(p40) p40.textContent = fmt(t.p40);
+            if(h24) h24.textContent = '$' + fmt(t.p24) + '/month';
+            if(h40) h40.textContent = '$' + fmt(t.p40) + '/month';
+            if(r24) r24.textContent = '$' + t.rate + '/hour';
+            if(r40) r40.textContent = '$' + t.rate + '/hour';
+          }
+          pills.forEach(function(p){
+            p.addEventListener('click', function(){ setTerm(p.getAttribute('data-pm-term')); });
+          });
+        })();
+      </script>
 
       <div class="pm-ed__c-grid" data-pm-calc>
         <div style="display:flex; flex-direction:column; gap:24px;">
