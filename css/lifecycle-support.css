@@ -288,24 +288,26 @@
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: wrap !important;
-    justify-content: center !important;
+    justify-content: flex-start !important;
     align-items: center !important;
-    padding: 14px 14px 16px !important;
+    padding: 16px 18px 18px !important;
     border-right: 0 !important;
     border-bottom: 1px solid rgba(255,255,255,0.1) !important;
-    gap: 6px !important;
+    gap: 8px !important;
     overflow: visible !important;
   }
   .agi-sidebar::-webkit-scrollbar { display: none !important; }
 
-  /* Section header — full-width, forces the next row of buttons to
-     break onto a new line and reads as a small caps mini-title. */
+  /* Section header — full-width, left-aligned mini-title that
+     forces the next row of buttons to break onto a new line. The
+     centered version felt floaty / "vertical options in the middle";
+     left-aligning gives the whole panel a proper editorial rhythm. */
   .agi-sidebar-label {
     flex: 0 0 100% !important;
     width: 100% !important;
-    margin: 4px 0 8px !important;
+    margin: 6px 0 10px !important;
     align-self: stretch !important;
-    text-align: center !important;
+    text-align: left !important;
     font-size: 9px !important;
     font-weight: 700 !important;
     letter-spacing: 0.22em !important;
@@ -317,6 +319,14 @@
      (it would push the whole nav down inside the dark stage). */
   .agi-sidebar > .agi-sidebar-label:first-of-type {
     margin-top: 0 !important;
+  }
+  /* The second label ("By Age Group") gets a hairline separator
+     above it so the visual break between the two groups is real,
+     not just spacing. */
+  .agi-sidebar > .agi-sidebar-label:nth-of-type(2) {
+    margin-top: 14px !important;
+    padding-top: 14px !important;
+    border-top: 1px solid rgba(255,255,255,0.08) !important;
   }
 
   /* Pill button. flex:0 0 auto so each pill is sized to its text;
