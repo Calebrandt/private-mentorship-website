@@ -13,3 +13,36 @@
       border-top: 1px solid var(--border);
     }
     .footer-bottom p { font-size: 12px; color: var(--hint); }
+
+    /* ── MOBILE: tighter, aligned footer ──────────────────────────
+       Brand sits on its own row up top; the 3 link columns share a
+       compact 3-up grid below, smaller font, smaller gaps. Items now
+       align cleanly across the row instead of squishing into 4
+       cramped columns. Desktop layout above 760px is untouched.
+       ──────────────────────────────────────────────────────────── */
+    @media (max-width: 760px) {
+      footer { padding: 48px 22px 28px; }
+      .footer-top {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 22px 16px;
+        margin-bottom: 32px;
+      }
+      .footer-brand {
+        grid-column: 1 / -1;
+        margin-bottom: 4px;
+      }
+      .footer-brand img { height: 32px; }
+      .footer-brand p { font-size: 13px; line-height: 1.55; max-width: none; margin-top: 10px; }
+      .footer-col h4 { font-size: 10px; margin-bottom: 10px; letter-spacing: .6px; }
+      .footer-col ul { gap: 8px; }
+      .footer-col ul li a { font-size: 12px; }
+      .footer-bottom {
+        padding-top: 20px;
+        gap: 6px;
+      }
+      .footer-bottom p { font-size: 11px; }
+    }
+    @media (max-width: 420px) {
+      .footer-col h4 { font-size: 9.5px; }
+      .footer-col ul li a { font-size: 11.5px; }
+    }

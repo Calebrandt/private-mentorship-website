@@ -1417,7 +1417,25 @@ function emitBlob(cx, cy, vx, vy, baseR, lifeMs, strength = 1, forceHole = false
       text-transform: uppercase;
       opacity: 0.5;
     }
-      
+
+    /* Mobile: shrink the PM folder card so it doesn't dominate the
+       hero. Internal proportions kept; just smaller. */
+    @media (max-width: 760px){
+      .pm-card{
+        width: 100px;
+        bottom: 16px;
+        left: 16px;
+        padding: 9px 8px 11px;
+      }
+      .pm-card__flag-box{ width: 54px; height: 54px; margin: 0 auto 8px; perspective: 500px; }
+      .pm-card__flag-3d{ width: 48px; height: 48px; }
+      .pm-card__meta{ font-size: 6px; padding: 0 1px 5px; margin: 0 -1px 8px; }
+      .pm-card__city{ font-size: 7px; padding-bottom: 7px; margin: 0 -1px 7px; }
+      .pm-card__badge{ width: 96px; height: 76px; margin: 0 0 -4px 50%; }
+      .pm-card__helmet{ width: 56px; }
+      .pm-card__role{ font-size: 8px; }
+      .pm-card__since{ font-size: 5.5px; }
+    }
   `;
 
   const style = document.createElement('style');

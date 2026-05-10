@@ -39,15 +39,21 @@
   /* ────────────────────────────────────────────────────────────
      MOBILE GUARDRAILS — applies only at ≤760px so desktop is
      completely untouched.
-       1. overflow-x:hidden on html/body clips any errant element
+       1. overflow-x:clip on html/body clips any errant element
           that extends past the viewport (the white space the user
-          could see on the right when pinch-zooming out).
+          could see on the right when pinch-zooming out). We use
+          `clip` instead of `hidden` because `hidden` establishes a
+          new scroll container and BREAKS position:sticky on every
+          descendant (the journey "Room in their lives" section + the
+          made-for cycle both rely on sticky pinning). `clip` clips
+          painted overflow without creating a scroll container, so
+          sticky still works correctly.
        2. The viewport meta tag at the top of <head> sets
           minimum-scale=1.0 so the layout can no longer be
           zoomed out below the designed size.
      ──────────────────────────────────────────────────────────── */
   @media (max-width: 760px){
-    html, body { overflow-x: hidden; max-width: 100vw; }
+    html, body { overflow-x: clip; max-width: 100vw; }
   }
 
   /* ===========================================================
@@ -1118,6 +1124,16 @@
     #the-assistant-lander::before,
     #the-assistant-lander::after{ /* keep visible — they're static gradients, not motion */ }
   }
+
+  /* ── MOBILE: drop the WebGL fluid sim + shorten the made-for cycle ─
+     The shader is gorgeous on a 27" desktop but performance-heavy and
+     visually busy on phones. Keep the sticky cycle of words; remove
+     the shimmer. Also shorten the scroll length so users aren't stuck
+     scrolling 8 viewports just to read 5 words. */
+  @media (max-width: 760px){
+    .pm-shader{ height: 360vh; }
+    .pm-shader__canvas{ display: none !important; }
+  }
 </style>
 
 <section class="pm-shader" id="pm-shader-section" aria-label="Welcome to Private Mentorship">
@@ -2151,10 +2167,42 @@
   @media (max-width: 760px){
     .pm-book__chapters{ grid-template-columns:repeat(2, 1fr); }
     .pm-book__chapter-sub{ display:none; }
-    .pm-book__page-head{ padding:36px 24px 20px; gap:14px; }
-    .pm-book__page-body{ padding:20px 20px 36px; max-height:none; }
+    .pm-book__page-head{ padding:24px 20px 14px; gap:12px; }
+    .pm-book__page-body{ padding:14px 20px 28px; max-height:none; }
     .pm-book__page-roman{ font-size:48px; }
-    .pm-book__stage{ min-height:560px; }
+    .pm-book__page-title{ font-size:22px; }
+    .pm-book__stage{ min-height:auto !important; }
+
+    /* Drop the page-flip metaphor entirely on phones. The book becomes
+       a vertical stack of readable cards. Users scroll through every
+       chapter naturally — no flipping, no hidden content. The chapter
+       rail buttons + cover are hidden because they're no longer needed. */
+    .pm-book__cover{ display:none !important; }
+    .pm-book__pager{ display:none !important; }
+    .pm-book__close{ display:none !important; }
+    .pm-book__page{
+      position:relative !important;
+      inset:auto !important;
+      opacity:1 !important;
+      transform:none !important;
+      pointer-events:auto !important;
+      margin:0 0 18px;
+      border-radius:14px;
+      transition:none !important;
+      box-shadow:0 1px 3px rgba(14,23,33,0.06), 0 8px 24px -16px rgba(14,23,33,0.18);
+    }
+    .pm-book__page.is-closing{
+      display:block;
+      opacity:1 !important;
+      transform:none !important;
+      pointer-events:auto;
+    }
+    /* Keep the chapter rail visible but slimmer — acts as a section
+       summary up top so users know what's coming. */
+    .pm-book__chapters{ margin-bottom:18px; }
+    .pm-book__chapter{ padding:10px 8px; }
+    .pm-book__chapter-num{ font-size:11px; }
+    .pm-book__chapter-title{ font-size:12px; }
   }
 
   /* reduced motion */
@@ -6021,6 +6069,50 @@
     .pm-calc__check-cta-icon{ width:40px; height:40px; }
   }
 
+  /* ── MOBILE: pull the calculator OUT of its modal ───────────────
+     On phones the "See if your plan fits" CTA + overlay modal create
+     two friction layers between users and the math they want to do.
+     We drop the CTA and force the modal to render inline as a normal
+     block right inside Chapter 03 (Plans). The modal stays in markup
+     but behaves like a flow card — users just scroll down and use it.
+     Desktop is untouched: the CTA + overlay still work above 760px. */
+  @media (max-width: 760px){
+    /* Hide the CTA — calculator is already visible below it. */
+    .pm-calc__check-cta{ display:none !important; }
+
+    /* Convert the fixed-overlay modal into an inline block. */
+    .pm-calc-modal{
+      position:relative !important;
+      inset:auto !important;
+      z-index:auto !important;
+      display:block !important;
+      padding:0 !important;
+      pointer-events:auto !important;
+      opacity:1 !important;
+      transition:none !important;
+      margin-top:18px;
+    }
+    /* Drop the dimmed backdrop entirely. */
+    .pm-calc-modal__backdrop{ display:none !important; }
+    /* Drop the close button — nothing to close anymore. */
+    .pm-calc-modal__close{ display:none !important; }
+    /* Reset panel: act like a normal card, no overlay max-height. */
+    .pm-calc-modal__panel{
+      position:relative !important;
+      width:100% !important;
+      max-width:100% !important;
+      max-height:none !important;
+      overflow:visible !important;
+      transform:none !important;
+      transition:none !important;
+      padding:22px 18px 20px !important;
+      border-radius:16px !important;
+      box-shadow:0 1px 2px rgba(14,23,33,0.04), 0 10px 24px -16px rgba(14,23,33,0.18) !important;
+    }
+    /* Body lock no longer applies — we never "open" anything. */
+    body.pm-calc-modal-open{ overflow:auto !important; }
+  }
+
   /* ───── v15 ADDITIONS ───── */
 
   /* (sticky side rail removed — was visually intrusive) */
@@ -8279,7 +8371,7 @@
   
 
   <script src="script.js"></script>
-  <script src="hero.js?v=20260509b" defer></script>
+  <script src="hero.js?v=20260509c" defer></script>
 
   <!-- ─── PLAN CALCULATOR (Chapter 03) ─── -->
   <script>
