@@ -1374,6 +1374,61 @@
   body.theme-light .pm-msg-theme-btn .pm-theme-icon-sun{display:none;}
   body.theme-light .pm-msg-theme-btn .pm-theme-icon-moon{display:block;}
 
+  /* ── Call modal in light theme ────────────────────────────────
+     Default modal is dark; when the client is on pearl light, the
+     call screen should match. Backgrounds/glass/text all flip. */
+  body.theme-light .pm-call-modal{
+    background:radial-gradient(120% 100% at 50% 0%,
+      #FDFCFF 0%,
+      #F2EEFB 55%,
+      #E5E0F4 100%);
+    color:#0F172A;
+  }
+  body.theme-light .pm-call-modal__top{
+    background:linear-gradient(180deg, rgba(15,23,42,0.04) 0%, rgba(0,0,0,0) 100%);
+  }
+  body.theme-light .pm-call-modal__name{color:#0F172A;}
+  body.theme-light .pm-call-modal__status{color:#64748B;}
+  body.theme-light .pm-call-modal__type{
+    background:rgba(255,255,255,0.78);
+    color:#475569;
+    border-color:rgba(15,23,42,0.08);
+  }
+  body.theme-light .pm-call-tile{
+    background:linear-gradient(135deg,rgba(255,255,255,0.85),rgba(255,255,255,0.55));
+    border:1px solid rgba(15,23,42,0.06);
+    box-shadow:0 24px 60px -28px rgba(15,23,42,0.18), inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+  body.theme-light .pm-call-tile__placeholder{color:#475569;}
+  body.theme-light .pm-call-tile__placeholder-name{color:#0F172A;}
+  body.theme-light .pm-call-tile__placeholder-sub{color:#94A3B8;}
+  body.theme-light .pm-call-tile__label{
+    background:rgba(255,255,255,0.85);
+    color:#0F172A;
+    border-color:rgba(15,23,42,0.08);
+  }
+  body.theme-light .pm-call-modal__controls{
+    background:linear-gradient(0deg, rgba(15,23,42,0.06) 0%, rgba(0,0,0,0) 100%);
+  }
+  body.theme-light .pm-call-ctrl{
+    background:rgba(255,255,255,0.78);
+    border:1px solid rgba(15,23,42,0.08);
+    color:#1F2937;
+    box-shadow:0 4px 14px -6px rgba(15,23,42,0.12);
+  }
+  body.theme-light .pm-call-ctrl:hover{background:#fff;color:#0F172A;}
+  /* Mute / camera-off (red destructive) and end-call stay branded */
+
+  /* Incoming-call ring modal — light glass card */
+  body.theme-light .pm-ring-modal__card{
+    background:rgba(255,255,255,0.92);
+    border:1px solid rgba(15,23,42,0.08);
+    color:#0F172A;
+    box-shadow:0 24px 60px -20px rgba(15,23,42,0.18);
+  }
+  body.theme-light .pm-ring-modal__title{color:#0F172A;}
+  body.theme-light .pm-ring-modal__sub{color:#64748B;}
+
   /* ── End LIGHT MODE ──────────────────────────────────────────── */
 </style>
 </head>
