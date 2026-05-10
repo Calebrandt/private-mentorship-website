@@ -1233,7 +1233,7 @@ function emitBlob(cx, cy, vx, vy, baseR, lifeMs, strength = 1, forceHole = false
     .pm-wordmark__top {
       display: block;
       font-family: 'Archivo', 'Helvetica Neue', 'Helvetica', sans-serif;
-      font-size: 62px;
+      font-size: clamp(28px, 8.5vw, 62px);
       font-weight: 600;
       letter-spacing: -0.055em;
       line-height: 0.86;
@@ -1243,12 +1243,18 @@ function emitBlob(cx, cy, vx, vy, baseR, lifeMs, strength = 1, forceHole = false
     .pm-wordmark__bottom {
       display: block;
       font-family: 'Anton', 'Impact', 'Haettenschweiler', 'Arial Narrow', sans-serif;
-      font-size: 74px;
+      font-size: clamp(34px, 9.5vw, 74px);
       font-weight: 400;
       letter-spacing: -0.01em;
       line-height: 0.82;
       margin-top: -6px;
       text-transform: uppercase;
+    }
+    @media (max-width: 540px){
+      /* On mobile, place the wordmark below the page nav (~68px tall)
+         and to the left margin. The wordmark now lives at the top of
+         the hero section, clear of the model's face. */
+      .pm-wordmark{top:84px;left:18px;right:18px;line-height:0.86;}
     }
 
     .pm-card {
@@ -1419,6 +1425,13 @@ function emitBlob(cx, cy, vx, vy, baseR, lifeMs, strength = 1, forceHole = false
   style.textContent = css;
   document.head.appendChild(style);
 
+  // Anchor the wordmark to the SECTION (identity-hero) instead of the
+  // portrait stage. The stage is sized to the portrait's aspect ratio
+  // and centered vertically, so on mobile the stage lands halfway down
+  // the viewport — anchoring the wordmark there puts it on top of the
+  // model's face. Anchoring to the section keeps the wordmark at the
+  // true top of the hero on every screen size.
+  const heroSection = document.querySelector('.identity-hero');
   const stageOverlay = document.querySelector('.portrait__stage');
 
   const mark = document.createElement('div');
@@ -1427,7 +1440,7 @@ function emitBlob(cx, cy, vx, vy, baseR, lifeMs, strength = 1, forceHole = false
     <span class="pm-wordmark__top">PRIVATE</span>
     <span class="pm-wordmark__bottom">MENTORSHIP</span>
   `;
-  (stageOverlay || document.body).appendChild(mark);
+  (heroSection || stageOverlay || document.body).appendChild(mark);
   
   const card = document.createElement('div');
   card.className = 'pm-card';

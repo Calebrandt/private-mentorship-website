@@ -6189,10 +6189,18 @@
     max-width:none; margin-left:auto; margin-right:auto;
     white-space:nowrap;
   }
+  /* On phones the title is too long to fit on one line — let it wrap. */
+  @media (max-width: 760px){
+    .pm-ed__fit-title{ white-space:normal; line-height:1.3; }
+  }
   .pm-ed__fit-list{
     list-style:none; padding:0; margin:0;
     display:grid; grid-template-columns:repeat(2, 1fr);
     gap:14px 32px;
+  }
+  /* Stack the eligibility list to a single column on phones */
+  @media (max-width: 600px){
+    .pm-ed__fit-list{ grid-template-columns:1fr; gap:12px; }
   }
   .pm-ed__fit-list li{
     display:grid; grid-template-columns:24px 1fr; gap:14px; align-items:start;
@@ -8257,7 +8265,7 @@
   
 
   <script src="script.js"></script>
-  <script src="hero.js" defer></script>
+  <script src="hero.js?v=20260509b" defer></script>
 
   <!-- ─── PLAN CALCULATOR (Chapter 03) ─── -->
   <script>
