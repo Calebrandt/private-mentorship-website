@@ -4308,8 +4308,28 @@
           margin:0 auto !important;
         }
         .tal__hero-media img{ width:100% !important; height:100% !important; object-fit:cover !important; }
-        .tal__hero-media-stat{ right:14px !important; bottom:14px !important; padding:10px 14px !important; }
+        /* The stat chip floats in the photo corner. Setting BOTH top
+           and bottom on a position:absolute element stretches it to
+           fill the vertical space — the cause of the "white box
+           vertically stretched out unnecessarily" bug. Pin to ONE
+           edge only and force the other to auto. */
+        .tal__hero-media-stat{
+          top:auto !important;
+          right:14px !important;
+          bottom:14px !important;
+          left:auto !important;
+          padding:10px 14px !important;
+          height:auto !important;
+          min-height:0 !important;
+          max-height:none !important;
+        }
         .tal__hero-media-stat-val{ font-size:18px !important; }
+        /* The "working across" label + marquee strip — runs 50s on
+           desktop. On a narrow phone viewport that feels like an
+           eternity to read past "WorkBC appointments". Halve it. */
+        .tal__slider-track{ animation-duration: 22s !important; }
+        .tal__slider-item{ font-size:15px !important; gap:48px !important; }
+        .tal__slider-track{ gap:48px !important; }
         /* ── 3 service cards: clean single-column stack with breathing room ── */
         .tal__cards{ grid-template-columns:1fr !important; gap:14px !important; margin-top:48px !important; }
         .tal__card{ padding:22px 20px !important; }
