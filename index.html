@@ -7467,6 +7467,94 @@
             color:rgba(58,42,16,0.45);
           }
           .sp-archive-mark span{ color:rgba(58,42,16,0.65); font-weight:700; }
+
+          /* ── MOBILE: redo the Real Moments / Experience layout ─
+             On desktop everything fits side-by-side: title | III mark,
+             photo | info | thumbnail strip, tight controls. On a phone
+             the 380px photo + the 104px strip overflow the viewport
+             and slam into the title above. We:
+               • Drop the sticky 100vh container — section flows
+                 naturally, content can be as tall as it needs.
+               • Stack the header vertically with proper spacing.
+               • Stack the main row: photo on top, info below.
+               • Hide the thumbnail strip (info already has Show More).
+               • Cap photo width to fit the viewport; height auto so
+                 aspect ratio holds.
+               • Tighten + space the bottom controls so prev/counter/
+                 next/sound/42 stories don't crash into each other.
+               • Add breathing room above the section (pad-top) so it
+                 doesn't kiss the journey "Still writing the story" end. */
+          @media (max-width: 760px){
+            #spotlight{ padding-top:48px !important; }
+            #sp-sticky{
+              position:relative !important;
+              top:auto !important;
+              height:auto !important;
+              min-height:0 !important;
+              overflow:visible !important;
+            }
+            /* header row: stack */
+            #sp-sticky > div:nth-of-type(1){
+              padding:24px 22px 18px !important;
+              flex-direction:column !important;
+              align-items:flex-start !important;
+              gap:14px !important;
+            }
+            #sp-sticky > div:nth-of-type(1) > div:nth-of-type(2){
+              flex-direction:row !important;
+              align-items:center !important;
+              gap:12px !important;
+              padding-bottom:0 !important;
+            }
+            #sp-sticky .sp-volume{ font-size:38px !important; line-height:1 !important; }
+            #sp-sticky h2{
+              font-size:32px !important;
+              line-height:1.05 !important;
+            }
+            /* main content row: stack vertically */
+            #sp-sticky > div:nth-of-type(2){
+              flex-direction:column !important;
+              align-items:stretch !important;
+              padding:22px 22px 6px !important;
+              gap:22px !important;
+            }
+            /* photo: full width, fixed aspect, fits viewport */
+            #sp-sticky > div:nth-of-type(2) > div:nth-of-type(1){
+              width:100% !important;
+              justify-content:center !important;
+            }
+            #sp-photo-wrap{
+              width:min(86vw, 360px) !important;
+              height:auto !important;
+              aspect-ratio:380 / 520;
+              margin:0 auto !important;
+              border-width:7px !important;
+            }
+            /* info column */
+            #sp-info{ width:100% !important; }
+            #sp-title{ font-size:22px !important; }
+            #sp-desc{ font-size:13px !important; max-width:none !important; }
+            #sp-info > div[style*="grid-template-columns:repeat(4,1fr)"]{
+              grid-template-columns:repeat(2, 1fr) !important;
+              gap:14px !important;
+            }
+            /* hide the right-side thumbnail strip on mobile */
+            #sp-strip-win,
+            #sp-sticky > div:nth-of-type(2) > div:last-child{
+              display:none !important;
+            }
+            /* bottom controls */
+            #sp-sticky > div:nth-of-type(3){
+              padding:14px 18px 18px !important;
+              gap:10px !important;
+              flex-wrap:wrap;
+            }
+            #sp-counter{ min-width:54px !important; font-size:10px !important; }
+            #sp-sound-btn{ width:26px !important; height:26px !important; }
+            #sp-sticky .sp-archive-mark{ font-size:8.5px !important; letter-spacing:0.22em !important; }
+            /* skip button */
+            #sp-skip{ bottom:12px !important; right:12px !important; }
+          }
         </style>
 
         <!-- Section header — editorial archive: eyebrow + gold title + Roman volume mark -->
