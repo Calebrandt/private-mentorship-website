@@ -1418,23 +1418,54 @@ function emitBlob(cx, cy, vx, vy, baseR, lifeMs, strength = 1, forceHole = false
       opacity: 0.5;
     }
 
-    /* Mobile: shrink the PM folder card so it doesn't dominate the
-       hero. Internal proportions kept; just smaller. */
+    /* Mobile: shrink the PM folder card properly so it reads as a
+       deliberate, premium chip — not an oversized panel that
+       crowds (and slightly overlaps) the portrait. Everything inside
+       scales down together so proportions still look intentional:
+       flag : city border : helmet+laurel : role+since. */
     @media (max-width: 760px){
       .pm-card{
-        width: 100px;
-        bottom: 16px;
-        left: 16px;
-        padding: 9px 8px 11px;
+        width: 78px;
+        bottom: 12px;
+        left: 12px;
+        padding: 7px 6px 9px;
       }
-      .pm-card__flag-box{ width: 54px; height: 54px; margin: 0 auto 8px; perspective: 500px; }
-      .pm-card__flag-3d{ width: 48px; height: 48px; }
-      .pm-card__meta{ font-size: 6px; padding: 0 1px 5px; margin: 0 -1px 8px; }
-      .pm-card__city{ font-size: 7px; padding-bottom: 7px; margin: 0 -1px 7px; }
-      .pm-card__badge{ width: 96px; height: 76px; margin: 0 0 -4px 50%; }
-      .pm-card__helmet{ width: 56px; }
-      .pm-card__role{ font-size: 8px; }
-      .pm-card__since{ font-size: 5.5px; }
+      .pm-card__meta{
+        font-size: 5px;
+        letter-spacing: 0.22em;
+        padding: 0 1px 4px;
+        margin: 0 -1px 6px;
+      }
+      .pm-card__meta-dot{ width: 3px; height: 3px; }
+      .pm-card__flag-box{
+        width: 36px;
+        height: 36px;
+        margin: 0 auto 6px;
+        perspective: 360px;
+      }
+      .pm-card__flag-3d{ width: 30px; height: 30px; }
+      .pm-card__city{
+        font-size: 5.5px;
+        letter-spacing: 0.18em;
+        padding-bottom: 5px;
+        margin: 0 -1px 5px;
+      }
+      .pm-card__badge{
+        width: 70px;
+        height: 56px;
+        margin: 0 0 -3px 50%;
+      }
+      .pm-card__helmet{ width: 38px; }
+      .pm-card__role{
+        font-size: 6.5px;
+        letter-spacing: 0.16em;
+        line-height: 1.18;
+      }
+      .pm-card__since{
+        margin-top: 3px;
+        font-size: 5px;
+        letter-spacing: 0.24em;
+      }
     }
   `;
 
