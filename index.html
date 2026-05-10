@@ -2293,46 +2293,243 @@
     color:var(--ink-3, #5d6b7e);
   }
 
-  /* responsive: stack chapter rail on small screens */
-  @media (max-width: 760px){
-    .pm-book__chapters{ grid-template-columns:repeat(2, 1fr); }
-    .pm-book__chapter-sub{ display:none; }
-    .pm-book__page-head{ padding:24px 20px 14px; gap:12px; }
-    .pm-book__page-body{ padding:14px 20px 28px; max-height:none; }
-    .pm-book__page-roman{ font-size:48px; }
-    .pm-book__page-title{ font-size:22px; }
-    .pm-book__stage{ min-height:auto !important; }
+  /* ════════════════════════════════════════════════════════════
+     MOBILE: rebuild the book as 5 distinct vertical sections.
 
-    /* Drop the page-flip metaphor entirely on phones. The book becomes
-       a vertical stack of readable cards. Users scroll through every
-       chapter naturally — no flipping, no hidden content. The chapter
-       rail buttons + cover are hidden because they're no longer needed. */
-    .pm-book__cover{ display:none !important; }
-    .pm-book__pager{ display:none !important; }
-    .pm-book__close{ display:none !important; }
-    .pm-book__page{
+     On desktop the book is a single sticky stage that flips between
+     5 chapter-pages. On a phone that metaphor doesn't translate —
+     it has to become 5 honest, full-width sections that read top to
+     bottom like a long-form article. Each chapter:
+       • a strong header band painted in its own --chapter-color
+         (Roman numeral + "Chapter 0X" eyebrow + title + sub)
+       • a clean white body underneath with proper padding
+       • generous gap between chapters so they feel SEPARATE
+       • inner multi-column grids forced to one column
+
+     We also fully neutralize the desktop sticky/flex-row container
+     (.pm-book-scroll .pm-book) so the rail-on-left, stage-on-right
+     layout doesn't try to render at 414px wide.
+     ════════════════════════════════════════════════════════════ */
+  @media (max-width: 760px){
+    /* 1. Drop scroll-jacking + horizontal flex from the wrapper. */
+    .pm-book-scroll{ min-height:auto !important; }
+    .pm-book-scroll .pm-book{
+      position:relative !important;
+      top:auto !important;
+      display:block !important;
+      flex-direction:column !important;
+      height:auto !important;
+      max-height:none !important;
+      gap:0 !important;
+      padding:0 16px !important;
+    }
+    .pm-book-scroll .pm-book__stage,
+    .pm-book__stage{
+      flex:none !important;
+      width:100% !important;
+      height:auto !important;
+      min-height:0 !important;
+      max-height:none !important;
+      margin:0 !important;
+    }
+    .pm-book__head,
+    .pm-book-scroll .pm-book__head{ display:none !important; }
+    .pm-book-scroll__progress{ display:none !important; }
+
+    /* 2. Hide the page-flip chrome — no cover, pager, close, rail. */
+    .pm-book__cover,
+    .pm-book__pager,
+    .pm-book__close,
+    .pm-book__chapters,
+    .pm-book-scroll .pm-book__chapters{ display:none !important; }
+
+    /* 3. Each chapter renders as a tall, distinct section. */
+    .pm-book__page,
+    .pm-book-scroll .pm-book__page{
       position:relative !important;
       inset:auto !important;
       opacity:1 !important;
       transform:none !important;
       pointer-events:auto !important;
-      margin:0 0 18px;
-      border-radius:14px;
+      display:block !important;
+      width:100% !important;
+      height:auto !important;
+      max-height:none !important;
+      margin:0 0 28px !important;
+      padding:0 !important;
+      background:#fff !important;
+      border:1px solid rgba(14,23,33,0.08) !important;
+      border-radius:18px !important;
+      overflow:hidden !important;
       transition:none !important;
-      box-shadow:0 1px 3px rgba(14,23,33,0.06), 0 8px 24px -16px rgba(14,23,33,0.18);
+      box-shadow:
+        0 1px 2px rgba(14,23,33,0.04),
+        0 16px 32px -22px rgba(14,23,33,0.18) !important;
     }
     .pm-book__page.is-closing{
-      display:block;
+      display:block !important;
       opacity:1 !important;
       transform:none !important;
-      pointer-events:auto;
     }
-    /* Keep the chapter rail visible but slimmer — acts as a section
-       summary up top so users know what's coming. */
-    .pm-book__chapters{ margin-bottom:18px; }
-    .pm-book__chapter{ padding:10px 8px; }
-    .pm-book__chapter-num{ font-size:11px; }
-    .pm-book__chapter-title{ font-size:12px; }
+    /* spine line: slim chapter-color stripe down the left edge */
+    .pm-book__page-spine,
+    .pm-book-scroll .pm-book__page-spine{
+      display:block !important;
+      position:absolute !important;
+      top:0; bottom:0; left:0;
+      width:4px !important;
+      background:var(--chapter-color, #0E7C82) !important;
+      opacity:1 !important;
+    }
+
+    /* 4. Chapter HEADER — a real "section header" band with the
+          chapter color tinting the background. */
+    .pm-book__page-head,
+    .pm-book-scroll .pm-book__page-head{
+      position:relative !important;
+      display:grid !important;
+      grid-template-columns:auto 1fr !important;
+      grid-template-rows:auto auto !important;
+      column-gap:16px !important;
+      row-gap:6px !important;
+      align-items:start !important;
+      padding:24px 22px 22px 28px !important;
+      margin:0 !important;
+      border-bottom:1px solid rgba(14,23,33,0.08) !important;
+      background:
+        linear-gradient(180deg,
+          color-mix(in srgb, var(--chapter-color, #0E7C82) 14%, #fff) 0%,
+          color-mix(in srgb, var(--chapter-color, #0E7C82) 4%, #fff) 100%) !important;
+    }
+    .pm-book__page-roman,
+    .pm-book-scroll .pm-book__page-head .pm-book__page-roman{
+      grid-row:1 / span 2;
+      align-self:center !important;
+      font-size:54px !important;
+      line-height:1 !important;
+      color:var(--chapter-color, #0E7C82) !important;
+      -webkit-text-fill-color:var(--chapter-color, #0E7C82) !important;
+      background:none !important;
+      filter:none !important;
+      animation:none !important;
+      text-shadow:none !important;
+    }
+    .pm-book__page-titlewrap{
+      display:flex !important;
+      flex-direction:column !important;
+      gap:6px !important;
+      min-width:0 !important;
+    }
+    .pm-book__page-eyebrow{
+      font:700 10px/1 'Inter', sans-serif !important;
+      letter-spacing:0.22em !important;
+      text-transform:uppercase !important;
+      color:var(--chapter-color, #0E7C82) !important;
+      opacity:0.85 !important;
+    }
+    .pm-book__page-title,
+    .pm-book-scroll .pm-book__page-head .pm-book__page-title{
+      font-size:24px !important;
+      line-height:1.15 !important;
+      letter-spacing:-0.02em !important;
+      margin:0 !important;
+      color:#0E1721 !important;
+    }
+    .pm-book__page-sub{
+      font-size:13.5px !important;
+      line-height:1.55 !important;
+      color:rgba(14,23,33,0.65) !important;
+      margin:0 !important;
+      grid-column:2 !important;
+    }
+    .pm-book__page-folio{
+      grid-column:2 !important;
+      justify-self:start !important;
+      margin-top:6px !important;
+      font:700 10px/1 'Inter', sans-serif !important;
+      letter-spacing:0.18em !important;
+      text-transform:uppercase !important;
+      color:rgba(14,23,33,0.4) !important;
+    }
+
+    /* 5. Chapter BODY — proper white card padding, no internal scroll. */
+    .pm-book__page-body,
+    .pm-book-scroll .pm-book__page-body{
+      padding:22px 18px 28px 22px !important;
+      height:auto !important;
+      max-height:none !important;
+      overflow:visible !important;
+      background:#fff !important;
+    }
+
+    /* 6. Force every inner editorial grid to single-column.
+          These are the ones that were silently 2-3 columns inside the
+          chapter body (donut + areas, plans, pillars, scenes). */
+    .pm-book__page-body .pm-ed__a-grid,
+    .pm-book__page-body .pm-ed__b-grid,
+    .pm-book__page-body .pm-ed__c-grid,
+    .pm-book__page-body .pm-ed__journey,
+    .pm-book__page-body .pm-ed__scenes,
+    .pm-book__page-body .pm-ed__pillars,
+    .pm-book__page-body .pm-ed__steps,
+    .pm-book__page-body .pm-ed__bars{
+      grid-template-columns:1fr !important;
+      gap:14px !important;
+    }
+    /* Restore the per-block head hidden by desktop's "page-flip" CSS
+       so the user gets context inside each chapter on mobile. */
+    .pm-book__page-body .pm-ed__block-head{
+      display:flex !important;
+      flex-direction:column !important;
+      gap:6px !important;
+      margin:0 0 18px !important;
+      padding:0 !important;
+    }
+    .pm-book__page-body .pm-ed__block-head-left{
+      display:flex !important;
+      align-items:flex-start !important;
+      gap:14px !important;
+      flex-direction:row !important;
+    }
+    .pm-book__page-body .pm-ed__block-roman{ font-size:36px !important; line-height:1 !important; }
+    .pm-book__page-body .pm-ed__block-eyebrow{
+      font-size:10px !important; letter-spacing:0.18em !important;
+    }
+    .pm-book__page-body .pm-ed__block-title{ font-size:18px !important; line-height:1.18 !important; }
+    .pm-book__page-body .pm-ed__block-sub{ font-size:13px !important; line-height:1.55 !important; }
+    .pm-book__page-body .pm-ed__block-count{ display:none !important; }
+
+    /* Inner cards (donut card, bars-card, pillar, area, etc.) get
+       proper mobile padding and spacing. */
+    .pm-book__page-body .pm-ed__donut-card,
+    .pm-book__page-body .pm-ed__bars-card,
+    .pm-book__page-body .pm-ed__plan,
+    .pm-book__page-body .pm-ed__pillar,
+    .pm-book__page-body .pm-ed__step,
+    .pm-book__page-body .pm-ed__scene,
+    .pm-book__page-body .pm-ed__area{
+      padding:16px 14px !important;
+      transform:none !important;
+      opacity:1 !important;
+    }
+    /* The "areas" buttons (Education / Life Skills / Personal Support
+       in chapter 1) — clean stack with bigger touch targets. */
+    .pm-book__page-body .pm-ed__areas{
+      display:flex !important;
+      flex-direction:column !important;
+      gap:10px !important;
+    }
+    .pm-book__page-body .pm-ed__area{
+      display:grid !important;
+      grid-template-columns:auto 1fr auto auto !important;
+      gap:10px !important;
+      align-items:center !important;
+    }
+    .pm-book__page-body .pm-ed__area-roman{ font-size:18px !important; width:34px !important; height:34px !important; }
+    .pm-book__page-body .pm-ed__area-title{ font-size:15px !important; }
+    .pm-book__page-body .pm-ed__area-meta{ font-size:12px !important; line-height:1.45 !important; }
+    .pm-book__page-body .pm-ed__area-pct{ font-size:14px !important; }
+    .pm-book__page-body .pm-ed__area-pct small{ font-size:9px !important; }
   }
 
   /* reduced motion */
@@ -4001,6 +4198,68 @@
         .tal__hero-intro{ font-size:15px; }
         .tal__hero-media{ max-width:380px; }
         .tal__inner{ padding:0 22px; }
+      }
+      /* ── Phone (≤760): make sure the hero text and photo never
+         collide. Stack them vertically with proper gap, cap the
+         title size aggressively, and let the photo flow under the
+         text on its own row. The 3 service cards fall into a clean
+         single-column stack. ── */
+      @media (max-width: 760px){
+        .tal{ padding:48px 0 56px !important; }
+        .tal__inner{ padding:0 18px !important; }
+        .tal__hero{ padding:0 !important; }
+        .tal__hero-grid{
+          display:flex !important;
+          flex-direction:column !important;
+          gap:32px !important;
+          min-height:0 !important;
+        }
+        .tal__hero-text{
+          width:100% !important;
+          max-width:none !important;
+          position:relative !important;
+        }
+        .tal__hero-num{ font-size:30px !important; }
+        .tal__hero-eyebrow{ margin:0 0 14px !important; gap:10px !important; }
+        .tal__hero-eyebrow-label{ font-size:10px !important; letter-spacing:.22em !important; }
+        .tal__hero-title{
+          font-size:28px !important;
+          line-height:1.08 !important;
+          margin:0 0 14px !important;
+        }
+        .tal__hero-intro{
+          font-size:14.5px !important;
+          line-height:1.6 !important;
+          margin:0 0 22px !important;
+        }
+        .tal__hero-actions{ flex-direction:column !important; gap:10px !important; align-items:stretch !important; }
+        .tal__btn{ width:100% !important; justify-content:center !important; }
+        .tal__hero-media{
+          position:relative !important;
+          right:auto !important; top:auto !important; left:auto !important; bottom:auto !important;
+          width:100% !important;
+          max-width:none !important;
+          margin:0 !important;
+          padding:0 !important;
+          pointer-events:auto !important;
+        }
+        .tal__hero-media-frame{
+          width:100% !important;
+          height:auto !important;
+          aspect-ratio:4/5 !important;
+          max-width:380px !important;
+          margin:0 auto !important;
+        }
+        .tal__hero-media img{ width:100% !important; height:100% !important; object-fit:cover !important; }
+        .tal__hero-media-stat{ right:14px !important; bottom:14px !important; padding:10px 14px !important; }
+        .tal__hero-media-stat-val{ font-size:18px !important; }
+        /* ── 3 service cards: clean single-column stack with breathing room ── */
+        .tal__cards{ grid-template-columns:1fr !important; gap:14px !important; margin-top:48px !important; }
+        .tal__card{ padding:22px 20px !important; }
+        .tal__card-roman{ font-size:34px !important; margin-bottom:6px !important; }
+        .tal__card-title{ font-size:21px !important; }
+        .tal__card-tagline{ font-size:13px !important; }
+        .tal__card-body{ font-size:13.5px !important; line-height:1.6 !important; }
       }
     </style>
 
