@@ -488,6 +488,23 @@ goToSlide(0);
       } catch(e) {}
     }
 
+    // PERF: cache geometry so onScroll doesn't force a synchronous
+    // layout (getBoundingClientRect) on every scroll event. Only
+    // recalculate on resize / orientation change.
+    var spaceTopCache = 0;
+    function recalcGeometry() {
+      spaceTopCache = space.getBoundingClientRect().top + window.scrollY;
+    }
+
+    // PERF: track section visibility so the rAF tick + per-frame strip
+    // update don't run when the gallery is far offscreen. Without this
+    // the loop runs at 60fps for the entire life of the page, doing
+    // 168 style writes per frame (42 thumbs × 4 props) — a major source
+    // of mobile scroll jank, especially scrolling upward.
+    var sectionVisible = true;
+    var ticking = false;
+    var SETTLE_EPS = 0.0008;
+
     function init() {
       NAV_H = detectNavH();
       stickyEl.style.top    = NAV_H + "px";
@@ -511,8 +528,19 @@ goToSlide(0);
       loadContent(0, true);
       updateStrip(0);
 
+      recalcGeometry();
+      window.addEventListener("resize", recalcGeometry);
+      window.addEventListener("orientationchange", recalcGeometry);
       window.addEventListener("scroll", onScroll, { passive: true });
-      requestAnimationFrame(tick);
+      // Pause animation work when section is far offscreen.
+      if ("IntersectionObserver" in window) {
+        var io = new IntersectionObserver(function(entries){
+          sectionVisible = entries[0].isIntersecting;
+          if (sectionVisible) wakeTick();
+        }, { rootMargin: "300px 0px" });
+        io.observe(stickyEl);
+      }
+      wakeTick();
 
       prevBtn.addEventListener("click", function() { goTo(activeIdx - 1); });
       nextBtn.addEventListener("click", function() { goTo(activeIdx + 1); });
@@ -546,23 +574,51 @@ goToSlide(0);
     }
 
     function onScroll() {
-      var spaceTop     = space.getBoundingClientRect().top + window.scrollY;
-      var stickyStart  = spaceTop - NAV_H;
+      // PERF: read cached spaceTop instead of forcing a fresh layout.
+      var stickyStart  = spaceTopCache - NAV_H;
       var scrolled     = Math.max(0, window.scrollY - stickyStart);
       var scrollRange  = Math.max(1, (N - 1) * PPP);
       targetRaw        = Math.min(N - 1, (scrolled / scrollRange) * (N - 1));
+      // Wake the rAF loop only when there's actual change to animate.
+      if (Math.abs(targetRaw - currentRaw) > SETTLE_EPS) wakeTick();
+    }
+
+    function wakeTick() {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(tick);
+      }
     }
 
     function tick() {
       currentRaw += (targetRaw - currentRaw) * 0.09;
+      var settled = Math.abs(targetRaw - currentRaw) < SETTLE_EPS;
+      if (settled) currentRaw = targetRaw;
+
       var newIdx = Math.min(N - 1, Math.max(0, Math.round(currentRaw)));
       if (newIdx !== activeIdx) {
         activeIdx = newIdx;
-        loadContent(activeIdx, false);
-        playClick();
+        // Only do DOM/image work if the gallery is actually visible —
+        // saves a flurry of img.src + opacity writes when scrolling
+        // past the section quickly (common on mobile, especially up).
+        if (sectionVisible) {
+          loadContent(activeIdx, false);
+          playClick();
+        } else {
+          // Keep counter in sync silently so the gallery is correct
+          // when the user scrolls back into view.
+          if (counterEl) counterEl.textContent =
+            String(activeIdx + 1).padStart(2, "0") + " / " + N;
+        }
       }
-      updateStrip(currentRaw);
-      requestAnimationFrame(tick);
+      // Strip update only matters when the strip is laid out (visible).
+      if (sectionVisible) updateStrip(currentRaw);
+
+      if (!settled && sectionVisible) {
+        requestAnimationFrame(tick);
+      } else {
+        ticking = false;
+      }
     }
 
     function loadContent(idx, instant) {

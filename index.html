@@ -1248,33 +1248,64 @@
 </script>
 
 <script>
-  /* duplicated made-for sticky cycle inside the shader section */
+  /* duplicated made-for sticky cycle inside the shader section.
+     PERF: previously this ran on every scroll event (unthrottled) and
+     called getBoundingClientRect() each time, forcing a synchronous
+     layout pass on every wheel/touch tick. On mobile that's the
+     biggest source of "stutter when scrolling up" because the browser
+     can't keep up. Throttle to rAF and short-circuit when the section
+     is offscreen so we don't burn frames on layout we won't paint. */
   (function(){
     var section = document.getElementById('pm-shader-section');
     var words = document.querySelectorAll('.mf-word-2');
     if(!section || !words.length) return;
 
+    var rafId = 0;
+    var lastIdx = -2; // -1 = before, words.length = after, otherwise active index
+    var sectionVisible = true;
+
     function update(){
+      rafId = 0;
+      if(!sectionVisible) return;
+
       var rect = section.getBoundingClientRect();
       var totalHeight = section.clientHeight - window.innerHeight;
       if(totalHeight <= 0) return;
+
       var progress = Math.max(0, Math.min(1, Math.abs(rect.top) / totalHeight));
       var stepSize = 1 / words.length;
-      words.forEach(function(word, index){
-        var startTrigger = index * stepSize;
-        var endTrigger = (index + 1) * stepSize;
-        word.className = 'mf-word-2';
-        if(progress >= startTrigger && progress < endTrigger){
-          word.classList.add('is-active');
-        } else if(progress >= endTrigger){
-          word.classList.add('is-past');
-        }
-      });
+      var activeIdx = Math.min(words.length - 1, Math.max(0, Math.floor(progress / stepSize)));
+
+      // Bail if the active index hasn't changed — saves DOM mutations on
+      // every scroll tick within the same word.
+      if(activeIdx === lastIdx) return;
+      lastIdx = activeIdx;
+
+      for(var i = 0; i < words.length; i++){
+        var w = words[i];
+        var cls = 'mf-word-2';
+        if(i < activeIdx) cls += ' is-past';
+        else if(i === activeIdx) cls += ' is-active';
+        if(w.className !== cls) w.className = cls;
+      }
+    }
+
+    function schedule(){
+      if(!rafId) rafId = requestAnimationFrame(update);
+    }
+
+    // Pause work entirely when the shader section is far off-screen.
+    if('IntersectionObserver' in window){
+      var io = new IntersectionObserver(function(entries){
+        sectionVisible = entries[0].isIntersecting;
+        if(sectionVisible) schedule();
+      }, { rootMargin: '200px 0px' });
+      io.observe(section);
     }
 
     update();
-    window.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
   })();
 </script>
 
