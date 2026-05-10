@@ -2266,7 +2266,6 @@ if (new URLSearchParams(location.search).get('demo') === '1') {
         // Stream's dynascale to consider it "visible" and subscribe to
         // the track. We toggle opacity instead of display.
         if (p.isLocalParticipant) {
-          // Local: show video iff camera is currently enabled
           if (_localStateCache.cameraEnabled !== false) {
             videoEl.classList.add('is-playing');
             if (fb) fb.style.display = 'none';
@@ -2274,16 +2273,15 @@ if (new URLSearchParams(location.search).get('demo') === '1') {
             videoEl.classList.remove('is-playing');
             if (fb) fb.style.display = 'flex';
           }
-        } else if (!hasVideoPublishedNow) {
-          // Remote camera is OFF — show placeholder instead of last frozen frame
-          videoEl.classList.remove('is-playing');
-          if (fb) fb.style.display = 'flex';
-          // Force-clear any cached frame so Safari/iOS don't keep a still
-          try { videoEl.srcObject = null; } catch (_) {}
         } else {
-          // Remote camera is on — wait for actual frames before unhiding
+          // Remote: hide video until actual frames arrive ('playing'
+          // event). If publishedTracks doesn't include video, also
+          // clear the srcObject so a cached last-frame doesn't show.
           videoEl.classList.remove('is-playing');
           if (fb) fb.style.display = 'flex';
+          if (!hasVideoPublishedNow) {
+            try { videoEl.srcObject = null; } catch (_) {}
+          }
           videoEl.addEventListener('playing', () => {
             videoEl.classList.add('is-playing');
             if (fb) fb.style.display = 'none';
@@ -2296,12 +2294,12 @@ if (new URLSearchParams(location.search).get('demo') === '1') {
           videoEl.addEventListener('pause', hide);
           videoEl.addEventListener('ended', hide);
         }
-        // Only bind tracks if there's actually a video track to deliver,
-        // OR for local (so the camera preview attaches when the camera
-        // is later re-enabled).
-        if (p.isLocalParticipant || hasVideoPublishedNow) {
-          _videoBindCleanup.push(C.bindVideo(videoEl, p));
-        }
+        // ALWAYS bind — this is what tells Stream's SFU to start
+        // delivering this participant's video. If we skip binding when
+        // publishedTracks is briefly empty (race during call setup),
+        // we'd never get the stream even after their camera comes
+        // online. Stream handles the no-video-yet case internally.
+        _videoBindCleanup.push(C.bindVideo(videoEl, p));
       }
 
       // Bind audio for every remote participant unconditionally
