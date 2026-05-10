@@ -224,16 +224,35 @@
          GPU cost.
    ════════════════════════════════════════════════════════════════ */
 @media (max-width: 760px) {
-  /* Modal chrome */
+  /* ── Modal header — tighter, more "premium editorial":
+        small eyebrow + clean title + concise subtitle, generous
+        breathing room before the stage starts. The user noted it
+        felt "too wide / clustered" — pulled the title down to 22px
+        and tightened spacing top to bottom. */
   .ages-modal__panel { padding: 0 !important; }
-  .ages-modal #ages { padding: 24px 16px 36px !important; }
-  .ages-modal #ages > div:first-child { margin-bottom: 22px !important; }
-  .ages-modal #ages h2 {
-    font-size: 26px !important;
-    line-height: 1.1 !important;
+  .ages-modal #ages { padding: 28px 18px 36px !important; }
+  .ages-modal #ages > div:first-child {
+    margin-bottom: 26px !important;
+    text-align: center !important;
   }
-  .ages-modal #ages p { font-size: 13.5px !important; line-height: 1.55 !important; }
-  .ages-modal #ages > div:first-child > span:first-child { font-size: 10px !important; }
+  .ages-modal #ages > div:first-child > span:first-child {
+    font-size: 9.5px !important;
+    letter-spacing: 0.20em !important;
+    margin-bottom: 10px !important;
+  }
+  .ages-modal #ages h2 {
+    font-size: 22px !important;
+    line-height: 1.16 !important;
+    letter-spacing: -0.018em !important;
+    max-width: 280px !important;
+    margin: 0 auto !important;
+  }
+  .ages-modal #ages p {
+    font-size: 13px !important;
+    line-height: 1.55 !important;
+    margin-top: 12px !important;
+    max-width: 320px !important;
+  }
 
   /* Stage container — full-bleed, vertical, no fixed/min height */
   .agi-stage {
@@ -251,55 +270,82 @@
     background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.78) 100%) !important;
   }
 
-  /* SIDEBAR → horizontal pill bar across the top */
+  /* ── SIDEBAR → two labeled groups stacked at the top.
+        The user wanted the three Strategy buttons grouped together
+        and the four Age Group buttons grouped together — in two
+        clearly-labeled rows so people understand they're separate
+        controls, not one long list. We use flex-wrap with the
+        section labels (`.agi-sidebar-label`) given `flex-basis: 100%`
+        so they force a line break in the wrap. The buttons that
+        follow each label flow on the next line until the next
+        full-width label breaks them again. The 4-button age row
+        wraps to 2 lines on narrow phones — that's fine since the
+        whole section is labeled "By Age Group" above. */
   .agi-sidebar {
     width: 100% !important;
     height: auto !important;
     flex: 0 0 auto !important;
+    display: flex !important;
     flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    -webkit-overflow-scrolling: touch;
-    padding: 12px 10px !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 14px 14px 16px !important;
     border-right: 0 !important;
     border-bottom: 1px solid rgba(255,255,255,0.1) !important;
     gap: 6px !important;
-    scrollbar-width: none;
+    overflow: visible !important;
   }
   .agi-sidebar::-webkit-scrollbar { display: none !important; }
+
+  /* Section header — full-width, forces the next row of buttons to
+     break onto a new line and reads as a small caps mini-title. */
   .agi-sidebar-label {
-    flex: 0 0 auto !important;
-    margin: 0 6px !important;
-    align-self: center !important;
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    margin: 4px 0 8px !important;
+    align-self: stretch !important;
+    text-align: center !important;
     font-size: 9px !important;
-    letter-spacing: 0.16em !important;
-    color: rgba(255,255,255,0.42) !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.22em !important;
+    color: rgba(255,255,255,0.55) !important;
     white-space: nowrap !important;
+    text-transform: uppercase !important;
   }
+  /* The first label in the sidebar shouldn't have top margin
+     (it would push the whole nav down inside the dark stage). */
+  .agi-sidebar > .agi-sidebar-label:first-of-type {
+    margin-top: 0 !important;
+  }
+
+  /* Pill button. flex:0 0 auto so each pill is sized to its text;
+     consecutive buttons wrap when they hit the right edge. */
   .agi-nav-item {
     flex: 0 0 auto !important;
     width: auto !important;
     white-space: nowrap !important;
     padding: 7px 14px !important;
     margin: 0 !important;
-    font-size: 12.5px !important;
+    font-size: 12px !important;
     border-radius: 999px !important;
-    background: rgba(255,255,255,0.05) !important;
-    color: rgba(255,255,255,0.65) !important;
+    background: rgba(255,255,255,0.06) !important;
+    color: rgba(255,255,255,0.7) !important;
   }
   .agi-nav-item.active {
     background: rgba(255,255,255,0.18) !important;
     color: #fff !important;
   }
-  .agi-nav-age { gap: 8px !important; }
+  .agi-nav-age {
+    gap: 6px !important;
+    padding: 6px 12px 6px 13px !important;
+  }
   .agi-age-badge {
-    font-size: 10px !important;
-    padding-left: 8px !important;
+    font-size: 9.5px !important;
+    padding-left: 7px !important;
     margin-left: 0 !important;
   }
-  /* The 3px-wide vertical white indicator that lived on the left
-     edge of the sidebar makes no sense in a horizontal pill bar. */
+  /* Vertical white indicator irrelevant in horizontal pill layout. */
   .agi-nav-indicator { display: none !important; }
 
   /* MAIN CONTENT — generous bottom padding so the description pod
