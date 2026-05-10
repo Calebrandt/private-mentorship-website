@@ -1966,6 +1966,10 @@ if (new URLSearchParams(location.search).get('demo') === '1') {
     activeConvo = convos.find(c => c.id === id);
     if (!activeConvo) return;
 
+    // Auto-close the conversations drawer once a thread is picked —
+    // the user's focus shifts to the messages.
+    setInboxOpen(false);
+
     document.body.classList.add('pm-msg-thread-open');
     $('threadPane').classList.remove('is-empty');
 
