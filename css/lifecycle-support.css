@@ -206,3 +206,177 @@
       line-height: 1; user-select: none;
       filter: drop-shadow(0 0 6px rgba(255,255,255,0.3));
     }
+
+/* ════════════════════════════════════════════════════════════════
+   MOBILE — full rebuild of the By Age & Stage stage.
+   Desktop is a 1400px-wide stage with a 340px sidebar on the left
+   and a 60px-padded main content on the right. On a 414px phone
+   that means the sidebar takes 82% of the screen and the main
+   content has negative width — which is exactly what the user
+   reported ("can't see the left bar, content goes right off
+   screen"). The fix: convert from row-layout to column-layout.
+       • Sidebar becomes a horizontal-scrolling pill bar across the top.
+       • Main content is full-width below.
+       • Top-row (3-step nodes + preview card) stacks vertically.
+       • Description pod fills width, smaller type, less padding.
+       • Cursor + blast canvas + chaos chips hidden — they're
+         decorative effects that don't translate to touch + add
+         GPU cost.
+   ════════════════════════════════════════════════════════════════ */
+@media (max-width: 760px) {
+  /* Modal chrome */
+  .ages-modal__panel { padding: 0 !important; }
+  .ages-modal #ages { padding: 24px 16px 36px !important; }
+  .ages-modal #ages > div:first-child { margin-bottom: 22px !important; }
+  .ages-modal #ages h2 {
+    font-size: 26px !important;
+    line-height: 1.1 !important;
+  }
+  .ages-modal #ages p { font-size: 13.5px !important; line-height: 1.55 !important; }
+  .ages-modal #ages > div:first-child > span:first-child { font-size: 10px !important; }
+
+  /* Stage container — full-bleed, vertical, no fixed/min height */
+  .agi-stage {
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    flex-direction: column !important;
+    border-radius: 18px !important;
+    box-shadow: 0 14px 32px -18px rgba(0,0,0,0.45) !important;
+  }
+  /* Tighter overlay for column layout (desktop's left-dark-right-light
+     gradient was tuned for the side-by-side photo/text composition). */
+  .agi-bg-overlay {
+    background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.78) 100%) !important;
+  }
+
+  /* SIDEBAR → horizontal pill bar across the top */
+  .agi-sidebar {
+    width: 100% !important;
+    height: auto !important;
+    flex: 0 0 auto !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px 10px !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+    gap: 6px !important;
+    scrollbar-width: none;
+  }
+  .agi-sidebar::-webkit-scrollbar { display: none !important; }
+  .agi-sidebar-label {
+    flex: 0 0 auto !important;
+    margin: 0 6px !important;
+    align-self: center !important;
+    font-size: 9px !important;
+    letter-spacing: 0.16em !important;
+    color: rgba(255,255,255,0.42) !important;
+    white-space: nowrap !important;
+  }
+  .agi-nav-item {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    white-space: nowrap !important;
+    padding: 7px 14px !important;
+    margin: 0 !important;
+    font-size: 12.5px !important;
+    border-radius: 999px !important;
+    background: rgba(255,255,255,0.05) !important;
+    color: rgba(255,255,255,0.65) !important;
+  }
+  .agi-nav-item.active {
+    background: rgba(255,255,255,0.18) !important;
+    color: #fff !important;
+  }
+  .agi-nav-age { gap: 8px !important; }
+  .agi-age-badge {
+    font-size: 10px !important;
+    padding-left: 8px !important;
+    margin-left: 0 !important;
+  }
+  /* The 3px-wide vertical white indicator that lived on the left
+     edge of the sidebar makes no sense in a horizontal pill bar. */
+  .agi-nav-indicator { display: none !important; }
+
+  /* MAIN CONTENT */
+  .agi-main-content {
+    padding: 22px 18px 26px !important;
+    gap: 22px !important;
+    justify-content: flex-start !important;
+  }
+
+  /* Top row — stack vertically so the role nodes + preview don't fight. */
+  .agi-top-row {
+    flex-direction: column !important;
+    gap: 16px !important;
+    align-items: stretch !important;
+  }
+  .agi-top-nav {
+    padding: 10px 14px !important;
+    gap: 10px !important;
+    align-self: stretch !important;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+  }
+  .agi-role-node { gap: 6px !important; }
+  .agi-role-node .agi-auth-tag {
+    font-size: 9px !important;
+    padding: 0 !important;
+    border: 0 !important;
+  }
+  .agi-role-dot {
+    width: 22px !important;
+    height: 22px !important;
+    font-size: 9px !important;
+    border-width: 1px !important;
+  }
+  .agi-role-line {
+    width: 14px !important;
+    flex: 0 0 14px !important;
+  }
+
+  /* Preview card */
+  .agi-preview-card {
+    width: 100% !important;
+    max-width: 320px !important;
+    margin: 0 auto !important;
+  }
+  .agi-preview-img { height: 100px !important; }
+  .agi-preview-meta { padding: 10px 12px 12px !important; }
+  .agi-preview-label { font-size: 9px !important; margin-bottom: 3px !important; }
+  .agi-preview-title { font-size: 12.5px !important; }
+
+  /* Description pod */
+  .agi-description-pod {
+    padding: 20px 18px 22px !important;
+    border-radius: 18px !important;
+    max-width: none !important;
+    transform: translateY(40px) !important;
+  }
+  .agi-description-pod h3 {
+    font-size: 22px !important;
+    line-height: 1.12 !important;
+    margin-bottom: 10px !important;
+  }
+  .agi-description-pod p {
+    font-size: 13.5px !important;
+    line-height: 1.6 !important;
+    max-width: none !important;
+    margin-bottom: 16px !important;
+  }
+  .agi-eyebrow { font-size: 10px !important; margin-bottom: 10px !important; }
+  .agi-authority-tags { gap: 6px !important; padding-top: 16px !important; }
+  .agi-auth-tag { font-size: 9px !important; padding: 5px 9px !important; letter-spacing: 0.08em !important; }
+
+  /* Decorative effects: hide on mobile (cursor-driven; touch can't
+     use them and they cost frames). */
+  .agi-stage-cursed, .agi-stage-cursed * { cursor: auto !important; }
+  #agi-cursor-ring, #agi-cursor-dot { display: none !important; }
+  #agi-blast-canvas { display: none !important; }
+  #agi-chaos-wrap { display: none !important; }
+  .agi-chip, .agi-icon { display: none !important; }
+}
