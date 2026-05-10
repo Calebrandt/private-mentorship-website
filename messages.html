@@ -2266,13 +2266,23 @@ if (new URLSearchParams(location.search).get('demo') === '1') {
         // Stream's dynascale to consider it "visible" and subscribe to
         // the track. We toggle opacity instead of display.
         if (p.isLocalParticipant) {
-          if (_localStateCache.cameraEnabled !== false) {
+          // Start with the placeholder visible — the 'playing' event
+          // below will flip on .is-playing the moment the local camera
+          // stream attaches and produces frames. This avoids depending
+          // on _localStateCache, which can be stale on first render.
+          videoEl.classList.remove('is-playing');
+          if (fb) fb.style.display = 'flex';
+          videoEl.addEventListener('playing', () => {
             videoEl.classList.add('is-playing');
             if (fb) fb.style.display = 'none';
-          } else {
+          });
+          const hideLocal = () => {
             videoEl.classList.remove('is-playing');
             if (fb) fb.style.display = 'flex';
-          }
+          };
+          videoEl.addEventListener('emptied', hideLocal);
+          videoEl.addEventListener('pause', hideLocal);
+          videoEl.addEventListener('ended', hideLocal);
         } else {
           // Remote: hide video until actual frames arrive ('playing'
           // event). If publishedTracks doesn't include video, also
