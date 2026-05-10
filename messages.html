@@ -1417,7 +1417,19 @@
     box-shadow:0 4px 14px -6px rgba(15,23,42,0.12);
   }
   body.theme-light .pm-call-ctrl:hover{background:#fff;color:#0F172A;}
-  /* Mute / camera-off (red destructive) and end-call stay branded */
+  /* Destructive states stay branded red — they're status indicators, not theme. */
+  body.theme-light .pm-call-ctrl.is-off{
+    background:rgba(220,38,38,0.92) !important;
+    border-color:rgba(220,38,38,0.95) !important;
+    color:#fff !important;
+  }
+  body.theme-light .pm-call-ctrl.is-off:hover{background:#dc2626 !important;color:#fff !important;}
+  body.theme-light .pm-call-ctrl.is-end{
+    background:#dc2626 !important;
+    border-color:rgba(15,23,42,0.10) !important;
+    color:#fff !important;
+  }
+  body.theme-light .pm-call-ctrl.is-end:hover{background:#b91c1c !important;color:#fff !important;}
 
   /* Incoming-call ring modal — light glass card */
   body.theme-light .pm-ring-modal__card{
@@ -2220,12 +2232,19 @@ if (new URLSearchParams(location.search).get('demo') === '1') {
       const isSelf = p.isLocalParticipant;
       const name = isSelf ? 'You' : otherName;
       const initials = initial(name);
-      return `<div class="pm-call-tile" data-uid="${esc(p.userId || (isSelf ? 'self' : 'other'))}" data-self="${isSelf ? '1' : '0'}">
+      // Stream's TrackType: 1 = audio, 2 = video. Use publishedTracks
+      // so when the remote turns camera off mid-call, we know to swap
+      // their tile to the avatar placeholder instead of a frozen frame.
+      const hasVideoPublished = (p.publishedTracks || []).includes(2);
+      const subText = isSelf
+        ? (_localStateCache.cameraEnabled ? 'Camera on' : 'Camera off')
+        : (hasVideoPublished ? 'Connected' : 'Camera off');
+      return `<div class="pm-call-tile" data-uid="${esc(p.userId || (isSelf ? 'self' : 'other'))}" data-self="${isSelf ? '1' : '0'}" data-has-video="${hasVideoPublished ? '1' : '0'}">
         <video autoplay playsinline muted="${isSelf ? 'muted' : ''}"></video>
         <div class="pm-call-tile__placeholder" data-fallback>
           <div class="pm-call-tile__avatar-lg">${esc(initials)}</div>
           <div class="pm-call-tile__placeholder-name">${esc(name)}</div>
-          <div class="pm-call-tile__placeholder-sub">${isSelf ? (_localStateCache.cameraEnabled ? 'Camera on' : 'Camera off') : 'Connected'}</div>
+          <div class="pm-call-tile__placeholder-sub">${esc(subText)}</div>
         </div>
         <div class="pm-call-tile__label">${esc(name)}</div>
         <div class="pm-call-tile__mute"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div>
@@ -2242,13 +2261,27 @@ if (new URLSearchParams(location.search).get('demo') === '1') {
       const fb = tile.querySelector('[data-fallback]');
 
       if (videoEl) {
+        const hasVideoPublishedNow = (p.publishedTracks || []).includes(2);
         // The video element MUST stay in the layout (display:block) for
         // Stream's dynascale to consider it "visible" and subscribe to
         // the track. We toggle opacity instead of display.
         if (p.isLocalParticipant) {
-          videoEl.classList.add('is-playing');
-          if (fb) fb.style.display = 'none';
+          // Local: show video iff camera is currently enabled
+          if (_localStateCache.cameraEnabled !== false) {
+            videoEl.classList.add('is-playing');
+            if (fb) fb.style.display = 'none';
+          } else {
+            videoEl.classList.remove('is-playing');
+            if (fb) fb.style.display = 'flex';
+          }
+        } else if (!hasVideoPublishedNow) {
+          // Remote camera is OFF — show placeholder instead of last frozen frame
+          videoEl.classList.remove('is-playing');
+          if (fb) fb.style.display = 'flex';
+          // Force-clear any cached frame so Safari/iOS don't keep a still
+          try { videoEl.srcObject = null; } catch (_) {}
         } else {
+          // Remote camera is on — wait for actual frames before unhiding
           videoEl.classList.remove('is-playing');
           if (fb) fb.style.display = 'flex';
           videoEl.addEventListener('playing', () => {
@@ -2263,7 +2296,12 @@ if (new URLSearchParams(location.search).get('demo') === '1') {
           videoEl.addEventListener('pause', hide);
           videoEl.addEventListener('ended', hide);
         }
-        _videoBindCleanup.push(C.bindVideo(videoEl, p));
+        // Only bind tracks if there's actually a video track to deliver,
+        // OR for local (so the camera preview attaches when the camera
+        // is later re-enabled).
+        if (p.isLocalParticipant || hasVideoPublishedNow) {
+          _videoBindCleanup.push(C.bindVideo(videoEl, p));
+        }
       }
 
       // Bind audio for every remote participant unconditionally
