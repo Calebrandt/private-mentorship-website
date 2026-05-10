@@ -1041,6 +1041,22 @@
     <script>
       (function(){
         var navChapterLinks = document.querySelectorAll('.nav-links a[data-nav-chapter], #navMobileMenu a[data-nav-chapter]');
+        function isMobile(){ return window.matchMedia('(max-width: 760px)').matches; }
+
+        function closeMobileDrawerSync(){
+          var menu = document.getElementById('navMobileMenu');
+          var hb = document.getElementById('navHamburger');
+          if (menu && menu.classList.contains('is-open')) {
+            menu.classList.remove('is-open');
+            menu.setAttribute('aria-hidden','true');
+            document.body.classList.remove('nav-mobile-lock');
+          }
+          if (hb) {
+            hb.classList.remove('is-active');
+            hb.setAttribute('aria-expanded','false');
+          }
+        }
+
         navChapterLinks.forEach(function(link){
           link.addEventListener('click', function(e){
             e.preventDefault();
@@ -1049,6 +1065,34 @@
             if(!book) return;
             var nav = document.getElementById('nav');
             var navH = nav ? nav.offsetHeight : 0;
+
+            if (isMobile()) {
+              // 1) Close the drawer FIRST so body scroll-lock is
+              //    released before window.scrollTo runs (otherwise
+              //    overflow:hidden on body would freeze the scroll).
+              closeMobileDrawerSync();
+              // 2) On mobile, the book's chapter rail is display:none
+              //    and the 5 chapter pages are stacked as full-width
+              //    cards. Scroll DIRECTLY to the article whose
+              //    data-page matches the requested chapter — that's
+              //    why "Plans" used to land on "The Service": the
+              //    handler was scrolling to the top of the book then
+              //    clicking a hidden rail button (no-op).
+              var chapter = document.querySelector('.pm-book__page[data-page="' + targetIdx + '"]');
+              var target = chapter || book;
+              // small delay so the drawer's transform:translateX
+              // animation doesn't fight with the smooth-scroll on
+              // some iOS Safari builds.
+              requestAnimationFrame(function(){
+                var rect = target.getBoundingClientRect();
+                var y = window.scrollY + rect.top - navH - 14;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+              });
+              return;
+            }
+
+            // Desktop behaviour unchanged: scroll to book, then click
+            // the chapter rail button so the page-flip animation runs.
             var rect = book.getBoundingClientRect();
             var y = window.scrollY + rect.top - navH - 12;
             window.scrollTo({ top: y, behavior: 'smooth' });
