@@ -7469,74 +7469,90 @@
           .sp-archive-mark span{ color:rgba(58,42,16,0.65); font-weight:700; }
 
           /* ── MOBILE: redo the Real Moments / Experience layout ─
-             On desktop everything fits side-by-side: title | III mark,
-             photo | info | thumbnail strip, tight controls. On a phone
-             the 380px photo + the 104px strip overflow the viewport
-             and slam into the title above. We:
-               • Drop the sticky 100vh container — section flows
-                 naturally, content can be as tall as it needs.
-               • Stack the header vertically with proper spacing.
-               • Stack the main row: photo on top, info below.
-               • Hide the thumbnail strip (info already has Show More).
-               • Cap photo width to fit the viewport; height auto so
-                 aspect ratio holds.
-               • Tighten + space the bottom controls so prev/counter/
-                 next/sound/42 stories don't crash into each other.
-               • Add breathing room above the section (pad-top) so it
-                 doesn't kiss the journey "Still writing the story" end. */
+             KEEP the sticky pin on mobile (the 42-photo gallery only
+             "works" if the section pins while the user scrolls — JS
+             advances slides based on scroll progress through the tall
+             #sp-space wrapper). We just restructure the contents to
+             fit within 100vh - 72px on a phone:
+               • Header stacked: title row above III · Archive row.
+               • Main row stacked: photo on top, info below.
+               • Photo capped (more square aspect) so it fits.
+               • Show More + Milestone hidden — saves vertical space.
+               • Stat grid 4 → 2 cols.
+               • Thumbnail strip hidden (the photo + counter already
+                 communicate position).
+               • Tight bottom controls, smaller font, no wrap.
+             Plus extra breathing room above the whole section. */
           @media (max-width: 760px){
             #spotlight{ padding-top:48px !important; }
+            /* keep sticky behaviour — only tighten internals */
             #sp-sticky{
-              position:relative !important;
-              top:auto !important;
-              height:auto !important;
-              min-height:0 !important;
-              overflow:visible !important;
+              padding:0 !important;
             }
             /* header row: stack */
             #sp-sticky > div:nth-of-type(1){
-              padding:24px 22px 18px !important;
+              padding:14px 18px 12px !important;
               flex-direction:column !important;
               align-items:flex-start !important;
-              gap:14px !important;
+              gap:6px !important;
             }
             #sp-sticky > div:nth-of-type(1) > div:nth-of-type(2){
               flex-direction:row !important;
               align-items:center !important;
-              gap:12px !important;
+              gap:10px !important;
               padding-bottom:0 !important;
             }
-            #sp-sticky .sp-volume{ font-size:38px !important; line-height:1 !important; }
+            #sp-sticky .sp-volume{ font-size:26px !important; line-height:1 !important; }
             #sp-sticky h2{
-              font-size:32px !important;
-              line-height:1.05 !important;
+              font-size:26px !important;
+              line-height:1.04 !important;
             }
-            /* main content row: stack vertically */
+            /* main content row: stack vertically with internal scroll
+               so anything that doesn't fit can still be reached. */
             #sp-sticky > div:nth-of-type(2){
               flex-direction:column !important;
               align-items:stretch !important;
-              padding:22px 22px 6px !important;
-              gap:22px !important;
+              padding:14px 18px 6px !important;
+              gap:14px !important;
+              overflow-y:auto !important;
+              -webkit-overflow-scrolling:touch;
             }
-            /* photo: full width, fixed aspect, fits viewport */
+            /* photo: full width, capped, slightly more square so it fits */
             #sp-sticky > div:nth-of-type(2) > div:nth-of-type(1){
               width:100% !important;
               justify-content:center !important;
             }
             #sp-photo-wrap{
-              width:min(86vw, 360px) !important;
+              width:min(74vw, 280px) !important;
               height:auto !important;
-              aspect-ratio:380 / 520;
+              aspect-ratio:1 / 1;
               margin:0 auto !important;
-              border-width:7px !important;
+              border-width:6px !important;
             }
             /* info column */
             #sp-info{ width:100% !important; }
-            #sp-title{ font-size:22px !important; }
-            #sp-desc{ font-size:13px !important; max-width:none !important; }
+            #sp-title{ font-size:18px !important; margin-bottom:6px !important; }
+            #sp-desc{
+              font-size:12.5px !important;
+              max-width:none !important;
+              line-height:1.55 !important;
+              margin:0 0 10px !important;
+              display:-webkit-box !important;
+              -webkit-line-clamp:3;
+              -webkit-box-orient:vertical;
+              overflow:hidden;
+            }
+            /* hide secondary content to fit within the pin */
+            #sp-info > div[style*="margin-bottom:22px"],   /* "Show More" row */
+            #sp-info > div[style*="display:flex;align-items:center;gap:10px"]{ /* milestone row */
+              display:none !important;
+            }
+            /* Stat grid: 4 → 2 columns, tighter */
             #sp-info > div[style*="grid-template-columns:repeat(4,1fr)"]{
               grid-template-columns:repeat(2, 1fr) !important;
-              gap:14px !important;
+              gap:8px 14px !important;
+              padding-top:10px !important;
+              margin-bottom:0 !important;
             }
             /* hide the right-side thumbnail strip on mobile */
             #sp-strip-win,
@@ -7545,15 +7561,16 @@
             }
             /* bottom controls */
             #sp-sticky > div:nth-of-type(3){
-              padding:14px 18px 18px !important;
-              gap:10px !important;
-              flex-wrap:wrap;
+              padding:10px 14px 12px !important;
+              gap:8px !important;
             }
-            #sp-counter{ min-width:54px !important; font-size:10px !important; }
-            #sp-sound-btn{ width:26px !important; height:26px !important; }
-            #sp-sticky .sp-archive-mark{ font-size:8.5px !important; letter-spacing:0.22em !important; }
+            #sp-counter{ min-width:48px !important; font-size:10px !important; }
+            #sp-sound-btn{ width:24px !important; height:24px !important; }
+            #sp-sticky .sp-archive-mark{ font-size:8.5px !important; letter-spacing:0.18em !important; }
+            /* shrink prev/next */
+            #sp-prev, #sp-next{ width:28px !important; height:28px !important; }
             /* skip button */
-            #sp-skip{ bottom:12px !important; right:12px !important; }
+            #sp-skip{ bottom:54px !important; right:12px !important; padding:7px 14px !important; font-size:11px !important; }
           }
         </style>
 
