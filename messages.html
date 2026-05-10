@@ -1161,216 +1161,220 @@
   .pm-msg-notify-toggle svg{width:15px;height:15px;}
 
   /* ════════════════════════════════════════════════════════════════
-     LIGHT MODE PREVIEW — soft pearl background w/ violet ambience.
-     To revert: delete everything between this banner and the closing
-     marker below (or run `git revert HEAD`).
+     LIGHT MODE — applied only when <body class="theme-light">.
+     The composer's theme button toggles this, persisted to localStorage.
+     Default (no class) = dark.
      ════════════════════════════════════════════════════════════════ */
 
   /* Base pane: soft pearl/lavender mist */
-  .pm-msg-thread,
-  .pm-msg-thread.is-empty,
-  .pm-msg-thread:not(.is-empty){
+  body.theme-light .pm-msg-thread,
+  body.theme-light .pm-msg-thread.is-empty,
+  body.theme-light .pm-msg-thread:not(.is-empty){
     background:radial-gradient(ellipse 90% 75% at 50% 60%,
       #FDFCFF 0%,
       #F5F3FC 55%,
       #ECE9F7 100%);
   }
   /* Aurora blobs — soften and warm against the light bg */
-  .pm-msg-thread::before{
+  body.theme-light .pm-msg-thread::before{
     background:rgba(167,139,250,0.32);
     opacity:0.45;
   }
-  .pm-msg-thread::after{
+  body.theme-light .pm-msg-thread::after{
     background:rgba(99,102,241,0.28);
     opacity:0.42;
   }
 
   /* Topbar pills (Conversations, Notify, User pod) — light glass */
-  .pm-msg-inbox-toggle{
+  body.theme-light .pm-msg-inbox-toggle{
     background:rgba(255,255,255,0.70);
     border-color:rgba(15,23,42,0.08);
     color:#475569;
     box-shadow:0 1px 2px rgba(15,23,42,0.04);
   }
-  .pm-msg-inbox-toggle:hover{
+  body.theme-light .pm-msg-inbox-toggle:hover{
     background:#fff;color:#0F172A;
   }
-  .pm-msg-inbox-toggle .pm-msg-inbox-toggle__count{
+  body.theme-light .pm-msg-inbox-toggle .pm-msg-inbox-toggle__count{
     background:rgba(15,23,42,0.06);color:#1F2937;
   }
-  .pm-msg-notify-toggle{
+  body.theme-light .pm-msg-notify-toggle{
     background:rgba(255,255,255,0.70);
     border-color:rgba(15,23,42,0.08);
     color:#475569;
   }
-  .pm-msg-notify-toggle:hover{background:#fff;color:#0F172A;}
-  .nx-userpod{
+  body.theme-light .pm-msg-notify-toggle:hover{background:#fff;color:#0F172A;}
+  body.theme-light .nx-userpod{
     background:rgba(255,255,255,0.78);
     border-color:rgba(15,23,42,0.08);
     box-shadow:0 1px 2px rgba(15,23,42,0.04);
   }
-  .nx-userpod__name{color:#1F2937;}
+  body.theme-light .nx-userpod__name{color:#1F2937;}
 
   /* Smith Family thread head pill — light glass */
-  .pm-msg-thread:not(.is-empty) .pm-msg-thread__head{
+  body.theme-light .pm-msg-thread:not(.is-empty) .pm-msg-thread__head{
     background:rgba(255,255,255,0.78);
     border-color:rgba(15,23,42,0.08);
     box-shadow:0 4px 14px -6px rgba(15,23,42,0.10);
   }
-  .pm-msg-thread:not(.is-empty) .pm-msg-thread__title{color:#0F172A;}
-  .pm-msg-thread:not(.is-empty) .pm-msg-thread__sub{color:#64748B;}
-  .pm-msg-thread:not(.is-empty) .pm-msg-thread__icon-btn{
+  body.theme-light .pm-msg-thread:not(.is-empty) .pm-msg-thread__title{color:#0F172A;}
+  body.theme-light .pm-msg-thread:not(.is-empty) .pm-msg-thread__sub{color:#64748B;}
+  body.theme-light .pm-msg-thread:not(.is-empty) .pm-msg-thread__icon-btn{
     background:rgba(255,255,255,0.6);
     border-color:rgba(15,23,42,0.08);
     color:#64748B;
   }
-  .pm-msg-thread:not(.is-empty) .pm-msg-thread__icon-btn:hover{
+  body.theme-light .pm-msg-thread:not(.is-empty) .pm-msg-thread__icon-btn:hover{
     background:#fff;color:#1F2937;border-color:rgba(87,80,241,0.30);
   }
 
   /* Hero (empty state) — dark gradient text instead of white-on-dark */
-  .pm-msg-composer__hero h2{
+  body.theme-light .pm-msg-composer__hero h2{
     background:linear-gradient(90deg,#0F172A 0%,#5750F1 100%);
     -webkit-background-clip:text;background-clip:text;
     -webkit-text-fill-color:transparent;
   }
-  .pm-msg-composer__hero p{color:#64748B;}
-  .pm-msg-composer__hero-line{
+  body.theme-light .pm-msg-composer__hero p{color:#64748B;}
+  body.theme-light .pm-msg-composer__hero-line{
     background:linear-gradient(90deg, transparent 0%, rgba(15,23,42,0.16) 50%, transparent 100%);
   }
 
   /* Composer card — bright glass with soft shadow.
      !important to beat the earlier dark-mode rule that sets the same. */
-  .pm-msg-composer__card{
+  body.theme-light .pm-msg-composer__card{
     background:rgba(255,255,255,0.85) !important;
     border:1px solid rgba(15,23,42,0.06) !important;
     box-shadow:
       0 30px 60px -20px rgba(15,23,42,0.10),
       0 1px 0 rgba(255,255,255,0.85) inset !important;
   }
-  .pm-msg-composer__card:focus-within{
+  body.theme-light .pm-msg-composer__card:focus-within{
     border-color:rgba(87,80,241,0.30) !important;
     box-shadow:
       0 30px 60px -20px rgba(87,80,241,0.18),
       0 1px 0 rgba(255,255,255,0.85) inset !important;
   }
-  .pm-msg-composer__textarea{
+  body.theme-light .pm-msg-composer__textarea{
     color:#0F172A;
     caret-color:#5750F1;
   }
-  .pm-msg-composer__textarea::placeholder{color:#94A3B8;}
-  .pm-msg-composer__textarea:disabled{color:#94A3B8;}
-  .pm-msg-composer__bottom{border-top-color:rgba(15,23,42,0.06);}
-  .pm-msg-composer__icon-btn{color:#94A3B8;}
-  .pm-msg-composer__icon-btn:hover:not(:disabled){color:#475569;background:rgba(15,23,42,0.04);}
-  .pm-msg-composer__send{background:rgba(15,23,42,0.06);color:#94A3B8;}
-  .pm-msg-composer__send.has-text{
+  body.theme-light .pm-msg-composer__textarea::placeholder{color:#94A3B8;}
+  body.theme-light .pm-msg-composer__textarea:disabled{color:#94A3B8;}
+  body.theme-light .pm-msg-composer__bottom{border-top-color:rgba(15,23,42,0.06);}
+  body.theme-light .pm-msg-composer__icon-btn{color:#94A3B8;}
+  body.theme-light .pm-msg-composer__icon-btn:hover:not(:disabled){color:#475569;background:rgba(15,23,42,0.04);}
+  body.theme-light .pm-msg-composer__send{background:rgba(15,23,42,0.06);color:#94A3B8;}
+  body.theme-light .pm-msg-composer__send.has-text{
     background:#0F172A;color:#fff;
     box-shadow:0 8px 22px -8px rgba(15,23,42,0.40);
   }
 
-  /* Quick-action chips — light glass (override the dark .pm-msg-chip from earlier) */
-  .pm-msg-chip{
+  /* Quick-action chips — light glass */
+  body.theme-light .pm-msg-chip{
     background:rgba(255,255,255,0.78) !important;
     border:1px solid rgba(15,23,42,0.06) !important;
     color:#475569 !important;
   }
-  .pm-msg-chip:hover{
+  body.theme-light .pm-msg-chip:hover{
     background:#fff !important;
     color:#0F172A !important;
     border-color:rgba(87,80,241,0.28) !important;
   }
 
-  /* Open Conversations CTA (empty state) — keep purple but tone for light bg */
-  .pm-msg-cta-btn{
+  /* Open Conversations CTA */
+  body.theme-light .pm-msg-cta-btn{
     background:linear-gradient(180deg, rgba(87,80,241,0.10), rgba(99,102,241,0.06));
     border-color:rgba(87,80,241,0.25);
     color:#5750F1;
     box-shadow:0 4px 14px -6px rgba(87,80,241,0.20), 0 1px 0 rgba(255,255,255,0.85) inset;
   }
-  .pm-msg-cta-btn:hover{
+  body.theme-light .pm-msg-cta-btn:hover{
     background:linear-gradient(180deg, rgba(87,80,241,0.16), rgba(99,102,241,0.10));
     color:#4338CA;
     border-color:rgba(87,80,241,0.40);
     box-shadow:0 10px 28px -8px rgba(87,80,241,0.30);
   }
 
-  /* Day dividers ("TODAY", "Thursday May 7") */
-  .pm-msg-day{color:#94A3B8;}
+  /* Day dividers */
+  body.theme-light .pm-msg-day{color:#94A3B8;}
 
-  /* Incoming message bubbles — white card on the lavender bg.
-     Override the high-specificity .pm-msg-thread:not(.is-empty) rules. */
-  .pm-msg-thread:not(.is-empty) .pm-msg-bubble{
+  /* Incoming message bubbles */
+  body.theme-light .pm-msg-thread:not(.is-empty) .pm-msg-bubble{
     background:#fff !important;
     color:#0F172A !important;
     border:1px solid rgba(15,23,42,0.06) !important;
     box-shadow:0 1px 2px rgba(15,23,42,0.04) !important;
   }
   /* Outgoing bubbles — brand purple */
-  .pm-msg-thread:not(.is-empty) .pm-msg-bubble-row.is-self .pm-msg-bubble{
+  body.theme-light .pm-msg-thread:not(.is-empty) .pm-msg-bubble-row.is-self .pm-msg-bubble{
     background:#5750F1 !important;
     color:#fff !important;
     border-color:transparent !important;
     box-shadow:0 8px 22px -10px rgba(87,80,241,0.45) !important;
   }
-  .pm-msg-thread:not(.is-empty) .pm-msg-bubble-avatar{
+  body.theme-light .pm-msg-thread:not(.is-empty) .pm-msg-bubble-avatar{
     background:#5750F1 !important;
     color:#fff !important;
     border:1px solid rgba(255,255,255,0.7) !important;
     box-shadow:0 1px 3px rgba(15,23,42,0.10) !important;
   }
-  .pm-msg-thread:not(.is-empty) .pm-msg-sender{color:#5750F1 !important;}
-  .pm-msg-thread:not(.is-empty) .pm-msg-time{color:#94A3B8 !important;}
-  .pm-msg-thread:not(.is-empty) .pm-msg-bubble-row.is-self .pm-msg-time{
+  body.theme-light .pm-msg-thread:not(.is-empty) .pm-msg-sender{color:#5750F1 !important;}
+  body.theme-light .pm-msg-thread:not(.is-empty) .pm-msg-time{color:#94A3B8 !important;}
+  body.theme-light .pm-msg-thread:not(.is-empty) .pm-msg-bubble-row.is-self .pm-msg-time{
     color:rgba(255,255,255,0.78) !important;
   }
-  .pm-msg-thread:not(.is-empty) .pm-msg-subject{
+  body.theme-light .pm-msg-thread:not(.is-empty) .pm-msg-subject{
     color:#5750F1 !important;
     border-bottom-color:rgba(87,80,241,0.20) !important;
   }
-  .pm-msg-thread:not(.is-empty) .pm-msg-bubble-row.is-self .pm-msg-subject{
+  body.theme-light .pm-msg-thread:not(.is-empty) .pm-msg-bubble-row.is-self .pm-msg-subject{
     color:rgba(255,255,255,0.92) !important;
     border-bottom-color:rgba(255,255,255,0.30) !important;
   }
 
-  /* System message card — light premium look (override the dark
-     :not(.is-empty) variant) */
-  .pm-msg-thread:not(.is-empty) .pm-msg-system,
-  .pm-msg-system{
+  /* System message card */
+  body.theme-light .pm-msg-thread:not(.is-empty) .pm-msg-system,
+  body.theme-light .pm-msg-system{
     background:linear-gradient(180deg,#FFFFFF 0%,#FAF8FF 100%) !important;
     border:1px solid rgba(87,80,241,0.20) !important;
     box-shadow:0 12px 28px -14px rgba(87,80,241,0.18) !important;
   }
-  .pm-msg-thread:not(.is-empty) .pm-msg-system__head,
-  .pm-msg-system__head{
+  body.theme-light .pm-msg-thread:not(.is-empty) .pm-msg-system__head,
+  body.theme-light .pm-msg-system__head{
     background:rgba(87,80,241,0.06) !important;
     border-bottom:1px solid rgba(87,80,241,0.18) !important;
     color:#5750F1 !important;
   }
-  .pm-msg-thread:not(.is-empty) .pm-msg-system__title,
-  .pm-msg-system__title{color:#0F172A !important;}
-  .pm-msg-thread:not(.is-empty) .pm-msg-system__body,
-  .pm-msg-system__body{color:#475569 !important;}
-  .pm-msg-thread:not(.is-empty) .pm-msg-system__foot,
-  .pm-msg-system__foot{
+  body.theme-light .pm-msg-thread:not(.is-empty) .pm-msg-system__title,
+  body.theme-light .pm-msg-system__title{color:#0F172A !important;}
+  body.theme-light .pm-msg-thread:not(.is-empty) .pm-msg-system__body,
+  body.theme-light .pm-msg-system__body{color:#475569 !important;}
+  body.theme-light .pm-msg-thread:not(.is-empty) .pm-msg-system__foot,
+  body.theme-light .pm-msg-system__foot{
     border-top:1px dashed rgba(87,80,241,0.22) !important;
     color:#5750F1 !important;
   }
 
-  /* Send-status floating "PM Sending" pill — readable on light */
-  .pm-msg-thinking{
+  /* Send-status floating "PM Sending" pill */
+  body.theme-light .pm-msg-thinking{
     background:rgba(255,255,255,0.86);
     border-color:rgba(15,23,42,0.08);
     box-shadow:0 12px 30px -10px rgba(15,23,42,0.16);
   }
-  .pm-msg-thinking__badge{
+  body.theme-light .pm-msg-thinking__badge{
     background:#0F172A;color:#fff;
   }
-  .pm-msg-thinking__text,
-  .pm-msg-thinking__text span{color:#1F2937;}
-  .pm-msg-thinking__dots span{background:#5750F1;}
+  body.theme-light .pm-msg-thinking__text,
+  body.theme-light .pm-msg-thinking__text span{color:#1F2937;}
+  body.theme-light .pm-msg-thinking__dots span{background:#5750F1;}
 
-  /* ── End LIGHT MODE PREVIEW ──────────────────────────────────── */
+  /* Theme toggle button in the composer — switches between dark and light.
+     Icon swap: sun visible by default (dark mode), moon when in light mode. */
+  .pm-msg-theme-btn .pm-theme-icon-moon{display:none;}
+  body.theme-light .pm-msg-theme-btn .pm-theme-icon-sun{display:none;}
+  body.theme-light .pm-msg-theme-btn .pm-theme-icon-moon{display:block;}
+
+  /* ── End LIGHT MODE ──────────────────────────────────────────── */
 </style>
 </head>
 <body class="pm-has-sidebar">
@@ -1463,6 +1467,10 @@
                 </button>
                 <button class="pm-msg-composer__icon-btn" id="btnPlus" type="button" aria-label="Commands" title="Commands (coming soon)" disabled>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/></svg>
+                </button>
+                <button class="pm-msg-composer__icon-btn pm-msg-theme-btn" id="btnTheme" type="button" aria-label="Toggle theme" title="Switch theme">
+                  <svg class="pm-theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                  <svg class="pm-theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                 </button>
               </div>
               <button class="pm-msg-composer__send" id="composerSend" type="button" disabled aria-label="Send">
@@ -1965,6 +1973,26 @@ if (new URLSearchParams(location.search).get('demo') === '1') {
       ta.setSelectionRange(ta.value.length, ta.value.length);
     });
   });
+
+  // ─── Theme toggle (dark ↔ pearl light) ─────────────────────────
+  // Persisted in localStorage so each client's choice sticks across
+  // page reloads and is remembered next session.
+  (function setupTheme(){
+    const THEME_KEY = 'pm-msg-theme';
+    const apply = (t) => {
+      if (t === 'light') document.body.classList.add('theme-light');
+      else document.body.classList.remove('theme-light');
+    };
+    let saved = 'dark';
+    try { saved = localStorage.getItem(THEME_KEY) || 'dark'; } catch (_) {}
+    apply(saved);
+    const btn = document.getElementById('btnTheme');
+    if (btn) btn.addEventListener('click', () => {
+      const next = document.body.classList.contains('theme-light') ? 'dark' : 'light';
+      try { localStorage.setItem(THEME_KEY, next); } catch (_) {}
+      apply(next);
+    });
+  })();
 
   const ctaEl = $('composerCta');
   const chipEls = document.querySelectorAll('#composerChips .pm-msg-chip');
