@@ -18,17 +18,20 @@ export default function IllustrationPanel({ phase }: Props) {
   const [errored, setErrored] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
+  // Prefix illustration paths with the configured Astro base path so assets
+  // resolve correctly when the wizard is deployed under a subpath
+  // (e.g. /hiring-apply/illustrations/welcome.svg).
+  const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+  const illustrationSrc = baseUrl + phase.illustration;
+
   useEffect(() => {
     setLoaded(false);
     setErrored(false);
-    // If the image is already cached, the browser fires the load event before
-    // React attaches the listener. Check synchronously after mount so we don't
-    // sit on the placeholder forever.
     const img = imgRef.current;
     if (img?.complete && img.naturalWidth > 0) {
       setLoaded(true);
     }
-  }, [phase.illustration]);
+  }, [illustrationSrc]);
 
   const showPlaceholder = errored || !loaded;
 
@@ -36,8 +39,8 @@ export default function IllustrationPanel({ phase }: Props) {
     <div className="hw-stage__art">
       <img
         ref={imgRef}
-        key={phase.illustration}
-        src={phase.illustration}
+        key={illustrationSrc}
+        src={illustrationSrc}
         alt={`${phase.label} illustration`}
         onLoad={() => setLoaded(true)}
         onError={() => setErrored(true)}
@@ -47,7 +50,7 @@ export default function IllustrationPanel({ phase }: Props) {
         <div className="hw-stage__art-placeholder">
           <strong>{phase.label}</strong>
           <p style={{ margin: 0 }}>Drop your Pana illustration here.</p>
-          <code>{phase.illustration}</code>
+          <code>{illustrationSrc}</code>
           <p style={{ marginTop: 14, fontSize: 11.5, color: 'var(--ink-tert)' }}>
             Source: storyset.com/illustration/{PHASE_HINT[phase.key]}
           </p>
