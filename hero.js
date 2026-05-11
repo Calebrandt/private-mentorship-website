@@ -1189,7 +1189,7 @@ function emitBlob(cx, cy, vx, vy, baseR, lifeMs, strength = 1, forceHole = false
 
     .pm-wordmark {
       position: absolute;
-      top: 28px;
+      top: 62px;
       left: 36px;
       z-index: 12;
       color: #3a2a10;

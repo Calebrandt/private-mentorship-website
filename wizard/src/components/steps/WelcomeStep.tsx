@@ -18,7 +18,7 @@ export default function WelcomeStep({ state, patch }: Props) {
       <div className="hw-card">
         <h3 className="hw-card__title">Before you begin</h3>
         <p className="hw-card__sub">
-          Twenty-four short steps. Your progress is saved automatically — you can leave and return any time.
+          Twenty-four short steps. Your progress is saved automatically — you can leave and return any time. Unfinished applications will be permanently deleted in 2 weeks.
         </p>
         <button
           type="button"
