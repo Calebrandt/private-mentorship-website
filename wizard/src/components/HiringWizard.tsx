@@ -188,7 +188,7 @@ export default function HiringWizard() {
   return (
     <>
       <nav className="hw-nav">
-        <a className="hw-nav__logo" href="/hiring-apply">Private Mentorship</a>
+        <a className="hw-nav__logo" href="/">Private Mentorship</a>
         <div className="hw-nav__right">
           <NavSaveIndicator status={saveStatus} />
           <button
