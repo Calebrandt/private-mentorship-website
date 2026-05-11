@@ -279,20 +279,34 @@
   }
   .tr-info-modal__body{
     font-family:inherit;
-    font-size:15px; line-height:1.65; color:#2D3A47;
-    letter-spacing:-0.005em;
+    max-width:620px;
+    margin:0 auto;
+    font-size:16px;
+    line-height:1.76;
+    color:#2D3A47;
+    letter-spacing:-0.008em;
   }
-  .tr-info-modal__body p{ margin:0 0 14px; }
+  .tr-info-modal__body p{ margin:0 0 18px; }
   .tr-info-modal__body p:last-child{ margin-bottom:0; }
-  .tr-info-modal__body strong{ color:#0E1721; font-weight:600; }
+  .tr-info-modal__body strong{
+    display:inline-block;
+    color:#0E1721;
+    font-weight:700;
+    letter-spacing:-0.015em;
+  }
   .tr-info-modal__body em{ font-style:italic; color:#2D3A47; }
   .tr-info-modal__list{
-    list-style:none; padding:0; margin:14px 0 0;
+    list-style:none;
+    padding:0;
+    margin:2px 0 20px;
   }
   .tr-info-modal__list li{
-    position:relative; padding:8px 0 8px 24px;
-    font-size:14.5px; line-height:1.55; color:#2D3A47;
-    letter-spacing:-0.005em;
+    position:relative;
+    padding:7px 0 7px 24px;
+    font-size:15.5px;
+    line-height:1.68;
+    color:#2D3A47;
+    letter-spacing:-0.008em;
   }
   .tr-info-modal__list li::before{
     content:""; position:absolute; left:2px; top:14px;
@@ -3919,7 +3933,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
             Submit Application
           </span>
-          <div class="pm-ed__step-fineprint"><em>Availability is limited. Applicants may be placed on a waitlist depending on Assistant availability and current roster.</em></div>
+          <div class="pm-ed__step-fineprint"><em>Due to the intensive, long-term nature of our private family assistants, intake is strictly limited. We are currently experiencing a surge in inquiries. Applications are processed in the exact order received. Secure your spot now to avoid a multi-month waitlist.</em></div>
         </button>
 
         <button type="button" class="pm-ed__step" style="--step-color:#DD5440" data-popup="step-3" aria-label="Open Meet Your Assistant brief">
@@ -4168,21 +4182,21 @@
             <div class="pm-ed__bar-row pm-ed__bar-row--showcase pm-slots-showcase__row">
               <span class="pm-ed__bar-label">Session 1</span>
               <span class="pm-ed__bar-track"><span class="pm-ed__bar-fill" style="width:88%; --bar-1:#0E7C82; --bar-2:#36A6A4"></span></span>
-              <span class="pm-ed__bar-val pm-slots-showcase__val">Mon &middot; 2h<span>4 PM</span></span>
+              <span class="pm-ed__bar-val pm-slots-showcase__val">Mon &middot; 2h<span>4–6 PM</span></span>
             </div>
             <div class="pm-ed__bar-row pm-ed__bar-row--showcase pm-slots-showcase__row">
               <span class="pm-ed__bar-label">Session 2</span>
               <span class="pm-ed__bar-track"><span class="pm-ed__bar-fill" style="width:94%; --bar-1:#0E7C82; --bar-2:#36A6A4"></span></span>
-              <span class="pm-ed__bar-val pm-slots-showcase__val">Wed &middot; 2h<span>4 PM</span></span>
+              <span class="pm-ed__bar-val pm-slots-showcase__val">Wed &middot; 2h<span>4–6 PM</span></span>
             </div>
             <div class="pm-ed__bar-row pm-ed__bar-row--showcase pm-slots-showcase__row">
               <span class="pm-ed__bar-label">Session 3</span>
               <span class="pm-ed__bar-track"><span class="pm-ed__bar-fill" style="width:100%; --bar-1:#E68A3D; --bar-2:#F0CB6F"></span></span>
-              <span class="pm-ed__bar-val pm-slots-showcase__val">Fri &middot; 2h<span>4 PM</span></span>
+              <span class="pm-ed__bar-val pm-slots-showcase__val">Fri &middot; 2h<span>4–6 PM</span></span>
             </div>
           </div>
           <div class="pm-ed__bars-foot">
-            <span>Same days, same times &mdash; locked in for the term. <strong>Customize yours when you check your fit.</strong></span>
+            <span>Same days, same times &mdash;<br>locked in for your 1&ndash;2 month plan.</span>
           </div>
         </div>
 
@@ -4193,7 +4207,7 @@
             <span class="pm-ed__plan-letter">A</span>
             <span class="pm-ed__plan-text">
               <span class="pm-ed__plan-title">Plans That Fit Your Life</span>
-              <span class="pm-ed__plan-meta">1 or 2 month term, 24 or 40 hours. Hours must be used within the term.</span>
+              <span class="pm-ed__plan-meta">1–2 month term. 24 or 40 hours used within the selected period.</span>
             </span>
             <span class="pm-ed__plan-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span>
           </button>
@@ -4564,7 +4578,7 @@
       <!-- ─── LEARN MORE (opens Ages modal) ─── -->
       <div class="pm-ed__learn-more-wrap">
         <button type="button" class="pm-ed__learn-more" data-open-ages aria-haspopup="dialog" aria-controls="agesModal">
-          Learn More — By Age &amp; Stage
+          Explore By Age
           <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </div>
@@ -4575,7 +4589,7 @@
       <div class="pm-ed__cta-text">
         <span class="pm-ed__cta-eyebrow">Apply now</span>
         <span class="pm-ed__cta-title">Submit your information / application.</span>
-        <span class="pm-ed__cta-meta">Limited families per Assistant. Current applicants reviewed in the order received.</span>
+        <span class="pm-ed__cta-meta">Private Mentorship is currently accepting a limited number of new families. Applications are reviewed in the order received.</span>
       </div>
       <a class="pm-ed__cta-btn" href="apply.html">
         Submit Application
@@ -5270,15 +5284,11 @@
               <span class="tal__hero-eyebrow-label">The Assistant</span>
             </p>
             <h2 class="tal__hero-title">What a Private Mentorship Assistant <em>does</em> for your family.</h2>
-            <p class="tal__hero-intro">Three jobs, every family. Our Assistants attend the meetings, file the applications, and re-teach what was decided &mdash; so the institutions in your loved one&rsquo;s life finally connect.</p>
+            <p class="tal__hero-intro">Three jobs, every family. Our Assistants attend the meetings, file the applications, and re-teach what was decided &mdash; so support doesn&rsquo;t end when the meeting does.</p>
             <div class="tal__hero-actions">
               <a href="the-assistant.html" class="tal__btn tal__btn--primary">
                 <span class="tal__btn-dot" aria-hidden="true"></span>
                 Read full description
-                <span class="tal__btn-arrow" aria-hidden="true">&rarr;</span>
-              </a>
-              <a href="apply.html" class="tal__btn tal__btn--ghost">
-                Apply for a spot
                 <span class="tal__btn-arrow" aria-hidden="true">&rarr;</span>
               </a>
             </div>
@@ -6498,6 +6508,27 @@
     box-shadow:0 0 0 3px rgba(14,124,130,0.18);
     margin-right:8px;
     vertical-align:1px;
+  }
+
+  .pm-ed__bar-row--showcase:not(.is-selected) .pm-ed__bar-label::before{
+    content:"";
+    display:inline-block;
+    width:8px; height:8px;
+    border-radius:50%;
+    background:#E68A3D;
+    box-shadow:0 0 0 3px rgba(230,138,61,0.18);
+    margin-right:8px;
+    vertical-align:1px;
+  }
+
+  .pm-slots-showcase__row:nth-child(-n+2) .pm-ed__bar-label::before{
+    background:#0E7C82;
+    box-shadow:0 0 0 3px rgba(14,124,130,0.18);
+  }
+
+  .pm-ed__bar-row--showcase .pm-ed__bar-label{
+    display:inline-flex;
+    align-items:center;
   }
 
   /* Reserve Weekly Time Slots — landing showcase */
@@ -7853,7 +7884,7 @@
             </span>
           </h2>
 
-          <p class="pm-hire__sub">Join a small, deliberate team of assistants who walk alongside families across Canada. We hire for character, follow-through, and the patience to do the long work — not for credentials alone.</p>
+          <p class="pm-hire__sub">Join a small, deliberate team of assistants who walk alongside families across Vancouver British Columbia. We hire for character, follow-through, and the patience to do the long work — not for credentials alone.</p>
 
           <ul class="pm-hire__bullets" aria-label="What we look for">
             <li><span class="pm-hire__check" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6.5L5 9l4.5-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>3+ years working with youth, students, or families</li>
@@ -7866,7 +7897,7 @@
               <span>Apply Now</span>
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 7H11M11 7L7 3M11 7L7 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </a>
-            <span class="pm-hire__cta-meta">Limited roster &middot; reviewed in the order received</span>
+            <span class="pm-hire__cta-meta">Hiring 5 assistants &middot; reviewed in order received</span>
           </div>
 
           <div class="pm-hire__socials">
@@ -7931,7 +7962,7 @@
             </div>
             <div class="pm-hire__chip-text">
               <span class="pm-hire__chip-title">Top Rated</span>
-              <span class="pm-hire__chip-meta">4.96 / 5 family rating</span>
+              <span class="pm-hire__chip-meta">5 / 5 family rating</span>
             </div>
           </div>
         </div>
@@ -7953,7 +7984,7 @@
             </div>
             <h4 class="pm-hire__why-title">Working Time</h4>
             <span class="pm-hire__why-rule" aria-hidden="true"></span>
-            <p class="pm-hire__why-desc">Part-time, long-term roles. 8&ndash;24 hours per week with consistent families on a schedule that respects your life.</p>
+            <p class="pm-hire__why-desc">Build long-term relationships with consistent families on schedules designed around real life &mdash; from a few hours a week to full-time support.</p>
           </article>
 
           <article class="pm-hire__why-card">
@@ -7967,7 +7998,7 @@
             </div>
             <h4 class="pm-hire__why-title">Compensation</h4>
             <span class="pm-hire__why-rule" aria-hidden="true"></span>
-            <p class="pm-hire__why-desc">$30&ndash;$45 per hour based on plan tier, plus paid travel between sessions and a real benefits package.</p>
+            <p class="pm-hire__why-desc">Strong compensation, long-term family contracts, and opportunities to grow into trusted roles with stable ongoing work.</p>
           </article>
 
           <article class="pm-hire__why-card">
@@ -7979,7 +8010,7 @@
             </div>
             <h4 class="pm-hire__why-title">Where You&rsquo;ll Work</h4>
             <span class="pm-hire__why-rule" aria-hidden="true"></span>
-            <p class="pm-hire__why-desc">In-home and in-community across Canada &mdash; with the family, in real life. No remote-only roles.</p>
+            <p class="pm-hire__why-desc">No cubicles or repetitive shifts. Work happens in homes, communities, and real-life environments where meaningful support actually matters.</p>
           </article>
 
         </div>
@@ -8962,7 +8993,7 @@
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
               <span class="sp-archive-mark">The Experience</span>
               <span style="display:inline-block;width:1px;height:10px;background:rgba(58,42,16,0.22);"></span>
-              <span class="sp-archive-mark"><span>Vol.</span> &nbsp;III</span>
+              <span class="sp-archive-mark">EVERY WEEK</span>
             </div>
             <h2 style="margin:0;font-family:'Bodoni Moda','Playfair Display',Georgia,serif;font-weight:700;font-size:clamp(34px,3.8vw,54px);letter-spacing:-.022em;line-height:1.04;color:#3a2a10;background-image:linear-gradient(90deg,#b88a36 0%,#c89a44 28%,#d6a84a 50%,#c89a44 72%,#b88a36 100%);background-size:160% 100%;background-position:50% 0;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:pmHeroGoldShimmer 28s ease-in-out infinite;filter:drop-shadow(0 1px 0 rgba(255,238,180,0.25)) drop-shadow(0 16px 28px rgba(180,135,55,0.14));">Real Moments. Real Growth.</h2>
           </div>
@@ -10276,7 +10307,7 @@
       },
       'trio-life': {
         icon: I.user, eyebrow: 'Support Area', title: 'Life Skills',
-        body: '<p>Private Mentorship Assistants role model and actively teach communication, socialization, and confidence.</p><p>We work with individuals who struggle with things like starting conversations, building relationships, navigating social situations, and developing independence.</p><p>The goal is simple: help them build real confidence so they can form stronger relationships with their family, their peers, and eventually in their professional and everyday life.</p>'
+        body: '<p>Private Mentorship Assistants role model positive behaviour and actively teach communication, socialization, and confidence.</p><p>We work with individuals who struggle with things like starting conversations, building relationships, navigating social situations, and developing independence.</p><p>The goal is simple: help them build real confidence so they can form stronger relationships with their family, their peers, and eventually in their professional and everyday life.</p>'
       },
       'trio-self': {
         icon: I.heart, eyebrow: 'Support Area', title: 'Personal Support',
@@ -10305,8 +10336,8 @@
       'step-3': {
         icon: I.clock, eyebrow: 'Step 04', title: 'Meet Your Assistant',
         body: '<p>Private Mentorship will contact you to schedule an in-person meeting once the Assistant is fully briefed on your family\'s needs.</p>'
-            + '<p>Both sides walk in already aligned: you know what you want, the Assistant has the dossier. The meeting is a personality and trust check.</p>'
-            + '<p>Common formats: dinner at a public space, a visit to the Assistant\'s residence, or hosting them at your home. If travel is a barrier for the initial briefing, a video call can be arranged &mdash; the in-person meeting still happens before the first session.</p>'
+            + '<p>Both sides walk in already aligned: you know what you want, the Assistant has your application. The meeting is a personality and trust check.</p>'
+            + '<p>Common first meetings include dinner at a public space, a visit to the Assistant\'s residence, or hosting them at your home. If travel is a barrier for the initial briefing, a video call can be arranged &mdash; the in-person meeting still happens before the first session.</p>'
             + '<p>If the fit isn\'t right, we re-match. The working relationship has to feel right on day one.</p>'
       },
       'step-apply': {
@@ -10315,7 +10346,7 @@
             + '<ul class="tr-info-modal__list"><li>Private Mentorship and your requested Assistant will <strong>review your family\'s application</strong> together.</li>'
             + '<li>We will <strong>organize your needs, schedule, and plan choice into a clear weekly structure</strong> &mdash; a written dossier the Assistant can reference from day one.</li>'
             + '<li>You will be contacted to <strong>schedule the in-person meeting</strong> with the Assistant once the dossier is complete.</li></ul>'
-            + '<p style="margin-top:14px"><em>Availability is limited.</em> Applicants may be placed on a waitlist depending on Assistant availability and the current roster of families. We accept families in the order their applications are received.</p>'
+            + '<p style="margin-top:14px">Due to the intensive, long-term nature of our private family assistants, intake is strictly limited. We are currently experiencing a surge in inquiries. Applications are processed in the exact order received. Secure your spot now to avoid a multi-month waitlist.</p>'
             + '<p>The application itself is short &mdash; we follow up directly to gather any additional detail the Assistant needs.</p>'
             + '<p style="margin-top:22px"><a href="apply.html" style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(90deg,#007AFF,#0062CC);color:#fff;text-decoration:none;font-weight:700;padding:14px 24px;border-radius:999px;letter-spacing:-0.01em;box-shadow:0 6px 18px -6px rgba(0,122,255,0.55);">Begin Application <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a></p>'
       },
@@ -10325,7 +10356,7 @@
       },
       'box-plans': {
         icon: I.calendar, eyebrow: 'Plans', title: 'Plans That Fit Your Life',
-        body: '<p><strong>1 Month Plan &mdash; 24 Hours.</strong> Best for families with a specific short-term project: transitions, evaluations, a school-year ramp-up, or a crunch around a single goal.</p><p><strong>2 Month Plan &mdash; 40 Hours.</strong> Best for families building long-term routines. Eight weeks is the cadence needed for habits to stick and for the Assistant to become a real part of the household.</p><p>Either plan can be renewed, extended, or stepped up once you know what&rsquo;s working.</p>'
+        body: '<p><strong>1 Month Plans.</strong></p><p>Designed for families who need more frequent weekly support and faster momentum.</p><p><strong>Example:</strong> Three 2-hour sessions every week focused on Educational Support, Life Skills Support, and Personal Support.</p><ul class="tr-info-modal__list"><li>two 3-hour sessions</li><li>one 4-hour session</li><li>multiple shorter weekly visits depending on the family&rsquo;s schedule and goals</li></ul><p>The structure is more intensive, with support happening consistently throughout the week so families can fully use their hours within the 1-month term.</p><p><strong>2 Month Plans.</strong></p><p>Designed for families who want the same support spread across a longer timeline.</p><p><strong>Example:</strong> Two sessions per week, or fewer longer sessions spaced further apart while still maintaining consistency and progress.</p><p>This option gives families a more relaxed rhythm while still allowing them to fully use their hours within the 2-month term.</p><p><strong>Final Clarifier.</strong></p><p>Every family builds their plan differently. Some families prioritize Educational Support. Others focus more heavily on Life Skills Support and Personal Support, including appointments, transportation, routines, coordination, and day-to-day assistance.</p><p>The same hourly package can look completely different depending on the family&rsquo;s goals, schedule, and level of involvement needed.</p>'
       },
       'box-flex': {
         icon: I.clock, eyebrow: 'Scheduling', title: 'Simple &amp; Flexible',
@@ -10341,11 +10372,11 @@
       },
       'pillar-confidential': {
         icon: I.lock, eyebrow: 'Pillar', title: 'Confidential',
-        body: '<p>What happens in your family stays in your family. We don&rsquo;t discuss your children with other clients. We don&rsquo;t post about our work on social media. We don&rsquo;t use your story as a case study.</p><p>Privacy is the baseline, not a bonus &mdash; and families tell us it&rsquo;s one of the reasons they stay.</p>'
+        body: '<p>What happens in your family stays in your family. We don&rsquo;t discuss your children with other clients or share private family matters publicly.</p><p>Privacy is the baseline, not a bonus &mdash; and families tell us it&rsquo;s one of the reasons they stay.</p>'
       },
       'pillar-personalized': {
         icon: I.heart, eyebrow: 'Pillar', title: 'Personalized',
-        body: '<p>No two plans look alike. We build around the child, the family, the neighbourhood, and the goals &mdash; not a one-size curriculum.</p><p>A 14-year-old working on executive function and a 22-year-old navigating their first job need very different weekly rhythms. We design each plan from scratch.</p>'
+        body: '<p>No two plans look alike. We build around the child, the family, the neighbourhood, and the goals &mdash; not a one-size curriculum.</p><p>A 14-year-old struggling in school and a 22-year-old navigating their first job need completely different support. Every plan is built around the person.</p>'
       },
       'pillar-partnership': {
         icon: I.people, eyebrow: 'Pillar', title: 'Partnership',
