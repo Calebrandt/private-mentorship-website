@@ -10,15 +10,15 @@ export default function WelcomeStep({ state, patch }: Props) {
   return (
     <div className="hw-step-enter">
       <p className="hw-step__eyebrow">Step 1 of 24 · Welcome</p>
-      <h1 className="hw-step__title">A serious application for serious work.</h1>
+      <h1 className="hw-step__title">Welcome to the Application</h1>
       <p className="hw-step__sub">
-        This application is intentionally detailed. We do not offer interviews until your application is complete and verified — usually within five business days.
+        Thank you for your interest in joining Private Mentorship as a Private Family Assistant. Each application is reviewed individually and typically takes about thirty minutes to complete.
       </p>
 
       <div className="hw-card">
         <h3 className="hw-card__title">Before you begin</h3>
         <p className="hw-card__sub">
-          Twenty-four steps. About thirty minutes. Save and resume any time on this device.
+          Twenty-four short steps. Your progress is saved automatically — you can leave and return any time.
         </p>
         <button
           type="button"
@@ -31,7 +31,7 @@ export default function WelcomeStep({ state, patch }: Props) {
             </svg>
           </span>
           <span className="hw-ack__text">
-            <strong>I understand.</strong> I'm ready to give this application my full attention. I will answer honestly and completely.
+            <strong>I understand.</strong> I'll answer honestly and complete every section.
           </span>
         </button>
       </div>

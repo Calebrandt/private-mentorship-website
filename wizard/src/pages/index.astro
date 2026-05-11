@@ -1,15 +1,23 @@
 ---
-// Lands on the wizard at `/hiring-apply`. The bare /  is just a redirect for dev convenience.
+import HiringWizard from '../components/HiringWizard';
+import '../styles/wizard.css';
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="refresh" content="0; url=/hiring-apply" />
-    <title>Redirecting…</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Assistant Application — Private Mentorship</title>
+    <meta name="description" content="Apply to become a Private Mentorship Assistant." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,500;1,600&display=swap"
+    />
   </head>
   <body>
-    <p>Redirecting to <a href="/hiring-apply">/hiring-apply</a>…</p>
+    <HiringWizard client:load />
   </body>
 </html>

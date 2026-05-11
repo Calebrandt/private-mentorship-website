@@ -10,15 +10,15 @@ export default function ConsentStep({ state, patch }: Props) {
   const consentReview = !!state.consentReview;
   return (
     <div className="hw-step-enter">
-      <p className="hw-step__eyebrow">Step 2 of 24 · Transparency</p>
-      <h1 className="hw-step__title">How your information is used.</h1>
+      <p className="hw-step__eyebrow">Step 2 of 24 · Privacy</p>
+      <h1 className="hw-step__title">Privacy and Information Sharing</h1>
       <p className="hw-step__sub">
-        Some profile information may be shared with families if you are accepted. Sensitive documents (ID, background check, certificates) are never made public.
+        If accepted, certain profile information is shared with families you're matched with. All personal documents and verification materials remain confidential at all times.
       </p>
 
       <div className="hw-card">
         <p className="hw-card__sub" style={{ marginBottom: 14 }}>
-          Please acknowledge both:
+          Please review and confirm:
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <button
@@ -32,7 +32,7 @@ export default function ConsentStep({ state, patch }: Props) {
               </svg>
             </span>
             <span className="hw-ack__text">
-              <strong>Profile sharing.</strong> If accepted, my preferred name, photo, summary, and qualifications may be shown to matched families. Personal documents stay private.
+              <strong>Profile visibility.</strong> I understand that, if accepted, my preferred name, photo, professional summary, and qualifications may be shared with families I am matched with.
             </span>
           </button>
 
@@ -47,7 +47,7 @@ export default function ConsentStep({ state, patch }: Props) {
               </svg>
             </span>
             <span className="hw-ack__text">
-              <strong>Review process.</strong> Private Mentorship reviews every application by hand. I understand a complete application is required before any interview is offered.
+              <strong>Application review.</strong> I understand that every application is reviewed individually by Private Mentorship, and a complete application is required before an interview is offered.
             </span>
           </button>
         </div>

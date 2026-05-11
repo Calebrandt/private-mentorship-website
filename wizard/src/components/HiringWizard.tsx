@@ -14,10 +14,19 @@ import WelcomeStep from './steps/WelcomeStep';
 import ConsentStep from './steps/ConsentStep';
 import PositionStrategyStep from './steps/PositionStrategyStep';
 import EarningsStep from './steps/EarningsStep';
+import IdentityStep from './steps/IdentityStep';
+import AddressStep from './steps/AddressStep';
+import TransportationStep from './steps/TransportationStep';
+import WorkEnvStep from './steps/WorkEnvStep';
+import AvailabilityStep from './steps/AvailabilityStep';
+import WorkHistoryStep from './steps/WorkHistoryStep';
+import ChildExpStep from './steps/ChildExpStep';
+import ValuesStep from './steps/ValuesStep';
 
 // Validators mirror the existing hiring-apply.html STEPS array — same semantics,
 // so when we wire to Supabase later the contract is identical.
-const VALIDATORS: Partial<Record<StepKey, { ok: (s: WizardState) => boolean; err: string }>> = {
+type ValidatorEntry = { ok: (s: WizardState) => boolean; err: string | ((s: WizardState) => string) };
+const VALIDATORS: Partial<Record<StepKey, ValidatorEntry>> = {
   WELCOME: {
     ok: s => s.welcomeAck === true,
     err: 'Please acknowledge to continue.',
@@ -34,9 +43,92 @@ const VALIDATORS: Partial<Record<StepKey, { ok: (s: WizardState) => boolean; err
     ok: s => !!s.contractorAck1 && !!s.contractorAck2 && !!s.contractorAck3,
     err: 'Please acknowledge all three terms.',
   },
+  IDENTITY: {
+    ok: s =>
+      typeof s.legalName === 'string' && (s.legalName as string).trim().length >= 2 &&
+      typeof s.preferredName === 'string' && (s.preferredName as string).trim().length >= 1 &&
+      typeof s.phone === 'string' && (s.phone as string).replace(/\D/g, '').length >= 10 &&
+      typeof s.dob === 'string' && (s.dob as string).length === 10,
+    err: 'Please complete all personal information fields.',
+  },
+  ADDRESS: {
+    ok: s => {
+      const line1 = typeof s.addressLine1 === 'string' && (s.addressLine1 as string).trim().length >= 3;
+      const city = typeof s.city === 'string' && (s.city as string).trim().length >= 2;
+      const province = typeof s.province === 'string' && (s.province as string).length === 2;
+      const postal = typeof s.postalCode === 'string' && /^[A-Z]\d[A-Z]\s?\d[A-Z]\d$/i.test((s.postalCode as string).trim());
+      return line1 && city && province && postal;
+    },
+    err: s => {
+      if (typeof s.addressLine1 !== 'string' || (s.addressLine1 as string).trim().length < 3) return 'Please enter your street address.';
+      if (typeof s.city !== 'string' || (s.city as string).trim().length < 2) return 'Please enter your city.';
+      if (typeof s.province !== 'string' || (s.province as string).length !== 2) return 'Please select your province.';
+      if (typeof s.postalCode !== 'string' || !/^[A-Z]\d[A-Z]\s?\d[A-Z]\d$/i.test((s.postalCode as string).trim())) return 'Please enter a valid postal code (example: V6B 2N4).';
+      return 'Please complete your address.';
+    },
+  },
+  TRANSPORTATION: {
+    ok: s =>
+      typeof s.hasCar === 'boolean' &&
+      typeof s.willingTransit === 'boolean' &&
+      typeof s.canDriveClients === 'boolean' &&
+      typeof s.validLicense === 'boolean',
+    err: 'Please answer all four transportation questions.',
+  },
+  WORK_ENV: {
+    ok: s => {
+      const anyLoc = !!s.locAssistantHome || !!s.locClientHome || !!s.locOnline || !!s.locCommunity;
+      if (!anyLoc) return false;
+      if (s.locAssistantHome) {
+        return (
+          typeof s.homeShareStatus === 'boolean' &&
+          typeof s.homeSubstanceFree === 'boolean' &&
+          typeof s.homeEnvDescription === 'string' &&
+          (s.homeEnvDescription as string).trim().length >= 20
+        );
+      }
+      return true;
+    },
+    err: 'Please pick at least one work location and complete any required home details.',
+  },
+  AVAILABILITY: {
+    ok: s => {
+      const anyWindow = !!s.availWeekdays || !!s.availEvenings || !!s.availWeekends;
+      const hours = typeof s.minHoursPerWeek === 'number' && (s.minHoursPerWeek as number) > 0;
+      return anyWindow && hours;
+    },
+    err: 'Select at least one availability window and your minimum weekly hours.',
+  },
+  WORK_HISTORY: {
+    ok: s =>
+      typeof s.workRole === 'string' && (s.workRole as string).trim().length >= 2 &&
+      typeof s.workYears === 'number' && (s.workYears as number) >= 0 &&
+      typeof s.workSummary === 'string' && (s.workSummary as string).trim().length >= 20,
+    err: 'Please complete role, years, and a summary of at least 20 characters.',
+  },
+  CHILD_EXP: {
+    ok: s => {
+      const anyAge = !!s.childAges_0_5 || !!s.childAges_6_12 || !!s.childAges_13_18;
+      const summaryOk = typeof s.childExpSummary === 'string' && (s.childExpSummary as string).trim().length >= 30;
+      return anyAge && summaryOk;
+    },
+    err: 'Select at least one age group and write at least 30 characters of experience.',
+  },
+  VALUES: {
+    ok: s => {
+      const anyValue =
+        !!s.valPatience || !!s.valStructure || !!s.valAccountability ||
+        !!s.valSafety || !!s.valAcademic || !!s.valIndependence;
+      const summaryOk = typeof s.valSummary === 'string' && (s.valSummary as string).trim().length >= 20;
+      return anyValue && summaryOk;
+    },
+    err: 'Select at least one core value and write at least 20 characters about your approach.',
+  },
 };
 
 const PHASE_1_STEPS: StepKey[] = ['WELCOME', 'CONSENT', 'POSITION_STRATEGY', 'EARNINGS'];
+const PHASE_2_STEPS: StepKey[] = ['IDENTITY', 'ADDRESS', 'TRANSPORTATION', 'WORK_ENV', 'AVAILABILITY', 'WORK_HISTORY', 'CHILD_EXP', 'VALUES'];
+const BUILT_STEPS: Set<StepKey> = new Set([...PHASE_1_STEPS, ...PHASE_2_STEPS]);
 
 export default function HiringWizard() {
   const [state, setState] = useState<WizardState>({});
@@ -63,7 +155,7 @@ export default function HiringWizard() {
   function handleContinue() {
     const v = VALIDATORS[currentStep];
     if (v && !v.ok(state)) {
-      setErrorMsg(v.err);
+      setErrorMsg(typeof v.err === 'function' ? v.err(state) : v.err);
       return;
     }
     setErrorMsg(null);
@@ -90,9 +182,8 @@ export default function HiringWizard() {
     }
   }
 
-  const inPhase1 = PHASE_1_STEPS.includes(currentStep);
   const continueLabel = stepIndex === TOTAL_STEPS - 1 ? 'Submit application' : 'Continue';
-  const continueEnabled = inPhase1;
+  const continueEnabled = BUILT_STEPS.has(currentStep);
 
   return (
     <>
@@ -161,6 +252,22 @@ function renderStep(
       return <PositionStrategyStep state={state} patch={patch} />;
     case 'EARNINGS':
       return <EarningsStep state={state} patch={patch} />;
+    case 'IDENTITY':
+      return <IdentityStep state={state} patch={patch} />;
+    case 'ADDRESS':
+      return <AddressStep state={state} patch={patch} />;
+    case 'TRANSPORTATION':
+      return <TransportationStep state={state} patch={patch} />;
+    case 'WORK_ENV':
+      return <WorkEnvStep state={state} patch={patch} />;
+    case 'AVAILABILITY':
+      return <AvailabilityStep state={state} patch={patch} />;
+    case 'WORK_HISTORY':
+      return <WorkHistoryStep state={state} patch={patch} />;
+    case 'CHILD_EXP':
+      return <ChildExpStep state={state} patch={patch} />;
+    case 'VALUES':
+      return <ValuesStep state={state} patch={patch} />;
     default:
       return <BuildInProgress step={step} />;
   }

@@ -6,15 +6,15 @@ interface Props {
 }
 
 const FORMATS = [
-  { key: 'IN_PERSON', title: 'In-person only', sub: 'You meet families face-to-face. Most contracts.' },
-  { key: 'ONLINE', title: 'Online only', sub: 'You work over video. Limited availability.' },
-  { key: 'HYBRID', title: 'Both — in-person and online', sub: 'Best match rate. Most flexible.' },
+  { key: 'IN_PERSON', title: 'In-person only', sub: 'Sessions take place at the homebase or in the community.' },
+  { key: 'ONLINE', title: 'Online only', sub: 'Sessions take place over video. Limited contracts available.' },
+  { key: 'HYBRID', title: 'Both — in-person and online', sub: "A mix of in-person and online sessions, depending on the family's needs." },
 ] as const;
 
 const SERVICES = [
-  { key: 'EDUCATION', title: 'Education', sub: '1-on-1 lessons, homework help, school re-teach, ESL, study strategies.' },
-  { key: 'LIFE_SKILLS', title: 'Life Skills', sub: 'Communication, social practice, daily routines, transit, independence.' },
-  { key: 'PERSONAL_SUPPORT', title: 'Personal Support', sub: 'Appointments, errands, transportation, paperwork, advocacy.' },
+  { key: 'EDUCATION', title: 'Education', sub: 'One-on-one teaching of school subjects, ESL, post-secondary prep, and hard skills.' },
+  { key: 'LIFE_SKILLS', title: 'Life Skills', sub: 'Communication, socialization, real-world outings, and confidence-building activities.' },
+  { key: 'PERSONAL_SUPPORT', title: 'Personal Support', sub: 'Errands, meal prep, transportation, family coordination, and light home tasks.' },
 ];
 
 export default function PositionStrategyStep({ state, patch }: Props) {
@@ -30,15 +30,15 @@ export default function PositionStrategyStep({ state, patch }: Props) {
 
   return (
     <div className="hw-step-enter">
-      <p className="hw-step__eyebrow">Step 3 of 24 · The work</p>
-      <h1 className="hw-step__title">What kind of work are you open to?</h1>
+      <p className="hw-step__eyebrow">Step 3 of 24 · Role preferences</p>
+      <h1 className="hw-step__title">Role and Work Preferences</h1>
       <p className="hw-step__sub">
-        These answers help us match you with the right contracts. Choose what you are genuinely comfortable with.
+        Your selections help us match you with the right family contracts. You can update these preferences any time after applying.
       </p>
 
       <div className="hw-card">
-        <h3 className="hw-card__title">Format</h3>
-        <p className="hw-card__sub">Pick one — you can change this later if your situation changes.</p>
+        <h3 className="hw-card__title">Work setting</h3>
+        <p className="hw-card__sub">How would you prefer to work with families?</p>
         <div className="hw-choices">
           {FORMATS.map(f => (
             <button
@@ -58,8 +58,8 @@ export default function PositionStrategyStep({ state, patch }: Props) {
       </div>
 
       <div className="hw-card">
-        <h3 className="hw-card__title">Service types</h3>
-        <p className="hw-card__sub">Pick every type you'd be comfortable with. You'll only get matched within these.</p>
+        <h3 className="hw-card__title">Areas of support</h3>
+        <p className="hw-card__sub">Which areas of support are you comfortable providing? You will only be matched with contracts within the areas you select.</p>
         <div className="hw-multi">
           {SERVICES.map(s => {
             const active = services.includes(s.key);

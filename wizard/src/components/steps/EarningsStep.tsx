@@ -5,6 +5,48 @@ interface Props {
   patch: (next: Partial<WizardState>) => void;
 }
 
+interface ContractCardProps {
+  badge: string;
+  amount: string;
+  hours: string;
+}
+
+function ContractCard({ badge, amount, hours }: ContractCardProps) {
+  return (
+    <div className="hw-contract">
+      <span className="hw-contract__badge">{badge}</span>
+      <div className="hw-contract__amount">{amount}</div>
+      <div className="hw-contract__meta">take-home per contract</div>
+      <div className="hw-contract__divider" />
+      <div className="hw-contract__feature">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <circle cx="8" cy="8" r="6.5" />
+          <polyline points="5.5 8.2 7.2 9.8 10.5 6.5" />
+        </svg>
+        <span>{hours}</span>
+      </div>
+    </div>
+  );
+}
+
+interface StackingCardProps {
+  count: string;
+  amount: string;
+  hours: string;
+}
+
+function StackingCard({ count, amount, hours }: StackingCardProps) {
+  return (
+    <div className="hw-stack">
+      <div className="hw-stack__count">{count}</div>
+      <div className="hw-stack__amount">{amount}</div>
+      <div className="hw-stack__period">per month</div>
+      <div className="hw-stack__divider" />
+      <div className="hw-stack__hours">{hours}</div>
+    </div>
+  );
+}
+
 export default function EarningsStep({ state, patch }: Props) {
   const a1 = !!state.contractorAck1;
   const a2 = !!state.contractorAck2;
@@ -12,42 +54,63 @@ export default function EarningsStep({ state, patch }: Props) {
 
   return (
     <div className="hw-step-enter">
-      <p className="hw-step__eyebrow">Step 4 of 24 · Pay &amp; contractor terms</p>
-      <h1 className="hw-step__title">How pay works.</h1>
+      <p className="hw-step__eyebrow">Step 4 of 24 · Compensation</p>
+      <h1 className="hw-step__title">Compensation and Contract Structure</h1>
       <p className="hw-step__sub">
-        Assistants are paid as independent contractors. Read the rates and confirm you understand the terms.
+        Private Family Assistants are engaged as independent contractors. Compensation is built around the type of contract you take on. Below are the standard take-home amounts per contract.
       </p>
 
       <div className="hw-card">
-        <h3 className="hw-card__title">Sample rates</h3>
+        <h3 className="hw-card__title">Contract earnings</h3>
         <p className="hw-card__sub">
-          A blended starting point. Specific contracts may pay more for specialized skills.
+          Each contract is either one or two months long, with 24 or 40 total hours.
         </p>
-        <div className="hw-rates">
-          <div className="hw-rates__row hw-rates__row--head">
-            <span>Activity</span>
-            <span>Per hour</span>
-          </div>
-          <div className="hw-rates__row">
-            <span className="hw-rates__label">Standard sessions</span>
-            <span className="hw-rates__value">$22 – $28</span>
-          </div>
-          <div className="hw-rates__row">
-            <span className="hw-rates__label">Specialized (ESL, post-secondary, complex needs)</span>
-            <span className="hw-rates__value">$28 – $38</span>
-          </div>
-          <div className="hw-rates__row">
-            <span className="hw-rates__label">Travel time between client locations</span>
-            <span className="hw-rates__value">Reimbursed</span>
-          </div>
-          <div className="hw-rates__row hw-rates__row--total">
-            <span>Typical bi-weekly payout window</span>
-            <span>14 days</span>
+
+        <div className="hw-contracts">
+          <ContractCard badge="1-Month" amount="$504" hours="24 total hours" />
+          <ContractCard badge="1-Month" amount="$840" hours="40 total hours" />
+          <ContractCard badge="2-Month" amount="$756" hours="24 total hours" />
+          <ContractCard badge="2-Month" amount="$1,260" hours="40 total hours" />
+        </div>
+
+        <p className="hw-contract-note">
+          <strong>Pay cycle.</strong> Payments are issued bi-weekly after the initial probationary period. Long-term assistants in good standing may qualify for upfront payment per contract.
+        </p>
+      </div>
+
+      <div className="hw-card">
+        <h3 className="hw-card__title">Sample monthly earnings</h3>
+        <p className="hw-card__sub">
+          Most assistants run 2–5 contracts at a time. Below is what common stacking levels translate to per month for each contract type.
+        </p>
+
+        <div className="hw-stacking-group">
+          <div className="hw-stacking-label">1-Month contracts</div>
+          <div className="hw-stacking">
+            <StackingCard count="2 contracts" amount="$1,008" hours="~12 hours per week" />
+            <StackingCard count="3 contracts" amount="$1,512" hours="~18 hours per week" />
+            <StackingCard count="5 contracts" amount="$2,520" hours="~30 hours per week" />
           </div>
         </div>
 
-        <p className="hw-card__sub" style={{ marginTop: 18, marginBottom: 12 }}>
-          Acknowledge all three:
+        <div className="hw-stacking-group">
+          <div className="hw-stacking-label">2-Month contracts</div>
+          <div className="hw-stacking">
+            <StackingCard count="2 contracts" amount="$1,260" hours="~10 hours per week" />
+            <StackingCard count="3 contracts" amount="$1,890" hours="~15 hours per week" />
+            <StackingCard count="5 contracts" amount="$3,150" hours="~25 hours per week" />
+          </div>
+        </div>
+
+        <p className="hw-contract-note" style={{ marginTop: 22 }}>
+          <strong>Please note:</strong> <span className="hw-underline">these are only estimates.</span> Each family designs their own session schedule (2-hour minimum per session, no 30-minute or 1-hour sessions). Some families use their contract hours quickly across longer sessions and renew within weeks; others spread the hours across the full term. Faster usage means earlier renewals — and a higher monthly take-home.
+        </p>
+      </div>
+
+      <div className="hw-card">
+        <h3 className="hw-card__title">Acknowledgments</h3>
+        <p className="hw-card__sub">
+          Please review and confirm each of the following:
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <button
@@ -61,7 +124,7 @@ export default function EarningsStep({ state, patch }: Props) {
               </svg>
             </span>
             <span className="hw-ack__text">
-              <strong>Contractor status.</strong> I work as an independent contractor — not an employee. I'm responsible for my own taxes (CRA T2125 / GST as applicable).
+              <strong>Contractor status.</strong> I understand that I am engaged as an independent contractor and not an employee of Private Mentorship. I am responsible for my own taxes and reporting (CRA T2125 / GST as applicable).
             </span>
           </button>
 
@@ -76,7 +139,7 @@ export default function EarningsStep({ state, patch }: Props) {
               </svg>
             </span>
             <span className="hw-ack__text">
-              <strong>Pay cycle.</strong> I'm paid every two weeks via e-transfer or direct deposit, based on completed sessions logged in the Private Mentorship system.
+              <strong>Pay cycle.</strong> I understand that payments are issued bi-weekly after the initial probationary period, based on completed sessions logged in the Private Mentorship system.
             </span>
           </button>
 
@@ -91,7 +154,7 @@ export default function EarningsStep({ state, patch }: Props) {
               </svg>
             </span>
             <span className="hw-ack__text">
-              <strong>No guarantees.</strong> Hours vary by demand and matching. I'll only be paid for sessions I actually run; nothing is guaranteed week-to-week.
+              <strong>Variable hours.</strong> I understand that hours vary based on demand and contract availability. Compensation is earned per completed session; weekly hours are not guaranteed.
             </span>
           </button>
         </div>
