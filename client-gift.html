@@ -77,27 +77,38 @@
     .pm-gift__preview-col{position:static;max-width:340px;margin:0 auto;}
   }
 
-  /* The gift card preview — Preline's "nested gradient frame" pattern */
+  /* The gift card preview — slim card with gradient ring + white halo gap */
   .pm-gift__card{
     position:relative;
-    aspect-ratio:1.586/1;  /* credit-card ratio */
-    border-radius:16px;
-    padding:5px;  /* outer gradient frame thickness */
-    box-shadow:0 18px 38px -18px rgba(15,23,42,0.25);
+    aspect-ratio:1.7/1;  /* slimmer than credit-card 1.586 — feels less chunky */
+    border-radius:18px;
+    padding:4px;  /* the gradient ring thickness */
+    box-shadow:0 14px 30px -16px rgba(15,23,42,0.22);
     transition:transform .4s cubic-bezier(.22,1,.36,1), box-shadow .4s ease;
   }
-  .pm-gift__card:hover{transform:translateY(-2px);box-shadow:0 24px 48px -20px rgba(15,23,42,0.32);}
+  .pm-gift__card:hover{transform:translateY(-2px);box-shadow:0 20px 40px -18px rgba(15,23,42,0.28);}
   .pm-gift__card-inner{
     position:relative;height:100%;width:100%;
-    border-radius:11px;padding:20px;
+    border-radius:14px;padding:14px 16px;
     display:flex;flex-direction:column;
     overflow:hidden;
   }
-  /* Subtle white sheen across the top — works on all bright pastels */
+  /* Subtle white sheen across the top */
   .pm-gift__card-inner::before{
     content:"";position:absolute;inset:0;opacity:0.55;pointer-events:none;
     background:radial-gradient(ellipse 70% 50% at 30% 0%, rgba(255,255,255,0.7), transparent 70%);
+    z-index:0;
   }
+  /* White halo ring sitting just inside the gradient frame — the
+     "ring around the card with a gap" effect from the Preline ref */
+  .pm-gift__card-inner::after{
+    content:"";position:absolute;inset:3px;
+    border:1px solid rgba(255,255,255,0.55);
+    border-radius:11px;
+    pointer-events:none;z-index:0;
+  }
+  /* Content sits above both pseudo layers */
+  .pm-gift__card-inner > *{position:relative;z-index:1;}
 
   /* Card variants — multi-stop pastel gradients, matching the Preline
      reference card (orange-100 → purple-200 → indigo-200 style sweep) */
@@ -131,36 +142,36 @@
     color:#9f1239;
   }
 
-  /* Card content — compact scale */
+  /* Card content — compact scale, sticker truly centered */
   .pm-gift__card-brand{
-    font-size:10px;font-weight:700;letter-spacing:.16em;
+    font-size:9.5px;font-weight:700;letter-spacing:.16em;
     text-transform:uppercase;opacity:.60;margin:0;
   }
-  /* Decorative SVG illustration */
+  /* Decorative SVG illustration — centered in its own flex zone */
   .pm-gift__card-art{
-    flex:1;display:flex;align-items:center;justify-content:center;
-    margin:2px 0;min-height:0;
+    flex:1 1 0;display:flex;align-items:center;justify-content:center;
+    margin:0;min-height:0;
   }
   .pm-gift__card-art svg{
-    width:96px;height:96px;
-    filter:drop-shadow(0 4px 10px rgba(0,0,0,0.18));
+    width:62px;height:62px;
+    filter:drop-shadow(0 3px 8px rgba(0,0,0,0.16));
   }
   .pm-gift__card-amount{
-    font-size:26px;font-weight:600;letter-spacing:-.022em;
+    font-size:22px;font-weight:600;letter-spacing:-.022em;
     margin:0;line-height:1;font-variant-numeric:tabular-nums;
   }
-  .pm-gift__card-amount small{font-size:12px;font-weight:500;margin-left:4px;opacity:.7;}
+  .pm-gift__card-amount small{font-size:11px;font-weight:500;margin-left:3px;opacity:.7;}
   .pm-gift__card-term{
-    font-size:9.5px;font-weight:500;letter-spacing:.06em;
-    text-transform:uppercase;opacity:.55;margin:5px 0 0;
+    font-size:9px;font-weight:500;letter-spacing:.06em;
+    text-transform:uppercase;opacity:.55;margin:4px 0 0;
   }
   .pm-gift__card-meta{
     display:flex;justify-content:space-between;align-items:flex-end;
-    margin-top:10px;font-size:10.5px;font-weight:500;line-height:1.4;
+    margin-top:8px;font-size:10px;font-weight:500;line-height:1.35;
   }
   .pm-gift__card-meta-label{
     display:block;opacity:.55;text-transform:uppercase;letter-spacing:.08em;
-    font-size:8.5px;font-weight:600;margin-bottom:2px;
+    font-size:8px;font-weight:600;margin-bottom:2px;
   }
   .pm-gift__card-meta-value{opacity:.95;}
 
@@ -595,186 +606,85 @@
   const RATES = { 1: 30, 2: 45 };
   function calcTotal(termMonths, hours){ return (RATES[termMonths] || 30) * hours; }
 
-  // ── Decorative stickers ──────────────────────────────────────
-  // Premium sticker style: gradient fills, white-shine highlights, bold sizing.
-  // viewBox 120 × 120. Each has a BIG (card) and SMALL (picker thumb) variant
-  // — small versions are simplified to read at thumbnail size.
+  // ── Stickers v2 — sharp, simple, cute ────────────────────────
+  // Design rules: 1–2 solid colors per sticker (no gradients in fills),
+  // bold geometric shapes, max 5–6 elements per sticker. ViewBox 120×120.
   const GRAPHICS = {
     gift: {
-      label: 'Gift box',
+      label: 'Gift',
       big: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <defs>
-          <linearGradient id="giftBody" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#FCD34D"/>
-            <stop offset="100%" stop-color="#D97706"/>
-          </linearGradient>
-          <linearGradient id="giftLid" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#FBBF24"/>
-            <stop offset="100%" stop-color="#F59E0B"/>
-          </linearGradient>
-          <linearGradient id="ribbon" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#F87171"/>
-            <stop offset="100%" stop-color="#B91C1C"/>
-          </linearGradient>
-        </defs>
-        <ellipse cx="60" cy="108" rx="36" ry="4" fill="rgba(0,0,0,0.10)"/>
-        <rect x="22" y="50" width="76" height="56" rx="5" fill="url(#giftBody)"/>
-        <rect x="22" y="50" width="76" height="6" fill="rgba(255,255,255,0.32)"/>
-        <rect x="22" y="50" width="6" height="56" fill="rgba(255,255,255,0.20)"/>
-        <rect x="16" y="40" width="88" height="18" rx="4" fill="url(#giftLid)"/>
-        <rect x="16" y="40" width="88" height="5" fill="rgba(255,255,255,0.40)"/>
-        <rect x="54" y="40" width="12" height="66" fill="url(#ribbon)"/>
-        <rect x="54" y="40" width="3.5" height="66" fill="rgba(255,255,255,0.30)"/>
-        <rect x="16" y="43" width="88" height="10" fill="url(#ribbon)"/>
-        <rect x="16" y="43" width="88" height="3" fill="rgba(255,255,255,0.30)"/>
-        <ellipse cx="46" cy="32" rx="16" ry="10" fill="#EF4444" transform="rotate(-18 46 32)"/>
-        <ellipse cx="44" cy="29" rx="7" ry="3" fill="rgba(255,255,255,0.45)" transform="rotate(-18 46 32)"/>
-        <ellipse cx="74" cy="32" rx="16" ry="10" fill="#EF4444" transform="rotate(18 74 32)"/>
-        <ellipse cx="76" cy="29" rx="7" ry="3" fill="rgba(255,255,255,0.45)" transform="rotate(18 74 32)"/>
-        <circle cx="60" cy="38" r="6.5" fill="#991B1B"/>
-        <circle cx="60" cy="35.5" r="2.5" fill="rgba(255,255,255,0.55)"/>
-        <path d="M16 24 L 19 30 L 25 32 L 19 34 L 16 40 L 13 34 L 7 32 L 13 30 Z" fill="#FBBF24"/>
-        <path d="M101 84 L 103 88 L 107 90 L 103 92 L 101 96 L 99 92 L 95 90 L 99 88 Z" fill="#FBBF24"/>
+        <rect x="22" y="50" width="76" height="52" rx="5" fill="#EF4444"/>
+        <rect x="16" y="42" width="88" height="14" rx="3" fill="#DC2626"/>
+        <rect x="54" y="42" width="12" height="60" fill="#FBBF24"/>
+        <rect x="16" y="46" width="88" height="6" fill="#FBBF24"/>
+        <circle cx="48" cy="36" r="9" fill="#FBBF24"/>
+        <circle cx="72" cy="36" r="9" fill="#FBBF24"/>
+        <circle cx="60" cy="40" r="5" fill="#EF4444"/>
       </svg>`,
       small: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect x="22" y="52" width="76" height="54" rx="5" fill="#F59E0B"/>
-        <rect x="16" y="42" width="88" height="16" rx="3" fill="#FBBF24"/>
-        <rect x="54" y="42" width="12" height="64" fill="#DC2626"/>
-        <rect x="16" y="44" width="88" height="10" fill="#DC2626"/>
-        <circle cx="60" cy="40" r="9" fill="#EF4444"/>
-        <circle cx="60" cy="40" r="3.5" fill="#991B1B"/>
+        <rect x="22" y="50" width="76" height="52" rx="5" fill="#EF4444"/>
+        <rect x="16" y="42" width="88" height="14" rx="3" fill="#DC2626"/>
+        <rect x="54" y="42" width="12" height="60" fill="#FBBF24"/>
+        <rect x="16" y="46" width="88" height="6" fill="#FBBF24"/>
+        <circle cx="48" cy="36" r="9" fill="#FBBF24"/>
+        <circle cx="72" cy="36" r="9" fill="#FBBF24"/>
+        <circle cx="60" cy="40" r="5" fill="#EF4444"/>
       </svg>`,
     },
 
     heart: {
       label: 'Heart',
       big: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <defs>
-          <radialGradient id="heartRad" cx="40%" cy="35%" r="70%">
-            <stop offset="0%" stop-color="#F9A8D4"/>
-            <stop offset="60%" stop-color="#EC4899"/>
-            <stop offset="100%" stop-color="#BE185D"/>
-          </radialGradient>
-        </defs>
-        <ellipse cx="60" cy="110" rx="32" ry="4" fill="rgba(0,0,0,0.10)"/>
-        <path d="M60 102 C 16 74, 10 42, 28 28 C 42 18, 54 26, 60 38 C 66 26, 78 18, 92 28 C 110 42, 104 74, 60 102 Z" fill="url(#heartRad)"/>
-        <path d="M34 32 C 28 36, 26 44, 28 50 C 32 42, 38 36, 44 34 C 40 30, 36 30, 34 32 Z" fill="rgba(255,255,255,0.55)"/>
-        <circle cx="78" cy="32" r="2.5" fill="rgba(255,255,255,0.7)"/>
-        <path d="M14 22 L 17 28 L 23 30 L 17 32 L 14 38 L 11 32 L 5 30 L 11 28 Z" fill="#FBBF24"/>
-        <path d="M104 16 L 106 21 L 111 22 L 106 24 L 104 29 L 102 24 L 97 22 L 102 21 Z" fill="#FBBF24"/>
-        <path d="M16 70 L 18 74 L 22 75 L 18 76 L 16 80 L 14 76 L 10 75 L 14 74 Z" fill="#FBBF24"/>
-        <path d="M104 76 L 106 80 L 110 81 L 106 82 L 104 86 L 102 82 L 98 81 L 102 80 Z" fill="#FBBF24"/>
+        <path d="M60 100 C 18 74, 14 42, 30 28 C 42 18, 54 26, 60 38 C 66 26, 78 18, 90 28 C 106 42, 102 74, 60 100 Z" fill="#EC4899"/>
+        <path d="M36 32 C 30 38, 28 46, 31 53 C 35 44, 42 38, 49 36 Z" fill="rgba(255,255,255,0.55)"/>
       </svg>`,
       small: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M60 102 C 16 74, 10 42, 28 28 C 42 18, 54 26, 60 38 C 66 26, 78 18, 92 28 C 110 42, 104 74, 60 102 Z" fill="#EC4899"/>
-        <path d="M34 34 C 28 38, 26 46, 30 52 C 34 44, 40 38, 46 36 Z" fill="rgba(255,255,255,0.50)"/>
-        <circle cx="16" cy="24" r="4" fill="#FBBF24"/>
-        <circle cx="104" cy="22" r="3.5" fill="#FBBF24"/>
+        <path d="M60 100 C 18 74, 14 42, 30 28 C 42 18, 54 26, 60 38 C 66 26, 78 18, 90 28 C 106 42, 102 74, 60 100 Z" fill="#EC4899"/>
+        <path d="M36 32 C 30 38, 28 46, 31 53 C 35 44, 42 38, 49 36 Z" fill="rgba(255,255,255,0.55)"/>
       </svg>`,
     },
 
     star: {
       label: 'Star',
       big: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <defs>
-          <radialGradient id="starRad" cx="40%" cy="35%" r="70%">
-            <stop offset="0%" stop-color="#FEF3C7"/>
-            <stop offset="50%" stop-color="#FBBF24"/>
-            <stop offset="100%" stop-color="#D97706"/>
-          </radialGradient>
-        </defs>
-        <ellipse cx="60" cy="110" rx="34" ry="4" fill="rgba(0,0,0,0.10)"/>
-        <path d="M60 12 L 73 46 L 110 50 L 82 73 L 91 110 L 60 90 L 29 110 L 38 73 L 10 50 L 47 46 Z" fill="url(#starRad)"/>
-        <path d="M60 24 C 56 36, 50 44, 38 50 C 44 50, 52 46, 60 38 Z" fill="rgba(255,255,255,0.55)"/>
-        <path d="M16 22 L 19 28 L 25 30 L 19 32 L 16 38 L 13 32 L 7 30 L 13 28 Z" fill="#06B6D4"/>
-        <path d="M16 22 L 19 28 L 25 30 L 19 32 L 16 38 L 13 32 L 7 30 L 13 28 Z" fill="rgba(255,255,255,0.30)"/>
-        <path d="M100 80 L 102 84 L 106 85 L 102 86 L 100 90 L 98 86 L 94 85 L 98 84 Z" fill="#A855F7"/>
-        <path d="M16 84 L 18 88 L 22 89 L 18 90 L 16 94 L 14 90 L 10 89 L 14 88 Z" fill="#EC4899"/>
+        <path d="M60 14 L 72 46 L 106 50 L 80 72 L 88 106 L 60 88 L 32 106 L 40 72 L 14 50 L 48 46 Z" fill="#FBBF24" stroke-linejoin="round"/>
+        <path d="M48 38 C 44 46, 38 52, 30 54 C 36 54, 44 50, 52 44 Z" fill="rgba(255,255,255,0.55)"/>
       </svg>`,
       small: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M60 12 L 73 46 L 110 50 L 82 73 L 91 110 L 60 90 L 29 110 L 38 73 L 10 50 L 47 46 Z" fill="#FBBF24"/>
-        <path d="M60 24 C 56 36, 50 44, 38 50 C 44 50, 52 46, 60 38 Z" fill="rgba(255,255,255,0.55)"/>
-        <path d="M100 22 L 103 28 L 109 30 L 103 32 L 100 38 L 97 32 L 91 30 L 97 28 Z" fill="#06B6D4"/>
+        <path d="M60 14 L 72 46 L 106 50 L 80 72 L 88 106 L 60 88 L 32 106 L 40 72 L 14 50 L 48 46 Z" fill="#FBBF24"/>
+        <path d="M48 38 C 44 46, 38 52, 30 54 C 36 54, 44 50, 52 44 Z" fill="rgba(255,255,255,0.55)"/>
       </svg>`,
     },
 
     crown: {
       label: 'Crown',
       big: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <defs>
-          <linearGradient id="crownGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#FDE68A"/>
-            <stop offset="50%" stop-color="#FBBF24"/>
-            <stop offset="100%" stop-color="#D97706"/>
-          </linearGradient>
-          <linearGradient id="crownBase" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#F59E0B"/>
-            <stop offset="100%" stop-color="#B45309"/>
-          </linearGradient>
-        </defs>
-        <ellipse cx="60" cy="110" rx="40" ry="4" fill="rgba(0,0,0,0.10)"/>
-        <path d="M14 56 L 24 86 L 96 86 L 106 56 L 86 70 L 72 38 L 60 62 L 48 38 L 34 70 Z" fill="url(#crownGrad)"/>
-        <path d="M14 56 L 24 86 L 96 86 L 106 56 L 86 70 L 72 38 L 60 62 L 48 38 L 34 70 Z" fill="rgba(255,255,255,0.30)" opacity=".5" transform="translate(0,-2) scale(1, 0.3)"/>
-        <rect x="20" y="88" width="80" height="14" rx="3" fill="url(#crownBase)"/>
-        <rect x="20" y="88" width="80" height="4" fill="rgba(255,255,255,0.35)"/>
-        <circle cx="14" cy="52" r="6" fill="#3B82F6"/>
-        <circle cx="14" cy="50" r="2.5" fill="rgba(255,255,255,0.65)"/>
-        <circle cx="60" cy="34" r="7.5" fill="#DC2626"/>
-        <circle cx="60" cy="32" r="3" fill="rgba(255,255,255,0.70)"/>
-        <circle cx="106" cy="52" r="6" fill="#10B981"/>
-        <circle cx="106" cy="50" r="2.5" fill="rgba(255,255,255,0.65)"/>
-        <circle cx="42" cy="94" r="3" fill="#A855F7"/>
-        <circle cx="60" cy="94" r="3" fill="#06B6D4"/>
-        <circle cx="78" cy="94" r="3" fill="#EC4899"/>
+        <path d="M18 52 L 28 86 L 92 86 L 102 52 L 84 68 L 72 40 L 60 60 L 48 40 L 36 68 Z" fill="#FBBF24"/>
+        <rect x="22" y="86" width="76" height="14" rx="3" fill="#F59E0B"/>
+        <circle cx="60" cy="36" r="6" fill="#DC2626"/>
+        <circle cx="20" cy="50" r="5" fill="#3B82F6"/>
+        <circle cx="100" cy="50" r="5" fill="#10B981"/>
       </svg>`,
       small: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M14 56 L 24 86 L 96 86 L 106 56 L 86 70 L 72 38 L 60 62 L 48 38 L 34 70 Z" fill="#FBBF24"/>
-        <rect x="20" y="88" width="80" height="14" rx="3" fill="#F59E0B"/>
-        <circle cx="60" cy="34" r="7" fill="#DC2626"/>
-        <circle cx="14" cy="52" r="5" fill="#3B82F6"/>
-        <circle cx="106" cy="52" r="5" fill="#10B981"/>
+        <path d="M18 52 L 28 86 L 92 86 L 102 52 L 84 68 L 72 40 L 60 60 L 48 40 L 36 68 Z" fill="#FBBF24"/>
+        <rect x="22" y="86" width="76" height="14" rx="3" fill="#F59E0B"/>
+        <circle cx="60" cy="36" r="6" fill="#DC2626"/>
+        <circle cx="20" cy="50" r="5" fill="#3B82F6"/>
+        <circle cx="100" cy="50" r="5" fill="#10B981"/>
       </svg>`,
     },
 
-    confetti: {
-      label: 'Confetti',
+    sparkle: {
+      label: 'Sparkle',
       big: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <defs>
-          <radialGradient id="popRad" cx="40%" cy="35%" r="70%">
-            <stop offset="0%" stop-color="#FEF3C7"/>
-            <stop offset="60%" stop-color="#FBBF24"/>
-            <stop offset="100%" stop-color="#D97706"/>
-          </radialGradient>
-        </defs>
-        <ellipse cx="60" cy="108" rx="22" ry="3" fill="rgba(0,0,0,0.10)"/>
-        <circle cx="60" cy="60" r="20" fill="url(#popRad)"/>
-        <circle cx="54" cy="54" r="6" fill="rgba(255,255,255,0.55)"/>
-        <rect x="12" y="20" width="14" height="6" rx="2" fill="#EC4899" transform="rotate(-28 12 20)"/>
-        <rect x="12" y="20" width="14" height="2" rx="1" fill="rgba(255,255,255,0.40)" transform="rotate(-28 12 20)"/>
-        <rect x="92" y="14" width="14" height="6" rx="2" fill="#3B82F6" transform="rotate(22 92 14)"/>
-        <rect x="92" y="14" width="14" height="2" rx="1" fill="rgba(255,255,255,0.40)" transform="rotate(22 92 14)"/>
-        <rect x="96" y="56" width="14" height="6" rx="2" fill="#10B981" transform="rotate(70 96 56)"/>
-        <rect x="96" y="56" width="14" height="2" rx="1" fill="rgba(255,255,255,0.40)" transform="rotate(70 96 56)"/>
-        <rect x="90" y="92" width="14" height="6" rx="2" fill="#A855F7" transform="rotate(-30 90 92)"/>
-        <rect x="90" y="92" width="14" height="2" rx="1" fill="rgba(255,255,255,0.40)" transform="rotate(-30 90 92)"/>
-        <rect x="14" y="92" width="14" height="6" rx="2" fill="#DC2626" transform="rotate(28 14 92)"/>
-        <rect x="14" y="92" width="14" height="2" rx="1" fill="rgba(255,255,255,0.40)" transform="rotate(28 14 92)"/>
-        <rect x="6" y="56" width="14" height="6" rx="2" fill="#06B6D4" transform="rotate(-72 6 56)"/>
-        <rect x="6" y="56" width="14" height="2" rx="1" fill="rgba(255,255,255,0.40)" transform="rotate(-72 6 56)"/>
-        <circle cx="32" cy="38" r="4" fill="#EC4899"/>
-        <circle cx="86" cy="34" r="3.5" fill="#10B981"/>
-        <circle cx="88" cy="80" r="4" fill="#A855F7"/>
-        <circle cx="30" cy="78" r="3.5" fill="#3B82F6"/>
-        <circle cx="60" cy="20" r="3" fill="#FBBF24"/>
-        <circle cx="60" cy="98" r="3" fill="#06B6D4"/>
+        <path d="M60 12 L 68 52 L 108 60 L 68 68 L 60 108 L 52 68 L 12 60 L 52 52 Z" fill="#FBBF24"/>
+        <path d="M28 22 L 31 33 L 42 36 L 31 39 L 28 50 L 25 39 L 14 36 L 25 33 Z" fill="#EC4899"/>
+        <path d="M92 78 L 94 87 L 103 89 L 94 91 L 92 100 L 90 91 L 81 89 L 90 87 Z" fill="#06B6D4"/>
       </svg>`,
       small: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <circle cx="60" cy="60" r="20" fill="#FBBF24"/>
-        <circle cx="54" cy="54" r="6" fill="rgba(255,255,255,0.55)"/>
-        <rect x="14" y="22" width="14" height="6" rx="2" fill="#EC4899" transform="rotate(-28 14 22)"/>
-        <rect x="92" y="16" width="14" height="6" rx="2" fill="#3B82F6" transform="rotate(22 92 16)"/>
-        <rect x="90" y="92" width="14" height="6" rx="2" fill="#10B981" transform="rotate(-30 90 92)"/>
-        <rect x="16" y="92" width="14" height="6" rx="2" fill="#A855F7" transform="rotate(28 16 92)"/>
+        <path d="M60 12 L 68 52 L 108 60 L 68 68 L 60 108 L 52 68 L 12 60 L 52 52 Z" fill="#FBBF24"/>
+        <path d="M28 22 L 31 33 L 42 36 L 31 39 L 28 50 L 25 39 L 14 36 L 25 33 Z" fill="#EC4899"/>
+        <path d="M92 78 L 94 87 L 103 89 L 94 91 L 92 100 L 90 91 L 81 89 L 90 87 Z" fill="#06B6D4"/>
       </svg>`,
     },
   };
