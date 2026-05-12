@@ -197,6 +197,35 @@ a{color:inherit;}
   .jd-cat__body{padding:12px 14px;}
 }
 
+/* ─── COMPARE TABLE — market rate vs PM ──────────────────── */
+.jd-compare{
+  width:100%;border-collapse:separate;border-spacing:0;
+  border:1px solid #e5e7eb;border-radius:6px;overflow:hidden;
+  background:#fff;margin:10px 0 4px;
+  font-size:12.5px;
+}
+.jd-compare thead th{
+  background:#fafaf9;
+  padding:10px 13px;text-align:left;
+  font-weight:600;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#71717a;
+  border-bottom:1px solid #e5e7eb;white-space:nowrap;
+}
+.jd-compare tbody td{
+  padding:10px 13px;border-bottom:1px solid #f1f1f3;
+  color:#3f3f46;font-variant-numeric:tabular-nums;
+}
+.jd-compare tbody td:first-child{color:#0f1a14;font-weight:500;}
+.jd-compare tbody tr.is-pm td{background:#fafaf9;color:#0f1a14;font-weight:600;}
+.jd-compare tbody tr.is-pm td:last-child{color:#15803d;}
+.jd-compare tbody tr:last-child td{border-bottom:none;}
+.jd-compare__yes{color:#15803d;}
+.jd-compare__no{color:#9ca3af;}
+.jd-compare__cite{margin-top:6px !important;font-size:11px !important;color:#71717a !important;line-height:1.5 !important;}
+@media (max-width:560px){
+  .jd-compare{font-size:11.5px;}
+  .jd-compare thead th, .jd-compare tbody td{padding:8px 10px;}
+}
+
 /* ─── FAQ — accordion via <details>/<summary> ────────────── */
 .jd-acc{display:flex;flex-direction:column;margin-top:4px;}
 .jd-acc-item{border-bottom:1px solid #f1f1f3;}
