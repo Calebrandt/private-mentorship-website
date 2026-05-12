@@ -35,238 +35,191 @@
   /* Shell */
   .nx-shell{padding:32px 28px 80px;max-width:1180px;margin:0 auto;}
   .nx-head{margin-bottom:28px;}
-  .nx-h1{font-size:32px;font-weight:800;letter-spacing:-.025em;margin:0 0 8px;color:var(--ink-2);line-height:1.05;}
+  .nx-h1{font-size:26px;font-weight:600;letter-spacing:-.022em;margin:0 0 6px;color:var(--ink-2);line-height:1.15;}
   .nx-sub{font-size:14.5px;color:var(--ink-mute);margin:0;font-weight:500;letter-spacing:-.005em;}
-
-  /* Premium dark hero — current contract */
-  .nx-hero{
-    position:relative;overflow:hidden;
-    background:linear-gradient(135deg,#0F172A 0%,#1E293B 50%,#334155 100%);
-    color:#fff;border-radius:22px;padding:38px 38px 32px;margin-bottom:26px;
-    box-shadow:0 28px 60px -20px rgba(15,23,42,0.6);
-  }
-  .nx-hero::before{
-    content:'';position:absolute;top:-100px;right:-80px;width:340px;height:340px;
-    background:radial-gradient(closest-side,rgba(212,165,116,0.18),transparent 70%);
-    pointer-events:none;
-  }
-  .nx-hero__corner{
-    position:absolute;top:18px;right:18px;
-    background:linear-gradient(135deg,#D4A574,#B08654);
-    color:#1A0F00;
-    padding:6px 12px;border-radius:9999px;
-    font-size:10.5px;font-weight:800;letter-spacing:.10em;text-transform:uppercase;
-    box-shadow:0 6px 14px -4px var(--gold-glow);
-    display:inline-flex;align-items:center;gap:6px;
-  }
-  .nx-hero__corner::before{
-    content:'';width:6px;height:6px;border-radius:50%;background:#1A0F00;
-  }
-  .nx-hero__eyebrow{font-size:11px;font-weight:800;letter-spacing:.20em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin:0 0 14px;}
-  .nx-hero__tier{font-size:34px;font-weight:800;letter-spacing:-.028em;margin:0;line-height:1.05;}
-  .nx-hero__sub{font-size:14.5px;color:rgba(255,255,255,0.65);margin:8px 0 0;font-weight:500;letter-spacing:-.005em;}
-
-  .nx-hero__row{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:24px;margin-top:30px;align-items:end;}
-  .nx-hero__metric-label{font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,0.50);margin:0 0 8px;}
-  .nx-hero__metric-value{font-family:Inter,sans-serif;font-size:30px;font-weight:800;letter-spacing:-.02em;margin:0;color:#fff;line-height:1;font-variant-numeric:tabular-nums;}
-  .nx-hero__metric-value small{font-size:14px;font-weight:700;color:rgba(255,255,255,0.55);margin-left:6px;letter-spacing:-.012em;}
-  .nx-hero__active{
-    display:inline-flex;align-items:center;gap:8px;
-    font-size:13px;font-weight:700;color:#86EFAC;letter-spacing:.04em;text-transform:uppercase;
-  }
-  .nx-hero__active::before{
-    content:'';width:9px;height:9px;border-radius:50%;background:#22C55E;
-    box-shadow:0 0 0 4px rgba(34,197,94,0.18);
-    animation:nxPulse 2s ease-in-out infinite;
-  }
-  @keyframes nxPulse {
-    0%,100%{box-shadow:0 0 0 4px rgba(34,197,94,0.18);}
-    50%{box-shadow:0 0 0 8px rgba(34,197,94,0.05);}
-  }
-
-  /* Locked schedule strip */
-  .nx-locked{
-    margin-top:28px;padding-top:22px;
-    border-top:1px solid rgba(255,255,255,0.10);
-  }
-  .nx-locked__head{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
-  .nx-locked__label{font-size:10.5px;font-weight:800;letter-spacing:.20em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin:0;}
-  .nx-locked__count{
-    background:rgba(255,255,255,0.10);color:#fff;
-    font-size:10.5px;font-weight:800;letter-spacing:.06em;
-    padding:3px 8px;border-radius:9999px;
-  }
-  .nx-locked__list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;}
-  .nx-ticket{
-    display:flex;align-items:center;gap:14px;
-    background:rgba(255,255,255,0.04);
-    border:1px solid rgba(255,255,255,0.08);
-    border-radius:11px;padding:13px 14px 13px 0;
-    position:relative;overflow:hidden;
-  }
-  .nx-ticket::before{
-    content:'';position:absolute;left:0;top:0;bottom:0;width:4px;
-    background:linear-gradient(180deg,#5750F1,#0ABEF9);
-  }
-  .nx-ticket__day{
-    width:46px;text-align:center;flex-shrink:0;margin-left:14px;
-    border-right:1px solid rgba(255,255,255,0.08);padding-right:12px;
-  }
-  .nx-ticket__day-name{font-size:11px;font-weight:800;letter-spacing:.12em;color:rgba(255,255,255,0.55);text-transform:uppercase;margin:0 0 1px;}
-  .nx-ticket__day-tag{font-size:9.5px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,0.40);text-transform:uppercase;margin:0;}
-  .nx-ticket__body{flex:1;min-width:0;}
-  .nx-ticket__time{font-size:13.5px;font-weight:700;color:#fff;margin:0;letter-spacing:-.005em;}
-  .nx-ticket__dur{font-size:11px;font-weight:600;color:rgba(255,255,255,0.55);margin:3px 0 0;}
-
-  /* Action row at bottom of hero */
-  .nx-hero__actions{
-    display:flex;gap:10px;margin-top:24px;
-  }
-  .nx-hero__btn{
-    flex:1;
-    background:#fff;color:#0F172A;border:none;
-    padding:14px 20px;border-radius:11px;
-    font:700 14px Inter,sans-serif;letter-spacing:-.005em;
-    cursor:pointer;
-    display:inline-flex;align-items:center;justify-content:center;gap:8px;
-    transition:transform .15s ease, box-shadow .15s ease;
-    box-shadow:0 8px 18px -6px rgba(0,0,0,0.35);
-  }
-  .nx-hero__btn:hover{transform:translateY(-1px);box-shadow:0 14px 28px -8px rgba(0,0,0,0.45);}
-  .nx-hero__btn--ghost{background:rgba(255,255,255,0.06);color:#fff;border:1px solid rgba(255,255,255,0.16);box-shadow:none;}
-  .nx-hero__btn--ghost:hover{background:rgba(255,255,255,0.10);}
-  .nx-hero__btn svg{width:14px;height:14px;stroke-width:2.6;}
-
-  /* Pending review banner */
-  .nx-pending{
-    background:linear-gradient(135deg,#FEF3C7 0%,#FDE68A 100%);
-    border:1px solid #F59E0B;border-radius:14px;
-    padding:18px 22px;margin-bottom:22px;
-    display:flex;align-items:center;gap:14px;
-    box-shadow:0 6px 18px -8px rgba(245,158,11,0.4);
-  }
-  .nx-pending__icon{
-    width:42px;height:42px;border-radius:11px;flex-shrink:0;
-    background:linear-gradient(135deg,#D97706,#F59E0B);color:#fff;
-    display:flex;align-items:center;justify-content:center;
-    box-shadow:inset 0 -2px 5px rgba(0,0,0,0.12);
-  }
-  .nx-pending__icon svg{width:20px;height:20px;stroke-width:2.4;}
-  .nx-pending__body{flex:1;min-width:0;}
-  .nx-pending__title{font-size:14.5px;font-weight:800;color:#78350F;margin:0;letter-spacing:-.005em;}
-  .nx-pending__sub{font-size:12.5px;color:#92400E;margin:3px 0 0;font-weight:500;line-height:1.45;}
 
   /* Generic card */
   .nx-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:26px;box-shadow:0 1px 2px rgba(15,23,42,0.04);}
   .nx-card__head{margin-bottom:20px;}
-  .nx-card__title{font-size:20px;font-weight:800;letter-spacing:-.018em;margin:0;color:var(--ink-2);line-height:1.15;}
+  .nx-card__title{font-size:20px;font-weight:700;letter-spacing:-.018em;margin:0;color:var(--ink-2);line-height:1.2;}
   .nx-card__sub{font-size:13px;color:var(--ink-mute);margin:5px 0 0;font-weight:500;}
 
-  /* Premium pill toggle (Monthly / Yearly) */
-  .nx-toggle-wrap{display:flex;justify-content:center;margin-bottom:30px;}
-  .nx-pill-toggle{
-    display:inline-flex;background:#F8FAFC;border:1px solid var(--border);
-    border-radius:9999px;padding:5px;gap:0;position:relative;
+  /* Pending review banner — calm slate (no orange/amber gradients) */
+  .nx-pending{
+    background:#fff;border:1px solid var(--border);border-radius:12px;
+    padding:16px 20px;margin-bottom:22px;
+    display:flex;align-items:center;gap:14px;
     box-shadow:0 1px 2px rgba(15,23,42,0.04);
   }
-  .nx-pill-toggle__btn{
-    background:transparent;border:0;cursor:pointer;
-    padding:11px 26px;border-radius:9999px;
-    font:700 13.5px Inter,sans-serif;color:var(--ink-mute);letter-spacing:-.005em;
-    transition:color .18s ease;position:relative;z-index:2;
-    display:inline-flex;align-items:center;gap:8px;
-  }
-  .nx-pill-toggle__btn:hover{color:var(--ink-2);}
-  .nx-pill-toggle__btn.is-active{color:#fff;}
-  .nx-pill-toggle__btn[disabled]{cursor:not-allowed;}
-  .nx-pill-toggle__indicator{
-    position:absolute;top:5px;left:5px;height:calc(100% - 10px);
-    background:linear-gradient(180deg,#5B82F8 0%,#5750F1 50%,#4338CA 100%);
-    border-radius:9999px;z-index:1;
-    transition:transform .35s cubic-bezier(.22,1,.36,1), width .35s cubic-bezier(.22,1,.36,1);
-    box-shadow:0 6px 14px -4px rgba(87,80,241,0.45), inset 0 -2px 4px rgba(0,0,0,0.10);
-  }
-  .nx-toggle__save{
-    background:rgba(255,255,255,0.20);color:#fff;
-    font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
-    padding:3px 8px;border-radius:9999px;
-  }
-  .nx-pill-toggle__btn:not(.is-active) .nx-toggle__save{background:#DCFCE7;color:#166534;}
-
-  /* Plan tier cards — clean white, popular = blue ring + tinted background */
-  .nx-plans{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:8px;}
-  .nx-plan{
-    position:relative;
-    background:#fff;border:1px solid var(--border);border-radius:20px;
-    padding:34px 32px 30px;text-align:left;font-family:inherit;
-    transition:transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s ease, border-color .25s ease;
-    display:flex;flex-direction:column;
-    box-shadow:0 1px 2px rgba(15,23,42,0.04);
-  }
-  .nx-plan:hover{transform:translateY(-3px);box-shadow:0 24px 44px -16px rgba(15,23,42,0.20);}
-  .nx-plan--popular{
-    border:2px solid var(--primary);
-    background:linear-gradient(180deg,#EEF1FB 0%,#F8FAFF 60%);
-    box-shadow:0 18px 36px -14px rgba(87,80,241,0.30);
-  }
-  .nx-plan__top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px;}
-  .nx-plan__title{font-size:30px;font-weight:800;color:var(--ink-2);margin:0;letter-spacing:-.025em;line-height:1.05;}
-  .nx-plan__pop{
-    background:linear-gradient(180deg,#5B82F8,#4338CA);color:#fff;
-    padding:5px 13px;border-radius:9999px;
-    font-size:11.5px;font-weight:700;letter-spacing:-.005em;
-    flex-shrink:0;
-    box-shadow:0 4px 10px -3px rgba(67,56,202,0.40);
-  }
-  .nx-plan__desc{font-size:14px;color:var(--ink-mute);margin:0 0 22px;font-weight:500;line-height:1.5;letter-spacing:-.005em;}
-  .nx-plan__price-row{display:flex;align-items:baseline;gap:8px;margin-bottom:4px;}
-  .nx-plan__currency{font-size:24px;font-weight:800;color:var(--ink-2);letter-spacing:-.020em;}
-  .nx-plan__price{font-size:48px;font-weight:800;color:var(--ink-2);letter-spacing:-.030em;line-height:1;font-variant-numeric:tabular-nums;}
-  .nx-plan__period{font-size:16px;color:var(--ink-mute);font-weight:600;letter-spacing:-.012em;}
-  .nx-plan__hint{font-size:12.5px;color:var(--ink-mute);margin:0 0 22px;font-weight:500;letter-spacing:-.005em;}
-  .nx-plan__hint strong{color:var(--ink-2);font-weight:700;}
-
-  .nx-plan__btn{
-    width:100%;border:none;cursor:pointer;
-    padding:16px 20px;border-radius:14px;
-    font:700 16px Inter,sans-serif;letter-spacing:-.012em;
-    transition:transform .15s ease, box-shadow .18s ease;
-    margin-bottom:24px;
-  }
-  .nx-plan__btn--primary{
-    background:linear-gradient(180deg,#5B82F8 0%,#5750F1 50%,#4338CA 100%);color:#fff;
-    box-shadow:0 12px 24px -8px rgba(87,80,241,0.55), inset 0 -2px 4px rgba(0,0,0,0.10);
-    border:1px solid rgba(255,255,255,0.18);
-  }
-  .nx-plan__btn--ghost{
-    background:linear-gradient(180deg,#1E293B 0%,#0F172A 100%);color:#fff;
-    box-shadow:0 12px 24px -8px rgba(15,23,42,0.50), inset 0 -2px 4px rgba(0,0,0,0.20);
-    border:1px solid rgba(255,255,255,0.10);
-  }
-  .nx-plan__btn:hover{transform:translateY(-1px);}
-  /* Selected = same gradient, just stamped with a check + brighter shadow */
-  .nx-plan__btn.is-selected{filter:brightness(1.05);box-shadow:0 16px 32px -10px rgba(0,0,0,0.30), inset 0 -2px 4px rgba(0,0,0,0.18);}
-  .nx-plan__btn--primary.is-selected{box-shadow:0 16px 32px -10px rgba(87,80,241,0.65), inset 0 -2px 4px rgba(0,0,0,0.10);}
-
-  .nx-plan__features{display:flex;flex-direction:column;gap:14px;padding:18px 0 0;border-top:1px solid var(--border);}
-  .nx-plan__feat{display:flex;align-items:flex-start;gap:14px;font-size:14px;color:var(--ink);font-weight:500;letter-spacing:-.005em;line-height:1.4;}
-  .nx-plan__feat-icon{
-    flex-shrink:0;width:34px;height:34px;border-radius:9px;
-    background:#F1F5F9;color:var(--ink-2);
+  .nx-pending__icon{
+    width:38px;height:38px;border-radius:10px;flex-shrink:0;
+    background:#eff6ff;color:#2563eb;
     display:flex;align-items:center;justify-content:center;
   }
-  .nx-plan__feat-icon svg{width:16px;height:16px;stroke-width:2.2;}
-  .nx-plan__feat-text{flex:1;padding-top:7px;}
+  .nx-pending__icon svg{width:18px;height:18px;stroke-width:2;}
+  .nx-pending__body{flex:1;min-width:0;}
+  .nx-pending__title{font-size:14px;font-weight:600;color:var(--ink-2);margin:0;letter-spacing:-.005em;}
+  .nx-pending__sub{font-size:12.5px;color:var(--ink-mute);margin:3px 0 0;font-weight:500;line-height:1.45;}
 
-  .nx-plan__includes{display:flex;flex-direction:column;gap:10px;margin-top:22px;padding-top:18px;border-top:1px solid var(--border);}
-  .nx-plan__includes-title{font-size:14.5px;color:var(--ink-2);margin:0 0 6px;font-weight:700;letter-spacing:-.010em;}
-  .nx-plan__inc{display:flex;align-items:flex-start;gap:12px;font-size:13.5px;color:var(--ink);font-weight:500;letter-spacing:-.005em;line-height:1.4;}
-  .nx-plan__inc-check{
-    flex-shrink:0;width:22px;height:22px;border-radius:9999px;
-    background:#EFF6FF;border:1px solid var(--primary);color:var(--primary);
-    display:flex;align-items:center;justify-content:center;margin-top:1px;
+  /* ══════════════════════════════════════════════════════════════
+     SHADCN PRICING BLOCK — centered title + switch + card grid
+     ══════════════════════════════════════════════════════════════ */
+  .pm-pricing{max-width:1180px;margin:0 auto;padding:24px 0 56px;}
+  .pm-pricing__head{max-width:640px;margin:0 auto 40px;text-align:center;}
+  .pm-pricing__title{
+    font-size:30px;font-weight:600;letter-spacing:-.022em;
+    color:var(--ink-2);margin:0 0 8px;line-height:1.15;
   }
-  .nx-plan__inc-check svg{width:12px;height:12px;stroke-width:2.6;}
+  .pm-pricing__sub{
+    font-size:15px;color:var(--ink-mute);margin:0;font-weight:500;letter-spacing:-.005em;
+  }
+
+  /* Switch group (Quarterly / Yearly) */
+  .pm-switches{display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:36px;}
+  .pm-switch{
+    display:inline-flex;align-items:center;gap:12px;
+    font-size:13.5px;color:var(--ink);font-weight:500;letter-spacing:-.005em;
+  }
+  .pm-switch__rail{
+    position:relative;width:42px;height:24px;
+    background:#e5e7eb;border-radius:9999px;cursor:pointer;
+    transition:background .2s ease;
+  }
+  .pm-switch__rail.is-on{background:var(--primary);}
+  .pm-switch__knob{
+    position:absolute;top:2px;left:2px;width:20px;height:20px;
+    background:#fff;border-radius:50%;
+    box-shadow:0 1px 2px rgba(0,0,0,0.15);
+    transition:transform .2s ease;
+  }
+  .pm-switch__rail.is-on .pm-switch__knob{transform:translateX(18px);}
+  .pm-switch__saving{
+    display:inline-flex;align-items:center;
+    font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+    background:#eff6ff;color:#2563eb;
+    padding:3px 9px;border-radius:9999px;
+    margin-left:4px;
+  }
+
+  /* Segmented term selector — sits below the switch, less prominent */
+  .pm-segment{
+    display:inline-flex;background:#f1f5f9;border-radius:9px;padding:3px;gap:2px;
+    border:1px solid var(--border);
+  }
+  .pm-segment__btn{
+    background:transparent;border:0;cursor:pointer;
+    padding:7px 14px;border-radius:7px;
+    font:500 12.5px Inter,sans-serif;color:var(--ink-mute);letter-spacing:-.005em;
+    transition:background .15s ease, color .15s ease;
+  }
+  .pm-segment__btn:hover{color:var(--ink-2);}
+  .pm-segment__btn.is-active{background:#fff;color:var(--ink-2);box-shadow:0 1px 2px rgba(15,23,42,0.06);}
+
+  /* Pricing card grid */
+  .pm-pricing__grid{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:24px;
+    align-items:start;
+  }
+
+  /* Individual pricing card — shadcn aesthetic */
+  .pm-tier{
+    display:flex;flex-direction:column;
+    background:var(--card);border:1px solid var(--border);
+    border-radius:14px;padding:32px 28px;text-align:center;
+    transition:border-color .2s ease, box-shadow .2s ease;
+  }
+  .pm-tier:hover{border-color:#cbd5e1;}
+  .pm-tier--popular{
+    border:2px solid var(--primary);
+    box-shadow:0 14px 32px -16px rgba(87,80,241,0.30);
+  }
+  .pm-tier__badge-row{margin-bottom:14px;min-height:24px;}
+  .pm-tier__badge{
+    display:inline-flex;align-items:center;
+    font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+    background:#eff6ff;color:#2563eb;
+    padding:4px 11px;border-radius:9999px;
+  }
+  .pm-tier__name{
+    font-size:16px;font-weight:500;color:var(--ink-2);
+    margin:0 0 16px;letter-spacing:-.005em;
+  }
+  .pm-tier__price{
+    font-size:44px;font-weight:700;color:var(--ink-2);
+    letter-spacing:-.03em;line-height:1;margin:0;
+    font-variant-numeric:tabular-nums;
+    display:inline-flex;align-items:baseline;justify-content:center;
+  }
+  .pm-tier__price-currency{
+    font-size:22px;font-weight:600;letter-spacing:-.015em;
+    margin-right:-2px;
+  }
+  .pm-tier__price-period{
+    display:block;font-size:13.5px;color:var(--ink-mute);
+    margin-top:8px;font-weight:500;letter-spacing:-.005em;
+  }
+  .pm-tier__desc{
+    font-size:13.5px;color:var(--ink-mute);
+    margin:14px 0 24px;font-weight:500;line-height:1.5;letter-spacing:-.005em;
+    min-height:40px;
+  }
+  .pm-tier__features{
+    list-style:none;padding:0;margin:0 0 24px;
+    display:flex;flex-direction:column;gap:10px;
+    text-align:left;
+  }
+  .pm-tier__features li{
+    display:flex;align-items:flex-start;gap:10px;
+    font-size:13.5px;color:var(--ink);font-weight:500;
+    line-height:1.45;letter-spacing:-.005em;
+  }
+  .pm-tier__features svg{
+    flex-shrink:0;width:16px;height:16px;color:var(--primary);
+    margin-top:2px;stroke-width:2;
+  }
+  .pm-tier__cta{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:100%;padding:11px 18px;
+    font:500 14px Inter,sans-serif;letter-spacing:-.005em;
+    border-radius:8px;cursor:pointer;
+    transition:background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .pm-tier__cta--ghost{
+    background:transparent;color:var(--ink-2);
+    border:1px solid var(--border);
+  }
+  .pm-tier__cta--ghost:hover{background:#f1f5f9;}
+  .pm-tier__cta--primary{
+    background:var(--primary);color:#fff;border:1px solid var(--primary);
+  }
+  .pm-tier__cta--primary:hover{background:#4338ca;border-color:#4338ca;}
+  .pm-tier__cta.is-selected{
+    background:#0f172a;color:#fff;border-color:#0f172a;
+  }
+  .pm-tier__cta.is-selected:hover{background:#1e293b;border-color:#1e293b;}
+
+  /* Continue button row */
+  .pm-pricing__foot{
+    display:flex;flex-direction:column;align-items:center;gap:14px;
+    margin-top:36px;
+  }
+  .pm-pricing__selected{font-size:13px;color:var(--ink-mute);font-weight:500;}
+  .pm-pricing__selected strong{color:var(--ink-2);font-weight:600;}
+
+  /* Dark mode */
+  [data-pm-theme="dark"] .pm-tier{background:#16171c;border-color:#262830;}
+  [data-pm-theme="dark"] .pm-tier:hover{border-color:#3a3d47;}
+  [data-pm-theme="dark"] .pm-tier__badge{background:rgba(96,165,250,0.16);color:#60A5FA;}
+  [data-pm-theme="dark"] .pm-segment{background:#1c1d23;border-color:#262830;}
+  [data-pm-theme="dark"] .pm-segment__btn.is-active{background:#22232a;}
+  [data-pm-theme="dark"] .pm-switch__rail{background:#262830;}
+  [data-pm-theme="dark"] .pm-switch__saving{background:rgba(96,165,250,0.16);color:#60A5FA;}
+  [data-pm-theme="dark"] .pm-tier__cta--ghost{border-color:#262830;}
+  [data-pm-theme="dark"] .pm-tier__cta--ghost:hover{background:#1c1d23;}
+  [data-pm-theme="dark"] .pm-tier__cta.is-selected{background:#fff;color:#0f172a;border-color:#fff;}
+  [data-pm-theme="dark"] .pm-tier__cta.is-selected:hover{background:#e5e5e5;}
+  [data-pm-theme="dark"] .nx-pending{background:#16171c;border-color:#262830;}
+  [data-pm-theme="dark"] .nx-pending__icon{background:rgba(96,165,250,0.16);color:#60A5FA;}
 
   /* Step bar / continue */
   .nx-stepbar{
@@ -524,131 +477,114 @@
   };
   function planKey(){ return `${state.duration === '2 Months' ? '2mo' : '1mo'}_${state.tier}`; }
 
-  // Always render the picker on load (no hidden behind a button).
+  // Shadcn-style pricing block: centered title + switch + 2 cards + continue
   function renderPlanPicker(){
-    const html = `
-      <section class="nx-card" style="margin-top:22px;">
-        <div class="nx-card__head" style="text-align:center;margin-bottom:6px;">
-          <h2 class="nx-card__title" style="font-size:26px;letter-spacing:-.022em;">${pending ? 'Plans available for your next contract' : 'Choose your plan'}</h2>
-          <p class="nx-card__sub" style="font-size:14px;margin-top:8px;">${contract?.end_at
-            ? `Your current plan stays active until ${esc(fmtDate(contract.end_at, { month:'long', day:'numeric' }))}. The new plan takes effect after that.`
-            : 'Pick a tier to get started — your assistant will help you onboard once approved.'}</p>
+    const subText = contract?.end_at
+      ? `Your current plan stays active until ${esc(fmtDate(contract.end_at, { month:'long', day:'numeric' }))}. The new plan takes effect after that.`
+      : 'Pick a tier to get started — your assistant will help you onboard once approved.';
+    $('flowWrap').innerHTML = `
+      <div class="pm-pricing">
+        <div class="pm-pricing__head">
+          <h2 class="pm-pricing__title">${pending ? 'Plans available for your next contract' : 'Choose your plan'}</h2>
+          <p class="pm-pricing__sub">${subText}</p>
         </div>
 
-        <div class="nx-toggle-wrap" style="flex-direction:column;gap:12px;align-items:center;">
-          <div class="nx-pill-toggle" id="cycleToggle">
-            <span class="nx-pill-toggle__indicator" id="cycleIndicator"></span>
-            <button class="nx-pill-toggle__btn ${state.isYearly?'is-active':''}" data-cycle="yearly" type="button">Yearly</button>
-            <button class="nx-pill-toggle__btn ${!state.isYearly?'is-active':''}" data-cycle="monthly" type="button">Quarterly</button>
-          </div>
-          <div class="nx-pill-toggle" id="termToggle">
-            <span class="nx-pill-toggle__indicator" id="termIndicator"></span>
-            <button class="nx-pill-toggle__btn ${state.duration==='1 Month'?'is-active':''}" data-term="1 Month" type="button">1 Month</button>
-            <button class="nx-pill-toggle__btn ${state.duration==='2 Months'?'is-active':''}" data-term="2 Months" type="button">2 Months</button>
+        <div class="pm-switches">
+          <label class="pm-switch">
+            <span>Quarterly</span>
+            <span class="pm-switch__rail ${state.isYearly ? 'is-on' : ''}" id="cycleSwitch" role="switch" aria-checked="${state.isYearly}">
+              <span class="pm-switch__knob"></span>
+            </span>
+            <span>Yearly</span>
+            <span class="pm-switch__saving">Save 20%</span>
+          </label>
+          <div class="pm-segment" id="termSegment">
+            <button type="button" class="pm-segment__btn ${state.duration==='1 Month'?'is-active':''}" data-term="1 Month">1 Month term</button>
+            <button type="button" class="pm-segment__btn ${state.duration==='2 Months'?'is-active':''}" data-term="2 Months">2 Month term</button>
           </div>
         </div>
 
-        <div class="nx-plans" id="planCards"></div>
+        <div class="pm-pricing__grid" id="planCards"></div>
 
-        <div class="nx-stepbar" style="justify-content:center;flex-direction:column;gap:14px;border-top:0;padding-top:8px;">
-          <span class="nx-stepbar__hint">Selected: <strong style="color:var(--ink-2);" id="selectedLabel">—</strong></span>
-          <button class="nx-btn nx-btn--primary" id="continueToSchedule" type="button" style="padding:14px 32px;">
+        <div class="pm-pricing__foot">
+          <span class="pm-pricing__selected">Selected: <strong id="selectedLabel">—</strong></span>
+          <button type="button" id="continueToSchedule" class="nx-btn nx-btn--primary" style="padding:13px 26px;">
             Continue to schedule
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
         </div>
-      </section>
+      </div>
     `;
-    $('flowWrap').innerHTML = html;
     renderPlanCards();
-    positionToggleIndicator();
-    document.querySelectorAll('#cycleToggle .nx-pill-toggle__btn').forEach(b => b.addEventListener('click', () => {
-      state.isYearly = b.dataset.cycle === 'yearly';
+    // Wire toggles
+    document.getElementById('cycleSwitch').addEventListener('click', () => {
+      state.isYearly = !state.isYearly;
       renderPlanPicker();
-    }));
-    document.querySelectorAll('#termToggle .nx-pill-toggle__btn').forEach(b => b.addEventListener('click', () => {
-      state.duration = b.dataset.term;
-      renderPlanPicker();
-    }));
+    });
+    document.querySelectorAll('#termSegment .pm-segment__btn').forEach(b => {
+      b.addEventListener('click', () => {
+        state.duration = b.dataset.term;
+        renderPlanPicker();
+      });
+    });
     document.getElementById('continueToSchedule').addEventListener('click', renderScheduleEditor);
   }
 
-  function positionToggleIndicator(){
-    [['cycleIndicator', 'cycleToggle', state.isYearly ? 0 : 1],
-     ['termIndicator',  'termToggle',  state.duration === '2 Months' ? 1 : 0]].forEach(([indId, togId, idx]) => {
-      const indicator = document.getElementById(indId);
-      const buttons = document.querySelectorAll(`#${togId} .nx-pill-toggle__btn`);
-      const active = buttons[idx];
-      if (!active || !indicator) return;
-      indicator.style.width = active.offsetWidth + 'px';
-      indicator.style.transform = `translateX(${active.offsetLeft - 5}px)`;
-    });
-  }
-
   function renderPlanCards(){
+    const checkIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
     const cards = ['24h','40h'].map(tier => {
       const key = `${state.duration === '2 Months' ? '2mo' : '1mo'}_${tier}`;
       const p = priceFor(key, state.isYearly);
       const meta = TIER_META[tier];
       const isPopular = tier === '40h';
       const isSelected = state.tier === tier;
+
       const features = tier === '40h'
         ? [
-            { icon:'briefcase', text:`<strong>40 reserved hours</strong> per month — up to 4 sessions per week` },
-            { icon:'shield',    text:`Priority assistant matching with senior tier mentors` },
-            { icon:'lightning', text:`<strong>$${p.ratePerHour}/hour</strong> blended rate, locked for the full term` },
+            '40 reserved hours per month',
+            'Up to 4 sessions per week',
+            'Priority assistant matching',
+            `$${p.ratePerHour}/hour blended rate, locked`,
+            'Same-day rescheduling Mon–Thu',
+            'Quarterly progress review',
           ]
         : [
-            { icon:'briefcase', text:`<strong>24 reserved hours</strong> per month — up to 3 sessions per week` },
-            { icon:'shield',    text:`Dedicated assistant matched to your goals` },
-            { icon:'lightning', text:`<strong>$${p.ratePerHour}/hour</strong> blended rate, locked for the full term` },
+            '24 reserved hours per month',
+            'Up to 3 sessions per week',
+            'Dedicated assistant matched to your goals',
+            `$${p.ratePerHour}/hour blended rate, locked`,
+            '24h advance cancel/reschedule',
+            'Monthly progress review',
           ];
-      const includes = tier === '40h'
-        ? ['Everything in Standard, plus:', 'Priority scheduling window', 'Same-day rescheduling on Mon–Thu', 'Quarterly progress review with the team']
-        : ['Standard membership includes:', 'Hours protected by contract', '24h advance cancel/reschedule', 'Monthly progress review'];
 
-      const ICONS = {
-        briefcase: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
-        shield:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
-        lightning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
-      };
-      const checkIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-
-      return `<div class="nx-plan${isPopular ? ' nx-plan--popular' : ''}">
-        <div class="nx-plan__top">
-          <h3 class="nx-plan__title">${esc(meta.name)}</h3>
-          ${isPopular ? `<span class="nx-plan__pop">Popular</span>` : ''}
+      return `<div class="pm-tier${isPopular ? ' pm-tier--popular' : ''}">
+        <div class="pm-tier__badge-row">
+          ${isPopular ? `<span class="pm-tier__badge">Most popular</span>` : ''}
         </div>
-        <p class="nx-plan__desc">${esc(meta.desc)}</p>
-        <div class="nx-plan__price-row">
-          <span class="nx-plan__currency">$</span>
-          <span class="nx-plan__price">${p.shownMonthly.toLocaleString('en-CA')}</span>
-          <span class="nx-plan__period">/${state.isYearly ? 'mo' : 'mo'}</span>
-        </div>
-        <p class="nx-plan__hint">${state.isYearly
-            ? `<strong>$${(p.shownMonthly * 12).toLocaleString('en-CA')}/year</strong> billed annually · 20% saved`
-            : `<strong>$${p.monthly.toLocaleString('en-CA')}/month</strong> billed monthly`} · CAD</p>
-        <button class="nx-plan__btn ${isPopular ? 'nx-plan__btn--primary' : 'nx-plan__btn--ghost'}${isSelected ? ' is-selected' : ''}" type="button" data-tier="${tier}">
+        <h3 class="pm-tier__name">${esc(meta.name)}</h3>
+        <p class="pm-tier__price">
+          <span class="pm-tier__price-currency">$</span>${p.shownMonthly.toLocaleString('en-CA')}
+        </p>
+        <p class="pm-tier__price-period">${state.isYearly ? 'per month, billed yearly' : 'per month, billed quarterly'}</p>
+        <p class="pm-tier__desc">${esc(meta.desc)}</p>
+        <ul class="pm-tier__features">
+          ${features.map(f => `<li>${checkIcon}<span>${esc(f)}</span></li>`).join('')}
+        </ul>
+        <button type="button" data-tier="${tier}"
+          class="pm-tier__cta ${isSelected ? 'is-selected' : (isPopular ? 'pm-tier__cta--primary' : 'pm-tier__cta--ghost')}">
           ${isSelected ? '✓ Selected' : 'Choose this plan'}
         </button>
-        <div class="nx-plan__features">
-          ${features.map(f => `<div class="nx-plan__feat">
-            <span class="nx-plan__feat-icon">${ICONS[f.icon]}</span>
-            <span class="nx-plan__feat-text">${f.text}</span>
-          </div>`).join('')}
-        </div>
-        <div class="nx-plan__includes">
-          <p class="nx-plan__includes-title">${esc(includes[0])}</p>
-          ${includes.slice(1).map(i => `<div class="nx-plan__inc">
-            <span class="nx-plan__inc-check">${checkIcon}</span>
-            <span>${esc(i)}</span>
-          </div>`).join('')}
-        </div>
       </div>`;
     }).join('');
+
     document.getElementById('planCards').innerHTML = cards;
-    document.querySelectorAll('.nx-plan__btn[data-tier]').forEach(btn => {
-      btn.addEventListener('click', () => { state.tier = btn.dataset.tier; renderPlanCards(); updateSelectedLabel(); });
+    document.querySelectorAll('.pm-tier__cta[data-tier]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.tier = btn.dataset.tier;
+        renderPlanCards();
+        updateSelectedLabel();
+      });
     });
     updateSelectedLabel();
   }
@@ -658,7 +594,7 @@
     if (!lbl) return;
     const meta = TIER_META[state.tier];
     const p = priceFor(planKey(), state.isYearly);
-    lbl.textContent = `${meta.name} · $${p.shownMonthly}/mo (${state.isYearly ? 'yearly' : 'monthly'})`;
+    lbl.textContent = `${meta.name} · $${p.shownMonthly}/mo (${state.isYearly ? 'yearly' : 'quarterly'})`;
   }
 
   function renderScheduleEditor(){
@@ -678,7 +614,9 @@
       </div>`;
     }).join('');
 
-    const monthlyDisplay = state.commitment === 'Yearly' ? Math.round(p.monthly * 0.95) : p.monthly;
+    const cycleLabel = state.isYearly ? 'Yearly' : 'Quarterly';
+    const livePrice = priceFor(planKey(), state.isYearly);
+    const monthlyDisplay = livePrice.shownMonthly;
 
     $('flowWrap').innerHTML = `<section class="nx-card" style="margin-top:22px;">
       <div class="nx-card__head">
@@ -695,7 +633,7 @@
         <div class="nx-summary__col">
           <p class="nx-summary__label">Billing</p>
           <p class="nx-summary__value">CAD$ ${monthlyDisplay.toLocaleString('en-CA')}/mo</p>
-          <p class="nx-summary__hint">${esc(state.commitment)} · ${esc(state.duration)} term</p>
+          <p class="nx-summary__hint">${esc(cycleLabel)} · ${esc(state.duration)} term</p>
         </div>
       </div>
 
@@ -794,9 +732,6 @@
   // Always render the picker by default. (If a request is pending, the user can
   // still browse plans, but the submit will hit the duplicate-request guard.)
   renderPlanPicker();
-  // Re-position the toggle indicator after layout settles.
-  setTimeout(positionToggleIndicator, 80);
-  window.addEventListener('resize', positionToggleIndicator);
 })();
 </script>
 </body>
