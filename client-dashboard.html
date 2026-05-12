@@ -7,8 +7,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
-<link rel="stylesheet" href="js/sidebar.css?v=20260508c" />
+<link rel="stylesheet" href="js/sidebar.css?v=20260512a" />
 <link rel="icon" href="assets/logos/pm-logo.png" />
+<!-- Site-wide theme — must run before paint to avoid FOUC -->
+<script src="js/theme.js?v=20260512a"></script>
 <style>
   *,*::before,*::after{box-sizing:border-box;}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;transition:background .2s ease, color .2s ease;}
@@ -418,138 +420,18 @@
   }
 
   /* ════════════════════════════════════════════════════════════
-     NEW LAYOUT SHELL — left sidebar (modern) + calendar (right)
-     Toggle between modern + classic via data-sidebar-mode on body
+     LAYOUT SHELL — classic sidebar (auto-rendered) + main + calendar
      ════════════════════════════════════════════════════════════ */
-
-  /* Modern mode: hide pm-sidebar + pm-has-sidebar offset */
-  body[data-sidebar-mode="modern"].pm-has-sidebar{padding-left:0 !important;}
-  body[data-sidebar-mode="modern"] .pm-sidebar,
-  body[data-sidebar-mode="modern"] .pm-sb-burger,
-  body[data-sidebar-mode="modern"] .pm-sb-scrim{display:none !important;}
-
-  /* Classic mode: hide new sidebar, calendar shifts */
-  body[data-sidebar-mode="classic"] .dash-sb-new{display:none;}
-  body[data-sidebar-mode="classic"] .dash-shell{grid-template-columns:1fr 320px;}
-
   .dash-shell{
     min-height:100vh;
     display:grid;
-    grid-template-columns:264px 1fr 320px;
+    grid-template-columns:1fr 320px;
     background:var(--bg);
   }
-  /* Middle column — solid HospiSuite gray-50, no gradient */
   .dash-main-wrap{
     display:flex;flex-direction:column;min-width:0;
     background:var(--bg);
   }
-
-  /* ── LEFT SIDEBAR (light shadcn sidebar-15 style) ── */
-  .dash-sb-new{
-    background:var(--card);
-    border-right:1px solid var(--border);
-    display:flex;flex-direction:column;
-    padding:10px 0;
-    position:sticky;top:0;
-    height:100vh;
-    overflow:hidden;
-  }
-  .dash-sb-org{
-    display:flex;align-items:center;gap:9px;
-    padding:8px 12px;margin:0 8px 6px;
-    border-radius:9px;cursor:pointer;
-    transition:background .14s ease;
-  }
-  .dash-sb-org:hover{background:var(--border-soft);}
-  .dash-sb-org__icon{
-    width:30px;height:30px;border-radius:8px;
-    background:linear-gradient(135deg,#3b82f6 0%,#4f46e5 100%);
-    color:#fff;font-weight:800;font-size:11.5px;letter-spacing:.04em;
-    display:flex;align-items:center;justify-content:center;flex-shrink:0;
-    box-shadow:0 2px 6px -1px rgba(59,130,246,0.30);
-  }
-  .dash-sb-org__name{flex:1;min-width:0;font-size:13.5px;font-weight:700;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-.005em;}
-  .dash-sb-org__chev{color:var(--ink-tert);width:14px;height:14px;flex-shrink:0;}
-
-  .dash-sb-scroll{flex:1 1 auto;overflow-y:auto;padding:4px 0;}
-  .dash-sb-scroll::-webkit-scrollbar{width:6px;}
-  .dash-sb-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px;}
-
-  .dash-sb-group{padding:0 8px;margin-bottom:6px;}
-  .dash-sb-group__label{
-    padding:9px 10px 4px;margin:0;
-    font-size:11px;font-weight:700;
-    color:var(--ink-tert);letter-spacing:.04em;text-transform:uppercase;
-  }
-  .dash-sb-group ul{list-style:none;margin:0;padding:0;}
-
-  .dash-sb-row{
-    display:flex;align-items:center;gap:9px;
-    width:100%;padding:7px 10px;
-    border:none;background:transparent;
-    color:var(--ink);
-    font-family:inherit;font-size:13px;font-weight:500;
-    border-radius:7px;cursor:pointer;text-decoration:none;text-align:left;
-    transition:background .14s ease, color .14s ease;
-    letter-spacing:-.005em;
-  }
-  .dash-sb-row:hover{background:var(--border-soft);color:var(--ink-2);}
-  .dash-sb-row.is-active{background:var(--primary-soft);color:var(--primary);font-weight:600;}
-  .dash-sb-row svg{width:15px;height:15px;flex-shrink:0;color:currentColor;opacity:.9;}
-  .dash-sb-row__label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .dash-sb-row__badge{
-    font-size:10.5px;font-weight:700;
-    color:#fff;background:#2563eb;
-    border-radius:5px;padding:1px 7px;
-  }
-
-  .dash-sb-search{
-    display:flex;align-items:center;gap:9px;
-    padding:8px 10px;margin:0 0 4px;
-    border-radius:7px;color:var(--ink-mute);
-    transition:background .14s ease;cursor:text;
-  }
-  .dash-sb-search:hover{background:var(--border-soft);}
-  .dash-sb-search svg{width:15px;height:15px;flex-shrink:0;}
-  .dash-sb-search input{flex:1;min-width:0;background:transparent;border:none;outline:none;font-family:inherit;font-size:13px;color:var(--ink);}
-  .dash-sb-search input::placeholder{color:var(--ink-tert);}
-  .dash-sb-search kbd{
-    font-family:inherit;font-size:10.5px;color:var(--ink-tert);
-    background:var(--card);border:1px solid var(--border);border-radius:4px;
-    padding:1px 5px;letter-spacing:.02em;
-  }
-
-  .dash-sb-user{
-    display:flex;align-items:center;gap:10px;
-    padding:10px 12px;margin:0 8px;
-    border-top:1px solid var(--border);cursor:pointer;
-  }
-  .dash-sb-user:hover{background:var(--border-soft);border-radius:8px;}
-  .dash-sb-user__avatar{
-    width:30px;height:30px;border-radius:50%;
-    background:linear-gradient(135deg,#3b82f6 0%,#4f46e5 100%);
-    color:#fff;display:flex;align-items:center;justify-content:center;
-    font-weight:700;font-size:11.5px;flex-shrink:0;
-    box-shadow:0 2px 6px -1px rgba(59,130,246,0.30);
-  }
-  .dash-sb-user__body{flex:1;min-width:0;}
-  .dash-sb-user__name{font-size:12.5px;font-weight:700;color:var(--ink-2);letter-spacing:-.005em;}
-  .dash-sb-user__email{font-size:11px;color:var(--ink-tert);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-
-  /* ── TOPBAR LAYOUT TOGGLE BUTTON ── */
-  /* Layout toggle — prominent action button (Apple blue in light, white in dark) */
-  .dash-layout-toggle{
-    display:inline-flex;align-items:center;gap:7px;
-    padding:8px 14px;
-    background:var(--action-bg);
-    color:var(--action-ink);
-    border:none;border-radius:8px;
-    font-family:inherit;font-size:12.5px;font-weight:600;
-    cursor:pointer;letter-spacing:-.005em;
-    transition:background .14s ease, transform .12s ease;
-  }
-  .dash-layout-toggle:hover{background:var(--action-bg-hover);transform:translateY(-1px);}
-  .dash-layout-toggle svg{width:13px;height:13px;}
 
   /* Theme toggle — subtle outlined icon button */
   .dash-theme-toggle{
@@ -567,184 +449,32 @@
   [data-dash-theme="dark"] .dash-theme-toggle__sun{display:block;}
   [data-dash-theme="dark"] .dash-theme-toggle__moon{display:none;}
 
-  /* ── RIGHT CALENDAR SIDEBAR ── */
-  .dash-cal{
-    background:var(--card);border-left:1px solid var(--border);
-    position:sticky;top:0;height:100vh;
-    overflow-y:auto;padding:14px 0;flex-shrink:0;
-  }
-  .dash-cal::-webkit-scrollbar{width:6px;}
-  .dash-cal::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px;}
+  /* Calendar styles live in js/sidebar.css — shared across all client pages */
 
-  .dash-cal-user{
-    display:flex;align-items:center;gap:10px;
-    padding:8px 14px 14px;margin:0 6px 6px;
-    border-bottom:1px solid var(--border);
-  }
-  .dash-cal-user__avatar{
-    width:34px;height:34px;border-radius:50%;
-    background:linear-gradient(135deg,#3b82f6 0%,#4f46e5 100%);
-    color:#fff;font-weight:700;font-size:12px;
-    display:flex;align-items:center;justify-content:center;flex-shrink:0;
-    box-shadow:0 2px 6px -1px rgba(59,130,246,0.30);
-  }
-  .dash-cal-user__body{flex:1;min-width:0;}
-  .dash-cal-user__name{font-size:13px;font-weight:700;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-.005em;}
-  .dash-cal-user__email{font-size:11px;color:var(--ink-tert);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .dash-cal-user__chev{color:var(--ink-tert);}
-
-  .dash-cal-month{padding:10px 16px;}
-  .dash-cal-month__head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-  .dash-cal-month__nav{
-    width:26px;height:26px;border:none;background:transparent;
-    color:var(--ink-mute);border-radius:6px;
-    display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
-    transition:background .14s ease, color .14s ease;
-  }
-  .dash-cal-month__nav:hover{background:var(--border-soft);color:var(--ink-2);}
-  .dash-cal-month__nav svg{width:14px;height:14px;}
-  .dash-cal-month__label{font-size:13.5px;font-weight:700;color:var(--ink-2);letter-spacing:-.005em;}
-  .dash-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font-size:11.5px;}
-  .dash-cal-grid__dow{text-align:center;color:var(--ink-tert);padding:6px 0 4px;font-weight:600;font-size:10.5px;}
-  .dash-cal-grid__day{
-    aspect-ratio:1;display:flex;align-items:center;justify-content:center;
-    border-radius:7px;color:var(--ink);cursor:pointer;
-    transition:background .12s ease, color .12s ease;
-    font-variant-numeric:tabular-nums;font-weight:500;
-  }
-  .dash-cal-grid__day:hover{background:var(--border-soft);}
-  .dash-cal-grid__day--other{color:var(--ink-tert);opacity:.6;}
-  .dash-cal-grid__day--today{background:var(--primary);color:#fff;font-weight:700;box-shadow:0 2px 6px -1px rgba(59,130,246,0.35);}
-  .dash-cal-grid__day--today:hover{filter:brightness(.92);}
-  [data-dash-theme="dark"] .dash-cal-grid__day--today{box-shadow:none;}
-
-  .dash-cal-section{margin-top:14px;padding:0 14px;}
-  .dash-cal-section__head{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:6px 4px;cursor:pointer;border-radius:6px;
-    transition:background .12s ease;
-  }
-  .dash-cal-section__head:hover{background:var(--border-soft);}
-  .dash-cal-section__title{font-size:12.5px;font-weight:700;color:var(--ink-2);letter-spacing:-.005em;}
-  .dash-cal-section__chev{color:var(--ink-tert);width:13px;height:13px;transition:transform .15s ease;}
-  .dash-cal-section.is-collapsed .dash-cal-section__chev{transform:rotate(-90deg);}
-  .dash-cal-section.is-collapsed .dash-cal-section__list{display:none;}
-  .dash-cal-section__list{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:2px;}
-  .dash-cal-section__row{
-    display:flex;align-items:center;gap:9px;
-    padding:6px 4px;cursor:pointer;border-radius:6px;
-    transition:background .12s ease;
-  }
-  .dash-cal-section__row:hover{background:var(--border-soft);}
-  .dash-cal-checkbox{
-    width:16px;height:16px;border:1.5px solid var(--border);
-    border-radius:5px;flex-shrink:0;
-    display:flex;align-items:center;justify-content:center;
-    transition:all .14s ease;background:var(--card);
-  }
-  .dash-cal-checkbox svg{width:11px;height:11px;color:#fff;display:none;}
-  .dash-cal-section__row.is-on .dash-cal-checkbox{background:var(--primary);border-color:var(--primary);}
-  .dash-cal-section__row.is-on .dash-cal-checkbox svg{display:block;}
-  .dash-cal-section__label{font-size:12.5px;color:var(--ink-mute);flex:1;min-width:0;font-weight:500;}
-  .dash-cal-section__row.is-on .dash-cal-section__label{color:var(--ink-2);font-weight:600;}
-
-  /* Responsive */
+  /* Responsive — calendar drops out on narrow screens */
   @media (max-width:1180px){
-    .dash-shell{grid-template-columns:264px 1fr;}
-    body[data-sidebar-mode="classic"] .dash-shell{grid-template-columns:1fr;}
-    .dash-cal{display:none;}
-  }
-  @media (max-width:880px){
     .dash-shell{grid-template-columns:1fr;}
-    .dash-sb-new{display:none;}
+    .dash-cal{display:none;}
   }
 </style>
 </head>
-<body class="pm-has-sidebar" data-sidebar-mode="modern">
+<body class="pm-has-sidebar">
 
-<!-- Classic PM sidebar (hidden in modern mode) -->
+<!-- Classic PM sidebar — auto-rendered by sidebar.js -->
 <div id="pmSidebar"></div>
 
 <div class="dash-shell">
 
-  <!-- ═══════ LEFT: NEW SIDEBAR (shadcn sidebar-15 pattern, light) ═══════ -->
-  <aside class="dash-sb-new" aria-label="Navigation">
-    <div class="dash-sb-org" role="button">
-      <span class="dash-sb-org__icon">PM</span>
-      <span class="dash-sb-org__name">Private Mentorship</span>
-      <svg class="dash-sb-org__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-    </div>
-    <div class="dash-sb-scroll">
-      <div class="dash-sb-group">
-        <ul>
-          <li>
-            <div class="dash-sb-search">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input type="search" placeholder="Search" aria-label="Search" />
-              <kbd>⌘K</kbd>
-            </div>
-          </li>
-          <li>
-            <a class="dash-sb-row is-active" href="client-dashboard.html">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2z"/></svg>
-              <span class="dash-sb-row__label">Home</span>
-            </a>
-          </li>
-          <li>
-            <a class="dash-sb-row" href="messages.html">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
-              <span class="dash-sb-row__label">Inbox</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-      <div class="dash-sb-group">
-        <p class="dash-sb-group__label">Daily</p>
-        <ul>
-          <li><a class="dash-sb-row" href="client-schedule.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="dash-sb-row__label">Schedule</span></a></li>
-          <li><a class="dash-sb-row" href="client-education.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span class="dash-sb-row__label">Education</span></a></li>
-          <li><a class="dash-sb-row" href="client-hours.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="dash-sb-row__label">Hours &amp; Billing</span></a></li>
-        </ul>
-      </div>
-      <div class="dash-sb-group">
-        <p class="dash-sb-group__label">Your Plan</p>
-        <ul>
-          <li><a class="dash-sb-row" href="client-membership.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg><span class="dash-sb-row__label">Membership</span></a></li>
-          <li><a class="dash-sb-row" href="client-contract.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="12" cy="15" r="3"/></svg><span class="dash-sb-row__label">Contract Details</span></a></li>
-        </ul>
-      </div>
-      <div class="dash-sb-group">
-        <p class="dash-sb-group__label">People</p>
-        <ul>
-          <li><a class="dash-sb-row" href="client-assistants.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.66A8 8 0 0 1 17 20.66"/></svg><span class="dash-sb-row__label">My Assistant</span></a></li>
-          <li><a class="dash-sb-row" href="client-account.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="dash-sb-row__label">My Family</span></a></li>
-          <li><a class="dash-sb-row" href="client-resources.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg><span class="dash-sb-row__label">Resources</span></a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="dash-sb-user" role="button">
-      <span class="dash-sb-user__avatar" id="dashSbUserAvatar">C</span>
-      <span class="dash-sb-user__body">
-        <span class="dash-sb-user__name" id="dashSbUserName">Client</span>
-        <span class="dash-sb-user__email" id="dashSbUserEmail"></span>
-      </span>
-    </div>
-  </aside>
-
-  <!-- ═══════ MIDDLE: EXISTING DASHBOARD CONTENT ═══════ -->
+  <!-- ═══════ MAIN: DASHBOARD CONTENT ═══════ -->
   <div class="dash-main-wrap">
     <header class="nx-topbar">
       <div class="nx-search">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="search" placeholder="Search sessions, messages, documents…" />
       </div>
-      <button class="dash-theme-toggle" type="button" id="dashThemeToggle" title="Toggle light / dark theme" aria-label="Toggle theme">
+      <button class="dash-theme-toggle" type="button" data-pm-theme-toggle title="Toggle light / dark theme" aria-label="Toggle theme">
         <svg class="dash-theme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         <svg class="dash-theme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.05" y2="7.05"/><line x1="16.95" y1="16.95" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.05" y2="16.95"/><line x1="16.95" y1="7.05" x2="19.07" y2="4.93"/></svg>
-      </button>
-      <button class="dash-layout-toggle" type="button" id="dashLayoutToggle" title="Switch between new sidebar and classic">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
-        <span id="dashLayoutToggleLabel">Classic layout</span>
       </button>
       <div class="nx-userpod">
         <span class="nx-userpod__avatar" id="nxUserAvatar">C</span>
@@ -949,143 +679,19 @@
 </main>
   </div><!-- /.dash-main-wrap -->
 
-  <!-- ═══════ RIGHT: CALENDAR SIDEBAR (always open) ═══════ -->
-  <aside class="dash-cal" aria-label="Calendar">
-    <div class="dash-cal-user" role="button">
-      <span class="dash-cal-user__avatar" id="dashCalUserAvatar">C</span>
-      <span class="dash-cal-user__body">
-        <span class="dash-cal-user__name" id="dashCalUserName">Client</span>
-        <span class="dash-cal-user__email" id="dashCalUserEmail"></span>
-      </span>
-      <svg class="dash-cal-user__chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="7 15 12 20 17 15"/><polyline points="7 9 12 4 17 9"/></svg>
-    </div>
-    <div class="dash-cal-month">
-      <div class="dash-cal-month__head">
-        <button class="dash-cal-month__nav" type="button" id="dashCalPrev" aria-label="Previous month">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <span class="dash-cal-month__label" id="dashCalLabel">May 2026</span>
-        <button class="dash-cal-month__nav" type="button" id="dashCalNext" aria-label="Next month">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-      </div>
-      <div class="dash-cal-grid" id="dashCalGrid"></div>
-    </div>
-    <div class="dash-cal-section">
-      <div class="dash-cal-section__head">
-        <span class="dash-cal-section__title">My Calendars</span>
-        <svg class="dash-cal-section__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </div>
-      <ul class="dash-cal-section__list">
-        <li class="dash-cal-section__row is-on"><span class="dash-cal-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="dash-cal-section__label">Sessions</span></li>
-        <li class="dash-cal-section__row is-on"><span class="dash-cal-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="dash-cal-section__label">Personal</span></li>
-        <li class="dash-cal-section__row"><span class="dash-cal-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="dash-cal-section__label">Family</span></li>
-      </ul>
-    </div>
-    <div class="dash-cal-section">
-      <div class="dash-cal-section__head">
-        <span class="dash-cal-section__title">Favorites</span>
-        <svg class="dash-cal-section__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </div>
-      <ul class="dash-cal-section__list">
-        <li class="dash-cal-section__row is-on"><span class="dash-cal-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="dash-cal-section__label">Holidays</span></li>
-        <li class="dash-cal-section__row is-on"><span class="dash-cal-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="dash-cal-section__label">Birthdays</span></li>
-      </ul>
-    </div>
-  </aside>
+  <!-- Right calendar — injected by js/right-calendar.js -->
+  <div id="pmCalendar"></div>
 
 </div><!-- /.dash-shell -->
 
-<script>
-  // Theme toggle (pearl light <-> dark) — persists per device
-  (function(){
-    var KEY = 'pmDashTheme';
-    var saved = null;
-    try { saved = localStorage.getItem(KEY); } catch(_){}
-    var initial = (saved === 'dark') ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-dash-theme', initial);
-    var btn = document.getElementById('dashThemeToggle');
-    if (btn) btn.addEventListener('click', function(){
-      var cur = document.documentElement.getAttribute('data-dash-theme') || 'light';
-      var nxt = cur === 'light' ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-dash-theme', nxt);
-      try { localStorage.setItem(KEY, nxt); } catch(_){}
-    });
-  })();
-
-  // Layout mode toggle (modern <-> classic) + calendar
-  (function(){
-    var KEY = 'pmDashSbMode';
-    var saved = null;
-    try { saved = localStorage.getItem(KEY); } catch(_){}
-    var initial = (saved === 'classic') ? 'classic' : 'modern';
-    document.body.setAttribute('data-sidebar-mode', initial);
-    setLabel(initial);
-
-    function setLabel(mode){
-      var label = document.getElementById('dashLayoutToggleLabel');
-      if (label) label.textContent = mode === 'modern' ? 'Classic layout' : 'New layout';
-    }
-    var toggle = document.getElementById('dashLayoutToggle');
-    if (toggle) toggle.addEventListener('click', function(){
-      var cur = document.body.getAttribute('data-sidebar-mode') || 'modern';
-      var nxt = cur === 'modern' ? 'classic' : 'modern';
-      document.body.setAttribute('data-sidebar-mode', nxt);
-      setLabel(nxt);
-      try { localStorage.setItem(KEY, nxt); } catch(_){}
-    });
-  })();
-
-  (function(){
-    var view = new Date(); view.setDate(1);
-    var today = new Date();
-    var todayKey = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate();
-    function render(){
-      var label = document.getElementById('dashCalLabel');
-      var grid = document.getElementById('dashCalGrid');
-      if (!label || !grid) return;
-      var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-      label.textContent = months[view.getMonth()] + ' ' + view.getFullYear();
-      grid.innerHTML = '';
-      ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(function(d){
-        var el = document.createElement('div'); el.className = 'dash-cal-grid__dow'; el.textContent = d; grid.appendChild(el);
-      });
-      var y = view.getFullYear(), m = view.getMonth();
-      var firstDow = new Date(y, m, 1).getDay();
-      var daysInMonth = new Date(y, m+1, 0).getDate();
-      var prevMonthDays = new Date(y, m, 0).getDate();
-      for (var i = 0; i < 42; i++) {
-        var dayEl = document.createElement('div');
-        dayEl.className = 'dash-cal-grid__day';
-        var dayNum, dY = y, dM = m;
-        if (i < firstDow) { dayNum = prevMonthDays - firstDow + i + 1; dM = m - 1; if (dM < 0) { dM = 11; dY = y - 1; } dayEl.classList.add('dash-cal-grid__day--other'); }
-        else if (i >= firstDow + daysInMonth) { dayNum = i - firstDow - daysInMonth + 1; dM = m + 1; if (dM > 11) { dM = 0; dY = y + 1; } dayEl.classList.add('dash-cal-grid__day--other'); }
-        else { dayNum = i - firstDow + 1; }
-        dayEl.textContent = dayNum;
-        var key = dY + '-' + (dM+1) + '-' + dayNum;
-        if (key === todayKey) dayEl.classList.add('dash-cal-grid__day--today');
-        grid.appendChild(dayEl);
-      }
-    }
-    var p = document.getElementById('dashCalPrev'); if (p) p.addEventListener('click', function(){ view.setMonth(view.getMonth() - 1); render(); });
-    var n = document.getElementById('dashCalNext'); if (n) n.addEventListener('click', function(){ view.setMonth(view.getMonth() + 1); render(); });
-    render();
-  })();
-
-  // Calendar section collapse + row checkbox toggle
-  document.querySelectorAll('.dash-cal-section__head').forEach(function(head){
-    head.addEventListener('click', function(){ head.closest('.dash-cal-section').classList.toggle('is-collapsed'); });
-  });
-  document.querySelectorAll('.dash-cal-section__row').forEach(function(row){
-    row.addEventListener('click', function(e){ e.stopPropagation(); row.classList.toggle('is-on'); });
-  });
-</script>
+<!-- Theme + calendar are handled by js/theme.js and js/right-calendar.js (loaded above) -->
 
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260508c"></script>
 <script src="js/hiring-service.js?v=20260508d"></script>
-<script src="js/sidebar.js?v=20260508c"></script>
+<script src="js/sidebar.js?v=20260512a"></script>
+<script src="js/right-calendar.js?v=20260512a"></script>
 <script src="js/incoming-call-ring.js?v=20260509a" defer></script>
 <script>
 (async () => {

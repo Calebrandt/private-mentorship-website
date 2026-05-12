@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Education — Private Mentorship</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="js/sidebar.css?v=20260512a" />
+  <link rel="icon" href="assets/logos/pm-logo.png" />
+  <script src="js/theme.js?v=20260512a"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;}
+    html,body{margin:0;padding:0;}
+    body{
+      font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;
+      background:#09090b;
+      color:#fafafa;
+      -webkit-font-smoothing:antialiased;
+      line-height:1.5;
+    }
+
+    /* ======================================================
+       EDU DASHBOARD (shadcn dark theme — sidebar-11 file tree)
+       ====================================================== */
+
+    /* Color tokens (shadcn dark) — default theme */
+    :root,
+    [data-edu-theme="dark"]{
+      --edu-bg:#09090b;
+      --edu-surface:#18181b;
+      --edu-surface-2:#27272a;
+      --edu-border:#27272a;
+      --edu-border-strong:#3f3f46;
+      --edu-ink:#fafafa;
+      --edu-ink-mute:#a1a1aa;
+      --edu-ink-faint:#71717a;
+      --edu-ink-dim:#52525b;
+      --edu-accent:#3b82f6;
+      --edu-accent-fade:rgba(59,130,246,0.10);
+      --edu-hero-gradient:linear-gradient(135deg, rgba(59,130,246,0.14) 0%, rgba(59,130,246,0.03) 60%);
+      --edu-hero-glow:radial-gradient(circle, rgba(59,130,246,0.16) 0%, transparent 60%);
+      --edu-warn:#f59e0b;
+      --edu-warn-fade:rgba(245,158,11,0.12);
+      --edu-warn-ink:#fbbf24;
+      --edu-success:#10b981;
+      --edu-success-ink:#34d399;
+      --edu-danger:#ef4444;
+      --edu-danger-fade:rgba(239,68,68,0.12);
+      --edu-danger-ink:#f87171;
+      --edu-shadow:0 1px 2px rgba(0,0,0,0);
+      --edu-action-bg:#fafafa;
+      --edu-action-ink:#0a0a0a;
+      --edu-action-bg-hover:#e5e5e5;
+    }
+
+    /* Pearl white theme */
+    [data-edu-theme="light"]{
+      --edu-bg:#f7f5f0;
+      --edu-surface:#ffffff;
+      --edu-surface-2:#efece5;
+      --edu-border:#e8e5dd;
+      --edu-border-strong:#d4d0c5;
+      --edu-ink:#18181b;
+      --edu-ink-mute:#5b5b62;
+      --edu-ink-faint:#7c7c83;
+      --edu-ink-dim:#a0a09a;
+      --edu-accent:#2563eb;
+      --edu-accent-fade:rgba(37,99,235,0.08);
+      --edu-hero-gradient:linear-gradient(135deg, rgba(37,99,235,0.09) 0%, rgba(37,99,235,0.02) 60%);
+      --edu-hero-glow:radial-gradient(circle, rgba(37,99,235,0.11) 0%, transparent 60%);
+      --edu-warn:#d97706;
+      --edu-warn-fade:rgba(217,119,6,0.10);
+      --edu-warn-ink:#b45309;
+      --edu-success:#059669;
+      --edu-success-ink:#047857;
+      --edu-danger:#dc2626;
+      --edu-danger-fade:rgba(220,38,38,0.08);
+      --edu-danger-ink:#b91c1c;
+      --edu-shadow:0 1px 2px rgba(15,15,15,0.04);
+      --edu-action-bg:#007AFF;
+      --edu-action-ink:#ffffff;
+      --edu-action-bg-hover:#0062cc;
+    }
+
+    .edu-shell{
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      background:var(--edu-bg);
+    }
+
+    /* Header bar */
+    .edu-header{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:0 24px;
+      background:var(--edu-bg);
+      border-bottom:1px solid var(--edu-border);
+      height:56px;
+      flex-shrink:0;
+      position:sticky;top:0;z-index:5;
+    }
+    .edu-trigger{
+      width:32px;height:32px;
+      border:1px solid var(--edu-border);
+      border-radius:7px;
+      background:transparent;
+      color:var(--edu-ink-mute);
+      display:inline-flex;align-items:center;justify-content:center;
+      cursor:pointer;
+      transition:background .15s ease, border-color .15s ease, color .15s ease;
+    }
+    .edu-trigger:hover{background:var(--edu-surface-2);color:var(--edu-ink);border-color:var(--edu-border-strong);}
+    .edu-trigger svg{width:15px;height:15px;}
+    .edu-sep-v{width:1px;height:18px;background:var(--edu-border);}
+    .edu-breadcrumb{
+      display:flex;align-items:center;gap:8px;
+      font-size:13.5px;color:var(--edu-ink-mute);
+    }
+    .edu-breadcrumb a{color:var(--edu-ink-mute);text-decoration:none;transition:color .15s ease;}
+    .edu-breadcrumb a:hover{color:var(--edu-ink);}
+    .edu-breadcrumb__sep{color:var(--edu-ink-dim);}
+    .edu-breadcrumb__current{color:var(--edu-ink);font-weight:500;}
+
+    .edu-header__spacer{flex:1;}
+    .edu-header__action{
+      display:inline-flex;align-items:center;gap:7px;
+      padding:7px 13px;
+      background:var(--edu-action-bg);
+      color:var(--edu-action-ink);
+      border:none;
+      border-radius:7px;
+      font-family:inherit;font-size:13px;font-weight:600;
+      cursor:pointer;
+      transition:background .15s ease, transform .12s ease;
+    }
+    .edu-header__action:hover{background:var(--edu-action-bg-hover);transform:translateY(-1px);}
+    .edu-header__action svg{width:14px;height:14px;}
+
+    .edu-theme-toggle{
+      width:32px;height:32px;
+      border:1px solid var(--edu-border);
+      border-radius:7px;
+      background:transparent;
+      color:var(--edu-ink-mute);
+      display:inline-flex;align-items:center;justify-content:center;
+      cursor:pointer;
+      transition:background .15s ease, border-color .15s ease, color .15s ease;
+      margin-right:6px;
+    }
+    .edu-theme-toggle:hover{background:var(--edu-surface-2);color:var(--edu-ink);border-color:var(--edu-border-strong);}
+    .edu-theme-toggle svg{width:15px;height:15px;}
+    .edu-theme-toggle__sun{display:none;}
+    .edu-theme-toggle__moon{display:block;}
+    [data-edu-theme="light"] .edu-theme-toggle__sun{display:block;}
+    [data-edu-theme="light"] .edu-theme-toggle__moon{display:none;}
+
+    /* Body grid */
+    .edu-body{
+      display:grid;
+      grid-template-columns:280px 1fr;
+      flex:1 1 auto;
+      min-height:0;
+    }
+
+    /* Tree sidebar */
+    .edu-tree{
+      background:var(--edu-surface);
+      border-right:1px solid var(--edu-border);
+      padding:8px 0 16px;
+      overflow-y:auto;
+    }
+    .edu-tree__group{padding:0 8px;margin-bottom:10px;}
+    .edu-tree__group-head{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:10px 10px 6px;
+    }
+    .edu-tree__group-label{
+      font-size:11.5px;
+      font-weight:600;
+      color:var(--edu-ink-faint);
+      letter-spacing:.02em;
+      margin:0;
+      text-transform:none;
+    }
+    .edu-tree__new{
+      width:22px;height:22px;
+      border:none;
+      background:transparent;
+      color:var(--edu-ink-faint);
+      border-radius:5px;
+      display:inline-flex;align-items:center;justify-content:center;
+      cursor:pointer;
+      transition:background .12s ease, color .12s ease;
+    }
+    .edu-tree__new:hover{background:var(--edu-surface-2);color:var(--edu-ink);}
+    .edu-tree__new svg{width:14px;height:14px;}
+
+    .edu-tree__list{list-style:none;margin:0;padding:0;}
+    .edu-tree__sublist{
+      list-style:none;
+      margin:0 0 0 14px;
+      padding:0 0 0 12px;
+      border-left:1px solid var(--edu-border);
+      display:none;
+    }
+    .edu-tree__folder.is-open > .edu-tree__sublist{display:block;}
+
+    .edu-tree__row{
+      width:100%;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      font-family:inherit;
+      font-size:13px;
+      color:var(--edu-ink-mute);
+      background:transparent;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      text-align:left;
+      transition:background .12s ease, color .12s ease;
+      line-height:1.35;
+    }
+    .edu-tree__row:hover{background:var(--edu-surface-2);color:var(--edu-ink);}
+    .edu-tree__row.is-active{
+      background:var(--edu-surface-2);
+      color:var(--edu-ink);
+      font-weight:500;
+    }
+    .edu-tree__row svg{width:14px;height:14px;flex-shrink:0;color:currentColor;opacity:.85;}
+    .edu-tree__chev{
+      width:13px;height:13px;flex-shrink:0;
+      color:var(--edu-ink-faint);
+      transition:transform .15s ease;
+    }
+    .edu-tree__folder.is-open > .edu-tree__row .edu-tree__chev{transform:rotate(90deg);}
+    .edu-tree__row--file{padding-left:24px;}
+    .edu-tree__badge{
+      margin-left:auto;
+      font-size:10.5px;font-weight:600;
+      color:var(--edu-ink-faint);
+      background:var(--edu-surface-2);
+      border-radius:5px;
+      padding:1px 7px;
+      letter-spacing:.02em;
+    }
+    .edu-tree__badge--warn{
+      background:var(--edu-warn-fade);color:var(--edu-warn-ink);
+    }
+
+    /* Content area */
+    .edu-content{
+      padding:32px 40px 80px;
+      overflow-y:auto;
+    }
+
+    .edu-page-head{margin-bottom:28px;}
+    .edu-page-head__title{
+      margin:0 0 4px;
+      font-size:26px;
+      font-weight:700;
+      color:var(--edu-ink);
+      letter-spacing:-.014em;
+    }
+    .edu-page-head__sub{
+      margin:0;
+      font-size:13.5px;
+      color:var(--edu-ink-mute);
+    }
+
+    /* Continue learning hero */
+    .edu-hero{
+      background:var(--edu-hero-gradient);
+      border:1px solid var(--edu-border);
+      border-radius:14px;
+      padding:24px 26px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:24px;
+      margin-bottom:24px;
+      position:relative;
+      overflow:hidden;
+    }
+    .edu-hero::after{
+      content:"";
+      position:absolute;
+      right:-40px;top:-40px;
+      width:220px;height:220px;
+      background:var(--edu-hero-glow);
+      pointer-events:none;
+    }
+    .edu-hero__body{flex:1;min-width:0;position:relative;z-index:1;}
+    .edu-hero__eyebrow{
+      font-size:11px;
+      font-weight:600;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      color:var(--edu-accent);
+      margin:0 0 6px;
+    }
+    .edu-hero__title{
+      margin:0 0 6px;
+      font-size:22px;
+      font-weight:700;
+      color:var(--edu-ink);
+      letter-spacing:-.012em;
+    }
+    .edu-hero__meta{
+      margin:0 0 16px;
+      font-size:13.5px;
+      color:var(--edu-ink-mute);
+    }
+    .edu-hero__progress{
+      width:100%;max-width:340px;
+      height:4px;
+      background:var(--edu-surface-2);
+      border-radius:99px;
+      overflow:hidden;
+      margin-bottom:6px;
+    }
+    .edu-hero__progress-bar{
+      height:100%;
+      background:var(--edu-accent);
+      width:64%;
+      border-radius:99px;
+    }
+    .edu-hero__progress-label{
+      font-size:11.5px;color:var(--edu-ink-mute);
+    }
+    .edu-hero__action{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:11px 20px;
+      background:var(--edu-action-bg);
+      color:var(--edu-action-ink);
+      border:none;border-radius:9px;
+      font-family:inherit;font-size:13.5px;font-weight:600;
+      cursor:pointer;
+      flex-shrink:0;position:relative;z-index:1;
+      transition:background .15s ease, transform .12s ease;
+    }
+    .edu-hero__action:hover{background:var(--edu-action-bg-hover);transform:translateY(-1px);}
+    .edu-hero__action svg{width:14px;height:14px;}
+
+    /* Stat cards */
+    .edu-stats{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:14px;
+      margin-bottom:24px;
+    }
+    .edu-stat{
+      background:var(--edu-surface);
+      border:1px solid var(--edu-border);
+      border-radius:12px;
+      padding:18px 20px;
+      transition:border-color .15s ease, transform .15s ease;
+    }
+    .edu-stat:hover{border-color:var(--edu-border-strong);transform:translateY(-1px);}
+    .edu-stat__head{
+      display:flex;align-items:center;justify-content:space-between;
+      margin-bottom:10px;
+    }
+    .edu-stat__label{
+      font-size:12px;
+      font-weight:500;
+      color:var(--edu-ink-mute);
+    }
+    .edu-stat__icon{
+      width:30px;height:30px;
+      border-radius:8px;
+      background:var(--edu-surface-2);
+      color:var(--edu-ink-mute);
+      display:inline-flex;align-items:center;justify-content:center;
+    }
+    .edu-stat__icon svg{width:14px;height:14px;}
+    .edu-stat__value{
+      font-size:26px;
+      font-weight:700;
+      letter-spacing:-.022em;
+      color:var(--edu-ink);
+      line-height:1;
+      margin-bottom:6px;
+      font-variant-numeric:tabular-nums;
+    }
+    .edu-stat__delta{
+      font-size:11.5px;
+      color:var(--edu-ink-mute);
+    }
+    .edu-stat__delta--up{color:var(--edu-success-ink);}
+
+    /* Two-column section */
+    .edu-cols{
+      display:grid;
+      grid-template-columns:1.4fr 1fr;
+      gap:14px;
+    }
+    @media (max-width:980px){
+      .edu-cols{grid-template-columns:1fr;}
+      .edu-stats{grid-template-columns:1fr;}
+    }
+
+    .edu-card{
+      background:var(--edu-surface);
+      border:1px solid var(--edu-border);
+      border-radius:12px;
+      padding:18px 20px;
+    }
+    .edu-card__head{
+      display:flex;align-items:center;justify-content:space-between;
+      margin-bottom:14px;
+    }
+    .edu-card__title{
+      margin:0;
+      font-size:14.5px;
+      font-weight:600;
+      color:var(--edu-ink);
+    }
+    .edu-card__link{
+      font-size:12px;
+      color:var(--edu-ink-mute);
+      text-decoration:none;
+      transition:color .15s ease;
+    }
+    .edu-card__link:hover{color:var(--edu-ink);}
+
+    /* Assignment list */
+    .edu-assign{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .edu-assign__row{
+      display:flex;
+      align-items:flex-start;
+      gap:11px;
+      padding:11px 12px;
+      background:transparent;
+      border:1px solid var(--edu-border);
+      border-radius:9px;
+      transition:border-color .15s ease, background .15s ease;
+    }
+    .edu-assign__row:hover{border-color:var(--edu-border-strong);background:var(--edu-surface-2);}
+    .edu-assign__check{
+      width:18px;height:18px;
+      border:1.5px solid var(--edu-border-strong);
+      border-radius:5px;
+      flex-shrink:0;
+      margin-top:1px;
+      cursor:pointer;
+      background:transparent;
+      transition:all .12s ease;
+    }
+    .edu-assign__check:hover{border-color:var(--edu-accent);}
+    .edu-assign__body{flex:1;min-width:0;}
+    .edu-assign__title{
+      font-size:13.5px;
+      font-weight:500;
+      color:var(--edu-ink);
+      margin:0 0 3px;
+    }
+    .edu-assign__meta{
+      font-size:11.5px;
+      color:var(--edu-ink-mute);
+      display:flex;align-items:center;gap:8px;
+    }
+    .edu-assign__meta-sep{color:var(--edu-ink-dim);}
+    .edu-assign__due{
+      font-size:11px;
+      font-weight:600;
+      padding:2px 8px;
+      border-radius:5px;
+      flex-shrink:0;
+      margin-top:1px;
+    }
+    .edu-assign__due--soon{background:var(--edu-warn-fade);color:var(--edu-warn-ink);}
+    .edu-assign__due--late{background:var(--edu-danger-fade);color:var(--edu-danger-ink);}
+    .edu-assign__due--ok{background:var(--edu-surface-2);color:var(--edu-ink-mute);}
+
+    /* Activity feed */
+    .edu-feed{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    .edu-feed__row{
+      display:flex;
+      align-items:flex-start;
+      gap:11px;
+      font-size:13px;
+    }
+    .edu-feed__dot{
+      width:7px;height:7px;
+      border-radius:50%;
+      background:var(--edu-ink-faint);
+      flex-shrink:0;
+      margin-top:7px;
+    }
+    .edu-feed__dot--accent{background:var(--edu-accent);}
+    .edu-feed__dot--success{background:var(--edu-success-ink);}
+    .edu-feed__body{flex:1;min-width:0;}
+    .edu-feed__text{margin:0 0 2px;color:var(--edu-ink);line-height:1.45;}
+    .edu-feed__text strong{font-weight:600;color:var(--edu-ink);}
+    .edu-feed__time{
+      font-size:11.5px;color:var(--edu-ink-mute);
+    }
+
+    @media (max-width:880px){
+      .edu-body{grid-template-columns:1fr;}
+      .edu-tree{border-right:none;border-bottom:1px solid var(--edu-border);max-height:280px;}
+      .edu-content{padding:24px 20px 48px;}
+      .edu-hero{flex-direction:column;align-items:flex-start;}
+    }
+  </style>
+</head>
+<body class="pm-has-sidebar">
+
+<!-- PM sidebar mount point (auto-rendered by sidebar.js) -->
+<div id="pmSidebar"></div>
+
+<div class="edu-shell">
+  <header class="edu-header">
+    <button class="edu-trigger" type="button" aria-label="Toggle tree" id="eduTreeTrigger">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="edu-sep-v"></span>
+    <nav class="edu-breadcrumb" aria-label="Breadcrumb">
+      <a href="client-dashboard.html">Dashboard</a>
+      <span class="edu-breadcrumb__sep">/</span>
+      <span class="edu-breadcrumb__current" id="eduBreadcrumbCurrent">Education</span>
+    </nav>
+    <span class="edu-header__spacer"></span>
+    <button class="edu-theme-toggle" type="button" id="eduThemeToggle" aria-label="Toggle theme" title="Toggle dark / pearl theme">
+      <svg class="edu-theme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="edu-theme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.05" y2="7.05"/><line x1="16.95" y1="16.95" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.05" y2="16.95"/><line x1="16.95" y1="7.05" x2="19.07" y2="4.93"/></svg>
+    </button>
+    <button class="edu-header__action" type="button" id="eduNewLessonBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New
+    </button>
+  </header>
+
+  <div class="edu-body">
+
+    <!-- File tree -->
+    <aside class="edu-tree" id="eduTree">
+
+      <!-- Pending Homework group with badge -->
+      <div class="edu-tree__group">
+        <div class="edu-tree__group-head">
+          <p class="edu-tree__group-label">Pending Homework</p>
+        </div>
+        <ul class="edu-tree__list">
+          <li><button class="edu-tree__row edu-tree__row--file" type="button" data-file="Conversation Practice — Worksheet 4">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Conversation Practice</span>
+            <span class="edu-tree__badge edu-tree__badge--warn">Due</span>
+          </button></li>
+          <li><button class="edu-tree__row edu-tree__row--file" type="button" data-file="Arithmetic Drill — Set 2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Arithmetic Drill</span>
+            <span class="edu-tree__badge edu-tree__badge--warn">Due</span>
+          </button></li>
+        </ul>
+      </div>
+
+      <!-- Recent group -->
+      <div class="edu-tree__group">
+        <div class="edu-tree__group-head">
+          <p class="edu-tree__group-label">Recent</p>
+        </div>
+        <ul class="edu-tree__list">
+          <li><button class="edu-tree__row edu-tree__row--file is-active" type="button" data-file="Lesson 1: Greetings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Lesson 1: Greetings</span>
+          </button></li>
+          <li><button class="edu-tree__row edu-tree__row--file" type="button" data-file="Numbers 1–100">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Numbers 1–100</span>
+          </button></li>
+        </ul>
+      </div>
+
+      <!-- Library group with + new button -->
+      <div class="edu-tree__group">
+        <div class="edu-tree__group-head">
+          <p class="edu-tree__group-label">Library</p>
+          <button class="edu-tree__new" type="button" aria-label="New folder" title="New folder or lesson">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+        </div>
+        <ul class="edu-tree__list">
+
+          <!-- English Lessons -->
+          <li class="edu-tree__folder is-open">
+            <button class="edu-tree__row" type="button" data-folder>
+              <svg class="edu-tree__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              <span>English Lessons</span>
+            </button>
+            <ul class="edu-tree__sublist">
+              <li class="edu-tree__folder is-open">
+                <button class="edu-tree__row" type="button" data-folder>
+                  <svg class="edu-tree__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                  <span>Beginner</span>
+                </button>
+                <ul class="edu-tree__sublist">
+                  <li><button class="edu-tree__row edu-tree__row--file is-active" type="button" data-file="Lesson 1: Greetings">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <span>Lesson 1: Greetings</span>
+                  </button></li>
+                  <li><button class="edu-tree__row edu-tree__row--file" type="button" data-file="Lesson 2: Numbers">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <span>Lesson 2: Numbers</span>
+                  </button></li>
+                  <li><button class="edu-tree__row edu-tree__row--file" type="button" data-file="Lesson 3: Colors and Shapes">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <span>Lesson 3: Colors and Shapes</span>
+                  </button></li>
+                </ul>
+              </li>
+              <li class="edu-tree__folder">
+                <button class="edu-tree__row" type="button" data-folder>
+                  <svg class="edu-tree__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                  <span>Intermediate</span>
+                </button>
+                <ul class="edu-tree__sublist">
+                  <li><button class="edu-tree__row edu-tree__row--file" type="button" data-file="Reading Comprehension">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <span>Reading Comprehension</span>
+                  </button></li>
+                  <li><button class="edu-tree__row edu-tree__row--file" type="button" data-file="Conversation Practice">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <span>Conversation Practice</span>
+                  </button></li>
+                </ul>
+              </li>
+              <li class="edu-tree__folder">
+                <button class="edu-tree__row" type="button" data-folder>
+                  <svg class="edu-tree__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                  <span>Advanced</span>
+                </button>
+                <ul class="edu-tree__sublist">
+                  <li><button class="edu-tree__row edu-tree__row--file" type="button" data-file="Essay Writing">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <span>Essay Writing</span>
+                  </button></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Math -->
+          <li class="edu-tree__folder">
+            <button class="edu-tree__row" type="button" data-folder>
+              <svg class="edu-tree__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              <span>Math</span>
+            </button>
+            <ul class="edu-tree__sublist">
+              <li><button class="edu-tree__row edu-tree__row--file" type="button" data-file="Arithmetic Basics">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>Arithmetic Basics</span>
+              </button></li>
+            </ul>
+          </li>
+
+          <!-- Science -->
+          <li class="edu-tree__folder">
+            <button class="edu-tree__row" type="button" data-folder>
+              <svg class="edu-tree__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              <span>Science</span>
+            </button>
+            <ul class="edu-tree__sublist">
+              <li><button class="edu-tree__row edu-tree__row--file" type="button" data-file="Biology Intro">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>Biology Intro</span>
+              </button></li>
+            </ul>
+          </li>
+
+          <!-- Social Studies (replaces Life Skills) -->
+          <li class="edu-tree__folder">
+            <button class="edu-tree__row" type="button" data-folder>
+              <svg class="edu-tree__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              <span>Social Studies</span>
+            </button>
+            <ul class="edu-tree__sublist">
+              <li><button class="edu-tree__row edu-tree__row--file" type="button" data-file="Canadian History">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>Canadian History</span>
+              </button></li>
+              <li><button class="edu-tree__row edu-tree__row--file" type="button" data-file="Geography Basics">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>Geography Basics</span>
+              </button></li>
+            </ul>
+          </li>
+
+          <!-- Homework -->
+          <li class="edu-tree__folder">
+            <button class="edu-tree__row" type="button" data-folder>
+              <svg class="edu-tree__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              <span>Homework</span>
+              <span class="edu-tree__badge">2</span>
+            </button>
+            <ul class="edu-tree__sublist">
+              <li><button class="edu-tree__row edu-tree__row--file" type="button" data-file="Conversation Practice — Worksheet 4">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>Conversation — Worksheet 4</span>
+              </button></li>
+              <li><button class="edu-tree__row edu-tree__row--file" type="button" data-file="Arithmetic Drill — Set 2">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>Arithmetic Drill — Set 2</span>
+              </button></li>
+            </ul>
+          </li>
+
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Content area: education dashboard -->
+    <main class="edu-content" id="eduContent">
+
+      <header class="edu-page-head">
+        <h1 class="edu-page-head__title">Education</h1>
+        <p class="edu-page-head__sub">Your lessons, homework, and learning progress in one place.</p>
+      </header>
+
+      <!-- Continue learning hero -->
+      <section class="edu-hero">
+        <div class="edu-hero__body">
+          <p class="edu-hero__eyebrow">Continue Learning</p>
+          <h2 class="edu-hero__title">Lesson 1: Greetings</h2>
+          <p class="edu-hero__meta">English Lessons · Beginner · last opened 2 hours ago</p>
+          <div class="edu-hero__progress" aria-label="Lesson progress">
+            <div class="edu-hero__progress-bar"></div>
+          </div>
+          <p class="edu-hero__progress-label">64% complete · 4 of 6 sections</p>
+        </div>
+        <button class="edu-hero__action" type="button">
+          Resume lesson
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </section>
+
+      <!-- Stats -->
+      <section class="edu-stats" aria-label="Learning stats">
+        <div class="edu-stat">
+          <div class="edu-stat__head">
+            <span class="edu-stat__label">Lessons completed</span>
+            <span class="edu-stat__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+          </div>
+          <div class="edu-stat__value">12</div>
+          <div class="edu-stat__delta edu-stat__delta--up">+3 this week</div>
+        </div>
+        <div class="edu-stat">
+          <div class="edu-stat__head">
+            <span class="edu-stat__label">Hours studied</span>
+            <span class="edu-stat__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </span>
+          </div>
+          <div class="edu-stat__value">18.5</div>
+          <div class="edu-stat__delta edu-stat__delta--up">+2.5 this week</div>
+        </div>
+        <div class="edu-stat">
+          <div class="edu-stat__head">
+            <span class="edu-stat__label">Pending assignments</span>
+            <span class="edu-stat__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+            </span>
+          </div>
+          <div class="edu-stat__value">2</div>
+          <div class="edu-stat__delta">1 due this week</div>
+        </div>
+      </section>
+
+      <!-- Two-column: unfinished assignments + activity -->
+      <section class="edu-cols">
+
+        <!-- Unfinished assignments -->
+        <div class="edu-card">
+          <div class="edu-card__head">
+            <h3 class="edu-card__title">Unfinished assignments</h3>
+            <a class="edu-card__link" href="#">View all</a>
+          </div>
+          <div class="edu-assign">
+            <div class="edu-assign__row">
+              <button class="edu-assign__check" type="button" aria-label="Mark complete"></button>
+              <div class="edu-assign__body">
+                <p class="edu-assign__title">Conversation Practice — Worksheet 4</p>
+                <p class="edu-assign__meta">
+                  <span>English · Intermediate</span>
+                  <span class="edu-assign__meta-sep">·</span>
+                  <span>5 questions</span>
+                </p>
+              </div>
+              <span class="edu-assign__due edu-assign__due--soon">Due Fri</span>
+            </div>
+            <div class="edu-assign__row">
+              <button class="edu-assign__check" type="button" aria-label="Mark complete"></button>
+              <div class="edu-assign__body">
+                <p class="edu-assign__title">Arithmetic Drill — Set 2</p>
+                <p class="edu-assign__meta">
+                  <span>Math · Basics</span>
+                  <span class="edu-assign__meta-sep">·</span>
+                  <span>12 problems</span>
+                </p>
+              </div>
+              <span class="edu-assign__due edu-assign__due--ok">Next week</span>
+            </div>
+            <div class="edu-assign__row">
+              <button class="edu-assign__check" type="button" aria-label="Mark complete"></button>
+              <div class="edu-assign__body">
+                <p class="edu-assign__title">Reading Reflection — Chapter 3</p>
+                <p class="edu-assign__meta">
+                  <span>English · Intermediate</span>
+                  <span class="edu-assign__meta-sep">·</span>
+                  <span>1 short essay</span>
+                </p>
+              </div>
+              <span class="edu-assign__due edu-assign__due--ok">Next week</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent activity -->
+        <div class="edu-card">
+          <div class="edu-card__head">
+            <h3 class="edu-card__title">Recent activity</h3>
+            <a class="edu-card__link" href="#">View history</a>
+          </div>
+          <div class="edu-feed">
+            <div class="edu-feed__row">
+              <span class="edu-feed__dot edu-feed__dot--accent"></span>
+              <div class="edu-feed__body">
+                <p class="edu-feed__text">Started <strong>Lesson 1: Greetings</strong></p>
+                <span class="edu-feed__time">2 hours ago</span>
+              </div>
+            </div>
+            <div class="edu-feed__row">
+              <span class="edu-feed__dot edu-feed__dot--success"></span>
+              <div class="edu-feed__body">
+                <p class="edu-feed__text">Completed <strong>Numbers 1–100</strong></p>
+                <span class="edu-feed__time">Yesterday</span>
+              </div>
+            </div>
+            <div class="edu-feed__row">
+              <span class="edu-feed__dot"></span>
+              <div class="edu-feed__body">
+                <p class="edu-feed__text">Assigned <strong>Conversation Practice — Worksheet 4</strong></p>
+                <span class="edu-feed__time">2 days ago</span>
+              </div>
+            </div>
+            <div class="edu-feed__row">
+              <span class="edu-feed__dot edu-feed__dot--success"></span>
+              <div class="edu-feed__body">
+                <p class="edu-feed__text">Completed <strong>Lesson 3: Colors and Shapes</strong></p>
+                <span class="edu-feed__time">3 days ago</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+</div>
+
+<!-- Supabase + sidebar -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260508c"></script>
+<script src="js/hiring-service.js?v=20260508c"></script>
+<script src="js/sidebar.js?v=20260512a"></script>
+<script src="js/right-calendar.js?v=20260512a"></script>
+
+<script>
+  // Theme toggle (dark / pearl white) — persists to localStorage
+  (function(){
+    var STORAGE_KEY = 'pmEduTheme';
+    var saved = null;
+    try { saved = localStorage.getItem(STORAGE_KEY); } catch(_){}
+    var initial = (saved === 'light' || saved === 'dark') ? saved : 'dark';
+    document.documentElement.setAttribute('data-edu-theme', initial);
+    document.addEventListener('click', function(e){
+      var btn = e.target.closest('#eduThemeToggle');
+      if (!btn) return;
+      var current = document.documentElement.getAttribute('data-edu-theme') || 'dark';
+      var next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-edu-theme', next);
+      try { localStorage.setItem(STORAGE_KEY, next); } catch(_){}
+    });
+  })();
+
+  // Folder collapse / expand + file selection
+  document.addEventListener('click', function(e){
+    var folderBtn = e.target.closest('[data-folder]');
+    if (folderBtn) {
+      var folderLi = folderBtn.closest('.edu-tree__folder');
+      if (folderLi) folderLi.classList.toggle('is-open');
+      return;
+    }
+    var fileBtn = e.target.closest('[data-file]');
+    if (fileBtn) {
+      document.querySelectorAll('.edu-tree__row.is-active').forEach(function(el){ el.classList.remove('is-active'); });
+      fileBtn.classList.add('is-active');
+      var name = fileBtn.getAttribute('data-file') || '';
+      var bc = document.getElementById('eduBreadcrumbCurrent');
+      var heroTitle = document.querySelector('.edu-hero__title');
+      if (bc) bc.textContent = name;
+      if (heroTitle) heroTitle.textContent = name;
+    }
+  });
+</script>
+</body>
+</html>

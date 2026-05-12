@@ -31,15 +31,18 @@
     ],
     client: [
       { type: 'link', href: 'client-dashboard.html', label: 'Dashboard', icon: 'dashboard' },
+      { type: 'link', href: 'messages.html', label: 'Inbox', icon: 'message' },
+      { type: 'section', label: 'Daily' },
       { type: 'link', href: 'client-schedule.html', label: 'Schedule', icon: 'calendar' },
-      { type: 'link', href: 'messages.html', label: 'Messages', icon: 'message' },
+      { type: 'link', href: 'client-education.html', label: 'Education', icon: 'book' },
+      { type: 'link', href: 'client-hours.html', label: 'Hours & Billing', icon: 'clock' },
+      { type: 'section', label: 'Your Plan' },
       { type: 'link', href: 'client-membership.html', label: 'Membership', icon: 'briefcase' },
       { type: 'link', href: 'client-contract.html', label: 'Contract Details', icon: 'file-clock' },
-      { type: 'link', href: 'client-hours.html', label: 'Hours & Billing', icon: 'clock' },
-      { type: 'divider' },
-      { type: 'link', href: 'client-resources.html', label: 'Resources', icon: 'folder' },
+      { type: 'section', label: 'People' },
       { type: 'link', href: 'client-assistants.html', label: 'My Assistant', icon: 'user-circle' },
       { type: 'link', href: 'client-account.html', label: 'My Family', icon: 'users' },
+      { type: 'link', href: 'client-resources.html', label: 'Resources', icon: 'folder' },
     ],
   };
 
@@ -67,6 +70,8 @@
     chev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
     chevs: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 15 12 20 17 15"/><polyline points="7 9 12 4 17 9"/></svg>',
     logout: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>',
+    moon: '<svg class="pm-sb-theme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+    sun: '<svg class="pm-sb-theme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.05" y2="7.05"/><line x1="16.95" y1="16.95" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.05" y2="16.95"/><line x1="16.95" y1="7.05" x2="19.07" y2="4.93"/></svg>',
   };
 
   function escapeHtml(s){ return (s || '').toString().replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[c])); }
@@ -107,6 +112,7 @@
   function renderNav(items){
     return items.map(item => {
       if (item.type === 'divider') return '<div class="pm-sb-divider"></div>';
+      if (item.type === 'section') return `<div class="pm-sb-section-label">${escapeHtml(item.label)}</div>`;
       if (item.type === 'group') return renderGroup(item);
       return renderLink(item);
     }).join('');
@@ -134,6 +140,10 @@
         <ul class="pm-sb-list">${navHtml}</ul>
       </div>
       <div class="pm-sb-bottom">
+        <button class="pm-sb-theme-toggle" type="button" data-pm-theme-toggle aria-label="Toggle light / dark theme">
+          ${ICONS.moon}${ICONS.sun}
+          <span class="pm-sb-theme-toggle__label">Theme</span>
+        </button>
         ${settingsHtml}
         <button class="pm-sb-account" type="button" id="pmSidebarAcctBtn">
           <span class="pm-sb-account__avatar">${escapeHtml(triggerInitial)}</span>
