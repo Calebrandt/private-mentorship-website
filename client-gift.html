@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gift — Private Mentorship</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
+<link rel="stylesheet" href="js/sidebar.css?v=20260512a" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<script src="js/theme.js?v=20260512a"></script>
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#f9fafb;color:#1f2937;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+  :root{
+    --bg:#f9fafb;--card:#ffffff;--border:#e5e7eb;--border-soft:#f3f4f6;
+    --ink:#1f2937;--ink-2:#0f172a;--ink-mute:#64748b;--ink-tert:#94a3b8;
+    --primary:#2563eb;--primary-hover:#1d4ed8;--primary-soft:#eff6ff;
+  }
+  [data-pm-theme="dark"]{
+    --bg:#0b0c10;--card:#16171c;--border:#262830;--border-soft:#1c1d23;
+    --ink:#f1f5f9;--ink-2:#ffffff;--ink-mute:#94a3b8;--ink-tert:#64748b;
+    --primary:#60A5FA;--primary-hover:#3b82f6;--primary-soft:rgba(96,165,250,0.12);
+  }
+  [data-pm-theme="dark"] html,
+  [data-pm-theme="dark"] body{background:var(--bg);color:var(--ink);}
+
+  /* Top bar */
+  .nx-topbar{
+    background:var(--card);border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 26px;gap:16px;position:sticky;top:0;z-index:20;
+  }
+  .nx-search{flex:1;max-width:520px;position:relative;}
+  .nx-search input{
+    width:100%;background:var(--border-soft);border:1px solid transparent;
+    border-radius:10px;padding:10px 14px 10px 38px;
+    font:500 13.5px Inter,sans-serif;color:var(--ink);
+  }
+  .nx-search input::placeholder{color:var(--ink-tert);font-weight:400;}
+  .nx-search input:focus{outline:none;border-color:var(--primary);background:var(--card);}
+  .nx-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--ink-tert);}
+  .nx-userpod{display:flex;align-items:center;gap:10px;padding:5px 12px 5px 5px;border:1px solid var(--border);border-radius:9999px;background:var(--card);}
+  .nx-userpod__avatar{
+    width:34px;height:34px;border-radius:50%;
+    background:linear-gradient(135deg,#1e1c89 0%,#010694 100%);
+    color:#fff;font-weight:700;font-size:13px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .nx-userpod__name{font-size:13px;font-weight:600;color:var(--ink);letter-spacing:-.005em;}
+
+  /* Shell */
+  .nx-shell{padding:32px 28px 80px;max-width:1180px;margin:0 auto;}
+  .nx-head{margin-bottom:32px;}
+  .nx-h1{font-size:28px;font-weight:600;letter-spacing:-.022em;margin:0 0 8px;color:var(--ink-2);line-height:1.15;}
+  .nx-sub{font-size:15px;color:var(--ink-mute);margin:0;font-weight:500;letter-spacing:-.005em;line-height:1.5;max-width:640px;}
+
+  /* ═══════════════════════════════════════════════════════════
+     GIFT PURCHASE FORM — Preline-inspired, refined PM aesthetic
+     ═══════════════════════════════════════════════════════════ */
+  .pm-gift{
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:32px;box-shadow:0 1px 2px rgba(15,23,42,0.04);
+  }
+  .pm-gift__grid{
+    display:grid;grid-template-columns:1fr 1.2fr;gap:48px;align-items:start;
+  }
+  @media (max-width:880px){
+    .pm-gift__grid{grid-template-columns:1fr;gap:32px;}
+  }
+
+  /* ── Left column: visual preview ── */
+  .pm-gift__preview-col{position:sticky;top:90px;}
+
+  /* The gift card preview — Preline's "nested gradient frame" pattern */
+  .pm-gift__card{
+    position:relative;
+    aspect-ratio:1.586/1;  /* credit-card ratio */
+    border-radius:18px;
+    padding:6px;  /* outer gradient frame thickness */
+    box-shadow:0 24px 50px -24px rgba(15,23,42,0.30);
+    transition:transform .4s cubic-bezier(.22,1,.36,1), box-shadow .4s ease;
+  }
+  .pm-gift__card:hover{transform:translateY(-3px);box-shadow:0 30px 60px -24px rgba(15,23,42,0.40);}
+  .pm-gift__card-inner{
+    position:relative;height:100%;width:100%;
+    background:#0f172a;color:#fff;
+    border-radius:12px;padding:26px;
+    display:flex;flex-direction:column;
+    overflow:hidden;
+  }
+  .pm-gift__card-inner::before{
+    content:"";position:absolute;inset:0;opacity:0.18;pointer-events:none;
+    background:radial-gradient(ellipse 80% 60% at 30% 20%, currentColor, transparent 60%);
+  }
+
+  /* Card variants — each is a different premium colorway */
+  .pm-gift__card--midnight{background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#334155 100%);}
+  .pm-gift__card--midnight .pm-gift__card-inner{background:linear-gradient(135deg,#0b1020 0%,#0f172a 100%);color:#fff;}
+
+  .pm-gift__card--royal{background:linear-gradient(135deg,#1e1c89 0%,#010694 100%);}
+  .pm-gift__card--royal .pm-gift__card-inner{background:linear-gradient(135deg,#0a0c4a 0%,#010694 100%);color:#fff;}
+
+  .pm-gift__card--rose{background:linear-gradient(135deg,#f5d0c5 0%,#b76e79 50%,#7d3c4a 100%);}
+  .pm-gift__card--rose .pm-gift__card-inner{background:linear-gradient(135deg,#5e2530 0%,#7d3c4a 100%);color:#fde8df;}
+
+  .pm-gift__card--emerald{background:linear-gradient(135deg,#86efac 0%,#10b981 50%,#064e3b 100%);}
+  .pm-gift__card--emerald .pm-gift__card-inner{background:linear-gradient(135deg,#022c22 0%,#064e3b 100%);color:#d1fae5;}
+
+  .pm-gift__card--ivory{background:linear-gradient(135deg,#fafaf5 0%,#e8e1d3 50%,#c9b690 100%);}
+  .pm-gift__card--ivory .pm-gift__card-inner{background:linear-gradient(135deg,#faf8f1 0%,#e8e1d3 100%);color:#3a2e1f;}
+
+  /* Card content */
+  .pm-gift__card-brand{
+    font-size:11px;font-weight:700;letter-spacing:.18em;
+    text-transform:uppercase;opacity:.65;margin:0 0 auto;
+  }
+  .pm-gift__card-amount{
+    font-size:42px;font-weight:600;letter-spacing:-.025em;
+    margin:0;line-height:1;font-variant-numeric:tabular-nums;
+  }
+  .pm-gift__card-amount small{font-size:18px;font-weight:500;margin-left:6px;opacity:.7;}
+  .pm-gift__card-meta{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    margin-top:16px;font-size:11.5px;font-weight:500;line-height:1.4;
+  }
+  .pm-gift__card-meta-label{
+    display:block;opacity:.55;text-transform:uppercase;letter-spacing:.08em;
+    font-size:9.5px;font-weight:600;margin-bottom:3px;
+  }
+  .pm-gift__card-meta-value{opacity:.95;}
+
+  /* Theme selector — small swatches under the card */
+  .pm-gift__themes{
+    display:flex;gap:10px;margin-top:24px;justify-content:center;
+  }
+  .pm-gift__theme{
+    position:relative;width:46px;height:30px;
+    border-radius:8px;cursor:pointer;border:0;padding:0;
+    transition:transform .15s ease;
+  }
+  .pm-gift__theme:hover{transform:translateY(-2px);}
+  .pm-gift__theme[aria-pressed="true"]::after{
+    content:"";position:absolute;inset:-4px;border-radius:11px;
+    border:2px solid var(--primary);pointer-events:none;
+  }
+  .pm-gift__theme--midnight{background:linear-gradient(135deg,#0f172a,#334155);}
+  .pm-gift__theme--royal{background:linear-gradient(135deg,#1e1c89,#010694);}
+  .pm-gift__theme--rose{background:linear-gradient(135deg,#f5d0c5,#7d3c4a);}
+  .pm-gift__theme--emerald{background:linear-gradient(135deg,#86efac,#064e3b);}
+  .pm-gift__theme--ivory{background:linear-gradient(135deg,#fafaf5,#c9b690);}
+
+  /* Pitch text under preview */
+  .pm-gift__pitch{
+    margin:28px 0 0;padding:18px 20px;
+    background:var(--border-soft);border-radius:11px;
+    font-size:13px;line-height:1.55;color:var(--ink-mute);font-weight:500;
+  }
+  .pm-gift__pitch strong{color:var(--ink-2);font-weight:600;}
+
+  /* ── Right column: form ── */
+  .pm-gift__form{display:flex;flex-direction:column;gap:24px;}
+  .pm-gift__field{border:0;padding:0;margin:0;}
+  .pm-gift__label{
+    display:block;font-size:13px;font-weight:600;color:var(--ink-2);
+    margin:0 0 10px;letter-spacing:-.005em;
+  }
+  .pm-gift__hint{
+    display:block;font-size:12px;color:var(--ink-tert);
+    margin:6px 0 0;font-weight:500;
+  }
+
+  /* Amount grid — selectable hour tiles */
+  .pm-gift__amounts{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
+  }
+  .pm-gift__amount{position:relative;cursor:pointer;}
+  .pm-gift__amount input{
+    position:absolute;opacity:0;pointer-events:none;
+  }
+  .pm-gift__amount-tile{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:14px 8px;border:1px solid var(--border);
+    border-radius:10px;background:var(--card);
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .pm-gift__amount-tile:hover{border-color:#cbd5e1;}
+  .pm-gift__amount input:checked + .pm-gift__amount-tile{
+    border-color:var(--primary);
+    box-shadow:0 0 0 3px var(--primary-soft);
+    background:var(--card);
+  }
+  .pm-gift__amount-hours{
+    font-size:14px;font-weight:600;color:var(--ink-2);
+    letter-spacing:-.005em;font-variant-numeric:tabular-nums;
+  }
+  .pm-gift__amount-price{
+    font-size:12px;color:var(--ink-mute);margin-top:4px;
+    font-variant-numeric:tabular-nums;font-weight:500;
+  }
+
+  /* Inputs / textarea */
+  .pm-gift__input,.pm-gift__textarea{
+    width:100%;background:var(--bg);
+    border:1px solid var(--border);border-radius:10px;
+    padding:12px 14px;font:500 14px Inter,sans-serif;color:var(--ink);
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .pm-gift__input::placeholder,.pm-gift__textarea::placeholder{color:var(--ink-tert);font-weight:400;}
+  .pm-gift__input:focus,.pm-gift__textarea:focus{
+    outline:none;border-color:var(--primary);
+    box-shadow:0 0 0 3px var(--primary-soft);
+    background:var(--card);
+  }
+  .pm-gift__textarea{resize:vertical;min-height:90px;font-family:inherit;line-height:1.5;}
+
+  /* Delivery method twin cards */
+  .pm-gift__delivery{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  }
+  .pm-gift__delivery-option{position:relative;cursor:pointer;}
+  .pm-gift__delivery-option input{position:absolute;opacity:0;pointer-events:none;}
+  .pm-gift__delivery-tile{
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+    padding:14px 10px;border:1px solid var(--border);
+    border-radius:10px;background:var(--card);
+    transition:border-color .15s ease;
+  }
+  .pm-gift__delivery-tile:hover{border-color:#cbd5e1;}
+  .pm-gift__delivery-option input:checked + .pm-gift__delivery-tile{
+    border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft);
+  }
+  .pm-gift__delivery-tile svg{width:18px;height:18px;color:var(--ink-mute);stroke-width:1.75;}
+  .pm-gift__delivery-option input:checked + .pm-gift__delivery-tile svg{color:var(--primary);}
+  .pm-gift__delivery-label{font-size:13px;font-weight:500;color:var(--ink);letter-spacing:-.005em;}
+
+  /* Two inputs side by side */
+  .pm-gift__row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media (max-width:640px){.pm-gift__row{grid-template-columns:1fr;}}
+
+  /* CTA */
+  .pm-gift__cta{
+    width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:14px 22px;border-radius:10px;border:0;cursor:pointer;
+    background:#0f172a;color:#fff;
+    font:500 14.5px Inter,sans-serif;letter-spacing:-.005em;
+    box-shadow:0 8px 20px -8px rgba(15,23,42,0.35);
+    transition:background .15s ease, transform .15s ease;
+  }
+  .pm-gift__cta:hover{background:#1e293b;transform:translateY(-1px);}
+  .pm-gift__cta svg{width:14px;height:14px;}
+  [data-pm-theme="dark"] .pm-gift__cta{background:#fafafa;color:#0f172a;}
+  [data-pm-theme="dark"] .pm-gift__cta:hover{background:#e5e7eb;}
+
+  .pm-gift__terms{
+    font-size:11.5px;color:var(--ink-tert);margin:12px 0 0;
+    line-height:1.5;text-align:center;font-weight:500;
+  }
+  .pm-gift__terms a{color:var(--primary);text-decoration:none;}
+  .pm-gift__terms a:hover{text-decoration:underline;}
+
+  /* Toast */
+  .nx-toast{
+    position:fixed;bottom:22px;left:50%;
+    transform:translateX(-50%) translateY(20px);z-index:1100;
+    background:var(--ink-2);color:#fff;
+    padding:13px 22px;border-radius:9999px;
+    font:600 13.5px Inter,sans-serif;
+    box-shadow:0 16px 36px -10px rgba(15,23,42,0.55);
+    opacity:0;pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  .nx-toast.is-shown{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
+  .nx-toast--success{background:linear-gradient(135deg,#16A34A,#22C55E);}
+
+  @media (max-width:560px){
+    .nx-shell{padding:20px 16px 60px;}
+    .nx-h1{font-size:24px;}
+    .nx-search{display:none;}
+    .pm-gift{padding:20px;}
+    .pm-gift__amounts{grid-template-columns:repeat(2,1fr);}
+  }
+</style>
+</head>
+<body class="pm-has-sidebar">
+
+<div id="pmSidebar"></div>
+
+<header class="nx-topbar">
+  <div class="nx-search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="search" placeholder="Search…" />
+  </div>
+  <div class="nx-userpod">
+    <span class="nx-userpod__avatar" id="nxUserAvatar">C</span>
+    <span class="nx-userpod__name" id="nxUserName">Client</span>
+  </div>
+</header>
+
+<main class="nx-shell">
+
+  <header class="nx-head">
+    <h1 class="nx-h1">Give the gift of mentorship</h1>
+    <p class="nx-sub">Purchase Private Mentorship hours for someone you love. Their own dedicated Family Assistant — the most personal gift you can give.</p>
+  </header>
+
+  <section class="pm-gift">
+    <div class="pm-gift__grid">
+
+      <!-- ── LEFT: Visual preview ── -->
+      <div class="pm-gift__preview-col">
+        <div class="pm-gift__card pm-gift__card--midnight" id="giftCard">
+          <div class="pm-gift__card-inner">
+            <p class="pm-gift__card-brand">Private Mentorship</p>
+            <p class="pm-gift__card-amount" id="cardAmount">24<small>hrs</small></p>
+            <div class="pm-gift__card-meta">
+              <div>
+                <span class="pm-gift__card-meta-label">For</span>
+                <span class="pm-gift__card-meta-value" id="cardRecipient">Recipient</span>
+              </div>
+              <div style="text-align:right;">
+                <span class="pm-gift__card-meta-label">From</span>
+                <span class="pm-gift__card-meta-value" id="cardSender">You</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pm-gift__themes" role="group" aria-label="Card design">
+          <button type="button" class="pm-gift__theme pm-gift__theme--midnight" data-theme="midnight" aria-pressed="true" aria-label="Midnight"></button>
+          <button type="button" class="pm-gift__theme pm-gift__theme--royal"    data-theme="royal"    aria-pressed="false" aria-label="Royal blue"></button>
+          <button type="button" class="pm-gift__theme pm-gift__theme--rose"     data-theme="rose"     aria-pressed="false" aria-label="Rose gold"></button>
+          <button type="button" class="pm-gift__theme pm-gift__theme--emerald"  data-theme="emerald"  aria-pressed="false" aria-label="Emerald"></button>
+          <button type="button" class="pm-gift__theme pm-gift__theme--ivory"    data-theme="ivory"    aria-pressed="false" aria-label="Ivory"></button>
+        </div>
+
+        <p class="pm-gift__pitch">
+          <strong>Why this gift?</strong> Most gifts gather dust. Private Mentorship hours unlock real time with a dedicated Family Assistant — academic support, mentorship, structure, and presence — for someone you love.
+        </p>
+      </div>
+
+      <!-- ── RIGHT: Form ── -->
+      <form class="pm-gift__form" id="giftForm" autocomplete="off">
+
+        <!-- Amount -->
+        <fieldset class="pm-gift__field">
+          <legend class="pm-gift__label">Choose an amount</legend>
+          <div class="pm-gift__amounts" id="amountGrid">
+            <label class="pm-gift__amount">
+              <input type="radio" name="amount" value="8">
+              <span class="pm-gift__amount-tile">
+                <span class="pm-gift__amount-hours">8 hrs</span>
+                <span class="pm-gift__amount-price">$240</span>
+              </span>
+            </label>
+            <label class="pm-gift__amount">
+              <input type="radio" name="amount" value="16">
+              <span class="pm-gift__amount-tile">
+                <span class="pm-gift__amount-hours">16 hrs</span>
+                <span class="pm-gift__amount-price">$480</span>
+              </span>
+            </label>
+            <label class="pm-gift__amount">
+              <input type="radio" name="amount" value="24" checked>
+              <span class="pm-gift__amount-tile">
+                <span class="pm-gift__amount-hours">24 hrs</span>
+                <span class="pm-gift__amount-price">$720</span>
+              </span>
+            </label>
+            <label class="pm-gift__amount">
+              <input type="radio" name="amount" value="40">
+              <span class="pm-gift__amount-tile">
+                <span class="pm-gift__amount-hours">40 hrs</span>
+                <span class="pm-gift__amount-price">$1,200</span>
+              </span>
+            </label>
+          </div>
+          <span class="pm-gift__hint">$30 / hour — locked in at gift purchase. Recipient redeems any time.</span>
+        </fieldset>
+
+        <!-- Delivery method -->
+        <fieldset class="pm-gift__field">
+          <legend class="pm-gift__label">How do you want it delivered?</legend>
+          <div class="pm-gift__delivery">
+            <label class="pm-gift__delivery-option">
+              <input type="radio" name="delivery" value="email" checked>
+              <span class="pm-gift__delivery-tile">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
+                <span class="pm-gift__delivery-label">Email</span>
+              </span>
+            </label>
+            <label class="pm-gift__delivery-option">
+              <input type="radio" name="delivery" value="sms">
+              <span class="pm-gift__delivery-tile">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                <span class="pm-gift__delivery-label">SMS</span>
+              </span>
+            </label>
+          </div>
+        </fieldset>
+
+        <!-- Recipient -->
+        <fieldset class="pm-gift__field">
+          <legend class="pm-gift__label">Recipient</legend>
+          <div class="pm-gift__row" style="margin-bottom:10px;">
+            <input class="pm-gift__input" id="recipName"  type="text" placeholder="Their name" autocomplete="off" />
+            <input class="pm-gift__input" id="recipEmail" type="email" placeholder="their@email.com" autocomplete="off" />
+          </div>
+          <span class="pm-gift__hint">We'll email them with redemption instructions when you complete checkout.</span>
+        </fieldset>
+
+        <!-- Message -->
+        <fieldset class="pm-gift__field">
+          <legend class="pm-gift__label">Personal message <span style="color:var(--ink-tert);font-weight:400;">(optional)</span></legend>
+          <textarea class="pm-gift__textarea" id="message" rows="4" placeholder="A short note that arrives with the gift…"></textarea>
+        </fieldset>
+
+        <!-- From + send date -->
+        <fieldset class="pm-gift__field">
+          <legend class="pm-gift__label">From you</legend>
+          <div class="pm-gift__row">
+            <input class="pm-gift__input" id="senderName" type="text" placeholder="Your name" />
+            <input class="pm-gift__input" id="sendDate"   type="date" />
+          </div>
+          <span class="pm-gift__hint">Pick a date to send the gift, or leave blank to send immediately.</span>
+        </fieldset>
+
+        <button type="submit" class="pm-gift__cta">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+          <span id="ctaText">Purchase $720 gift</span>
+        </button>
+
+        <p class="pm-gift__terms">
+          By purchasing, you agree to our <a href="terms.html">Terms</a>. Gifts are non-refundable but can be transferred. Hours never expire.
+        </p>
+      </form>
+
+    </div>
+  </section>
+
+</main>
+
+<div class="nx-toast" id="nxToast"><span id="nxToastText">Done</span></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260508d"></script>
+<script src="js/hiring-service.js?v=20260508g"></script>
+<script src="js/sidebar.js?v=20260512a"></script>
+<script src="js/right-calendar.js?v=20260512a"></script>
+<script>
+(async () => {
+  const $ = id => document.getElementById(id);
+
+  // Populate user pod from auth, but don't gate the page — it's a public-feeling
+  // landing for the gift flow even before sign-in.
+  try {
+    const user = await window.pmHiring.getCurrentUser();
+    if (user) {
+      const profile = await window.pmHiring.fetchCurrentUserProfile().catch(() => null);
+      const fullName = profile?.full_name || user.email?.split('@')[0] || 'Client';
+      const first = fullName.split(' ')[0];
+      $('nxUserName').textContent = first;
+      $('nxUserAvatar').textContent = (first[0] || 'C').toUpperCase();
+      // Prefill sender field
+      $('senderName').value = fullName;
+    }
+  } catch (_) {}
+
+  // Pricing table — keep in sync with /membership ($30/hr base)
+  const HOURLY = 30;
+  const PRICES = { 8:240, 16:480, 24:720, 40:1200 };
+
+  // State
+  const state = {
+    amount: 24,
+    theme: 'midnight',
+    delivery: 'email',
+  };
+
+  function fmtPrice(n){ return '$' + n.toLocaleString('en-CA'); }
+
+  function updateCard(){
+    // Amount
+    $('cardAmount').innerHTML = state.amount + '<small>hrs</small>';
+    // Theme
+    const card = $('giftCard');
+    card.className = 'pm-gift__card pm-gift__card--' + state.theme;
+    // Recipient + sender
+    const rn = ($('recipName').value || '').trim() || 'Recipient';
+    const sn = ($('senderName').value || '').trim() || 'You';
+    $('cardRecipient').textContent = rn.length > 20 ? rn.slice(0, 20) + '…' : rn;
+    $('cardSender').textContent    = sn.length > 20 ? sn.slice(0, 20) + '…' : sn;
+    // CTA text
+    $('ctaText').textContent = 'Purchase ' + fmtPrice(PRICES[state.amount] || 0) + ' gift';
+  }
+
+  // Amount selection
+  $('amountGrid').addEventListener('change', e => {
+    if (e.target.name === 'amount') {
+      state.amount = Number(e.target.value);
+      updateCard();
+    }
+  });
+
+  // Theme selection
+  document.querySelectorAll('.pm-gift__theme').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.pm-gift__theme').forEach(b => b.setAttribute('aria-pressed', 'false'));
+      btn.setAttribute('aria-pressed', 'true');
+      state.theme = btn.dataset.theme;
+      updateCard();
+    });
+  });
+
+  // Delivery selection
+  document.querySelectorAll('input[name="delivery"]').forEach(inp => {
+    inp.addEventListener('change', () => { state.delivery = inp.value; });
+  });
+
+  // Live update card preview as recipient / sender typed
+  ['recipName','senderName'].forEach(id => {
+    $(id).addEventListener('input', updateCard);
+  });
+
+  // Submit — placeholder, no Stripe wired yet
+  $('giftForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const rn = ($('recipName').value || '').trim();
+    const re = ($('recipEmail').value || '').trim();
+    const sn = ($('senderName').value || '').trim();
+    if (!rn || !re || !sn) {
+      showToast('Please fill in recipient and your name', 'error');
+      return;
+    }
+    showToast('Demo only — Stripe checkout wires next');
+  });
+
+  let toastTimer = null;
+  function showToast(text, kind='success'){
+    const t = $('nxToast'); $('nxToastText').textContent = text;
+    t.classList.remove('nx-toast--success');
+    t.classList.add(kind === 'error' ? '' : 'nx-toast--success');
+    t.classList.add('is-shown');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('is-shown'), 3000);
+  }
+
+  // Initial render
+  updateCard();
+})();
+</script>
+</body>
+</html>
