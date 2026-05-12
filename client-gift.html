@@ -114,16 +114,25 @@
   /* Card content */
   .pm-gift__card-brand{
     font-size:11px;font-weight:700;letter-spacing:.18em;
-    text-transform:uppercase;opacity:.65;margin:0 0 auto;
+    text-transform:uppercase;opacity:.65;margin:0;
+  }
+  /* Decorative SVG illustration */
+  .pm-gift__card-art{
+    flex:1;display:flex;align-items:center;justify-content:center;
+    margin:6px 0;min-height:0;
+  }
+  .pm-gift__card-art svg{
+    width:88px;height:88px;
+    filter:drop-shadow(0 4px 12px rgba(0,0,0,0.35));
   }
   .pm-gift__card-amount{
-    font-size:42px;font-weight:600;letter-spacing:-.025em;
+    font-size:34px;font-weight:600;letter-spacing:-.025em;
     margin:0;line-height:1;font-variant-numeric:tabular-nums;
   }
-  .pm-gift__card-amount small{font-size:18px;font-weight:500;margin-left:6px;opacity:.7;}
+  .pm-gift__card-amount small{font-size:15px;font-weight:500;margin-left:5px;opacity:.7;}
   .pm-gift__card-meta{
     display:flex;justify-content:space-between;align-items:flex-end;
-    margin-top:16px;font-size:11.5px;font-weight:500;line-height:1.4;
+    margin-top:12px;font-size:11.5px;font-weight:500;line-height:1.4;
   }
   .pm-gift__card-meta-label{
     display:block;opacity:.55;text-transform:uppercase;letter-spacing:.08em;
@@ -131,9 +140,17 @@
   }
   .pm-gift__card-meta-value{opacity:.95;}
 
-  /* Theme selector — small swatches under the card */
+  /* Picker section — wraps a label + a row of selectable swatches/icons */
+  .pm-gift__picker{margin-top:22px;}
+  .pm-gift__picker-label{
+    display:block;font-size:10.5px;font-weight:600;letter-spacing:.10em;
+    text-transform:uppercase;color:var(--ink-tert);
+    margin:0 0 12px;text-align:center;
+  }
+
+  /* Theme (colorway) selector */
   .pm-gift__themes{
-    display:flex;gap:10px;margin-top:24px;justify-content:center;
+    display:flex;gap:10px;justify-content:center;
   }
   .pm-gift__theme{
     position:relative;width:46px;height:30px;
@@ -150,6 +167,25 @@
   .pm-gift__theme--rose{background:linear-gradient(135deg,#f5d0c5,#7d3c4a);}
   .pm-gift__theme--emerald{background:linear-gradient(135deg,#86efac,#064e3b);}
   .pm-gift__theme--ivory{background:linear-gradient(135deg,#fafaf5,#c9b690);}
+
+  /* Decoration (illustration) selector */
+  .pm-gift__graphics{
+    display:flex;gap:10px;justify-content:center;
+  }
+  .pm-gift__graphic{
+    position:relative;width:54px;height:42px;
+    border:1px solid var(--border);
+    border-radius:9px;cursor:pointer;padding:0;
+    background:var(--card);
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .15s ease, border-color .15s ease;
+  }
+  .pm-gift__graphic:hover{transform:translateY(-2px);border-color:#cbd5e1;}
+  .pm-gift__graphic[aria-pressed="true"]{
+    border-color:var(--primary);
+    box-shadow:0 0 0 3px var(--primary-soft);
+  }
+  .pm-gift__graphic svg{width:28px;height:28px;}
 
   /* Pitch text under preview */
   .pm-gift__pitch{
@@ -313,6 +349,7 @@
         <div class="pm-gift__card pm-gift__card--midnight" id="giftCard">
           <div class="pm-gift__card-inner">
             <p class="pm-gift__card-brand">Private Mentorship</p>
+            <div class="pm-gift__card-art" id="cardArt"></div>
             <p class="pm-gift__card-amount" id="cardAmount">24<small>hrs</small></p>
             <div class="pm-gift__card-meta">
               <div>
@@ -327,12 +364,22 @@
           </div>
         </div>
 
-        <div class="pm-gift__themes" role="group" aria-label="Card design">
-          <button type="button" class="pm-gift__theme pm-gift__theme--midnight" data-theme="midnight" aria-pressed="true" aria-label="Midnight"></button>
-          <button type="button" class="pm-gift__theme pm-gift__theme--royal"    data-theme="royal"    aria-pressed="false" aria-label="Royal blue"></button>
-          <button type="button" class="pm-gift__theme pm-gift__theme--rose"     data-theme="rose"     aria-pressed="false" aria-label="Rose gold"></button>
-          <button type="button" class="pm-gift__theme pm-gift__theme--emerald"  data-theme="emerald"  aria-pressed="false" aria-label="Emerald"></button>
-          <button type="button" class="pm-gift__theme pm-gift__theme--ivory"    data-theme="ivory"    aria-pressed="false" aria-label="Ivory"></button>
+        <div class="pm-gift__picker">
+          <span class="pm-gift__picker-label">Card color</span>
+          <div class="pm-gift__themes" role="group" aria-label="Card color">
+            <button type="button" class="pm-gift__theme pm-gift__theme--midnight" data-theme="midnight" aria-pressed="true" aria-label="Midnight"></button>
+            <button type="button" class="pm-gift__theme pm-gift__theme--royal"    data-theme="royal"    aria-pressed="false" aria-label="Royal blue"></button>
+            <button type="button" class="pm-gift__theme pm-gift__theme--rose"     data-theme="rose"     aria-pressed="false" aria-label="Rose gold"></button>
+            <button type="button" class="pm-gift__theme pm-gift__theme--emerald"  data-theme="emerald"  aria-pressed="false" aria-label="Emerald"></button>
+            <button type="button" class="pm-gift__theme pm-gift__theme--ivory"    data-theme="ivory"    aria-pressed="false" aria-label="Ivory"></button>
+          </div>
+        </div>
+
+        <div class="pm-gift__picker">
+          <span class="pm-gift__picker-label">Decoration</span>
+          <div class="pm-gift__graphics" role="group" aria-label="Card decoration" id="graphicPicker">
+            <!-- Buttons injected by JS so the SVG markup stays in one place -->
+          </div>
         </div>
 
         <p class="pm-gift__pitch">
@@ -471,10 +518,126 @@
   const HOURLY = 30;
   const PRICES = { 8:240, 16:480, 24:720, 40:1200 };
 
+  // ── Decorative SVG illustrations ─────────────────────────────
+  // Each entry has BIG (for the card preview) + SMALL (for the picker thumbnail).
+  // Multi-color flat illustrations — premium feel without external assets.
+  const GRAPHICS = {
+    gift: {
+      label: 'Gift',
+      big: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="20" y="44" width="60" height="40" rx="3" fill="#FBBF24"/>
+        <rect x="20" y="44" width="60" height="40" rx="3" fill="#000" opacity=".10"/>
+        <rect x="14" y="36" width="72" height="14" rx="2" fill="#F59E0B"/>
+        <rect x="46" y="36" width="8" height="48" fill="#DC2626"/>
+        <rect x="14" y="38" width="72" height="6" fill="#DC2626"/>
+        <path d="M50 36 C 38 22, 30 30, 36 38 Z" fill="#EF4444"/>
+        <path d="M50 36 C 62 22, 70 30, 64 38 Z" fill="#EF4444"/>
+        <circle cx="50" cy="36" r="3.5" fill="#991B1B"/>
+      </svg>`,
+      small: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="22" y="46" width="56" height="38" rx="3" fill="#FBBF24"/>
+        <rect x="16" y="38" width="68" height="12" rx="2" fill="#F59E0B"/>
+        <rect x="46" y="38" width="8" height="46" fill="#DC2626"/>
+        <rect x="16" y="40" width="68" height="6" fill="#DC2626"/>
+        <circle cx="50" cy="38" r="4" fill="#EF4444"/>
+      </svg>`,
+    },
+    heart: {
+      label: 'Heart',
+      big: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M50 82 C 18 60, 14 36, 28 26 C 38 18, 48 24, 50 32 C 52 24, 62 18, 72 26 C 86 36, 82 60, 50 82 Z" fill="#EC4899"/>
+        <path d="M50 82 C 18 60, 14 36, 28 26 C 38 18, 48 24, 50 32 C 52 24, 62 18, 72 26 C 86 36, 82 60, 50 82 Z" fill="url(#heartShine)" opacity=".5"/>
+        <circle cx="20" cy="24" r="3" fill="#FBBF24"/>
+        <circle cx="84" cy="20" r="2.5" fill="#FBBF24"/>
+        <circle cx="78" cy="56" r="2" fill="#FBBF24"/>
+        <circle cx="14" cy="50" r="2" fill="#FBBF24"/>
+        <defs>
+          <linearGradient id="heartShine" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#fff" stop-opacity=".5"/>
+            <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+      </svg>`,
+      small: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M50 82 C 18 60, 14 36, 28 26 C 38 18, 48 24, 50 32 C 52 24, 62 18, 72 26 C 86 36, 82 60, 50 82 Z" fill="#EC4899"/>
+        <circle cx="22" cy="26" r="3" fill="#FBBF24"/>
+        <circle cx="78" cy="22" r="2.5" fill="#FBBF24"/>
+      </svg>`,
+    },
+    star: {
+      label: 'Star',
+      big: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M50 14 L 60 40 L 88 42 L 66 60 L 74 86 L 50 70 L 26 86 L 34 60 L 12 42 L 40 40 Z" fill="#FBBF24"/>
+        <path d="M50 14 L 60 40 L 88 42 L 66 60 L 74 86 L 50 70 L 26 86 L 34 60 L 12 42 L 40 40 Z" fill="url(#starShine)" opacity=".6"/>
+        <path d="M20 22 L 23 28 L 29 29 L 24 33 L 26 39 L 20 36 L 14 39 L 16 33 L 11 29 L 17 28 Z" fill="#06B6D4"/>
+        <path d="M82 70 L 84 74 L 88 75 L 85 78 L 86 82 L 82 80 L 78 82 L 79 78 L 76 75 L 80 74 Z" fill="#A855F7"/>
+        <defs>
+          <linearGradient id="starShine" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#fff" stop-opacity=".7"/>
+            <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+      </svg>`,
+      small: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M50 14 L 60 40 L 88 42 L 66 60 L 74 86 L 50 70 L 26 86 L 34 60 L 12 42 L 40 40 Z" fill="#FBBF24"/>
+        <path d="M82 24 L 85 30 L 92 31 L 87 36 L 88 42 L 82 39 L 76 42 L 77 36 L 72 31 L 79 30 Z" fill="#06B6D4"/>
+      </svg>`,
+    },
+    crown: {
+      label: 'Crown',
+      big: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M16 50 L 24 70 L 76 70 L 84 50 L 70 60 L 60 38 L 50 56 L 40 38 L 30 60 Z" fill="#FBBF24"/>
+        <path d="M16 50 L 24 70 L 76 70 L 84 50 L 70 60 L 60 38 L 50 56 L 40 38 L 30 60 Z" fill="url(#crownShine)" opacity=".4"/>
+        <rect x="20" y="72" width="60" height="10" rx="2" fill="#F59E0B"/>
+        <rect x="20" y="72" width="60" height="3" fill="#fff" opacity=".25"/>
+        <circle cx="16" cy="46" r="4" fill="#3B82F6"/>
+        <circle cx="50" cy="34" r="5" fill="#DC2626"/>
+        <circle cx="84" cy="46" r="4" fill="#10B981"/>
+        <circle cx="50" cy="34" r="2" fill="#fff" opacity=".5"/>
+        <defs>
+          <linearGradient id="crownShine" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#fff" stop-opacity=".5"/>
+            <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+      </svg>`,
+      small: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M14 48 L 22 72 L 78 72 L 86 48 L 70 60 L 60 38 L 50 56 L 40 38 L 30 60 Z" fill="#FBBF24"/>
+        <rect x="20" y="72" width="60" height="10" rx="2" fill="#F59E0B"/>
+        <circle cx="50" cy="34" r="5" fill="#DC2626"/>
+      </svg>`,
+    },
+    confetti: {
+      label: 'Confetti',
+      big: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="50" cy="50" r="14" fill="#FBBF24"/>
+        <circle cx="50" cy="50" r="7" fill="#F59E0B"/>
+        <rect x="16" y="20" width="10" height="4" rx="1" fill="#EC4899" transform="rotate(-25 16 20)"/>
+        <rect x="74" y="18" width="10" height="4" rx="1" fill="#3B82F6" transform="rotate(20 74 18)"/>
+        <rect x="80" y="48" width="10" height="4" rx="1" fill="#10B981" transform="rotate(70 80 48)"/>
+        <rect x="74" y="78" width="10" height="4" rx="1" fill="#A855F7" transform="rotate(-35 74 78)"/>
+        <rect x="16" y="78" width="10" height="4" rx="1" fill="#DC2626" transform="rotate(30 16 78)"/>
+        <rect x="10" y="48" width="10" height="4" rx="1" fill="#06B6D4" transform="rotate(-70 10 48)"/>
+        <circle cx="28" cy="36" r="3" fill="#EC4899"/>
+        <circle cx="72" cy="34" r="2.5" fill="#10B981"/>
+        <circle cx="76" cy="66" r="3" fill="#FBBF24"/>
+        <circle cx="24" cy="64" r="2.5" fill="#3B82F6"/>
+      </svg>`,
+      small: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="50" cy="50" r="14" fill="#FBBF24"/>
+        <rect x="18" y="22" width="10" height="4" rx="1" fill="#EC4899" transform="rotate(-25 18 22)"/>
+        <rect x="72" y="20" width="10" height="4" rx="1" fill="#3B82F6" transform="rotate(20 72 20)"/>
+        <rect x="74" y="76" width="10" height="4" rx="1" fill="#10B981" transform="rotate(-35 74 76)"/>
+        <rect x="18" y="76" width="10" height="4" rx="1" fill="#A855F7" transform="rotate(30 18 76)"/>
+      </svg>`,
+    },
+  };
+
   // State
   const state = {
     amount: 24,
     theme: 'midnight',
+    graphic: 'gift',
     delivery: 'email',
   };
 
@@ -486,6 +649,8 @@
     // Theme
     const card = $('giftCard');
     card.className = 'pm-gift__card pm-gift__card--' + state.theme;
+    // Graphic
+    $('cardArt').innerHTML = (GRAPHICS[state.graphic] || GRAPHICS.gift).big;
     // Recipient + sender
     const rn = ($('recipName').value || '').trim() || 'Recipient';
     const sn = ($('senderName').value || '').trim() || 'You';
@@ -493,6 +658,23 @@
     $('cardSender').textContent    = sn.length > 20 ? sn.slice(0, 20) + '…' : sn;
     // CTA text
     $('ctaText').textContent = 'Purchase ' + fmtPrice(PRICES[state.amount] || 0) + ' gift';
+  }
+
+  // Render the graphic-picker thumbnails from the GRAPHICS map
+  function renderGraphicPicker(){
+    const wrap = $('graphicPicker');
+    wrap.innerHTML = Object.keys(GRAPHICS).map(key => {
+      const isOn = state.graphic === key;
+      return `<button type="button" class="pm-gift__graphic" data-graphic="${key}" aria-pressed="${isOn}" aria-label="${GRAPHICS[key].label}">${GRAPHICS[key].small}</button>`;
+    }).join('');
+    // Wire clicks
+    wrap.querySelectorAll('.pm-gift__graphic').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.graphic = btn.dataset.graphic;
+        wrap.querySelectorAll('.pm-gift__graphic').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.graphic === state.graphic)));
+        updateCard();
+      });
+    });
   }
 
   // Amount selection
@@ -547,6 +729,7 @@
   }
 
   // Initial render
+  renderGraphicPicker();
   updateCard();
 })();
 </script>
