@@ -60,36 +60,37 @@
   /* ═══════════════════════════════════════════════════════════
      GIFT PURCHASE FORM — Preline-inspired, refined PM aesthetic
      ═══════════════════════════════════════════════════════════ */
-  .pm-gift{
-    background:var(--card);border:1px solid var(--border);border-radius:14px;
-    padding:28px;box-shadow:0 1px 2px rgba(15,23,42,0.04);
-  }
+  /* No outer card wrapper — form sits directly on the page like Preline */
+  .pm-gift{background:transparent;border:0;padding:0;box-shadow:none;}
   .pm-gift__grid{
-    display:grid;grid-template-columns:330px 1fr;gap:44px;align-items:start;
+    display:grid;grid-template-columns:460px 1fr;gap:48px;align-items:start;
+  }
+  @media (max-width:1080px){
+    .pm-gift__grid{grid-template-columns:400px 1fr;gap:40px;}
   }
   @media (max-width:880px){
     .pm-gift__grid{grid-template-columns:1fr;gap:28px;}
   }
 
-  /* ── Left column: visual preview (compact, Preline-scale) ── */
+  /* ── Left column: visual preview (Preline-scale) ── */
   .pm-gift__preview-col{position:sticky;top:84px;}
   @media (max-width:880px){
-    .pm-gift__preview-col{position:static;max-width:340px;margin:0 auto;}
+    .pm-gift__preview-col{position:static;max-width:460px;margin:0 auto;}
   }
 
-  /* The gift card preview — slim card with gradient ring + white halo gap */
+  /* The gift card preview — Preline-scale: 460px wide × ~307px tall */
   .pm-gift__card{
     position:relative;
-    aspect-ratio:1.7/1;  /* slimmer than credit-card 1.586 — feels less chunky */
-    border-radius:18px;
-    padding:4px;  /* the gradient ring thickness */
-    box-shadow:0 14px 30px -16px rgba(15,23,42,0.22);
+    aspect-ratio:1.5/1;  /* matches the Preline reference card */
+    border-radius:22px;
+    padding:5px;  /* gradient ring thickness */
+    box-shadow:0 18px 38px -18px rgba(15,23,42,0.25);
     transition:transform .4s cubic-bezier(.22,1,.36,1), box-shadow .4s ease;
   }
-  .pm-gift__card:hover{transform:translateY(-2px);box-shadow:0 20px 40px -18px rgba(15,23,42,0.28);}
+  .pm-gift__card:hover{transform:translateY(-2px);box-shadow:0 24px 48px -20px rgba(15,23,42,0.30);}
   .pm-gift__card-inner{
     position:relative;height:100%;width:100%;
-    border-radius:14px;padding:14px 16px;
+    border-radius:18px;padding:22px 24px;
     display:flex;flex-direction:column;
     overflow:hidden;
   }
@@ -102,9 +103,9 @@
   /* White halo ring sitting just inside the gradient frame — the
      "ring around the card with a gap" effect from the Preline ref */
   .pm-gift__card-inner::after{
-    content:"";position:absolute;inset:3px;
+    content:"";position:absolute;inset:4px;
     border:1px solid rgba(255,255,255,0.55);
-    border-radius:11px;
+    border-radius:14px;
     pointer-events:none;z-index:0;
   }
   /* Content sits above both pseudo layers */
@@ -142,36 +143,36 @@
     color:#9f1239;
   }
 
-  /* Card content — compact scale, sticker truly centered */
+  /* Card content — Preline scale: big sticker, generous typography */
   .pm-gift__card-brand{
-    font-size:9.5px;font-weight:700;letter-spacing:.16em;
+    font-size:11px;font-weight:700;letter-spacing:.18em;
     text-transform:uppercase;opacity:.60;margin:0;
   }
-  /* Decorative SVG illustration — centered in its own flex zone */
+  /* Sticker — the hero, takes the most vertical space */
   .pm-gift__card-art{
     flex:1 1 0;display:flex;align-items:center;justify-content:center;
     margin:0;min-height:0;
   }
   .pm-gift__card-art svg{
-    width:62px;height:62px;
-    filter:drop-shadow(0 3px 8px rgba(0,0,0,0.16));
+    width:145px;height:145px;
+    filter:drop-shadow(0 6px 14px rgba(0,0,0,0.20));
   }
   .pm-gift__card-amount{
-    font-size:22px;font-weight:600;letter-spacing:-.022em;
+    font-size:30px;font-weight:600;letter-spacing:-.024em;
     margin:0;line-height:1;font-variant-numeric:tabular-nums;
   }
-  .pm-gift__card-amount small{font-size:11px;font-weight:500;margin-left:3px;opacity:.7;}
+  .pm-gift__card-amount small{font-size:14px;font-weight:500;margin-left:4px;opacity:.7;}
   .pm-gift__card-term{
-    font-size:9px;font-weight:500;letter-spacing:.06em;
-    text-transform:uppercase;opacity:.55;margin:4px 0 0;
+    font-size:10.5px;font-weight:500;letter-spacing:.08em;
+    text-transform:uppercase;opacity:.55;margin:5px 0 0;
   }
   .pm-gift__card-meta{
     display:flex;justify-content:space-between;align-items:flex-end;
-    margin-top:8px;font-size:10px;font-weight:500;line-height:1.35;
+    margin-top:12px;font-size:11.5px;font-weight:500;line-height:1.35;
   }
   .pm-gift__card-meta-label{
     display:block;opacity:.55;text-transform:uppercase;letter-spacing:.08em;
-    font-size:8px;font-weight:600;margin-bottom:2px;
+    font-size:9px;font-weight:600;margin-bottom:2px;
   }
   .pm-gift__card-meta-value{opacity:.95;}
 
@@ -385,12 +386,11 @@
 
 <main class="nx-shell">
 
-  <header class="nx-head">
-    <h1 class="nx-h1">Send a gift</h1>
-    <p class="nx-sub">Give someone a Private Family Assistant.</p>
-  </header>
-
   <section class="pm-gift">
+    <header class="nx-head">
+      <h1 class="nx-h1">Send a gift</h1>
+      <p class="nx-sub">Give someone a Private Family Assistant.</p>
+    </header>
     <div class="pm-gift__grid">
 
       <!-- ── LEFT: Visual preview ── -->
