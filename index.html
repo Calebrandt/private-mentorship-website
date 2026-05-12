@@ -2887,6 +2887,37 @@
       margin-top: 4px !important;
     }
     .pm-book__page-body .pm-ed__area-arrow{ display: none !important; }
+    /* Animated wipe bar at the bottom of each area row — shows the
+       current example % and animates "close then reopen at new length"
+       to communicate that the split is customizable per family. */
+    .pm-book__page-body .pm-ed__area{ position: relative !important; }
+    .pm-book__page-body .pm-ed__area-bar{
+      position: absolute !important;
+      left: 16px !important; right: 16px !important; bottom: 8px !important;
+      height: 3px !important;
+      background: rgba(14,23,33,0.06) !important;
+      border-radius: 9999px !important;
+      overflow: hidden !important;
+      pointer-events: none !important;
+    }
+    .pm-book__page-body .pm-ed__area-bar-fill{
+      display: block !important;
+      height: 100% !important;
+      width: 100% !important;
+      background: var(--area-color, #0E7C82) !important;
+      border-radius: 9999px !important;
+      /* JS sets transform/origin/transition inline to orchestrate the
+         close→snap→reopen cycle. Initial values are defaults so the
+         bar paints at the starting preset before JS boots. */
+      transform: scaleX(0.4);
+      transform-origin: left center;
+      transition: transform 750ms cubic-bezier(.22,1,.36,1);
+    }
+    /* Slight extra bottom padding so content doesn't sit under the bar */
+    .pm-book__page-body .pm-ed__area{ padding-bottom: 22px !important; }
+    @media (prefers-reduced-motion: reduce){
+      .pm-book__page-body .pm-ed__area-bar-fill{ transition: none !important; }
+    }
 
     /* ════════ CHAPTER 02 — How It Works ════════ */
 
@@ -3816,17 +3847,17 @@
       </div>
 
       <div class="pm-ed__a-grid">
-        <!-- Donut left (kept, with updated palette) -->
-        <div class="pm-ed__donut-card">
-          <div class="pm-ed__donut-eyebrow">Where time goes</div>
-          <div class="pm-ed__donut-title">Average split per family</div>
+        <!-- Donut left — animated, cycles through real family splits -->
+        <div class="pm-ed__donut-card" data-pm-mix>
+          <div class="pm-ed__donut-eyebrow">Example split &middot; <span data-pm-mix-name>Balanced</span></div>
+          <div class="pm-ed__donut-title">Every family chooses their own.</div>
           <div class="pm-ed__donut">
             <div class="pm-ed__donut-center">
               <svg viewBox="0 0 42 42">
                 <circle cx="21" cy="21" r="15.92" fill="none" stroke="rgba(14,23,33,0.06)" stroke-width="6"/>
-                <circle cx="21" cy="21" r="15.92" fill="none" stroke="#0E7C82" stroke-width="6" stroke-dasharray="40 60" stroke-dashoffset="25" transform="rotate(-90 21 21)" stroke-linecap="butt"/>
-                <circle cx="21" cy="21" r="15.92" fill="none" stroke="#E68A3D" stroke-width="6" stroke-dasharray="35 65" stroke-dashoffset="-15" transform="rotate(-90 21 21)" stroke-linecap="butt"/>
-                <circle cx="21" cy="21" r="15.92" fill="none" stroke="#DD5440" stroke-width="6" stroke-dasharray="25 75" stroke-dashoffset="-50" transform="rotate(-90 21 21)" stroke-linecap="butt"/>
+                <circle cx="21" cy="21" r="15.92" fill="none" stroke="#0E7C82" stroke-width="6" stroke-dasharray="40 60" stroke-dashoffset="25" transform="rotate(-90 21 21)" stroke-linecap="butt" data-pm-mix-arc="0"/>
+                <circle cx="21" cy="21" r="15.92" fill="none" stroke="#E68A3D" stroke-width="6" stroke-dasharray="35 65" stroke-dashoffset="-15" transform="rotate(-90 21 21)" stroke-linecap="butt" data-pm-mix-arc="1"/>
+                <circle cx="21" cy="21" r="15.92" fill="none" stroke="#DD5440" stroke-width="6" stroke-dasharray="25 75" stroke-dashoffset="-50" transform="rotate(-90 21 21)" stroke-linecap="butt" data-pm-mix-arc="2"/>
               </svg>
               <div class="pm-ed__donut-center-text">
                 <div class="pm-ed__donut-center-num">100<span style="font-size:.5em">%</span></div>
@@ -3836,34 +3867,37 @@
           </div>
         </div>
 
-        <!-- Three areas -->
+        <!-- Three areas — percentages animate, every family customizes -->
         <div class="pm-ed__areas">
-          <button type="button" class="pm-ed__area" style="--area-color:#0E7C82" data-popup="trio-edu" aria-label="Open Education Support brief">
+          <button type="button" class="pm-ed__area" style="--area-color:#0E7C82" data-popup="trio-edu" data-pm-mix-area="0" aria-label="Open Education Support brief">
             <span class="pm-ed__area-roman">I</span>
             <span class="pm-ed__area-text">
               <span class="pm-ed__area-title">Education</span>
               <span class="pm-ed__area-meta">1-on-1 lessons, homework, study strategies, school re-teach, ESL, vocational, post-secondary support.</span>
             </span>
-            <span class="pm-ed__area-pct">40%<small>of time</small></span>
+            <span class="pm-ed__area-pct"><span data-pm-mix-pct>40</span>%<small>example</small></span>
             <span class="pm-ed__area-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span>
+            <span class="pm-ed__area-bar" aria-hidden="true"><span class="pm-ed__area-bar-fill" data-pm-mix-bar></span></span>
           </button>
-          <button type="button" class="pm-ed__area" style="--area-color:#E68A3D" data-popup="trio-life" aria-label="Open Life Skills brief">
+          <button type="button" class="pm-ed__area" style="--area-color:#E68A3D" data-popup="trio-life" data-pm-mix-area="1" aria-label="Open Life Skills brief">
             <span class="pm-ed__area-roman">II</span>
             <span class="pm-ed__area-text">
               <span class="pm-ed__area-title">Life Skills</span>
               <span class="pm-ed__area-meta">Communication, confidence, social practice, daily routines, independence, transit, social opportunities.</span>
             </span>
-            <span class="pm-ed__area-pct">35%<small>of time</small></span>
+            <span class="pm-ed__area-pct"><span data-pm-mix-pct>35</span>%<small>example</small></span>
             <span class="pm-ed__area-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span>
+            <span class="pm-ed__area-bar" aria-hidden="true"><span class="pm-ed__area-bar-fill" data-pm-mix-bar></span></span>
           </button>
-          <button type="button" class="pm-ed__area" style="--area-color:#DD5440" data-popup="trio-self" aria-label="Open Personal Support brief">
+          <button type="button" class="pm-ed__area" style="--area-color:#DD5440" data-popup="trio-self" data-pm-mix-area="2" aria-label="Open Personal Support brief">
             <span class="pm-ed__area-roman">III</span>
             <span class="pm-ed__area-text">
               <span class="pm-ed__area-title">Personal Support</span>
               <span class="pm-ed__area-meta">Appointments, errands, transportation, paperwork, advocacy, day-to-day coordination.</span>
             </span>
-            <span class="pm-ed__area-pct">25%<small>of time</small></span>
+            <span class="pm-ed__area-pct"><span data-pm-mix-pct>25</span>%<small>example</small></span>
             <span class="pm-ed__area-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span>
+            <span class="pm-ed__area-bar" aria-hidden="true"><span class="pm-ed__area-bar-fill" data-pm-mix-bar></span></span>
           </button>
         </div>
       </div>
@@ -10593,6 +10627,161 @@
       }
     }, true);
   })();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════
+  Chapter 01 — animated time-split.
+  Cycles through real family example splits so visitors understand
+  the percentages are NOT fixed allocations — every family customizes
+  Education / Life Skills / Personal Support to fit their needs.
+
+  Animation per cycle (~5.5s):
+    Phase 1 (750ms): all 3 bars wipe-close from left to right
+                     (transform-origin:right, scaleX:0)
+    Phase 2 (snap) : transform-origin → left, bars stay at scaleX:0
+    Phase 3 (750ms): bars reopen from left at new lengths
+                     + percent counters tween to new values
+                     + donut arcs tween to new values
+    Phase 4 (4000ms): hold and read
+
+  Respects prefers-reduced-motion → static initial preset, no motion.
+═══════════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+  // ── Realistic family example splits (E / L / P, must sum to 100) ──
+  var PRESETS = [
+    { name: 'Balanced',          v: [40, 35, 25] },
+    { name: 'Academic focus',    v: [60, 25, 15] },
+    { name: 'Independence',      v: [25, 50, 25] },
+    { name: 'Day-to-day support',v: [30, 20, 50] },
+    { name: 'Steady mix',        v: [45, 30, 25] },
+  ];
+
+  var pcts  = document.querySelectorAll('[data-pm-mix-pct]');
+  var bars  = document.querySelectorAll('[data-pm-mix-bar]');
+  var arcs  = document.querySelectorAll('[data-pm-mix-arc]');
+  var name  = document.querySelector('[data-pm-mix-name]');
+  if (!pcts.length || !bars.length || !arcs.length) return;
+
+  // Honor reduced-motion: paint the first preset and bail.
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var current = [40, 35, 25];   // initial values shown in markup
+  var idx = 0;
+  var timer = null;
+  var paused = false;
+
+  // Set bar to initial value
+  bars.forEach(function(b, i){ b.style.transform = 'scaleX(' + (current[i]/100) + ')'; });
+
+  function lerp(a, b, t){ return a + (b - a) * t; }
+  function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+
+  function setArc(arc, length, offset){
+    arc.setAttribute('stroke-dasharray', length.toFixed(2) + ' ' + (100 - length).toFixed(2));
+    arc.setAttribute('stroke-dashoffset', offset.toFixed(2));
+  }
+
+  // Apply [E, L, P] to the donut (keeps segments butted, matches
+  // the original 25-anchor used by the static markup).
+  function applyDonut(values){
+    var E = values[0], L = values[1], P = values[2];
+    setArc(arcs[0], E, 25);
+    setArc(arcs[1], L, 25 - E);
+    setArc(arcs[2], P, 25 - E - L);
+  }
+
+  // Tween from current values → target over duration, updating
+  // the donut arcs AND the percent text counters each frame.
+  function tweenTo(target, duration){
+    var start = performance.now();
+    var from = current.slice();
+    function tick(now){
+      var t = Math.min(1, (now - start) / duration);
+      var e = easeOutCubic(t);
+      var v = [
+        Math.round(lerp(from[0], target[0], e)),
+        Math.round(lerp(from[1], target[1], e)),
+        Math.round(lerp(from[2], target[2], e)),
+      ];
+      pcts[0].textContent = v[0];
+      pcts[1].textContent = v[1];
+      pcts[2].textContent = v[2];
+      applyDonut([
+        lerp(from[0], target[0], e),
+        lerp(from[1], target[1], e),
+        lerp(from[2], target[2], e),
+      ]);
+      if (t < 1) requestAnimationFrame(tick);
+      else current = target.slice();
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function step(){
+    if (paused) return;
+    idx = (idx + 1) % PRESETS.length;
+    var next = PRESETS[idx];
+
+    // Update the eyebrow label name
+    if (name) name.textContent = next.name;
+
+    // Phase 1 — close bars right-anchored (left edge sweeps right)
+    bars.forEach(function(b){
+      b.style.transformOrigin = 'right center';
+      b.style.transform = 'scaleX(0)';
+    });
+
+    // After close completes…
+    setTimeout(function(){
+      // Phase 2 — snap origin back to left while still at scale 0 (no anim)
+      bars.forEach(function(b){
+        b.style.transition = 'none';
+        b.style.transformOrigin = 'left center';
+        // transform stays scaleX(0) so the snap is invisible
+      });
+      // Phase 3 — re-enable transition next frame, reopen at new lengths
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){
+          bars.forEach(function(b, i){
+            b.style.transition = '';
+            b.style.transform = 'scaleX(' + (next.v[i] / 100) + ')';
+          });
+          // Tween numbers + donut in parallel with bar reopen
+          tweenTo(next.v, 750);
+        });
+      });
+    }, 780);
+
+    // Phase 4 — hold this preset, then loop
+    timer = setTimeout(step, 5500);
+  }
+
+  if (reduce){
+    // No motion — paint a preset stat and leave a clarifier label.
+    applyDonut(current);
+    if (name) name.textContent = 'Every family customizes';
+    return;
+  }
+
+  // Only run while the Chapter 01 page is visible — saves cycles when
+  // the user is on a different chapter / has the section closed.
+  var page = document.getElementById('pm-book-page-1') || document.body;
+  function start(){ if (!timer){ timer = setTimeout(step, 4500); } }
+  function stop(){ if (timer){ clearTimeout(timer); timer = null; } paused = true; }
+  function resume(){ paused = false; if (!timer){ start(); } }
+
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting) resume(); else stop();
+      });
+    }, { threshold: 0.15 });
+    io.observe(page);
+  } else {
+    start();
+  }
+})();
 </script>
 
 </body>
