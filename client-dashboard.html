@@ -699,15 +699,34 @@
   function esc(s){return (s||'').toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
 
   // ─── Demo mode ─────────────────────────────────────────────────
-  // Append ?demo=1 to the URL to see the dashboard populated with rich fake data.
-  // Skips auth, doesn't touch the DB.
-  if (new URLSearchParams(location.search).get('demo') === '1') {
+  // Triggers when:
+  //   • ?demo=1 in URL, OR
+  //   • signed-in email is in DEMO_EMAILS (test/preview accounts)
+  // Skips auth-backed data fetches; identity (name/email) stays real
+  // so you still see your own avatar.
+  const DEMO_EMAILS = ['yangm7971@gmail.com'];
+  let __demoTrigger = new URLSearchParams(location.search).get('demo') === '1';
+  let __realUser = null, __realProfile = null;
+  if (!__demoTrigger) {
+    try {
+      __realUser = await window.pmHiring.getCurrentUser();
+      if (__realUser && __realUser.email && DEMO_EMAILS.indexOf(__realUser.email.toLowerCase()) >= 0) {
+        __demoTrigger = true;
+        try { __realProfile = await window.pmHiring.fetchCurrentUserProfile(); } catch (_) {}
+      }
+    } catch (_) {}
+  }
+  if (__demoTrigger) {
     const now = Date.now();
+    const __prevPmHiring = window.pmHiring;
     window.pmHiring = {
-      getCurrentUser: async () => ({ id: 'demo-user', email: 'demo@privatementorship.ca' }),
-      fetchCurrentUserProfile: async () => ({ full_name: 'Jane Demo', role: 'CLIENT' }),
+      // Keep real identity when triggered by email; fall back to demo identity otherwise
+      getCurrentUser: async () => __realUser || { id: 'demo-user', email: 'demo@privatementorship.ca' },
+      fetchCurrentUserProfile: async () => __realProfile || { full_name: 'Jane Demo', role: 'CLIENT' },
       isCurrentUserAdminOrOwner: async () => false,
-      signOut: async () => { location.href = 'index.html'; },
+      signOut: (__prevPmHiring && typeof __prevPmHiring.signOut === 'function')
+        ? __prevPmHiring.signOut.bind(__prevPmHiring)
+        : async () => { location.href = 'index.html'; },
       fetchMyClientRecord: async () => ({
         id: 'demo-client', full_name: 'Jane Demo', display_name: 'Jane Demo',
         hours_balance: 18.5, active_plan_id: 'plan-x',
@@ -791,8 +810,11 @@
     // Show a small banner so user knows it's demo
     document.addEventListener('DOMContentLoaded', () => {
       const bar = document.createElement('div');
-      bar.textContent = 'Demo mode — fake data, not from your account. Remove ?demo=1 from the URL to exit.';
-      bar.style.cssText = 'position:fixed;bottom:14px;right:14px;z-index:9999;background:#2563eb;color:#fff;font:600 12px Inter,sans-serif;padding:10px 14px;border-radius:9999px;box-shadow:0 8px 24px -6px rgba(37,99,235,0.40);';
+      const isEmailTrigger = !!__realUser && !new URLSearchParams(location.search).get('demo');
+      bar.textContent = isEmailTrigger
+        ? 'Demo mode — your test account auto-shows fake data so you can preview a populated dashboard.'
+        : 'Demo mode — fake data, not from your account. Remove ?demo=1 from the URL to exit.';
+      bar.style.cssText = 'position:fixed;bottom:14px;right:14px;z-index:9999;background:#2563eb;color:#fff;font:600 12px Inter,sans-serif;padding:10px 14px;border-radius:9999px;box-shadow:0 8px 24px -6px rgba(37,99,235,0.40);max-width:360px;line-height:1.4;';
       document.body.appendChild(bar);
     });
   }
