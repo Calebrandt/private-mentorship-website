@@ -130,6 +130,17 @@
     const initials = (displayName.split(/\s+/).map(s => s[0] || '').slice(0, 2).join('') || 'U').toUpperCase();
 
     const triggerInitial = (initials || 'A').charAt(0);
+
+    // Messages.html owns its own theme system (body.theme-light) — don't
+    // render the sidebar theme toggle there, otherwise we'd ship a button
+    // that does nothing (theme.js isn't loaded on that page).
+    const isMessagesPage = currentPath() === 'messages.html';
+    const themeToggleHtml = isMessagesPage ? '' : (
+      `<button class="pm-sb-theme-toggle" type="button" data-pm-theme-toggle aria-label="Toggle light / dark theme">
+        ${ICONS.moon}${ICONS.sun}
+        <span class="pm-sb-theme-toggle__label">Theme</span>
+      </button>`
+    );
     return `<aside class="pm-sidebar" id="pmSidebarEl">
       <div class="pm-sb-top">
         <span class="pm-sb-top__avatar">${escapeHtml(orgInitial)}</span>
@@ -140,10 +151,7 @@
         <ul class="pm-sb-list">${navHtml}</ul>
       </div>
       <div class="pm-sb-bottom">
-        <button class="pm-sb-theme-toggle" type="button" data-pm-theme-toggle aria-label="Toggle light / dark theme">
-          ${ICONS.moon}${ICONS.sun}
-          <span class="pm-sb-theme-toggle__label">Theme</span>
-        </button>
+        ${themeToggleHtml}
         ${settingsHtml}
         <button class="pm-sb-account" type="button" id="pmSidebarAcctBtn">
           <span class="pm-sb-account__avatar">${escapeHtml(triggerInitial)}</span>
