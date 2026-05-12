@@ -27,6 +27,16 @@
     html.setAttribute(ATTR, theme);
     // Back-compat for any existing CSS using the old dashboard attribute
     html.setAttribute('data-dash-theme', theme);
+    // Also sync messages.html's body.theme-light class so its existing CSS
+    // responds when theme is toggled from the sidebar.
+    if (document.body) {
+      document.body.classList.toggle('theme-light', theme === 'light');
+    } else {
+      // Body not parsed yet — defer until DOM ready
+      document.addEventListener('DOMContentLoaded', function () {
+        document.body.classList.toggle('theme-light', html.getAttribute(ATTR) === 'light');
+      }, { once: true });
+    }
   }
 
   function initial() {
