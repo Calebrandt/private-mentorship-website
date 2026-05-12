@@ -39,11 +39,12 @@
       { type: 'section', label: 'Your Plan' },
       { type: 'link', href: 'client-membership.html', label: 'Membership', icon: 'briefcase' },
       { type: 'link', href: 'client-contract.html', label: 'Contract Details', icon: 'file-clock' },
-      { type: 'link', href: 'client-gift.html', label: 'Gift', icon: 'gift' },
       { type: 'section', label: 'People' },
       { type: 'link', href: 'client-assistants.html', label: 'My Assistant', icon: 'user-circle' },
       { type: 'link', href: 'client-account.html', label: 'My Family', icon: 'users' },
       { type: 'link', href: 'client-resources.html', label: 'Resources', icon: 'folder' },
+      { type: 'section', label: 'Give' },
+      { type: 'link', href: 'client-gift.html', label: 'Send a Gift', icon: 'gift' },
     ],
   };
 
