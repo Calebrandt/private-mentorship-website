@@ -226,22 +226,68 @@
   .nx-row__value--success{color:#16A34A;}
   .nx-row__value--mute{color:var(--ink-mute);font-weight:500;}
 
-  .nx-history{display:flex;flex-direction:column;gap:10px;}
-  .nx-hist{display:flex;align-items:center;gap:14px;padding:14px;background:#FAFBFC;border:1px solid var(--border);border-radius:11px;}
-  .nx-hist__icon{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#5750F1,#0ABEF9);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:inset 0 -2px 5px rgba(0,0,0,0.12);}
-  .nx-hist__icon--prev{background:linear-gradient(135deg,#64748B,#475569);}
-  .nx-hist__icon svg{width:17px;height:17px;stroke-width:2.4;}
-  .nx-hist__body{flex:1;min-width:0;}
-  .nx-hist__label{font-size:14.5px;font-weight:700;color:var(--ink-2);margin:0;letter-spacing:-.005em;}
-  .nx-hist__dates{font-size:12.5px;color:var(--ink-mute);margin:3px 0 0;font-weight:500;}
-  .nx-hist__pill{
-    display:inline-flex;align-items:center;gap:6px;
-    font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
-    padding:4px 10px;border-radius:9999px;flex-shrink:0;
+  /* ── Contract history — shadcn DataTable look ────────────────── */
+  .nx-card--table{padding:0;overflow:hidden;}
+  .nx-card--table .nx-card__head{padding:22px 24px;border-bottom:1px solid #e5e7eb;}
+  .nx-table-wrap{width:100%;overflow-x:auto;}
+  .nx-table{
+    width:100%;border-collapse:collapse;
+    font-size:14px;color:var(--ink);
   }
-  .nx-pill--active{background:var(--green-soft);color:#166534;}
-  .nx-pill--completed{background:#F1F5F9;color:#64748B;}
-  .nx-pill--draft{background:var(--orange-soft);color:#9A3412;}
+  .nx-table thead{background:rgba(15,23,42,0.02);}
+  .nx-table th{
+    text-align:left;padding:11px 24px;
+    font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--ink-mute);
+    border-bottom:1px solid #e5e7eb;
+    white-space:nowrap;
+  }
+  .nx-table td{
+    padding:14px 24px;
+    border-bottom:1px solid rgba(15,23,42,0.06);
+    vertical-align:middle;
+  }
+  .nx-table tbody tr:last-child td{border-bottom:none;}
+  .nx-table tbody tr{transition:background .12s ease;}
+  .nx-table tbody tr:hover{background:rgba(15,23,42,0.025);}
+  .nx-table__primary{
+    font-size:14px;font-weight:600;color:var(--ink-2);
+    letter-spacing:-.005em;white-space:nowrap;
+  }
+  .nx-table__muted{
+    color:var(--ink-mute);font-variant-numeric:tabular-nums;
+    font-size:13.5px;white-space:nowrap;
+  }
+  .nx-table__nums{
+    font-variant-numeric:tabular-nums;font-weight:500;color:var(--ink);
+    text-align:right;font-size:13.5px;
+  }
+
+  /* shadcn Badge — soft tint bg + colored text, no gradient */
+  .nx-badge{
+    display:inline-flex;align-items:center;
+    font-size:11px;font-weight:500;letter-spacing:0;
+    padding:2px 10px;border-radius:9999px;
+    text-transform:lowercase;
+    white-space:nowrap;
+  }
+  .nx-badge--active{background:#dcfce7;color:#15803d;}
+  .nx-badge--draft{background:#dbeafe;color:#1d4ed8;}
+  .nx-badge--completed{background:#ede9fe;color:#6d28d9;}
+  .nx-badge--expired{background:#f1f5f9;color:#64748b;}
+  .nx-badge--cancelled{background:#f1f5f9;color:#64748b;text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:rgba(100,116,139,0.5);}
+
+  /* Dark theme overrides for the table */
+  [data-pm-theme="dark"] .nx-card--table .nx-card__head{border-bottom-color:rgba(255,255,255,0.08);}
+  [data-pm-theme="dark"] .nx-table thead{background:rgba(255,255,255,0.02);}
+  [data-pm-theme="dark"] .nx-table th{border-bottom-color:rgba(255,255,255,0.08);}
+  [data-pm-theme="dark"] .nx-table td{border-bottom-color:rgba(255,255,255,0.06);}
+  [data-pm-theme="dark"] .nx-table tbody tr:hover{background:rgba(255,255,255,0.025);}
+  [data-pm-theme="dark"] .nx-badge--active{background:rgba(34,197,94,0.16);color:#4ADE80;}
+  [data-pm-theme="dark"] .nx-badge--draft{background:rgba(59,130,246,0.16);color:#93C5FD;}
+  [data-pm-theme="dark"] .nx-badge--completed{background:rgba(139,92,246,0.16);color:#C4B5FD;}
+  [data-pm-theme="dark"] .nx-badge--expired{background:rgba(148,163,184,0.14);color:#94A3B8;}
+  [data-pm-theme="dark"] .nx-badge--cancelled{background:rgba(148,163,184,0.14);color:#94A3B8;}
 
   .nx-empty{padding:48px 24px;text-align:center;background:#fff;border:1px dashed var(--border);border-radius:14px;color:var(--ink-mute);font-size:14px;font-weight:500;}
 
@@ -584,29 +630,45 @@
     }
   });
 
-  // ─── Contract history ─────────────────────────────────────────
+  // ─── Contract history (shadcn DataTable style) ────────────────
   if ((contracts || []).length) {
-    const histHtml = contracts.map(c => {
+    // Map raw status → one of the 5 known badge variants
+    const BADGE_VARIANTS = new Set(['active','draft','completed','expired','cancelled']);
+    const badgeClass = (s) => BADGE_VARIANTS.has(s) ? s : 'completed';
+
+    const rowsHtml = contracts.map(c => {
       const status = String(c.status || '').toLowerCase();
-      const start = fmtDate(c.start_at, { month:'short', day:'numeric', year:'numeric' });
-      const end = fmtDate(c.end_at, { month:'short', day:'numeric', year:'numeric' });
+      const start  = fmtDate(c.start_at, { month:'short', day:'numeric', year:'numeric' });
+      const end    = fmtDate(c.end_at,   { month:'short', day:'numeric', year:'numeric' });
       const isActive = status === 'active';
-      const docIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
-      return `<div class="nx-hist">
-        <div class="nx-hist__icon ${isActive ? '' : 'nx-hist__icon--prev'}">${docIcon}</div>
-        <div class="nx-hist__body">
-          <p class="nx-hist__label">${esc(c._label || (isActive ? 'Active contract' : 'Contract'))}</p>
-          <p class="nx-hist__dates">${esc(start)} – ${esc(end)}${c.included_hours ? ' · ' + c.included_hours + ' hours' : ''}</p>
-        </div>
-        <span class="nx-hist__pill nx-pill--${isActive ? 'active' : (status === 'draft' ? 'draft' : 'completed')}">${esc(status || '—')}</span>
-      </div>`;
+      const label = c._label || (isActive ? 'Active contract' : 'Contract');
+      const hours = c.included_hours ? `${c.included_hours}h` : '—';
+      return `<tr>
+        <td class="nx-table__primary">${esc(label)}</td>
+        <td class="nx-table__muted">${esc(start)} – ${esc(end)}</td>
+        <td class="nx-table__nums">${esc(hours)}</td>
+        <td><span class="nx-badge nx-badge--${badgeClass(status)}">${esc(status || '—')}</span></td>
+      </tr>`;
     }).join('');
-    $('historyWrap').innerHTML = `<section class="nx-card">
+
+    $('historyWrap').innerHTML = `<section class="nx-card nx-card--table">
       <div class="nx-card__head">
         <h2 class="nx-card__title">Contract history</h2>
         <p class="nx-card__sub">All contracts on file, including past and future.</p>
       </div>
-      <div class="nx-history">${histHtml}</div>
+      <div class="nx-table-wrap">
+        <table class="nx-table">
+          <thead>
+            <tr>
+              <th>Contract</th>
+              <th>Period</th>
+              <th style="text-align:right;">Hours</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>
     </section>`;
   }
 })();
