@@ -10649,11 +10649,16 @@
 <script>
 (function(){
   // ── Realistic family example splits (E / L / P, must sum to 100) ──
+  // 100% presets are interleaved with mixed splits so visitors see that
+  // they can put ALL of their time into any one area if they want to.
   var PRESETS = [
     { name: 'Balanced',          v: [40, 35, 25] },
     { name: 'Academic focus',    v: [60, 25, 15] },
+    { name: 'Full academics',    v: [100, 0, 0] },
     { name: 'Independence',      v: [25, 50, 25] },
+    { name: 'Full life skills',  v: [0, 100, 0] },
     { name: 'Day-to-day support',v: [30, 20, 50] },
+    { name: 'Full coordination', v: [0, 0, 100] },
     { name: 'Steady mix',        v: [45, 30, 25] },
   ];
 
