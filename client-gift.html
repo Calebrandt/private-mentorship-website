@@ -95,34 +95,35 @@
     background:radial-gradient(ellipse 70% 50% at 30% 0%, rgba(255,255,255,0.7), transparent 70%);
   }
 
-  /* Card variants — all bright pastel gradients, never solid dark */
-  .pm-gift__card--peach{background:linear-gradient(135deg,#FB923C 0%,#F9A8D4 100%);}
+  /* Card variants — multi-stop pastel gradients, matching the Preline
+     reference card (orange-100 → purple-200 → indigo-200 style sweep) */
+  .pm-gift__card--peach{background:linear-gradient(135deg,#FB923C 0%,#F9A8D4 50%,#A5B4FC 100%);}
   .pm-gift__card--peach .pm-gift__card-inner{
-    background:linear-gradient(135deg,#FED7AA 0%,#FBCFE8 100%);
+    background:linear-gradient(135deg,#FED7AA 0%,#FBCFE8 50%,#C7D2FE 100%);
     color:#7c2d12;
   }
 
-  .pm-gift__card--sky{background:linear-gradient(135deg,#7DD3FC 0%,#C4B5FD 100%);}
+  .pm-gift__card--sky{background:linear-gradient(135deg,#7DD3FC 0%,#C4B5FD 50%,#F9A8D4 100%);}
   .pm-gift__card--sky .pm-gift__card-inner{
-    background:linear-gradient(135deg,#E0F2FE 0%,#EDE9FE 100%);
+    background:linear-gradient(135deg,#BAE6FD 0%,#DDD6FE 50%,#FBCFE8 100%);
     color:#1e3a8a;
   }
 
-  .pm-gift__card--mint{background:linear-gradient(135deg,#6EE7B7 0%,#67E8F9 100%);}
+  .pm-gift__card--mint{background:linear-gradient(135deg,#6EE7B7 0%,#67E8F9 50%,#A5B4FC 100%);}
   .pm-gift__card--mint .pm-gift__card-inner{
-    background:linear-gradient(135deg,#D1FAE5 0%,#CFFAFE 100%);
+    background:linear-gradient(135deg,#A7F3D0 0%,#BAE6FD 50%,#DDD6FE 100%);
     color:#064e3b;
   }
 
-  .pm-gift__card--lilac{background:linear-gradient(135deg,#C084FC 0%,#F472B6 100%);}
+  .pm-gift__card--lilac{background:linear-gradient(135deg,#C084FC 0%,#F472B6 50%,#FBA76C 100%);}
   .pm-gift__card--lilac .pm-gift__card-inner{
-    background:linear-gradient(135deg,#F3E8FF 0%,#FCE7F3 100%);
+    background:linear-gradient(135deg,#E9D5FF 0%,#FBCFE8 50%,#FED7AA 100%);
     color:#6b21a8;
   }
 
-  .pm-gift__card--sunset{background:linear-gradient(135deg,#FCA5A5 0%,#FCD34D 100%);}
+  .pm-gift__card--sunset{background:linear-gradient(135deg,#FCD34D 0%,#FCA5A5 50%,#F9A8D4 100%);}
   .pm-gift__card--sunset .pm-gift__card-inner{
-    background:linear-gradient(135deg,#FECACA 0%,#FEF3C7 100%);
+    background:linear-gradient(135deg,#FDE68A 0%,#FED7AA 50%,#FBCFE8 100%);
     color:#9f1239;
   }
 
@@ -181,11 +182,11 @@
     content:"";position:absolute;inset:-4px;border-radius:11px;
     border:2px solid var(--primary);pointer-events:none;
   }
-  .pm-gift__theme--peach{background:linear-gradient(135deg,#FB923C,#F9A8D4);}
-  .pm-gift__theme--sky{background:linear-gradient(135deg,#7DD3FC,#C4B5FD);}
-  .pm-gift__theme--mint{background:linear-gradient(135deg,#6EE7B7,#67E8F9);}
-  .pm-gift__theme--lilac{background:linear-gradient(135deg,#C084FC,#F472B6);}
-  .pm-gift__theme--sunset{background:linear-gradient(135deg,#FCA5A5,#FCD34D);}
+  .pm-gift__theme--peach{background:linear-gradient(135deg,#FB923C,#F9A8D4 50%,#A5B4FC);}
+  .pm-gift__theme--sky{background:linear-gradient(135deg,#7DD3FC,#C4B5FD 50%,#F9A8D4);}
+  .pm-gift__theme--mint{background:linear-gradient(135deg,#6EE7B7,#67E8F9 50%,#A5B4FC);}
+  .pm-gift__theme--lilac{background:linear-gradient(135deg,#C084FC,#F472B6 50%,#FBA76C);}
+  .pm-gift__theme--sunset{background:linear-gradient(135deg,#FCD34D,#FCA5A5 50%,#F9A8D4);}
 
   /* Decoration (illustration) selector */
   .pm-gift__graphics{
@@ -279,9 +280,12 @@
   }
   .pm-gift__textarea{resize:vertical;min-height:90px;font-family:inherit;line-height:1.5;}
 
-  /* Delivery method twin cards */
+  /* Delivery method — three options */
   .pm-gift__delivery{
-    display:grid;grid-template-columns:1fr 1fr;gap:10px;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  }
+  @media (max-width:560px){
+    .pm-gift__delivery{grid-template-columns:1fr;}
   }
   .pm-gift__delivery-option{position:relative;cursor:pointer;}
   .pm-gift__delivery-option input{position:absolute;opacity:0;pointer-events:none;}
@@ -413,7 +417,7 @@
 
         <div class="pm-gift__pitch">
           <p class="pm-gift__pitch-title">Why this gift?</p>
-          <p class="pm-gift__pitch-body">Most gifts are forgotten the moment they're unwrapped. Give someone a Private Family Assistant — one or two months of their own dedicated mentor, structure, and support. The kind of gift that's remembered for a lifetime.</p>
+          <p class="pm-gift__pitch-body">Most gifts are forgotten the moment they're unwrapped. Give someone a Private Family Assistant — one or two months of their own dedicated time receiving educational, life-skill, and personal support. The kind of gift that's remembered for a lifetime.</p>
         </div>
       </div>
 
@@ -475,10 +479,17 @@
               </span>
             </label>
             <label class="pm-gift__delivery-option">
-              <input type="radio" name="delivery" value="sms">
+              <input type="radio" name="delivery" value="mail">
               <span class="pm-gift__delivery-tile">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-                <span class="pm-gift__delivery-label">SMS</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>
+                <span class="pm-gift__delivery-label">Mail</span>
+              </span>
+            </label>
+            <label class="pm-gift__delivery-option">
+              <input type="radio" name="delivery" value="inperson">
+              <span class="pm-gift__delivery-tile">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span class="pm-gift__delivery-label">In person</span>
               </span>
             </label>
           </div>
@@ -491,7 +502,7 @@
             <input class="pm-gift__input" id="recipName"  type="text" placeholder="Their name" autocomplete="off" />
             <input class="pm-gift__input" id="recipEmail" type="email" placeholder="their@email.com" autocomplete="off" />
           </div>
-          <span class="pm-gift__hint">We'll email them with redemption instructions when you complete checkout.</span>
+          <span class="pm-gift__hint">We can email it, mail a physical card, or hand-deliver it personally — pick whichever feels right above.</span>
         </fieldset>
 
         <!-- Message -->
