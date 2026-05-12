@@ -280,8 +280,10 @@ body.pm-has-sidebar.pm-sidebar-open{padding-left:var(--pm-sb-expanded);}
 }
 [data-pm-theme="light"] .pm-sb-link{color:#475569;}
 [data-pm-theme="light"] .pm-sb-link:hover{background:#f1f5f9;color:#0f172a;}
-[data-pm-theme="light"] .pm-sb-link.is-active{background:#eff6ff;color:#2563eb;}
-[data-pm-theme="light"] .pm-sb-link__badge{background:rgba(37,99,235,0.10);color:#2563eb;}
+/* Active state uses the SAME accent blue as dark mode (--pm-sb-accent #60A5FA)
+   so the icon + text color matches across themes. Only the bg differs. */
+[data-pm-theme="light"] .pm-sb-link.is-active{background:rgba(96,165,250,0.12);color:#60A5FA;}
+[data-pm-theme="light"] .pm-sb-link__badge{background:rgba(96,165,250,0.16);color:#60A5FA;}
 [data-pm-theme="light"] .pm-sb-divider{background:#e5e7eb;}
 [data-pm-theme="light"] .pm-sb-section-label{color:#94a3b8;}
 [data-pm-theme="light"] .pm-sb-group__toggle{color:#475569;}
