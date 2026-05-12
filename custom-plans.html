@@ -17,11 +17,10 @@
     a{color:inherit;}
 
     /* ============================================================
-       JD layout — cloned from hiring.html so this page sits in the
-       same visual family as the Private Family Assistant job page.
+       JD layout — matches hiring.html. Compact, info-dense, white.
        ============================================================ */
 
-    /* Sticky header bar */
+    /* Sticky bar */
     .jd-stickybar{
       position:fixed;top:0;left:0;right:0;z-index:200;
       background:#0f1a14;color:#fff;
@@ -38,16 +37,15 @@
     .jd-stickybar__logo{
       width:30px;height:30px;border-radius:8px;background:#fff;color:#0f1a14;
       display:flex;align-items:center;justify-content:center;flex-shrink:0;
-      font-family:"Inter",sans-serif;font-weight:800;font-size:11px;letter-spacing:.04em;
+      font-weight:800;font-size:11px;letter-spacing:.04em;
     }
     .jd-stickybar__title{display:flex;flex-direction:column;min-width:0;}
-    .jd-stickybar__title strong{font-family:"Inter",sans-serif;font-size:13.5px;font-weight:600;letter-spacing:-.003em;line-height:1.2;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .jd-stickybar__title span{font-family:"Inter",sans-serif;font-size:11.5px;color:rgba(255,255,255,0.6);line-height:1.3;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .jd-stickybar__title strong{font-size:13.5px;font-weight:600;letter-spacing:-.003em;line-height:1.2;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .jd-stickybar__title span{font-size:11.5px;color:rgba(255,255,255,0.6);line-height:1.3;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .jd-stickybar__apply{
       display:inline-flex;align-items:center;gap:6px;
-      padding:8px 16px;border-radius:7px;
-      background:#fff;color:#0f1a14;
-      font-family:"Inter",sans-serif;font-size:12.5px;font-weight:600;letter-spacing:-.003em;
+      padding:8px 16px;border-radius:7px;background:#fff;color:#0f1a14;
+      font-size:12.5px;font-weight:600;letter-spacing:-.003em;
       text-decoration:none;flex-shrink:0;
       transition:background .18s ease, transform .15s ease;
     }
@@ -59,7 +57,7 @@
       .jd-stickybar__apply{padding:10px 16px;font-size:13px;}
     }
 
-    /* Top header card */
+    /* Header card */
     .jd-header{padding:24px 24px 0;background:#f4f4f5;}
     .jd-header__inner{max-width:1240px;margin:0 auto;}
     .jd-header__card{
@@ -76,30 +74,22 @@
     .jd-header__logo img{display:block;width:100%;height:100%;object-fit:contain;padding:10px;}
     .jd-header__text{min-width:0;}
     .jd-header__title-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px;}
-    .jd-header__status{
-      font-family:"Inter",sans-serif;font-size:22px;font-weight:700;
-      letter-spacing:-.014em;line-height:1.2;color:#0f1a14;
-    }
+    .jd-header__status{font-size:22px;font-weight:700;letter-spacing:-.014em;line-height:1.2;color:#0f1a14;}
     .jd-header__status::after{content:":";margin-left:2px;}
-    .jd-header__title{
-      margin:0 0 8px;font-family:"Inter",sans-serif;font-weight:700;
-      font-size:22px;line-height:1.2;letter-spacing:-.014em;color:#0f1a14;
-    }
-    .jd-header__meta{font-family:"Inter",sans-serif;font-size:13px;color:#52525b;line-height:1.5;}
+    .jd-header__title{margin:0 0 8px;font-weight:700;font-size:22px;line-height:1.2;letter-spacing:-.014em;color:#0f1a14;}
+    .jd-header__meta{font-size:13px;color:#52525b;line-height:1.5;}
     .jd-header__meta .jd-header__sep{color:#d4d4d8;margin:0 8px;}
     .jd-header__pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
     .jd-pill{
-      display:inline-flex;align-items:center;
-      padding:5px 12px;border-radius:5px;
-      background:transparent;color:#3f3f46;
-      border:1px solid #e5e7eb;
-      font-family:"Inter",sans-serif;font-size:12px;font-weight:500;
+      display:inline-flex;align-items:center;padding:5px 12px;border-radius:5px;
+      background:transparent;color:#3f3f46;border:1px solid #e5e7eb;
+      font-size:12px;font-weight:500;
     }
     .jd-header__apply{
       display:inline-flex;align-items:center;
       padding:9px 18px;border-radius:6px;
       background:#007AFF;color:#fff;
-      font-family:"Inter",sans-serif;font-size:12.5px;font-weight:600;letter-spacing:-.003em;
+      font-size:12.5px;font-weight:600;letter-spacing:-.003em;
       text-decoration:none;flex-shrink:0;
       transition:background .18s ease;
     }
@@ -116,45 +106,37 @@
       .jd-header__logo{width:64px;height:64px;border-radius:10px;}
     }
 
-    /* Two-column body */
+    /* Two-col body */
     .jd-body{padding:16px 24px 64px;background:#f4f4f5;}
     .jd-body__inner{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:280px 1fr;gap:18px;align-items:start;}
     @media (max-width:980px){.jd-body__inner{grid-template-columns:1fr;}}
     @media (max-width:560px){.jd-body{padding:14px 14px 48px;}}
 
     /* Sidebar */
-    .jd-sidebar{display:flex;flex-direction:column;gap:12px;position:sticky;top:80px;}
+    .jd-sidebar{display:flex;flex-direction:column;gap:10px;position:sticky;top:80px;}
     @media (max-width:980px){.jd-sidebar{position:static;}}
-
-    .jd-sidecard{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:16px 18px;}
-    .jd-sidecard__h{
-      margin:0 0 12px;font-family:"Inter",sans-serif;font-weight:600;
-      font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#71717a;
-    }
-    .jd-sidecard__map{
-      width:100%;aspect-ratio:5/3;border-radius:6px;overflow:hidden;
-      background:#f4f4f5;position:relative;margin-bottom:10px;
-      border:1px solid #e5e7eb;filter:grayscale(0.15);
-    }
+    .jd-sidecard{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:14px 16px;}
+    .jd-sidecard__h{margin:0 0 10px;font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#71717a;}
+    .jd-sidecard__map{width:100%;aspect-ratio:5/3;border-radius:6px;overflow:hidden;background:#f4f4f5;position:relative;margin-bottom:10px;border:1px solid #e5e7eb;filter:grayscale(0.2);}
     .jd-sidecard__map iframe{display:block;width:100%;height:100%;border:0;}
     .jd-sidecard__loc{display:flex;align-items:flex-start;gap:8px;}
     .jd-sidecard__loc-icon{flex:0 0 14px;color:#71717a;margin-top:2px;}
     .jd-sidecard__loc-icon svg{width:14px;height:14px;}
-    .jd-sidecard__loc-text{font-family:"Inter",sans-serif;font-size:12.5px;line-height:1.45;color:#0f1a14;}
+    .jd-sidecard__loc-text{font-size:12.5px;line-height:1.45;color:#0f1a14;}
     .jd-sidecard__loc-text strong{display:block;font-weight:600;margin-bottom:1px;font-size:13px;}
     .jd-sidecard__loc-text span{color:#71717a;font-size:11.5px;}
     .jd-sidecard__meta{display:flex;flex-direction:column;gap:6px;}
-    .jd-sidecard__meta-row{display:flex;align-items:center;gap:8px;font-family:"Inter",sans-serif;font-size:12px;color:#3f3f46;}
+    .jd-sidecard__meta-row{display:flex;align-items:center;gap:8px;font-size:12px;color:#3f3f46;}
     .jd-sidecard__meta-row svg{width:12px;height:12px;color:#9ca3af;flex-shrink:0;}
     .jd-sidecard__meta-row strong{color:#0f1a14;font-weight:600;}
-    .jd-sidecard__toc{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;}
+    .jd-sidecard__toc{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;}
     .jd-sidecard__toc a{
-      display:block;padding:5px 0;
-      font-family:"Inter",sans-serif;font-size:12.5px;color:#3f3f46;text-decoration:none;
-      border-bottom:1px dashed transparent;
-      transition:color .15s ease, border-color .15s ease;
+      display:block;padding:5px 0;border-top:1px solid #f1f1f3;
+      font-size:12.5px;color:#3f3f46;text-decoration:none;
+      transition:color .15s ease;
     }
-    .jd-sidecard__toc a:hover{color:#0f1a14;border-bottom-color:#e5e7eb;}
+    .jd-sidecard__toc a:first-child{border-top:0;padding-top:0;}
+    .jd-sidecard__toc a:hover{color:#0f1a14;}
     .jd-sidecard__share{display:flex;gap:6px;}
     .jd-sidecard__share a{
       width:26px;height:26px;border-radius:5px;background:transparent;color:#71717a;
@@ -166,138 +148,89 @@
     .jd-sidecard__share svg{width:11px;height:11px;}
 
     /* Main column */
-    .jd-main{display:flex;flex-direction:column;gap:10px;min-width:0;}
+    .jd-main{display:flex;flex-direction:column;gap:8px;min-width:0;}
     .jd-card{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px 20px;}
-    .jd-card__h{
-      margin:0 0 8px;font-family:"Inter",sans-serif;font-weight:700;
-      font-size:15.5px;line-height:1.25;letter-spacing:-.005em;color:#0f1a14;
-    }
-    .jd-card p{margin:0 0 7px;font-family:"Inter",sans-serif;font-size:13.5px;line-height:1.55;color:#3f3f46;}
+    .jd-card__h{margin:0 0 8px;font-weight:700;font-size:15.5px;line-height:1.25;letter-spacing:-.005em;color:#0f1a14;}
+    .jd-card p{margin:0 0 7px;font-size:13.5px;line-height:1.55;color:#3f3f46;}
     .jd-card p strong{color:#0f1a14;font-weight:600;}
     .jd-card p:last-child{margin-bottom:0;}
     .jd-card p a{color:#0f1a14;text-decoration:underline;text-underline-offset:3px;}
-    .jd-card__sub{margin:12px 0 4px;font-family:"Inter",sans-serif;font-weight:600;font-size:12.5px;letter-spacing:-.002em;color:#0f1a14;}
+    .jd-card__sub{margin:14px 0 4px;font-weight:600;font-size:12.5px;letter-spacing:-.002em;color:#0f1a14;}
     .jd-card__sub:first-child{margin-top:0;}
-    .jd-card__small{margin:-4px 0 10px !important;font-family:"Inter",sans-serif;font-size:11.5px !important;color:#71717a !important;}
+    .jd-card__small{margin:-4px 0 10px !important;font-size:11.5px !important;color:#71717a !important;}
     .jd-card ul{margin:0;padding:0;list-style:none;}
-    .jd-card ul li{
-      position:relative;padding:2px 0 2px 14px;
-      font-family:"Inter",sans-serif;font-size:13px;line-height:1.5;color:#3f3f46;
-    }
+    .jd-card ul li{position:relative;padding:2px 0 2px 14px;font-size:13px;line-height:1.5;color:#3f3f46;}
     .jd-card ul li::before{content:"";position:absolute;left:3px;top:10px;width:3px;height:3px;border-radius:50%;background:#9ca3af;}
     .jd-card ul li strong{color:#0f1a14;font-weight:600;}
 
-    /* Inline label/value rows */
-    .jd-kv{margin:0 0 6px;font-family:"Inter",sans-serif;font-size:13px;line-height:1.5;color:#3f3f46;}
+    .jd-kv{margin:0 0 5px;font-size:13px;line-height:1.5;color:#3f3f46;}
     .jd-kv strong{color:#0f1a14;font-weight:600;}
 
-    /* Inline note */
     .jd-note{
       margin-top:10px !important;padding:8px 12px;
-      border-left:2px solid #d4d4d8;
-      background:#fafaf9;border-radius:0 4px 4px 0;
-      font-family:"Inter",sans-serif;font-size:12px !important;line-height:1.5;color:#52525b !important;
+      border-left:2px solid #d4d4d8;background:#fafaf9;border-radius:0 4px 4px 0;
+      font-size:12px !important;line-height:1.5;color:#52525b !important;
     }
     .jd-note strong{color:#0f1a14;font-weight:600;}
 
-    /* Two-column inside cards */
-    .jd-cols{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;}
+    .jd-cols{display:grid;grid-template-columns:1fr 1fr;gap:4px 24px;}
     @media (max-width:680px){.jd-cols{grid-template-columns:1fr;gap:0;}}
 
-    /* Tier list — compact table-style summary */
-    .jd-tiers{display:flex;flex-direction:column;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#fff;}
+    /* Tier table — single row per tier, info-dense */
+    .jd-tiers{display:flex;flex-direction:column;border:1px solid #e5e7eb;border-radius:6px;overflow:hidden;background:#fff;margin-top:6px;}
     .jd-tier-row{
-      display:grid;grid-template-columns:40px 1.4fr 1fr 1fr auto;gap:16px;align-items:center;
-      padding:14px 18px;border-bottom:1px solid #f1f1f3;
+      display:grid;grid-template-columns:32px 1.3fr 1.1fr 0.8fr auto;gap:14px;align-items:center;
+      padding:11px 14px;border-bottom:1px solid #f1f1f3;
     }
     .jd-tier-row:last-child{border-bottom:none;}
     .jd-tier-row__num{
-      width:28px;height:28px;border-radius:6px;background:#0f1a14;color:#fff;
-      font-family:"Inter",sans-serif;font-size:11.5px;font-weight:700;letter-spacing:-.005em;
+      width:24px;height:24px;border-radius:4px;background:#0f1a14;color:#fff;
+      font-size:10.5px;font-weight:700;
       display:flex;align-items:center;justify-content:center;
     }
-    .jd-tier-row__name{font-family:"Inter",sans-serif;font-size:13.5px;font-weight:600;color:#0f1a14;letter-spacing:-.005em;}
-    .jd-tier-row__shape{font-family:"Inter",sans-serif;font-size:12.5px;color:#52525b;line-height:1.4;}
-    .jd-tier-row__hours{font-family:"Inter",sans-serif;font-size:12.5px;color:#3f3f46;font-variant-numeric:tabular-nums;}
-    .jd-tier-row__hours strong{color:#0f1a14;font-weight:600;font-size:13px;}
-    .jd-tier-row__price{font-family:"Inter",sans-serif;font-size:12.5px;color:#3f3f46;font-variant-numeric:tabular-nums;text-align:right;}
-    .jd-tier-row__price strong{color:#0f1a14;font-weight:600;font-size:13.5px;display:block;}
-    .jd-tier-row__price span{font-size:11.5px;color:#71717a;}
+    .jd-tier-row__name{font-size:13px;font-weight:600;color:#0f1a14;letter-spacing:-.003em;}
+    .jd-tier-row__shape{font-size:12px;color:#52525b;line-height:1.4;}
+    .jd-tier-row__hours{font-size:12px;color:#3f3f46;font-variant-numeric:tabular-nums;}
+    .jd-tier-row__hours strong{color:#0f1a14;font-weight:600;font-size:12.5px;}
+    .jd-tier-row__price{font-size:12px;color:#3f3f46;font-variant-numeric:tabular-nums;text-align:right;}
+    .jd-tier-row__price strong{color:#0f1a14;font-weight:600;font-size:13px;display:block;}
+    .jd-tier-row__price span{font-size:11px;color:#71717a;}
     @media (max-width:880px){
-      .jd-tier-row{grid-template-columns:32px 1fr;gap:12px;padding:14px 16px;}
+      .jd-tier-row{grid-template-columns:28px 1fr;gap:10px;padding:11px 12px;}
       .jd-tier-row__shape,.jd-tier-row__hours,.jd-tier-row__price{grid-column:2;text-align:left !important;}
     }
 
-    /* 3-up row (How it works, Add-ons) */
-    .jd-3up{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:4px;}
-    .jd-3up__item{padding:16px;background:#fafaf9;border:1px solid #e5e7eb;border-radius:8px;}
-    .jd-3up__num{
-      display:inline-flex;align-items:center;justify-content:center;
-      width:24px;height:24px;border-radius:50%;background:#0f1a14;color:#fff;
-      font-family:"Inter",sans-serif;font-size:10.5px;font-weight:700;
-      margin-bottom:10px;
-    }
-    .jd-3up__icon{
-      width:28px;height:28px;border-radius:7px;background:#0f1a14;color:#fff;
-      display:flex;align-items:center;justify-content:center;margin-bottom:10px;
-    }
-    .jd-3up__icon svg{width:14px;height:14px;}
-    .jd-3up__h{margin:0 0 6px;font-family:"Inter",sans-serif;font-weight:600;font-size:13.5px;letter-spacing:-.003em;color:#0f1a14;}
-    .jd-3up__d{margin:0;font-family:"Inter",sans-serif;font-size:12.5px;line-height:1.5;color:#52525b;}
-    @media (max-width:720px){.jd-3up{grid-template-columns:1fr;}}
-
-    /* Gold callout — used for Live-In tier (the one visual standout) */
-    .jd-callout{
-      position:relative;overflow:hidden;
-      background:linear-gradient(135deg,#faf6ec 0%,#f4ecd8 100%);
-      border:1px solid #e8d5a8;border-radius:10px;
-      padding:20px 24px;
-    }
-    .jd-callout::before{
-      content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
-      background:linear-gradient(180deg,#8b6a2e 0%,#b88a36 25%,#d6a84a 50%,#f5d989 75%,#d6a84a 100%);
-    }
-    .jd-callout__badge{
-      display:inline-flex;align-items:center;gap:5px;
-      padding:4px 10px;border-radius:5px;background:#3a2a10;
-      color:#f5d989;font-family:"Inter",sans-serif;font-size:10px;font-weight:700;
-      letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;
-    }
-    .jd-callout__h{margin:0 0 6px;font-family:"Inter",sans-serif;font-weight:700;font-size:17px;line-height:1.25;letter-spacing:-.012em;color:#3a2a10;}
-    .jd-callout__p{margin:0;font-family:"Inter",sans-serif;font-size:13.5px;line-height:1.6;color:rgba(58,42,16,0.78);}
-    .jd-callout__p strong{color:#3a2a10;font-weight:600;}
-    .jd-callout ul{margin:10px 0 0;padding:0;list-style:none;}
-    .jd-callout ul li{position:relative;padding:2px 0 2px 14px;font-family:"Inter",sans-serif;font-size:13px;line-height:1.5;color:rgba(58,42,16,0.78);}
-    .jd-callout ul li::before{content:"";position:absolute;left:3px;top:10px;width:3px;height:3px;border-radius:50%;background:#8b6a2e;}
-    .jd-callout ul li strong{color:#3a2a10;font-weight:600;}
-
     /* FAQ */
-    .jd-faq__q{
-      margin:12px 0 4px;font-family:"Inter",sans-serif;font-weight:600;
-      font-size:13.5px;letter-spacing:-.005em;color:#0f1a14;
-    }
+    .jd-faq__q{margin:12px 0 4px;font-weight:600;font-size:13.5px;letter-spacing:-.005em;color:#0f1a14;}
     .jd-faq__q:first-child{margin-top:0;}
-    .jd-faq__a{margin:0 0 12px !important;font-family:"Inter",sans-serif;font-size:13px !important;line-height:1.55 !important;color:#3f3f46 !important;}
+    .jd-faq__a{margin:0 0 12px !important;font-size:13px !important;line-height:1.55 !important;color:#3f3f46 !important;}
+    .jd-faq__a:last-child{margin-bottom:0 !important;}
 
-    /* About PM dark card */
-    .jd-card--dark{background:#0f1a14;border-color:#0f1a14;color:#ECEAE0;}
-    .jd-card--dark .jd-card__h{color:#fff;}
-    .jd-card--dark p{color:rgba(236,234,224,0.78);}
-    .jd-card--dark p strong{color:#fff;}
-    .jd-card--dark a{color:#BFCCBE;text-decoration:underline;text-underline-offset:3px;}
-    .jd-card--dark ul li{color:rgba(236,234,224,0.78);}
-    .jd-card--dark ul li::before{background:#9CB39B;}
-    .jd-card--dark ul li strong{color:#fff;}
+    /* Compact ordered list (process steps) */
+    .jd-ol{margin:6px 0 0;padding:0;list-style:none;counter-reset:jdstep;}
+    .jd-ol li{
+      counter-increment:jdstep;position:relative;
+      padding:6px 0 6px 32px;font-size:13px;line-height:1.55;color:#3f3f46;
+      border-top:1px solid #f1f1f3;
+    }
+    .jd-ol li:first-child{border-top:0;}
+    .jd-ol li::before{
+      content:counter(jdstep, decimal-leading-zero);
+      position:absolute;left:0;top:7px;
+      width:24px;height:18px;
+      font-size:10.5px;font-weight:700;color:#71717a;letter-spacing:.04em;
+    }
+    .jd-ol li strong{color:#0f1a14;font-weight:600;}
 
-    /* Quote form card */
-    .jd-form{display:flex;flex-direction:column;gap:12px;}
+    /* Quote form */
+    .jd-form{display:flex;flex-direction:column;gap:10px;}
     .jd-form__row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
     @media (max-width:560px){.jd-form__row{grid-template-columns:1fr;}}
-    .jd-form__field{display:flex;flex-direction:column;gap:5px;}
-    .jd-form__label{font-family:"Inter",sans-serif;font-size:11.5px;font-weight:600;color:#0f1a14;letter-spacing:-.002em;}
+    .jd-form__field{display:flex;flex-direction:column;gap:4px;}
+    .jd-form__label{font-size:11.5px;font-weight:600;color:#0f1a14;letter-spacing:-.002em;}
     .jd-form__input,.jd-form__textarea,.jd-form__select{
-      width:100%;background:#fafaf9;border:1px solid #e5e7eb;border-radius:6px;
-      padding:9px 11px;font-family:"Inter",sans-serif;font-size:13px;color:#0f1a14;
+      width:100%;background:#fafaf9;border:1px solid #e5e7eb;border-radius:5px;
+      padding:8px 10px;font-size:13px;color:#0f1a14;font-family:inherit;
       transition:border-color .15s ease, background .15s ease, box-shadow .15s ease;
     }
     .jd-form__input::placeholder,.jd-form__textarea::placeholder{color:#9ca3af;}
@@ -305,64 +238,64 @@
       outline:none;background:#fff;border-color:#0f1a14;
       box-shadow:0 0 0 3px rgba(15,26,20,0.06);
     }
-    .jd-form__textarea{resize:vertical;min-height:88px;line-height:1.5;font-family:inherit;}
-    .jd-form__checks{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+    .jd-form__textarea{resize:vertical;min-height:80px;line-height:1.5;}
+    .jd-form__checks{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
     @media (max-width:560px){.jd-form__checks{grid-template-columns:1fr;}}
     .jd-form__check{
       display:flex;align-items:center;gap:8px;cursor:pointer;
-      padding:7px 10px;background:#fafaf9;border:1px solid #e5e7eb;border-radius:5px;
-      font-family:"Inter",sans-serif;font-size:12.5px;color:#3f3f46;
+      padding:6px 9px;background:#fafaf9;border:1px solid #e5e7eb;border-radius:4px;
+      font-size:12.5px;color:#3f3f46;
       transition:border-color .15s ease, background .15s ease;
     }
     .jd-form__check:hover{border-color:#d4d4d8;background:#fff;}
-    .jd-form__check input{accent-color:#007AFF;width:14px;height:14px;flex-shrink:0;}
+    .jd-form__check input{accent-color:#007AFF;width:13px;height:13px;flex-shrink:0;}
     .jd-form__submit{
       align-self:flex-start;
-      padding:10px 22px;border-radius:6px;border:0;cursor:pointer;
+      padding:9px 20px;border-radius:6px;border:0;cursor:pointer;
       background:#007AFF;color:#fff;
-      font-family:"Inter",sans-serif;font-size:13px;font-weight:600;letter-spacing:-.003em;
+      font-size:13px;font-weight:600;letter-spacing:-.003em;
       transition:background .15s ease, transform .15s ease;
     }
     .jd-form__submit:hover{background:#0062cc;transform:translateY(-1px);}
-    .jd-form__note{font-family:"Inter",sans-serif;font-size:11.5px;color:#71717a;margin:4px 0 0;line-height:1.5;}
+    .jd-form__note{font-size:11.5px;color:#71717a;margin:2px 0 0;line-height:1.5;}
 
-    /* Apply box (final CTA) */
-    .jd-applybox{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:24px;text-align:center;}
-    .jd-applybox__h{margin:0 0 6px;font-family:"Inter",sans-serif;font-weight:700;font-size:17px;letter-spacing:-.008em;color:#0f1a14;}
-    .jd-applybox__p{margin:0 0 16px;font-family:"Inter",sans-serif;font-size:13.5px;line-height:1.55;color:#52525b;}
-    .jd-applybox__btn{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:11px 22px;border-radius:8px;background:#007AFF;color:#fff;
-      font-family:"Inter",sans-serif;font-size:13.5px;font-weight:600;letter-spacing:-.003em;
-      text-decoration:none;transition:background .18s ease, transform .15s ease;
+    /* Final apply box */
+    .jd-applybox{
+      background:#fff;border:1px solid #e5e7eb;border-radius:8px;
+      padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;
     }
-    .jd-applybox__btn:hover{background:#0062cc;transform:translateY(-1px);}
-    .jd-applybox__btn svg{width:12px;height:12px;}
-    .jd-applybox__meta{margin-top:10px;font-family:"Inter",sans-serif;font-size:11.5px;color:#71717a;}
-
+    .jd-applybox__text{font-size:12.5px;color:#52525b;line-height:1.5;}
+    .jd-applybox__text strong{color:#0f1a14;font-weight:600;display:block;margin-bottom:1px;font-size:13.5px;}
+    .jd-applybox__btn{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:9px 18px;border-radius:6px;background:#007AFF;color:#fff;
+      font-size:12.5px;font-weight:600;letter-spacing:-.003em;
+      text-decoration:none;flex-shrink:0;
+      transition:background .18s ease;
+    }
+    .jd-applybox__btn:hover{background:#0062cc;}
+    .jd-applybox__btn svg{width:11px;height:11px;}
     @media (max-width:560px){
-      .jd-card{padding:18px 20px;}
-      .jd-callout{padding:18px 20px;}
-      .jd-applybox{padding:22px 18px;}
+      .jd-card{padding:14px 16px;}
+      .jd-applybox{flex-direction:column;align-items:stretch;text-align:left;}
+      .jd-applybox__btn{justify-content:center;}
     }
 
     /* Footer */
     .jd-foot{
       background:#0d1410;border-top:1px solid rgba(255,255,255,0.08);
-      padding:36px 28px;text-align:center;color:rgba(255,255,255,0.5);font-size:13px;
-      font-family:"Inter",sans-serif;
+      padding:32px 28px;text-align:center;color:rgba(255,255,255,0.5);font-size:12.5px;
     }
-    .jd-foot a{color:rgba(255,255,255,0.7);text-decoration:none;margin:0 12px;}
+    .jd-foot a{color:rgba(255,255,255,0.7);text-decoration:none;margin:0 10px;}
     .jd-foot a:hover{color:#fff;}
 
-    /* Toast */
-    .jd-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);z-index:1100;background:#0f1a14;color:#fff;padding:11px 20px;border-radius:8px;font:600 13px Inter,sans-serif;box-shadow:0 16px 36px -10px rgba(15,23,42,0.55);opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s ease;}
+    .jd-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);z-index:1100;background:#0f1a14;color:#fff;padding:11px 20px;border-radius:6px;font:600 13px Inter,sans-serif;box-shadow:0 16px 36px -10px rgba(15,23,42,0.55);opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s ease;}
     .jd-toast.is-shown{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
   </style>
 </head>
 <body>
 
-  <!-- ===== STICKY APPLY BAR ===== -->
+  <!-- ===== STICKY BAR ===== -->
   <div class="jd-stickybar" id="jdStickybar" aria-hidden="true">
     <div class="jd-stickybar__inner">
       <div class="jd-stickybar__left">
@@ -376,7 +309,7 @@
     </div>
   </div>
 
-  <!-- ===== HEADER CARD ===== -->
+  <!-- ===== HEADER ===== -->
   <section class="jd-header" id="jd-header-anchor">
     <div class="jd-header__inner">
       <div class="jd-header__card">
@@ -392,7 +325,7 @@
             <div class="jd-header__meta">
               <a href="index.html" style="color:#0f1a14;text-decoration:none;font-weight:500;">Private Mentorship</a>
               <span class="jd-header__sep">·</span>Greater Vancouver, BC
-              <span class="jd-header__sep">·</span>Quote-based pricing
+              <span class="jd-header__sep">·</span>Quote-based
             </div>
             <div class="jd-header__pills">
               <span class="jd-pill">Daytime</span>
@@ -408,26 +341,22 @@
     </div>
   </section>
 
-  <!-- ===== TWO-COLUMN BODY ===== -->
+  <!-- ===== BODY ===== -->
   <section class="jd-body">
     <div class="jd-body__inner">
 
-      <!-- LEFT SIDEBAR -->
+      <!-- SIDEBAR -->
       <aside class="jd-sidebar">
         <div class="jd-sidecard">
           <h3 class="jd-sidecard__h">Service area</h3>
           <div class="jd-sidecard__map" aria-hidden="true">
-            <iframe
-              src="https://maps.google.com/maps?q=Vancouver%2C+BC&ll=49.24,-123.1207&z=11&t=m&ie=UTF8&iwloc=&output=embed"
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
-              title="Vancouver, BC"></iframe>
+            <iframe src="https://maps.google.com/maps?q=Vancouver%2C+BC&ll=49.24,-123.1207&z=11&t=m&ie=UTF8&iwloc=&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Vancouver, BC"></iframe>
           </div>
           <div class="jd-sidecard__loc">
-            <svg class="jd-sidecard__loc-icon" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 16s5.5-4.5 5.5-9a5.5 5.5 0 0 0-11 0c0 4.5 5.5 9 5.5 9z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="9" cy="7" r="2" stroke="currentColor" stroke-width="1.6"/></svg>
+            <svg class="jd-sidecard__loc-icon" viewBox="0 0 18 18" fill="none"><path d="M9 16s5.5-4.5 5.5-9a5.5 5.5 0 0 0-11 0c0 4.5 5.5 9 5.5 9z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="9" cy="7" r="2" stroke="currentColor" stroke-width="1.6"/></svg>
             <div class="jd-sidecard__loc-text">
               <strong>Greater Vancouver, BC</strong>
-              <span>In-person, with travel by arrangement</span>
+              <span>In-person, travel by arrangement</span>
             </div>
           </div>
         </div>
@@ -436,20 +365,20 @@
           <h3 class="jd-sidecard__h">At a glance</h3>
           <div class="jd-sidecard__meta">
             <div class="jd-sidecard__meta-row">
-              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path d="M8 4v4l2.5 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-              <span>Response within <strong>one business day</strong></span>
+              <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path d="M8 4v4l2.5 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              <span>Response within <strong>1 business day</strong></span>
             </div>
             <div class="jd-sidecard__meta-row">
-              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M2 6h12M6 2v3M10 2v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-              <span><strong>80–720</strong> hours per month</span>
+              <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M2 6h12M6 2v3M10 2v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              <span><strong>80–720</strong> hrs / month</span>
             </div>
             <div class="jd-sidecard__meta-row">
-              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="2" y="4" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 4V2.5a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 11 2.5V4" stroke="currentColor" stroke-width="1.4"/></svg>
-              <span>Term: <strong>3, 6, or 12 months</strong></span>
+              <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 4V2.5a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 11 2.5V4" stroke="currentColor" stroke-width="1.4"/></svg>
+              <span><strong>3, 6 or 12</strong> month terms</span>
             </div>
             <div class="jd-sidecard__meta-row">
-              <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 13c0-2.2 2.7-4 6-4s6 1.8 6 4M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" stroke="currentColor" stroke-width="1.4"/></svg>
-              <span>Billed <strong>monthly</strong>, paused with notice</span>
+              <svg viewBox="0 0 16 16" fill="none"><path d="M2 13c0-2.2 2.7-4 6-4s6 1.8 6 4M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" stroke="currentColor" stroke-width="1.4"/></svg>
+              <span>Billed <strong>monthly</strong></span>
             </div>
           </div>
         </div>
@@ -457,13 +386,12 @@
         <div class="jd-sidecard">
           <h3 class="jd-sidecard__h">On this page</h3>
           <ul class="jd-sidecard__toc">
-            <li><a href="#cp-about">About Custom Plans</a></li>
+            <li><a href="#cp-about">Overview</a></li>
             <li><a href="#cp-tiers">Service tiers</a></li>
-            <li><a href="#cp-livein">Bridge / Live-In care</a></li>
-            <li><a href="#cp-addons">Add-ons</a></li>
-            <li><a href="#cp-pricing">Pricing structure</a></li>
+            <li><a href="#cp-coverage">Coverage &amp; add-ons</a></li>
+            <li><a href="#cp-pricing">Pricing &amp; commitment</a></li>
             <li><a href="#cp-included">What's included</a></li>
-            <li><a href="#cp-how">How it works</a></li>
+            <li><a href="#cp-process">Process</a></li>
             <li><a href="#cp-faq">Common questions</a></li>
             <li><a href="#cp-quote">Request a quote</a></li>
           </ul>
@@ -472,233 +400,169 @@
         <div class="jd-sidecard">
           <h3 class="jd-sidecard__h">Share this page</h3>
           <div class="jd-sidecard__share">
-            <a href="#" aria-label="Share on LinkedIn"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.5 6h2v7h-2zM4.5 5a1.2 1.2 0 1 1 0-2.4 1.2 1.2 0 0 1 0 2.4zM7 6h1.9v.95h.03a2.1 2.1 0 0 1 1.9-1.05c2.03 0 2.4 1.34 2.4 3.07V13h-2v-3.4c0-.81-.01-1.85-1.13-1.85-1.13 0-1.3.88-1.3 1.79V13H7z"/></svg></a>
-            <a href="#" aria-label="Share on X"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M11.95 2H14l-4.5 5.14L14.85 14H10.6l-3.32-4.36L3.45 14H1.4l4.82-5.5L1 2h4.36l3 4 3.59-4z"/></svg></a>
-            <a href="#" aria-label="Share on Facebook"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M9 14V8.5h1.85L11.1 6.4H9v-1.3c0-.6.18-1.02 1.08-1.02H11.2V2.1A14.7 14.7 0 0 0 9.6 2C8 2 6.95 2.96 6.95 4.74V6.4H5.1v2.1h1.85V14z"/></svg></a>
+            <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.5 6h2v7h-2zM4.5 5a1.2 1.2 0 1 1 0-2.4 1.2 1.2 0 0 1 0 2.4zM7 6h1.9v.95h.03a2.1 2.1 0 0 1 1.9-1.05c2.03 0 2.4 1.34 2.4 3.07V13h-2v-3.4c0-.81-.01-1.85-1.13-1.85-1.13 0-1.3.88-1.3 1.79V13H7z"/></svg></a>
+            <a href="#" aria-label="X"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M11.95 2H14l-4.5 5.14L14.85 14H10.6l-3.32-4.36L3.45 14H1.4l4.82-5.5L1 2h4.36l3 4 3.59-4z"/></svg></a>
+            <a href="#" aria-label="Facebook"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M9 14V8.5h1.85L11.1 6.4H9v-1.3c0-.6.18-1.02 1.08-1.02H11.2V2.1A14.7 14.7 0 0 0 9.6 2C8 2 6.95 2.96 6.95 4.74V6.4H5.1v2.1h1.85V14z"/></svg></a>
             <a href="#" aria-label="Copy link"><svg viewBox="0 0 16 16" fill="none"><path d="M6.5 9.5l3-3M5 11.5L3.5 13a2.12 2.12 0 0 1-3-3L2 8.5M11 4.5L12.5 3a2.12 2.12 0 0 1 3 3L14 7.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></a>
           </div>
         </div>
       </aside>
 
-      <!-- RIGHT MAIN COLUMN -->
+      <!-- MAIN -->
       <main class="jd-main">
 
         <article class="jd-card" id="cp-about">
-          <h2 class="jd-card__h">About Custom Plans</h2>
-          <p>Our standard plans of 24 or 40 reserved hours per month are built for families who want two or three sessions a week paced over the month. Custom Plans exist for families whose needs go further — daily coverage, overnight presence, travel companionship, or full-time live-in support through a transitional season.</p>
-          <p>Every custom plan is built one-to-one. The four service tiers below are anchor points, not boxes — hours, structure, and rate are finalised on a conversation. Plans run on 3-, 6-, or 12-month commitments, with discounts at the longer terms.</p>
-          <p class="jd-note"><strong>Standard plans</strong> are menu-priced at $30–$45 / hour, available month-to-month. <strong>Custom plans</strong> are quote-based and require a brief intake call. <a href="index.html#pm-book">See standard plans</a>.</p>
+          <h2 class="jd-card__h">Overview</h2>
+          <p>Custom Plans are for families whose needs go beyond standard 24- or 40-hour monthly hours — daily coverage, overnights, travel companionship, or live-in support through a transitional season. Quote-based and contracted at 3, 6 or 12 month terms.</p>
+          <p class="jd-note"><strong>Standard plans</strong> ($30–$45 / hour, month-to-month) cover most families. <a href="index.html#pm-book">See standard plans →</a></p>
         </article>
 
         <article class="jd-card" id="cp-tiers">
           <h2 class="jd-card__h">Service tiers</h2>
-          <p class="jd-card__small">Anchor points only — the final plan is shaped to your family</p>
+          <p class="jd-card__small">Anchor points only — the final plan is shaped to your family on a call</p>
           <div class="jd-tiers">
             <div class="jd-tier-row">
               <span class="jd-tier-row__num">I</span>
               <div class="jd-tier-row__name">Intensive Day</div>
-              <div class="jd-tier-row__shape">4 hours × 5 weekdays</div>
-              <div class="jd-tier-row__hours"><strong>80 hrs</strong>&nbsp;/&nbsp;month</div>
-              <div class="jd-tier-row__price"><strong>From $3,200&nbsp;/&nbsp;mo</strong><span>~$40 / hour</span></div>
+              <div class="jd-tier-row__shape">4 hrs × 5 weekdays</div>
+              <div class="jd-tier-row__hours"><strong>80 hrs</strong>&nbsp;/&nbsp;mo</div>
+              <div class="jd-tier-row__price"><strong>From $3,200&nbsp;/&nbsp;mo</strong><span>~$40 / hr · 3-mo min</span></div>
             </div>
             <div class="jd-tier-row">
               <span class="jd-tier-row__num">II</span>
               <div class="jd-tier-row__name">Full Daytime</div>
-              <div class="jd-tier-row__shape">8 hours × 5 weekdays</div>
-              <div class="jd-tier-row__hours"><strong>160 hrs</strong>&nbsp;/&nbsp;month</div>
-              <div class="jd-tier-row__price"><strong>From $6,080&nbsp;/&nbsp;mo</strong><span>~$38 / hour</span></div>
+              <div class="jd-tier-row__shape">8 hrs × 5 weekdays</div>
+              <div class="jd-tier-row__hours"><strong>160 hrs</strong>&nbsp;/&nbsp;mo</div>
+              <div class="jd-tier-row__price"><strong>From $6,080&nbsp;/&nbsp;mo</strong><span>~$38 / hr · 3-mo min</span></div>
             </div>
             <div class="jd-tier-row">
               <span class="jd-tier-row__num">III</span>
               <div class="jd-tier-row__name">Extended Care</div>
-              <div class="jd-tier-row__shape">12 hours × 5 weekdays</div>
-              <div class="jd-tier-row__hours"><strong>240 hrs</strong>&nbsp;/&nbsp;month</div>
-              <div class="jd-tier-row__price"><strong>From $8,640&nbsp;/&nbsp;mo</strong><span>~$36 / hour</span></div>
+              <div class="jd-tier-row__shape">12 hrs × 5 weekdays</div>
+              <div class="jd-tier-row__hours"><strong>240 hrs</strong>&nbsp;/&nbsp;mo</div>
+              <div class="jd-tier-row__price"><strong>From $8,640&nbsp;/&nbsp;mo</strong><span>~$36 / hr · 6-mo min</span></div>
             </div>
             <div class="jd-tier-row">
               <span class="jd-tier-row__num">IV</span>
               <div class="jd-tier-row__name">Bridge / Live-In</div>
               <div class="jd-tier-row__shape">24/7 rotating presence</div>
-              <div class="jd-tier-row__hours"><strong>720 hrs</strong>&nbsp;/&nbsp;month</div>
-              <div class="jd-tier-row__price"><strong>From $14,000&nbsp;/&nbsp;mo</strong><span>2–3 Assistants</span></div>
+              <div class="jd-tier-row__hours"><strong>720 hrs</strong>&nbsp;/&nbsp;mo</div>
+              <div class="jd-tier-row__price"><strong>From $14,000&nbsp;/&nbsp;mo</strong><span>2–3 assistants · 1-mo min</span></div>
             </div>
           </div>
+
+          <h3 class="jd-card__sub">Tier I — Intensive Day</h3>
+          <p class="jd-kv"><strong>Shape:</strong> Daily 4-hour blocks across the school week. Same Assistant, same time each day.</p>
+          <p class="jd-kv"><strong>Best for:</strong> Routine and continuity. Families who want a steady weekday presence without full-day coverage.</p>
+
+          <h3 class="jd-card__sub">Tier II — Full Daytime</h3>
+          <p class="jd-kv"><strong>Shape:</strong> Full weekday coverage, typically 8 AM – 4 PM (flexible).</p>
+          <p class="jd-kv"><strong>Best for:</strong> Working parents. School pick-ups, appointments, errands, dinner help — handled.</p>
+          <p class="jd-kv"><strong>Note:</strong> Most-requested tier. 6 / 12-month terms earn a per-hour discount.</p>
+
+          <h3 class="jd-card__sub">Tier III — Extended Care</h3>
+          <p class="jd-kv"><strong>Shape:</strong> Wake-up through bedtime weekday coverage via a two-Assistant rotation.</p>
+          <p class="jd-kv"><strong>Best for:</strong> Families needing near-continuous weekday presence. Overnight add-on available.</p>
+
+          <h3 class="jd-card__sub">Tier IV — Bridge / Live-In</h3>
+          <p class="jd-kv"><strong>Shape:</strong> 24/7 presence via a rotation of 2–3 Assistants, weekends and overnights included.</p>
+          <p class="jd-kv"><strong>Best for:</strong> Transitional seasons — post-hospital recovery, post-loss, parent travel, school break, longer recovery windows.</p>
+          <p class="jd-kv"><strong>Note:</strong> Held to a separate contract template and a vetted Live-In Assistant pool. Engagements longer than 3 months use a custom contract.</p>
         </article>
 
-        <article class="jd-card">
-          <h2 class="jd-card__h">Tier I — Intensive Day</h2>
-          <p class="jd-kv"><strong>Shape:</strong> 4-hour blocks across the school week. Same time each day.</p>
-          <p class="jd-kv"><strong>Hours:</strong> 80 / month</p>
-          <p class="jd-kv"><strong>Pricing:</strong> From $3,200 / month · ~$40 / hour</p>
-          <p class="jd-kv"><strong>Minimum:</strong> 3-month commitment</p>
-          <h3 class="jd-card__sub">Included</h3>
-          <ul>
-            <li>One dedicated Assistant for routine and continuity</li>
-            <li>Daily blend of education, life skills, and personal support</li>
-            <li>School drop-off / pick-up coordination if needed</li>
-            <li>Backup coverage when your primary Assistant is unavailable</li>
-          </ul>
-        </article>
+        <article class="jd-card" id="cp-coverage">
+          <h2 class="jd-card__h">Coverage &amp; add-ons</h2>
+          <p class="jd-card__small">Layer onto any tier or contracted on their own</p>
 
-        <article class="jd-card">
-          <h2 class="jd-card__h">Tier II — Full Daytime</h2>
-          <p class="jd-card__small">Most requested by working parents</p>
-          <p class="jd-kv"><strong>Shape:</strong> Full weekday coverage, morning to evening.</p>
-          <p class="jd-kv"><strong>Hours:</strong> 160 / month</p>
-          <p class="jd-kv"><strong>Pricing:</strong> From $6,080 / month · ~$38 / hour</p>
-          <p class="jd-kv"><strong>Minimum:</strong> 3-month commitment · 6 / 12-month terms earn a discount</p>
-          <h3 class="jd-card__sub">Included</h3>
-          <ul>
-            <li>Full-day weekday coverage (typical: 8 AM – 4 PM, flexible)</li>
-            <li>School pick-ups, appointments, errands, dinner help</li>
-            <li>One dedicated Assistant with documented backup</li>
-            <li>Monthly check-in with family contact</li>
-          </ul>
-        </article>
+          <h3 class="jd-card__sub">Travel</h3>
+          <p class="jd-kv"><strong>Use:</strong> Assistant accompanies the family on vacation or relocation for continuity.</p>
+          <p class="jd-kv"><strong>Billing:</strong> Active hours at standard rate. Downtime at reduced presence rate. Travel costs (flights, hotel, meals, mileage) pass-through and pre-approved.</p>
 
-        <article class="jd-card">
-          <h2 class="jd-card__h">Tier III — Extended Care</h2>
-          <p class="jd-kv"><strong>Shape:</strong> Wake-up through bedtime weekday coverage.</p>
-          <p class="jd-kv"><strong>Hours:</strong> 240 / month</p>
-          <p class="jd-kv"><strong>Pricing:</strong> From $8,640 / month · ~$36 / hour</p>
-          <p class="jd-kv"><strong>Minimum:</strong> 6-month commitment</p>
-          <h3 class="jd-card__sub">Included</h3>
-          <ul>
-            <li>Two-Assistant rotation for full daily continuity</li>
-            <li>Overnight add-on available for transition periods</li>
-            <li>Weekly progress notes shared with family contact</li>
-            <li>Priority scheduling for changes mid-term</li>
-          </ul>
-        </article>
+          <h3 class="jd-card__sub">Overnight</h3>
+          <p class="jd-kv"><strong>Use:</strong> Overnight presence layered on a daytime plan, or as part of Live-In.</p>
+          <p class="jd-kv"><strong>Billing:</strong> Awake-overnight at premium rate (active through the night). Sleep-overnight at reduced presence rate (on-site and available, but resting). Documented in writing before service begins.</p>
 
-        <!-- THE GOLD CALLOUT — Tier IV / Live-In -->
-        <div class="jd-callout" id="cp-livein">
-          <span class="jd-callout__badge">Tier IV · Premium</span>
-          <h2 class="jd-callout__h">Bridge / Live-In Care</h2>
-          <p class="jd-callout__p">A rotation of two or three Assistants providing twenty-four-hour presence through a transitional season. Designed for the moments that matter most — a post-hospital recovery, a school break, parent travel, or the loss of a primary caregiver. Live-In is the most personal and the most logistically complex service we offer, and is contracted one family at a time.</p>
-          <ul>
-            <li><strong>Coverage:</strong> 24/7 presence, weekends and overnights included</li>
-            <li><strong>Team:</strong> 2–3 Assistants rotating on a documented schedule</li>
-            <li><strong>Pricing:</strong> From $14,000 / month at a presence rate (~$20–25 / hour). Room and board, if applicable, is built into the contract.</li>
-            <li><strong>Minimum:</strong> 1 month for short transitions; custom contract for engagements longer than 3 months</li>
-            <li><strong>Note:</strong> Live-In is held to a separate contract template and a vetted Assistant pool. Travel days and overnight active hours are billed at premium rates set on intake.</li>
-          </ul>
-        </div>
-
-        <article class="jd-card" id="cp-addons">
-          <h2 class="jd-card__h">Add-ons</h2>
-          <p class="jd-card__small">Layer onto any tier or quote on their own</p>
-          <div class="jd-3up" style="margin-top:8px;">
-            <div class="jd-3up__item">
-              <div class="jd-3up__icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
-              </div>
-              <h3 class="jd-3up__h">Travel</h3>
-              <p class="jd-3up__d">Assistant accompanies the family on vacation or relocation. Per-diem covers travel, lodging, meals. Active hours billed normally; downtime at a reduced presence rate.</p>
-            </div>
-            <div class="jd-3up__item">
-              <div class="jd-3up__icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-              </div>
-              <h3 class="jd-3up__h">Overnight</h3>
-              <p class="jd-3up__d">Overnight presence on top of a daytime plan. Awake-overnight is billed at a premium rate; sleep-overnight is billed at a reduced presence rate. Documented before service begins.</p>
-            </div>
-            <div class="jd-3up__item">
-              <div class="jd-3up__icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              </div>
-              <h3 class="jd-3up__h">Vacation coverage</h3>
-              <p class="jd-3up__d">Short-term intensive support during a defined window — school breaks, parent business trips, recovery periods. Two-week minimum, billed up front, refundable if cancelled 14 days out.</p>
-            </div>
-          </div>
+          <h3 class="jd-card__sub">Vacation coverage</h3>
+          <p class="jd-kv"><strong>Use:</strong> Short-term intensive support during a defined window — school breaks, parent business trips, recovery periods.</p>
+          <p class="jd-kv"><strong>Billing:</strong> Two-week minimum, billed up front, refundable if cancelled 14+ days out.</p>
         </article>
 
         <article class="jd-card" id="cp-pricing">
-          <h2 class="jd-card__h">Pricing structure</h2>
-          <p>Custom plans are quote-based rather than menu-priced. The four tiers above list starting figures; the final plan reflects the actual hours, days, and structure your family needs.</p>
-          <h3 class="jd-card__sub">How hourly rates work</h3>
-          <p class="jd-kv"><strong>Standard active rate:</strong> $36 – $45 / hour. Higher for shorter intensives, lower for longer commitments.</p>
-          <p class="jd-kv"><strong>Live-In presence rate:</strong> $20 – $25 / hour. Most live-in hours are "on-site presence" rather than active work, so the rate is lower.</p>
-          <p class="jd-kv"><strong>Overnight awake rate:</strong> Premium — set on intake. Awake-overnight requires the Assistant to be alert through the night.</p>
-          <p class="jd-kv"><strong>Overnight sleep rate:</strong> Reduced presence rate. Assistant is on-site and available, but resting.</p>
-          <p class="jd-kv"><strong>Travel:</strong> Active hours at standard rate. Downtime on the trip at reduced presence rate. Travel costs (flights, hotel, meals, mileage) are pass-through and pre-approved.</p>
-          <h3 class="jd-card__sub">Commitment discounts</h3>
-          <ul>
-            <li><strong>3-month term:</strong> Standard rate.</li>
-            <li><strong>6-month term:</strong> Roughly 5–8% per-hour discount.</li>
-            <li><strong>12-month term:</strong> Roughly 10–12% per-hour discount.</li>
-          </ul>
-          <p class="jd-note"><strong>No-surprise pricing.</strong> Every line item — hourly rate, mileage, travel, overnight, holidays — is written into your contract before service begins.</p>
+          <h2 class="jd-card__h">Pricing &amp; commitment</h2>
+          <p>Custom plans are quote-based rather than menu-priced — the four tiers above list starting figures, and the final plan reflects the actual hours, days, and structure your family needs.</p>
+
+          <h3 class="jd-card__sub">Rate types</h3>
+          <p class="jd-kv"><strong>Standard active:</strong> $36 – $45 / hour. Higher for shorter intensives, lower for longer commitments.</p>
+          <p class="jd-kv"><strong>Live-In presence:</strong> $20 – $25 / hour. Most live-in hours are on-site presence rather than active work.</p>
+          <p class="jd-kv"><strong>Overnight awake:</strong> Premium rate, set on intake.</p>
+          <p class="jd-kv"><strong>Overnight sleep:</strong> Reduced presence rate.</p>
+          <p class="jd-kv"><strong>Travel downtime:</strong> Reduced presence rate. Travel costs pass-through.</p>
+
+          <h3 class="jd-card__sub">Term discounts</h3>
+          <p class="jd-kv"><strong>3-month term:</strong> Standard rate.</p>
+          <p class="jd-kv"><strong>6-month term:</strong> 5–8% per-hour discount.</p>
+          <p class="jd-kv"><strong>12-month term:</strong> 10–12% per-hour discount.</p>
+
+          <p class="jd-note"><strong>No-surprise pricing.</strong> Every line item — hourly rate, mileage, travel, overnight, holidays — is written into the contract before service begins.</p>
         </article>
 
         <article class="jd-card" id="cp-included">
-          <h2 class="jd-card__h">What's included in every custom plan</h2>
+          <h2 class="jd-card__h">What's included</h2>
+          <p class="jd-card__small">Every Custom Plan, regardless of tier</p>
           <div class="jd-cols">
             <ul>
-              <li><strong>Dedicated Assistant matching</strong> based on family fit, age range, and support needs</li>
-              <li><strong>Documented backup coverage</strong> so no day goes uncovered</li>
+              <li><strong>Dedicated Assistant</strong> matched on fit, age range, and support needs</li>
+              <li><strong>Documented backup coverage</strong> — no day uncovered</li>
               <li><strong>All standard PM services:</strong> education, life skills, personal support</li>
               <li><strong>Monthly family check-in</strong> with your PM contact</li>
               <li><strong>Written contract</strong> with every rate and term spelled out</li>
             </ul>
             <ul>
-              <li><strong>Schedule flexibility</strong> within term — hours can flex up or down with 30 days' notice</li>
+              <li><strong>Schedule flexibility</strong> — hours flex up/down with 30 days' notice</li>
               <li><strong>Pause clause</strong> for medical, school break, or family emergencies</li>
-              <li><strong>Same Assistant continuity</strong> for the duration of the contract</li>
-              <li><strong>Direct communication</strong> with PM (not an outsourced call centre)</li>
+              <li><strong>Continuity</strong> — same Assistant for the full contract</li>
+              <li><strong>Direct communication</strong> with PM, not an outsourced call centre</li>
               <li><strong>Transition support</strong> when the contract ends or evolves</li>
             </ul>
           </div>
         </article>
 
-        <article class="jd-card" id="cp-how">
-          <h2 class="jd-card__h">How it works</h2>
-          <p class="jd-card__small">Three steps from first contact to first day</p>
-          <div class="jd-3up" style="margin-top:8px;">
-            <div class="jd-3up__item">
-              <span class="jd-3up__num">01</span>
-              <h3 class="jd-3up__h">A real conversation</h3>
-              <p class="jd-3up__d">Submit the form below or send us an email. Within one business day we set up a 30-minute call to understand your situation — schedule, ages, support needs, season of life.</p>
-            </div>
-            <div class="jd-3up__item">
-              <span class="jd-3up__num">02</span>
-              <h3 class="jd-3up__h">A tailored proposal</h3>
-              <p class="jd-3up__d">Within a few business days you receive a written plan: hours, structure, Assistant profile, monthly cost, contract length, start date. Nothing hidden in fine print.</p>
-            </div>
-            <div class="jd-3up__item">
-              <span class="jd-3up__num">03</span>
-              <h3 class="jd-3up__h">Match and begin</h3>
-              <p class="jd-3up__d">On acceptance, we match you with the right Assistant (or rotation) and schedule an in-home orientation. Service starts on the date in your contract — typically two to three weeks out.</p>
-            </div>
-          </div>
+        <article class="jd-card" id="cp-process">
+          <h2 class="jd-card__h">Process</h2>
+          <p class="jd-card__small">Three steps, typically two to three weeks from inquiry to first day</p>
+          <ol class="jd-ol">
+            <li><strong>Inquiry &amp; call.</strong> Submit the form below or email us. We respond within one business day and schedule a 30-minute intake call to understand your situation.</li>
+            <li><strong>Written proposal.</strong> Within a few business days you receive a written plan covering hours, structure, Assistant profile, monthly cost, contract length, and start date.</li>
+            <li><strong>Match &amp; begin.</strong> On acceptance we match the Assistant (or rotation), schedule an in-home orientation, and begin service on the contract date.</li>
+          </ol>
         </article>
 
         <article class="jd-card" id="cp-faq">
           <h2 class="jd-card__h">Common questions</h2>
+
           <h3 class="jd-faq__q">Why isn't this on the main pricing page?</h3>
-          <p class="jd-faq__a">Custom plans are quote-based, not menu-priced. Hour counts, structure, and rate vary by family. Posting fixed prices for every possible shape would mislead more often than it would help — so we anchor with starting figures and finalise the rest on a call.</p>
+          <p class="jd-faq__a">Custom plans are quote-based, not menu-priced. Hour counts, structure, and rate vary too much by family to publish fixed prices. The four tier figures above are anchors — the final plan is sized on a call.</p>
 
           <h3 class="jd-faq__q">Can the plan change month-to-month?</h3>
-          <p class="jd-faq__a">Within your contract term, hours and structure can flex up or down with 30 days' notice. A bigger structural change (Daytime to Live-In, for example) triggers a fresh contract.</p>
+          <p class="jd-faq__a">Within your term, hours flex up or down with 30 days' notice. A bigger structural change (Daytime to Live-In, for example) triggers a fresh contract.</p>
 
           <h3 class="jd-faq__q">How does Live-In pricing actually work?</h3>
-          <p class="jd-faq__a">Live-In is billed at a presence rate (around $20–25 / hour) because most hours are "on-site available" rather than active work. The monthly figure reflects the rotation of 2–3 Assistants and any room-and-board arrangement. Awake-overnight active hours are billed at a premium rate set on intake.</p>
+          <p class="jd-faq__a">Billed at a presence rate (~$20–25 / hour) because most live-in hours are on-site availability, not active work. The monthly figure reflects the rotation of 2–3 Assistants and any room-and-board arrangement. Awake-overnight active hours are billed at a separate premium rate.</p>
 
           <h3 class="jd-faq__q">Do you support travel and relocation?</h3>
-          <p class="jd-faq__a">Yes. Assistants travel with families when continuity matters. Travel time is billed actively; downtime on the trip is at the reduced presence rate. Travel costs (flights, hotel, meals, mileage) are pass-through and pre-approved.</p>
+          <p class="jd-faq__a">Yes. Active hours at standard rate, downtime at reduced presence rate, travel costs pass-through and pre-approved.</p>
 
           <h3 class="jd-faq__q">Is there a minimum commitment?</h3>
-          <p class="jd-faq__a">Three months for Intensive Day and Full Daytime. Six months for Extended Care. One month for short-transition Bridge / Live-In, with custom contracts for engagements longer than three months. Longer terms earn a discount.</p>
+          <p class="jd-faq__a">Three months for Intensive Day and Full Daytime, six months for Extended Care, one month for short-transition Bridge / Live-In. Custom contract for Live-In engagements longer than three months.</p>
 
-          <h3 class="jd-faq__q">What if our needs don't match any of the four tiers?</h3>
-          <p class="jd-faq__a">That's the most common case. The four tiers are anchors so you have a sense of the shape and cost. Most families land somewhere in between — say a 6-hour weekday block plus selected weekends, or Daytime plus a few overnight nights per month. Tell us what you need on the form below and we'll build it.</p>
+          <h3 class="jd-faq__q">What if our needs don't match any tier?</h3>
+          <p class="jd-faq__a">Most families land between the four tiers — say a 6-hour weekday block plus weekends, or Daytime plus selected overnights. Describe what you need on the form below and we'll build it.</p>
         </article>
 
-        <article class="jd-card jd-card--dark">
+        <article class="jd-card">
           <h2 class="jd-card__h">About Private Mentorship</h2>
-          <p>Private Mentorship matches families in Greater Vancouver with a long-term Private Family Assistant — one person, one family, ongoing. Most of our families have stayed with their Assistant since 2023.</p>
-          <p>We're founder-led, contract-based, and direct. Every contract is signed by an actual member of the team, not an outsourced intake service. We choose our Assistants slowly and our families carefully.</p>
-          <p><a href="index.html">Learn more about how we work →</a></p>
+          <p>Private Mentorship matches families in Greater Vancouver with a long-term Private Family Assistant. Most of our families have stayed with their Assistant since 2023.</p>
+          <p>Founder-led, contract-based, direct. Every contract is signed by an actual team member — no outsourced intake. Assistants are vetted slowly; families are accepted carefully. <a href="index.html">Learn more →</a></p>
         </article>
 
         <article class="jd-card" id="cp-quote">
@@ -731,9 +595,8 @@
                 </select>
               </div>
             </div>
-
             <div class="jd-form__field">
-              <label class="jd-form__label">What kind of support are you considering?</label>
+              <label class="jd-form__label">Support you're considering</label>
               <div class="jd-form__checks">
                 <label class="jd-form__check"><input type="checkbox" value="intensive-day"> Intensive Day (80 hrs/mo)</label>
                 <label class="jd-form__check"><input type="checkbox" value="full-daytime"> Full Daytime (160 hrs/mo)</label>
@@ -742,41 +605,37 @@
                 <label class="jd-form__check"><input type="checkbox" value="overnight"> Overnight presence</label>
                 <label class="jd-form__check"><input type="checkbox" value="travel"> Travel / Relocation</label>
                 <label class="jd-form__check"><input type="checkbox" value="vacation"> Vacation coverage</label>
-                <label class="jd-form__check"><input type="checkbox" value="not-sure"> Not sure yet — let's discuss</label>
+                <label class="jd-form__check"><input type="checkbox" value="not-sure"> Not sure yet</label>
               </div>
             </div>
-
             <div class="jd-form__field">
-              <label class="jd-form__label" for="cpHours">Roughly how many hours per week do you need?</label>
-              <input class="jd-form__input" id="cpHours" type="text" placeholder="e.g. 40 hours weekdays, plus occasional weekends" />
+              <label class="jd-form__label" for="cpHours">Roughly how many hours per week?</label>
+              <input class="jd-form__input" id="cpHours" type="text" placeholder="e.g. 40 hrs weekdays, plus occasional weekends" />
             </div>
-
             <div class="jd-form__field">
               <label class="jd-form__label" for="cpContext">Tell us about the situation</label>
               <textarea class="jd-form__textarea" id="cpContext" rows="5" placeholder="Who is the support for? Ages, season of life, what's most important — anything that helps us prepare for the call."></textarea>
             </div>
-
             <button class="jd-form__submit" type="submit">Send and request a call</button>
             <p class="jd-form__note">We'll respond within one business day. By submitting, you agree to be contacted by our intake team.</p>
           </form>
         </article>
 
-        <!-- Final apply box -->
         <div class="jd-applybox">
-          <h3 class="jd-applybox__h">Prefer to talk it through?</h3>
-          <p class="jd-applybox__p">If a form feels formal for what you're navigating, email us directly. A real person responds within one business day.</p>
+          <div class="jd-applybox__text">
+            <strong>Prefer email?</strong>
+            Send a short note about your situation to hello@privatementorship.ca. A real person responds within one business day.
+          </div>
           <a class="jd-applybox__btn" href="mailto:hello@privatementorship.ca">
-            hello@privatementorship.ca
+            Email instead
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </a>
-          <p class="jd-applybox__meta">Inquiries handled by the founding team. Confidential.</p>
         </div>
 
       </main>
     </div>
   </section>
 
-  <!-- ===== FOOTER ===== -->
   <footer class="jd-foot">
     © Private Mentorship · <a href="index.html">Home</a> · <a href="the-assistant.html">The Assistant</a> · <a href="hiring.html">Hiring</a> · <a href="signin.html">Sign in</a>
   </footer>
@@ -784,7 +643,6 @@
   <div class="jd-toast" id="jdToast"><span id="jdToastText">Done</span></div>
 
   <script>
-    // Sticky bar — appears when the header card scrolls past
     (function(){
       var anchor = document.getElementById('jd-header-anchor');
       var bar = document.getElementById('jdStickybar');
@@ -798,7 +656,6 @@
       obs.observe(anchor);
     })();
 
-    // Form submit — placeholder until wired to Supabase
     (function(){
       var form = document.getElementById('cpQuoteForm');
       if (!form) return;
@@ -810,13 +667,13 @@
         showToast('Got it — we\'ll be in touch within one business day.');
         form.reset();
       });
-      var toastTimer = null;
+      var t = null;
       function showToast(text){
-        var t = document.getElementById('jdToast');
+        var el = document.getElementById('jdToast');
         document.getElementById('jdToastText').textContent = text;
-        t.classList.add('is-shown');
-        if (toastTimer) clearTimeout(toastTimer);
-        toastTimer = setTimeout(function(){ t.classList.remove('is-shown'); }, 3500);
+        el.classList.add('is-shown');
+        if (t) clearTimeout(t);
+        t = setTimeout(function(){ el.classList.remove('is-shown'); }, 3500);
       }
     })();
   </script>
