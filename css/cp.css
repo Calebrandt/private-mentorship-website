@@ -197,7 +197,38 @@ a{color:inherit;}
   .jd-cat__body{padding:12px 14px;}
 }
 
-/* ─── FAQ ────────────────────────────────────────────────── */
+/* ─── FAQ — accordion via <details>/<summary> ────────────── */
+.jd-acc{display:flex;flex-direction:column;margin-top:4px;}
+.jd-acc-item{border-bottom:1px solid #f1f1f3;}
+.jd-acc-item:last-child{border-bottom:none;}
+.jd-acc-q{
+  list-style:none;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:18px;
+  padding:14px 0;
+  cursor:pointer;
+  font-size:14px;font-weight:600;color:#0f1a14;letter-spacing:-.003em;line-height:1.4;
+  user-select:none;
+  transition:color .15s ease;
+}
+.jd-acc-q::-webkit-details-marker{display:none;}
+.jd-acc-q::marker{display:none;content:'';}
+.jd-acc-q:hover{color:#52525b;}
+.jd-acc-chev{
+  width:16px;height:16px;color:#52525b;flex-shrink:0;margin-top:2px;
+  transition:transform .35s cubic-bezier(.22,1,.36,1);
+}
+.jd-acc-item[open] .jd-acc-chev{transform:rotate(180deg);}
+.jd-acc-a{
+  padding:0 0 16px;max-width:62ch;
+  font-size:13.5px;line-height:1.65;color:#3f3f46;letter-spacing:-.002em;
+  animation:jdAccFade .32s ease;
+}
+.jd-acc-a p{margin:0 0 8px;}
+.jd-acc-a p:last-child{margin-bottom:0;}
+@keyframes jdAccFade{from{opacity:0;transform:translateY(-3px);}to{opacity:1;transform:translateY(0);}}
+@media (prefers-reduced-motion: reduce){.jd-acc-chev,.jd-acc-a{transition:none;animation:none;}}
+
+/* Legacy classes — kept so older markup still reads OK if any remains */
 .jd-faq__q{margin:14px 0 5px;font-weight:600;font-size:13.5px;letter-spacing:-.003em;color:#0f1a14;}
 .jd-faq__q:first-child{margin-top:0;}
 .jd-faq__a{margin:0 0 12px !important;font-size:13.5px !important;line-height:1.6 !important;color:#3f3f46 !important;}
