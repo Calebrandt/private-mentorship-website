@@ -130,6 +130,10 @@
     margin:0;line-height:1;font-variant-numeric:tabular-nums;
   }
   .pm-gift__card-amount small{font-size:15px;font-weight:500;margin-left:5px;opacity:.7;}
+  .pm-gift__card-term{
+    font-size:11px;font-weight:500;letter-spacing:.06em;
+    text-transform:uppercase;opacity:.6;margin:7px 0 0;
+  }
   .pm-gift__card-meta{
     display:flex;justify-content:space-between;align-items:flex-end;
     margin-top:12px;font-size:11.5px;font-weight:500;line-height:1.4;
@@ -351,6 +355,7 @@
             <p class="pm-gift__card-brand">Private Mentorship</p>
             <div class="pm-gift__card-art" id="cardArt"></div>
             <p class="pm-gift__card-amount" id="cardAmount">24<small>hrs</small></p>
+            <p class="pm-gift__card-term" id="cardTerm">1-month plan</p>
             <div class="pm-gift__card-meta">
               <div>
                 <span class="pm-gift__card-meta-label">For</span>
@@ -390,40 +395,47 @@
       <!-- ── RIGHT: Form ── -->
       <form class="pm-gift__form" id="giftForm" autocomplete="off">
 
-        <!-- Amount -->
+        <!-- Term -->
         <fieldset class="pm-gift__field">
-          <legend class="pm-gift__label">Choose an amount</legend>
-          <div class="pm-gift__amounts" id="amountGrid">
+          <legend class="pm-gift__label">Plan length</legend>
+          <div class="pm-gift__amounts" style="grid-template-columns:1fr 1fr;" id="termGrid">
             <label class="pm-gift__amount">
-              <input type="radio" name="amount" value="8">
+              <input type="radio" name="term" value="1" checked>
               <span class="pm-gift__amount-tile">
-                <span class="pm-gift__amount-hours">8 hrs</span>
-                <span class="pm-gift__amount-price">$240</span>
+                <span class="pm-gift__amount-hours">1 Month</span>
+                <span class="pm-gift__amount-price">$30 / hour</span>
               </span>
             </label>
             <label class="pm-gift__amount">
-              <input type="radio" name="amount" value="16">
+              <input type="radio" name="term" value="2">
               <span class="pm-gift__amount-tile">
-                <span class="pm-gift__amount-hours">16 hrs</span>
-                <span class="pm-gift__amount-price">$480</span>
-              </span>
-            </label>
-            <label class="pm-gift__amount">
-              <input type="radio" name="amount" value="24" checked>
-              <span class="pm-gift__amount-tile">
-                <span class="pm-gift__amount-hours">24 hrs</span>
-                <span class="pm-gift__amount-price">$720</span>
-              </span>
-            </label>
-            <label class="pm-gift__amount">
-              <input type="radio" name="amount" value="40">
-              <span class="pm-gift__amount-tile">
-                <span class="pm-gift__amount-hours">40 hrs</span>
-                <span class="pm-gift__amount-price">$1,200</span>
+                <span class="pm-gift__amount-hours">2 Months</span>
+                <span class="pm-gift__amount-price">$45 / hour</span>
               </span>
             </label>
           </div>
-          <span class="pm-gift__hint">$30 / hour — locked in at gift purchase. Recipient redeems any time.</span>
+        </fieldset>
+
+        <!-- Hours -->
+        <fieldset class="pm-gift__field">
+          <legend class="pm-gift__label">Reserved hours</legend>
+          <div class="pm-gift__amounts" style="grid-template-columns:1fr 1fr;" id="hoursGrid">
+            <label class="pm-gift__amount">
+              <input type="radio" name="hours" value="24" checked>
+              <span class="pm-gift__amount-tile">
+                <span class="pm-gift__amount-hours">24 hours</span>
+                <span class="pm-gift__amount-price" id="hoursPrice24">$720</span>
+              </span>
+            </label>
+            <label class="pm-gift__amount">
+              <input type="radio" name="hours" value="40">
+              <span class="pm-gift__amount-tile">
+                <span class="pm-gift__amount-hours">40 hours</span>
+                <span class="pm-gift__amount-price" id="hoursPrice40">$1,200</span>
+              </span>
+            </label>
+          </div>
+          <span class="pm-gift__hint">Hourly rate is locked at purchase. Hours never expire.</span>
         </fieldset>
 
         <!-- Delivery method -->
@@ -499,24 +511,47 @@
 (async () => {
   const $ = id => document.getElementById(id);
 
-  // Populate user pod from auth, but don't gate the page — it's a public-feeling
-  // landing for the gift flow even before sign-in.
+  // Derive a clean "last name" for the card.
+  //   • Prefer profile.full_name → use the last word (true last name).
+  //   • Else from email: strip digits, take the leading letter run, Title-case it.
+  //     e.g. "yangm7971@gmail.com" → "Yang", "michaelyang42@…" → "Michaelyang"
+  //     (good enough as a placeholder — user can edit the field anyway.)
+  function lastNameOf(profileName, email){
+    if (profileName && String(profileName).trim()) {
+      const parts = String(profileName).trim().split(/\s+/);
+      return parts[parts.length - 1];
+    }
+    if (email) {
+      const prefix = String(email).split('@')[0] || '';
+      const leadingLetters = (prefix.match(/^[a-zA-Z]+/) || [''])[0];
+      if (leadingLetters.length >= 2) {
+        return leadingLetters.charAt(0).toUpperCase() + leadingLetters.slice(1).toLowerCase();
+      }
+    }
+    return '';
+  }
+
+  // Populate user pod from auth — page is browsable without sign-in.
   try {
     const user = await window.pmHiring.getCurrentUser();
     if (user) {
       const profile = await window.pmHiring.fetchCurrentUserProfile().catch(() => null);
-      const fullName = profile?.full_name || user.email?.split('@')[0] || 'Client';
-      const first = fullName.split(' ')[0];
+      const fullName = profile?.full_name || '';
+      const last = lastNameOf(fullName, user.email);
+      // Top-right pod shows the FIRST name when available, else last name fallback
+      const first = (fullName.split(' ')[0]) || last || 'Client';
       $('nxUserName').textContent = first;
-      $('nxUserAvatar').textContent = (first[0] || 'C').toUpperCase();
-      // Prefill sender field
-      $('senderName').value = fullName;
+      $('nxUserAvatar').textContent = (first[0] || last[0] || 'C').toUpperCase();
+      // Prefill sender → just the LAST name (e.g. "Yang"), never the email prefix.
+      if (last) $('senderName').value = last;
     }
   } catch (_) {}
 
-  // Pricing table — keep in sync with /membership ($30/hr base)
-  const HOURLY = 30;
-  const PRICES = { 8:240, 16:480, 24:720, 40:1200 };
+  // Pricing — keep in sync with /membership
+  //   1-month term = $30/hour · 2-month term = $45/hour
+  //   Hours tier = 24 OR 40
+  const RATES = { 1: 30, 2: 45 };
+  function calcTotal(termMonths, hours){ return (RATES[termMonths] || 30) * hours; }
 
   // ── Decorative SVG illustrations ─────────────────────────────
   // Each entry has BIG (for the card preview) + SMALL (for the picker thumbnail).
@@ -635,7 +670,8 @@
 
   // State
   const state = {
-    amount: 24,
+    term: 1,        // 1 or 2 (months)
+    hours: 24,      // 24 or 40
     theme: 'midnight',
     graphic: 'gift',
     delivery: 'email',
@@ -644,20 +680,28 @@
   function fmtPrice(n){ return '$' + n.toLocaleString('en-CA'); }
 
   function updateCard(){
-    // Amount
-    $('cardAmount').innerHTML = state.amount + '<small>hrs</small>';
+    // Hours hero number
+    $('cardAmount').innerHTML = state.hours + '<small>hrs</small>';
+    // Plan length eyebrow under the hours
+    $('cardTerm').textContent = (state.term === 2 ? '2-month plan' : '1-month plan');
     // Theme
     const card = $('giftCard');
     card.className = 'pm-gift__card pm-gift__card--' + state.theme;
     // Graphic
     $('cardArt').innerHTML = (GRAPHICS[state.graphic] || GRAPHICS.gift).big;
-    // Recipient + sender
+    // Recipient + sender (no email-derived strings; fallback is just "You")
     const rn = ($('recipName').value || '').trim() || 'Recipient';
     const sn = ($('senderName').value || '').trim() || 'You';
     $('cardRecipient').textContent = rn.length > 20 ? rn.slice(0, 20) + '…' : rn;
     $('cardSender').textContent    = sn.length > 20 ? sn.slice(0, 20) + '…' : sn;
-    // CTA text
-    $('ctaText').textContent = 'Purchase ' + fmtPrice(PRICES[state.amount] || 0) + ' gift';
+    // Live-recompute hour-tile prices for current term
+    const p24 = calcTotal(state.term, 24);
+    const p40 = calcTotal(state.term, 40);
+    if ($('hoursPrice24')) $('hoursPrice24').textContent = fmtPrice(p24);
+    if ($('hoursPrice40')) $('hoursPrice40').textContent = fmtPrice(p40);
+    // CTA
+    const total = calcTotal(state.term, state.hours);
+    $('ctaText').textContent = 'Purchase ' + fmtPrice(total) + ' gift';
   }
 
   // Render the graphic-picker thumbnails from the GRAPHICS map
@@ -677,10 +721,16 @@
     });
   }
 
-  // Amount selection
-  $('amountGrid').addEventListener('change', e => {
-    if (e.target.name === 'amount') {
-      state.amount = Number(e.target.value);
+  // Term + hours selection (independent dimensions)
+  $('termGrid').addEventListener('change', e => {
+    if (e.target.name === 'term') {
+      state.term = Number(e.target.value);
+      updateCard();
+    }
+  });
+  $('hoursGrid').addEventListener('change', e => {
+    if (e.target.name === 'hours') {
+      state.hours = Number(e.target.value);
       updateCard();
     }
   });
