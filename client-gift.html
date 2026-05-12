@@ -191,13 +191,19 @@
   }
   .pm-gift__graphic svg{width:28px;height:28px;}
 
-  /* Pitch text under preview */
+  /* Pitch text under preview — title on its own line, body below */
   .pm-gift__pitch{
-    margin:28px 0 0;padding:18px 20px;
-    background:var(--border-soft);border-radius:11px;
-    font-size:13px;line-height:1.55;color:var(--ink-mute);font-weight:500;
+    margin:28px 0 0;padding:20px 22px;
+    background:var(--border-soft);border-radius:12px;
   }
-  .pm-gift__pitch strong{color:var(--ink-2);font-weight:600;}
+  .pm-gift__pitch-title{
+    font-size:13px;font-weight:600;color:var(--ink-2);
+    margin:0 0 8px;letter-spacing:-.005em;
+  }
+  .pm-gift__pitch-body{
+    font-size:13px;line-height:1.6;color:var(--ink-mute);
+    font-weight:500;margin:0;letter-spacing:-.002em;
+  }
 
   /* ── Right column: form ── */
   .pm-gift__form{display:flex;flex-direction:column;gap:24px;}
@@ -387,9 +393,10 @@
           </div>
         </div>
 
-        <p class="pm-gift__pitch">
-          <strong>Why this gift?</strong> Most gifts gather dust. Private Mentorship hours unlock real time with a dedicated Family Assistant — academic support, mentorship, structure, and presence — for someone you love.
-        </p>
+        <div class="pm-gift__pitch">
+          <p class="pm-gift__pitch-title">Why this gift?</p>
+          <p class="pm-gift__pitch-body">Most gifts are forgotten the moment they're unwrapped. Give someone a Private Family Assistant — one or two months of their own dedicated mentor, structure, and support. The kind of gift that's remembered for a lifetime.</p>
+        </div>
       </div>
 
       <!-- ── RIGHT: Form ── -->
