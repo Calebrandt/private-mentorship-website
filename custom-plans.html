@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Custom Plans — Private Mentorship</title>
+<meta name="description" content="Daily, overnight, travel, or live-in care plans for families who need more than our standard hours. Built around your family's rhythm." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#FAF8F4;color:#0E1721;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+
+  :root{
+    --bg:#FAF8F4;
+    --ink:#0E1721;
+    --ink-mute:rgba(14,23,33,0.62);
+    --ink-tert:rgba(14,23,33,0.45);
+    --border:rgba(14,23,33,0.08);
+    --border-soft:rgba(14,23,33,0.05);
+    --card:#FFFFFF;
+    --teal:#0E7C82;
+    --amber:#E68A3D;
+    --red:#DD5440;
+    --gold:#C19A4E;
+    --gold-deep:#A07F35;
+  }
+
+  /* ── Top nav ── */
+  .cp-nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(250,248,244,0.84);
+    backdrop-filter:saturate(140%) blur(14px);
+    -webkit-backdrop-filter:saturate(140%) blur(14px);
+    border-bottom:1px solid var(--border-soft);
+  }
+  .cp-nav__inner{
+    max-width:1180px;margin:0 auto;padding:18px 28px;
+    display:flex;align-items:center;justify-content:space-between;gap:24px;
+  }
+  .cp-nav__logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);}
+  .cp-nav__logo img{width:32px;height:32px;}
+  .cp-nav__logo-name{font:800 17px/1 'Inter',sans-serif;letter-spacing:-.022em;}
+  .cp-nav__back{
+    font:600 13px/1 'Inter',sans-serif;color:var(--ink-mute);text-decoration:none;
+    letter-spacing:-.005em;display:inline-flex;align-items:center;gap:6px;
+    transition:color .15s ease;
+  }
+  .cp-nav__back:hover{color:var(--ink);}
+  .cp-nav__back svg{width:13px;height:13px;}
+
+  /* ── Shell ── */
+  .cp-shell{max-width:1080px;margin:0 auto;padding:56px 28px 80px;}
+
+  /* ── Hero ── */
+  .cp-hero{margin-bottom:64px;}
+  .cp-hero__eyebrow{
+    display:inline-block;font:700 11px/1 'Inter',sans-serif;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--gold-deep);
+    padding:6px 12px;background:rgba(193,154,78,0.10);
+    border-radius:9999px;margin-bottom:18px;
+  }
+  .cp-hero__title{
+    font:800 clamp(36px, 5vw, 56px)/1.05 'Inter',sans-serif;
+    letter-spacing:-.028em;color:var(--ink);margin:0 0 18px;max-width:780px;
+  }
+  .cp-hero__title em{font-style:normal;color:var(--gold-deep);}
+  .cp-hero__sub{
+    font:500 17px/1.55 'Inter',sans-serif;color:var(--ink-mute);
+    margin:0;max-width:680px;letter-spacing:-.005em;
+  }
+  .cp-hero__actions{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;}
+  .cp-btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:13px 22px;border-radius:9999px;
+    font:700 14px/1 'Inter',sans-serif;letter-spacing:-.005em;
+    cursor:pointer;border:none;text-decoration:none;
+    transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .cp-btn--primary{
+    background:var(--ink);color:#FAF8F4;
+    box-shadow:0 8px 22px -8px rgba(14,23,33,0.45);
+  }
+  .cp-btn--primary:hover{transform:translateY(-1px);box-shadow:0 14px 30px -10px rgba(14,23,33,0.55);}
+  .cp-btn--ghost{
+    background:transparent;color:var(--ink);border:1px solid var(--border);
+  }
+  .cp-btn--ghost:hover{background:#fff;border-color:var(--ink);}
+  .cp-btn svg{width:14px;height:14px;}
+
+  /* ── Section title ── */
+  .cp-section{margin-bottom:72px;}
+  .cp-section__eyebrow{
+    font:700 10.5px/1 'Inter',sans-serif;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--ink-tert);margin:0 0 12px;
+  }
+  .cp-section__title{
+    font:800 28px/1.15 'Inter',sans-serif;letter-spacing:-.022em;
+    color:var(--ink);margin:0 0 12px;max-width:720px;
+  }
+  .cp-section__sub{
+    font:500 15px/1.6 'Inter',sans-serif;color:var(--ink-mute);
+    margin:0;max-width:680px;letter-spacing:-.003em;
+  }
+
+  /* ── Why this exists ── */
+  .cp-why{
+    background:#fff;border:1px solid var(--border);border-radius:18px;
+    padding:32px 36px;
+  }
+  .cp-why__grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;
+  }
+  @media (max-width:760px){.cp-why__grid{grid-template-columns:1fr;gap:28px;}}
+  .cp-why__col h3{
+    font:700 16px/1.3 'Inter',sans-serif;letter-spacing:-.012em;
+    color:var(--ink);margin:0 0 10px;
+  }
+  .cp-why__col p{
+    font:500 14.5px/1.6 'Inter',sans-serif;color:var(--ink-mute);margin:0;
+    letter-spacing:-.003em;
+  }
+  .cp-why__col p + p{margin-top:10px;}
+  .cp-why__col-tag{
+    display:inline-block;font:700 10px/1 'Inter',sans-serif;
+    letter-spacing:.14em;text-transform:uppercase;
+    padding:4px 9px;border-radius:9999px;margin-bottom:12px;
+  }
+  .cp-why__col-tag--standard{background:rgba(14,124,130,0.10);color:var(--teal);}
+  .cp-why__col-tag--custom{background:rgba(193,154,78,0.12);color:var(--gold-deep);}
+
+  /* ── Tier cards ── */
+  .cp-tiers{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:18px;
+  }
+  @media (max-width:760px){.cp-tiers{grid-template-columns:1fr;}}
+  .cp-tier{
+    position:relative;
+    background:#fff;border:1px solid var(--border);border-radius:18px;
+    padding:30px 32px;
+    transition:transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s ease, border-color .25s ease;
+  }
+  .cp-tier:hover{transform:translateY(-2px);box-shadow:0 18px 38px -18px rgba(14,23,33,0.18);}
+  .cp-tier--feature{
+    border-color:var(--gold);
+    box-shadow:0 18px 38px -18px rgba(193,154,78,0.30);
+  }
+  .cp-tier__head{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    margin-bottom:8px;
+  }
+  .cp-tier__roman{
+    width:36px;height:36px;border-radius:10px;
+    background:var(--tier-color, var(--teal));color:#fff;
+    font:800 13px/1 'Inter',sans-serif;letter-spacing:-.012em;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .cp-tier__tag{
+    font:700 9.5px/1 'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--gold-deep);background:rgba(193,154,78,0.12);
+    padding:4px 10px;border-radius:9999px;
+  }
+  .cp-tier__name{
+    font:800 22px/1.15 'Inter',sans-serif;letter-spacing:-.020em;
+    color:var(--ink);margin:14px 0 4px;
+  }
+  .cp-tier__shape{
+    font:500 13px/1.4 'Inter',sans-serif;color:var(--ink-mute);
+    margin:0 0 18px;letter-spacing:-.003em;
+  }
+  .cp-tier__hours{
+    display:flex;align-items:baseline;gap:6px;margin-bottom:6px;
+  }
+  .cp-tier__hours-num{
+    font:800 36px/1 'Inter',sans-serif;letter-spacing:-.028em;color:var(--ink);
+    font-variant-numeric:tabular-nums;
+  }
+  .cp-tier__hours-unit{
+    font:600 14px/1 'Inter',sans-serif;color:var(--ink-mute);letter-spacing:-.005em;
+  }
+  .cp-tier__price{
+    font:600 13.5px/1.4 'Inter',sans-serif;color:var(--ink);margin:0 0 22px;
+    letter-spacing:-.003em;
+  }
+  .cp-tier__price small{color:var(--ink-mute);font-weight:500;}
+  .cp-tier__price-from{color:var(--ink-tert);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:3px;}
+  .cp-tier__list{
+    list-style:none;padding:0;margin:0 0 24px;
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .cp-tier__list li{
+    display:flex;align-items:flex-start;gap:10px;
+    font:500 13.5px/1.5 'Inter',sans-serif;color:var(--ink);
+    letter-spacing:-.003em;
+  }
+  .cp-tier__list svg{
+    width:14px;height:14px;flex-shrink:0;color:var(--tier-color, var(--teal));margin-top:3px;
+    stroke-width:2.4;
+  }
+  .cp-tier__cta{
+    display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    padding:11px 18px;border-radius:9999px;width:100%;
+    font:700 13.5px/1 'Inter',sans-serif;letter-spacing:-.005em;
+    background:#fff;color:var(--ink);border:1px solid var(--ink);
+    cursor:pointer;text-decoration:none;
+    transition:background .15s ease, color .15s ease;
+  }
+  .cp-tier__cta:hover{background:var(--ink);color:#fff;}
+  .cp-tier--feature .cp-tier__cta{background:var(--ink);color:#fff;}
+  .cp-tier--feature .cp-tier__cta:hover{background:transparent;color:var(--ink);}
+
+  /* ── Add-ons ── */
+  .cp-addons{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+  }
+  @media (max-width:760px){.cp-addons{grid-template-columns:1fr;}}
+  .cp-addon{
+    background:#fff;border:1px solid var(--border);border-radius:14px;
+    padding:22px 24px;
+  }
+  .cp-addon__icon{
+    width:40px;height:40px;border-radius:10px;
+    background:rgba(193,154,78,0.10);color:var(--gold-deep);
+    display:flex;align-items:center;justify-content:center;margin-bottom:14px;
+  }
+  .cp-addon__icon svg{width:18px;height:18px;stroke-width:2;}
+  .cp-addon__title{font:700 15px/1.2 'Inter',sans-serif;letter-spacing:-.012em;color:var(--ink);margin:0 0 6px;}
+  .cp-addon__body{font:500 13px/1.55 'Inter',sans-serif;color:var(--ink-mute);margin:0;letter-spacing:-.003em;}
+
+  /* ── How it works ── */
+  .cp-steps{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:16px;
+    counter-reset:step;
+  }
+  @media (max-width:760px){.cp-steps{grid-template-columns:1fr;}}
+  .cp-step{
+    background:#fff;border:1px solid var(--border);border-radius:14px;
+    padding:24px 26px;position:relative;
+  }
+  .cp-step__num{
+    font:800 11px/1 'Inter',sans-serif;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--gold-deep);margin:0 0 12px;
+  }
+  .cp-step__title{font:700 16px/1.25 'Inter',sans-serif;letter-spacing:-.014em;color:var(--ink);margin:0 0 8px;}
+  .cp-step__body{font:500 13.5px/1.55 'Inter',sans-serif;color:var(--ink-mute);margin:0;letter-spacing:-.003em;}
+
+  /* ── FAQ ── */
+  .cp-faq{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--border);}
+  .cp-faq__item{border-bottom:1px solid var(--border);padding:22px 0;}
+  .cp-faq__q{
+    font:700 16px/1.4 'Inter',sans-serif;letter-spacing:-.012em;color:var(--ink);
+    margin:0 0 8px;
+  }
+  .cp-faq__a{
+    font:500 14.5px/1.6 'Inter',sans-serif;color:var(--ink-mute);
+    margin:0;letter-spacing:-.003em;
+  }
+
+  /* ── Form ── */
+  .cp-form-wrap{
+    background:#fff;border:1px solid var(--border);border-radius:20px;
+    padding:36px 40px;
+  }
+  @media (max-width:760px){.cp-form-wrap{padding:24px;}}
+  .cp-form{display:flex;flex-direction:column;gap:18px;}
+  .cp-form__row{
+    display:grid;grid-template-columns:1fr 1fr;gap:14px;
+  }
+  @media (max-width:560px){.cp-form__row{grid-template-columns:1fr;}}
+  .cp-field{display:flex;flex-direction:column;gap:7px;}
+  .cp-field__label{
+    font:600 12.5px/1 'Inter',sans-serif;letter-spacing:-.003em;color:var(--ink);
+  }
+  .cp-field__input,.cp-field__textarea,.cp-field__select{
+    width:100%;background:#FAF8F4;border:1px solid var(--border);border-radius:10px;
+    padding:11px 13px;font:500 14px 'Inter',sans-serif;color:var(--ink);
+    transition:border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .cp-field__input::placeholder,.cp-field__textarea::placeholder{color:var(--ink-tert);font-weight:400;}
+  .cp-field__input:focus,.cp-field__textarea:focus,.cp-field__select:focus{
+    outline:none;background:#fff;border-color:var(--ink);
+    box-shadow:0 0 0 3px rgba(14,23,33,0.06);
+  }
+  .cp-field__textarea{resize:vertical;min-height:110px;line-height:1.55;font-family:inherit;}
+  .cp-checkgroup{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+  @media (max-width:560px){.cp-checkgroup{grid-template-columns:1fr;}}
+  .cp-check{
+    display:flex;align-items:center;gap:9px;cursor:pointer;
+    padding:10px 12px;background:#FAF8F4;border:1px solid var(--border);border-radius:9px;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .cp-check:hover{border-color:#cbd5e1;}
+  .cp-check input{accent-color:var(--gold);width:16px;height:16px;flex-shrink:0;}
+  .cp-check__label{font:500 13.5px/1.3 'Inter',sans-serif;color:var(--ink);letter-spacing:-.003em;}
+  .cp-form__submit{
+    align-self:flex-start;
+    padding:14px 28px;border-radius:9999px;border:0;cursor:pointer;
+    background:var(--ink);color:#FAF8F4;
+    font:700 14px/1 'Inter',sans-serif;letter-spacing:-.005em;
+    box-shadow:0 8px 22px -8px rgba(14,23,33,0.45);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .cp-form__submit:hover{transform:translateY(-1px);box-shadow:0 14px 30px -10px rgba(14,23,33,0.55);}
+  .cp-form__note{font:500 12px/1.5 'Inter',sans-serif;color:var(--ink-tert);margin:8px 0 0;letter-spacing:-.003em;}
+
+  /* ── Footer ── */
+  .cp-foot{
+    margin-top:80px;padding:36px 0;border-top:1px solid var(--border);
+    text-align:center;
+  }
+  .cp-foot__lock{
+    display:inline-flex;align-items:center;gap:6px;
+    font:500 12px/1 'Inter',sans-serif;color:var(--ink-tert);letter-spacing:-.003em;
+  }
+  .cp-foot__lock svg{width:11px;height:11px;}
+
+  /* ── Toast ── */
+  .cp-toast{
+    position:fixed;bottom:24px;left:50%;
+    transform:translateX(-50%) translateY(20px);z-index:1100;
+    background:var(--ink);color:#fff;
+    padding:13px 22px;border-radius:9999px;
+    font:600 13.5px Inter,sans-serif;
+    box-shadow:0 16px 36px -10px rgba(15,23,42,0.55);
+    opacity:0;pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  .cp-toast.is-shown{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
+</style>
+</head>
+<body>
+
+<!-- ─── Top nav ─── -->
+<header class="cp-nav">
+  <div class="cp-nav__inner">
+    <a class="cp-nav__logo" href="index.html" aria-label="Private Mentorship home">
+      <img src="assets/logos/pm-logo.png" alt="" />
+      <span class="cp-nav__logo-name">Private Mentorship</span>
+    </a>
+    <a class="cp-nav__back" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Back to home
+    </a>
+  </div>
+</header>
+
+<main class="cp-shell">
+
+  <!-- ─── HERO ─── -->
+  <section class="cp-hero">
+    <span class="cp-hero__eyebrow">Custom Plans</span>
+    <h1 class="cp-hero__title">When your family needs <em>more than standard hours.</em></h1>
+    <p class="cp-hero__sub">Daytime coverage, overnight presence, travel companionship, or full-time live-in support — built around your family's rhythm, not ours. Every custom plan starts with a conversation.</p>
+    <div class="cp-hero__actions">
+      <a class="cp-btn cp-btn--primary" href="#cp-quote">
+        Request a quote
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+      <a class="cp-btn cp-btn--ghost" href="#cp-tiers">See the plans</a>
+    </div>
+  </section>
+
+  <!-- ─── Why this exists ─── -->
+  <section class="cp-section">
+    <p class="cp-section__eyebrow">Why this exists</p>
+    <h2 class="cp-section__title">Standard hours work for most families. Some need more.</h2>
+    <p class="cp-section__sub" style="margin-bottom:32px;">Our 24- and 40-hour monthly plans are built for families with two or three sessions a week. But some families need eight hours a day. Some need overnights. Some are taking a family trip and want their Assistant with them. Some need a full-time, live-in bridge through a difficult season. Different needs, different math.</p>
+
+    <div class="cp-why">
+      <div class="cp-why__grid">
+        <div class="cp-why__col">
+          <span class="cp-why__col-tag cp-why__col-tag--standard">Standard Plans</span>
+          <h3>2–3 sessions a week, paced over the month</h3>
+          <p>24 or 40 hours per month, billed monthly or every two months. $30–$45 / hour depending on how quickly hours are used. The right fit for most families.</p>
+          <p style="margin-top:14px;font-size:13px;"><a href="index.html#pm-book" style="color:var(--teal);text-decoration:none;font-weight:600;">See standard plans →</a></p>
+        </div>
+        <div class="cp-why__col">
+          <span class="cp-why__col-tag cp-why__col-tag--custom">Custom Plans</span>
+          <h3>Daily, overnight, travel, or live-in care</h3>
+          <p>80 to 720 hours per month. Built around your family's actual schedule — eight-hour weekdays, overnight presence, a season of intensive support, or live-in continuity through a transition.</p>
+          <p style="margin-top:14px;font-size:13px;color:var(--ink-tert);">Quote-based. Every plan is built one-to-one.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── TIERS ─── -->
+  <section class="cp-section" id="cp-tiers">
+    <p class="cp-section__eyebrow">Anchor tiers</p>
+    <h2 class="cp-section__title">Four shapes families ask for most.</h2>
+    <p class="cp-section__sub" style="margin-bottom:32px;">These are starting points, not boxes. We'll adjust hours, days, and structure to match your family. Pricing scales with intensity and is finalised on a call.</p>
+
+    <div class="cp-tiers">
+
+      <!-- Tier 1: Intensive Day -->
+      <article class="cp-tier" style="--tier-color:#0E7C82">
+        <div class="cp-tier__head">
+          <span class="cp-tier__roman">I</span>
+        </div>
+        <h3 class="cp-tier__name">Intensive Day</h3>
+        <p class="cp-tier__shape">Half-days, weekdays. 4 hours × 5 days a week.</p>
+        <div class="cp-tier__hours">
+          <span class="cp-tier__hours-num">80</span>
+          <span class="cp-tier__hours-unit">hrs / month</span>
+        </div>
+        <p class="cp-tier__price"><span class="cp-tier__price-from">Starting from</span>$3,200 / month <small>· ~$40 / hr</small></p>
+        <ul class="cp-tier__list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Daily 4-hour blocks across the school week</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Same Assistant every day for routine</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Education + life skills + personal support, mixed</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>3-month minimum commitment</li>
+        </ul>
+        <a class="cp-tier__cta" href="#cp-quote">Talk to us</a>
+      </article>
+
+      <!-- Tier 2: Full Daytime — FEATURED -->
+      <article class="cp-tier cp-tier--feature" style="--tier-color:#E68A3D">
+        <div class="cp-tier__head">
+          <span class="cp-tier__roman">II</span>
+          <span class="cp-tier__tag">Most requested</span>
+        </div>
+        <h3 class="cp-tier__name">Full Daytime</h3>
+        <p class="cp-tier__shape">Full days, weekdays. 8 hours × 5 days a week.</p>
+        <div class="cp-tier__hours">
+          <span class="cp-tier__hours-num">160</span>
+          <span class="cp-tier__hours-unit">hrs / month</span>
+        </div>
+        <p class="cp-tier__price"><span class="cp-tier__price-from">Starting from</span>$6,080 / month <small>· ~$38 / hr</small></p>
+        <ul class="cp-tier__list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Full-day weekday coverage (morning to evening)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>School pick-ups, appointments, errands, dinner help</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Dedicated Assistant + backup coverage</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>3-month minimum &middot; 6 / 12-month discount available</li>
+        </ul>
+        <a class="cp-tier__cta" href="#cp-quote">Talk to us</a>
+      </article>
+
+      <!-- Tier 3: Extended -->
+      <article class="cp-tier" style="--tier-color:#DD5440">
+        <div class="cp-tier__head">
+          <span class="cp-tier__roman">III</span>
+        </div>
+        <h3 class="cp-tier__name">Extended Care</h3>
+        <p class="cp-tier__shape">Long days, weekdays. 12 hours × 5 days a week.</p>
+        <div class="cp-tier__hours">
+          <span class="cp-tier__hours-num">240</span>
+          <span class="cp-tier__hours-unit">hrs / month</span>
+        </div>
+        <p class="cp-tier__price"><span class="cp-tier__price-from">Starting from</span>$8,640 / month <small>· ~$36 / hr</small></p>
+        <ul class="cp-tier__list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Wake-up through bedtime weekday coverage</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Two-Assistant rotation for full continuity</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Overnight add-on available for transition periods</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>6-month minimum commitment</li>
+        </ul>
+        <a class="cp-tier__cta" href="#cp-quote">Talk to us</a>
+      </article>
+
+      <!-- Tier 4: Bridge / Live-In -->
+      <article class="cp-tier" style="--tier-color:#7A4FA0">
+        <div class="cp-tier__head">
+          <span class="cp-tier__roman">IV</span>
+        </div>
+        <h3 class="cp-tier__name">Bridge / Live-In</h3>
+        <p class="cp-tier__shape">24-hour presence through a transitional season.</p>
+        <div class="cp-tier__hours">
+          <span class="cp-tier__hours-num">24/7</span>
+          <span class="cp-tier__hours-unit">live-in</span>
+        </div>
+        <p class="cp-tier__price"><span class="cp-tier__price-from">Starting from</span>$14,000 / month <small>· rotation of 2-3 Assistants</small></p>
+        <ul class="cp-tier__list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Two or three Assistants rotating to maintain presence</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Overnight and weekend coverage included</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Designed for transitions: post-hospital, post-loss, school break, parent travel</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Minimum 1 month &middot; custom contract for &gt; 3 months</li>
+        </ul>
+        <a class="cp-tier__cta" href="#cp-quote">Talk to us</a>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ─── Add-ons ─── -->
+  <section class="cp-section">
+    <p class="cp-section__eyebrow">Add-ons</p>
+    <h2 class="cp-section__title">Layer on top of any plan.</h2>
+    <p class="cp-section__sub" style="margin-bottom:32px;">Travel, overnight, and vacation coverage can be added to any anchor tier or quoted on their own.</p>
+
+    <div class="cp-addons">
+      <div class="cp-addon">
+        <div class="cp-addon__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+        </div>
+        <h3 class="cp-addon__title">Travel</h3>
+        <p class="cp-addon__body">Your Assistant accompanies the family on vacation or relocation. Per-diem covers travel, lodging, meals. Hourly rate continues during active hours, with reduced "on-call" rate for downtime.</p>
+      </div>
+
+      <div class="cp-addon">
+        <div class="cp-addon__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </div>
+        <h3 class="cp-addon__title">Overnight</h3>
+        <p class="cp-addon__body">Overnight presence on top of a daytime plan. Awake-overnight is billed at a premium rate; sleep-overnight is billed at a reduced presence rate. Clear in writing before we start.</p>
+      </div>
+
+      <div class="cp-addon">
+        <div class="cp-addon__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <h3 class="cp-addon__title">Vacation Coverage</h3>
+        <p class="cp-addon__body">Short-term intensive support during a defined window — school breaks, parent business trips, recovery periods. Two-week minimum, billed up front, fully refundable if cancelled 14 days out.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── How it works ─── -->
+  <section class="cp-section">
+    <p class="cp-section__eyebrow">How it works</p>
+    <h2 class="cp-section__title">Three steps from first call to first day.</h2>
+    <p class="cp-section__sub" style="margin-bottom:32px;">Custom plans are quote-based because every family's situation is different. Here's the path.</p>
+
+    <div class="cp-steps">
+      <div class="cp-step">
+        <p class="cp-step__num">Step 01</p>
+        <h3 class="cp-step__title">A real conversation</h3>
+        <p class="cp-step__body">Submit the form below or send us an email. We'll set up a 30-minute call to understand your family's situation — schedule, ages, support needs, season of life, anything relevant.</p>
+      </div>
+      <div class="cp-step">
+        <p class="cp-step__num">Step 02</p>
+        <h3 class="cp-step__title">A tailored proposal</h3>
+        <p class="cp-step__body">Within a few business days we send a written plan: hours, structure, Assistant profile, monthly cost, contract length, and start date. No surprises in the fine print.</p>
+      </div>
+      <div class="cp-step">
+        <p class="cp-step__num">Step 03</p>
+        <h3 class="cp-step__title">Match and begin</h3>
+        <p class="cp-step__body">If you accept, we match you with the right Assistant (or rotation) and schedule an in-home introduction. Service begins on the date in your contract — typically two to three weeks out.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FAQ ─── -->
+  <section class="cp-section">
+    <p class="cp-section__eyebrow">Common questions</p>
+    <h2 class="cp-section__title">A few things families always ask.</h2>
+
+    <div class="cp-faq" style="margin-top:24px;">
+      <div class="cp-faq__item">
+        <h3 class="cp-faq__q">Why isn't this on the main pricing page?</h3>
+        <p class="cp-faq__a">Custom plans are quote-based, not menu-priced. Hour counts, structure, and rate vary by family. Putting a fixed price on every shape would mislead more often than it would help — so we anchor with starting figures and finalise on a call.</p>
+      </div>
+
+      <div class="cp-faq__item">
+        <h3 class="cp-faq__q">Can my plan change month to month?</h3>
+        <p class="cp-faq__a">Within the contract length you signed, hours and structure can flex up or down with 30 days' notice. Bigger structural changes (going from Daytime to Live-In, for example) trigger a fresh contract.</p>
+      </div>
+
+      <div class="cp-faq__item">
+        <h3 class="cp-faq__q">How does pricing work for Live-In?</h3>
+        <p class="cp-faq__a">Live-In is billed at a presence rate (lower per-hour than active hourly) because most hours are "available" rather than active work. The total monthly figure reflects the rotation of 2–3 Assistants, room and board if applicable, and the longer commitment.</p>
+      </div>
+
+      <div class="cp-faq__item">
+        <h3 class="cp-faq__q">Do you support travel and relocation?</h3>
+        <p class="cp-faq__a">Yes — Assistants travel with families when continuity matters. Travel days are billed actively; downtime on the trip (e.g. when the family is independent) is reduced presence rate. Travel costs (flights, hotel, meals, mileage) are pass-through.</p>
+      </div>
+
+      <div class="cp-faq__item">
+        <h3 class="cp-faq__q">Is there a minimum commitment?</h3>
+        <p class="cp-faq__a">3 months for Intensive Day and Full Daytime. 6 months for Extended Care. Live-In and Bridge start at 1 month for short transitions, with custom contracts for longer engagements. Longer commitments earn a discount.</p>
+      </div>
+
+      <div class="cp-faq__item">
+        <h3 class="cp-faq__q">What if our needs don't match any of the four tiers?</h3>
+        <p class="cp-faq__a">That's the normal case. The four tiers are anchors so you have a sense of the shape and cost. Most families end up with something in between — say a 6-hour weekday block plus weekends, or Daytime plus selected overnights. Tell us what you need on the form below and we'll build it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Quote form ─── -->
+  <section class="cp-section" id="cp-quote">
+    <p class="cp-section__eyebrow">Request a quote</p>
+    <h2 class="cp-section__title">Tell us about your family.</h2>
+    <p class="cp-section__sub" style="margin-bottom:24px;">A few minutes of detail saves us a half-hour on the call. Everything below is confidential and shared only with the person preparing your proposal.</p>
+
+    <div class="cp-form-wrap">
+      <form class="cp-form" id="cpQuoteForm" autocomplete="off">
+        <div class="cp-form__row">
+          <div class="cp-field">
+            <label class="cp-field__label" for="cpName">Your name</label>
+            <input class="cp-field__input" id="cpName" type="text" placeholder="First and last" required />
+          </div>
+          <div class="cp-field">
+            <label class="cp-field__label" for="cpEmail">Email</label>
+            <input class="cp-field__input" id="cpEmail" type="email" placeholder="you@example.com" required />
+          </div>
+        </div>
+
+        <div class="cp-form__row">
+          <div class="cp-field">
+            <label class="cp-field__label" for="cpPhone">Phone</label>
+            <input class="cp-field__input" id="cpPhone" type="tel" placeholder="(604) 555-0100" />
+          </div>
+          <div class="cp-field">
+            <label class="cp-field__label" for="cpTimezone">Best time to call</label>
+            <select class="cp-field__select" id="cpTimezone">
+              <option>Weekday morning</option>
+              <option>Weekday afternoon</option>
+              <option>Weekday evening</option>
+              <option>Weekend</option>
+              <option>Anytime</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="cp-field">
+          <label class="cp-field__label">What kind of support are you considering?</label>
+          <div class="cp-checkgroup">
+            <label class="cp-check"><input type="checkbox" value="intensive-day"> <span class="cp-check__label">Intensive Day (80 hrs/mo)</span></label>
+            <label class="cp-check"><input type="checkbox" value="full-daytime"> <span class="cp-check__label">Full Daytime (160 hrs/mo)</span></label>
+            <label class="cp-check"><input type="checkbox" value="extended"> <span class="cp-check__label">Extended Care (240 hrs/mo)</span></label>
+            <label class="cp-check"><input type="checkbox" value="bridge"> <span class="cp-check__label">Bridge / Live-In</span></label>
+            <label class="cp-check"><input type="checkbox" value="overnight"> <span class="cp-check__label">Overnight presence</span></label>
+            <label class="cp-check"><input type="checkbox" value="travel"> <span class="cp-check__label">Travel / Relocation</span></label>
+            <label class="cp-check"><input type="checkbox" value="vacation"> <span class="cp-check__label">Vacation coverage</span></label>
+            <label class="cp-check"><input type="checkbox" value="not-sure"> <span class="cp-check__label">Not sure yet — let's discuss</span></label>
+          </div>
+        </div>
+
+        <div class="cp-field">
+          <label class="cp-field__label" for="cpHours">Roughly how many hours per week do you need?</label>
+          <input class="cp-field__input" id="cpHours" type="text" placeholder="e.g. 40 hours weekdays, plus occasional weekends" />
+        </div>
+
+        <div class="cp-field">
+          <label class="cp-field__label" for="cpContext">Tell us about the situation</label>
+          <textarea class="cp-field__textarea" id="cpContext" placeholder="Who is the support for? Ages, season of life, what's most important — anything that helps us prepare for the call." rows="5"></textarea>
+        </div>
+
+        <button class="cp-form__submit" type="submit">
+          Send and request a call
+        </button>
+        <p class="cp-form__note">We'll respond within one business day. By submitting, you agree to be contacted by our intake team.</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ─── Footer ─── -->
+  <footer class="cp-foot">
+    <span class="cp-foot__lock">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      © Private Mentorship. All inquiries handled privately.
+    </span>
+  </footer>
+
+</main>
+
+<div class="cp-toast" id="cpToast"><span id="cpToastText">Done</span></div>
+
+<script>
+(function(){
+  var form = document.getElementById('cpQuoteForm');
+  if (!form) return;
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var name = document.getElementById('cpName').value.trim();
+    var email = document.getElementById('cpEmail').value.trim();
+    if (!name || !email) { showToast('Please fill in your name and email.'); return; }
+    // Placeholder — wire to Supabase 'custom_plan_requests' or an email endpoint
+    showToast('Got it — we\'ll be in touch within one business day.');
+    form.reset();
+  });
+  var toastTimer = null;
+  function showToast(text){
+    var t = document.getElementById('cpToast');
+    document.getElementById('cpToastText').textContent = text;
+    t.classList.add('is-shown');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove('is-shown'); }, 3800);
+  }
+})();
+</script>
+</body>
+</html>
