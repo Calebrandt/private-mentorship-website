@@ -52,9 +52,10 @@
 
   /* Shell */
   .nx-shell{padding:32px 28px 80px;max-width:1180px;margin:0 auto;}
-  .nx-head{margin-bottom:32px;}
-  .nx-h1{font-size:28px;font-weight:600;letter-spacing:-.022em;margin:0 0 8px;color:var(--ink-2);line-height:1.15;}
-  .nx-sub{font-size:15px;color:var(--ink-mute);margin:0;font-weight:500;letter-spacing:-.005em;line-height:1.5;max-width:640px;}
+  .nx-head{margin-bottom:28px;}
+  /* Title/description: Preline-style — small, calm, professional */
+  .nx-h1{font-size:20px;font-weight:500;letter-spacing:-.012em;margin:0 0 4px;color:var(--ink-2);line-height:1.3;}
+  .nx-sub{font-size:13.5px;color:var(--ink-mute);margin:0;font-weight:500;letter-spacing:-.002em;line-height:1.5;max-width:520px;}
 
   /* ═══════════════════════════════════════════════════════════
      GIFT PURCHASE FORM — Preline-inspired, refined PM aesthetic
@@ -307,19 +308,21 @@
   .pm-gift__row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   @media (max-width:640px){.pm-gift__row{grid-template-columns:1fr;}}
 
-  /* CTA */
+  /* CTA — Apple blue, the brand action color used across the site */
   .pm-gift__cta{
     width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;
     padding:14px 22px;border-radius:10px;border:0;cursor:pointer;
-    background:#0f172a;color:#fff;
+    background:#007AFF;color:#fff;
     font:500 14.5px Inter,sans-serif;letter-spacing:-.005em;
-    box-shadow:0 8px 20px -8px rgba(15,23,42,0.35);
-    transition:background .15s ease, transform .15s ease;
+    box-shadow:0 8px 20px -8px rgba(0,122,255,0.45);
+    transition:background .15s ease, transform .15s ease, box-shadow .15s ease;
   }
-  .pm-gift__cta:hover{background:#1e293b;transform:translateY(-1px);}
+  .pm-gift__cta:hover{background:#0062cc;transform:translateY(-1px);box-shadow:0 12px 26px -8px rgba(0,122,255,0.55);}
+  .pm-gift__cta:active{transform:translateY(0);}
   .pm-gift__cta svg{width:14px;height:14px;}
-  [data-pm-theme="dark"] .pm-gift__cta{background:#fafafa;color:#0f172a;}
-  [data-pm-theme="dark"] .pm-gift__cta:hover{background:#e5e7eb;}
+  /* Dark mode: Apple's slightly brighter dark-system blue */
+  [data-pm-theme="dark"] .pm-gift__cta{background:#0A84FF;box-shadow:0 8px 20px -8px rgba(10,132,255,0.50);}
+  [data-pm-theme="dark"] .pm-gift__cta:hover{background:#3b9eff;}
 
   .pm-gift__terms{
     font-size:11.5px;color:var(--ink-tert);margin:12px 0 0;
@@ -369,8 +372,8 @@
 <main class="nx-shell">
 
   <header class="nx-head">
-    <h1 class="nx-h1">Give the gift of mentorship</h1>
-    <p class="nx-sub">Purchase Private Mentorship hours for someone you love. Their own dedicated Family Assistant — the most personal gift you can give.</p>
+    <h1 class="nx-h1">Send a gift</h1>
+    <p class="nx-sub">Give someone a Private Family Assistant.</p>
   </header>
 
   <section class="pm-gift">
