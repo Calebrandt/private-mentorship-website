@@ -1819,25 +1819,26 @@
     return ms / (1000*60*60) < 24;
   }
 
+  // Client-side cancellation — Phase 3.5 business rule applied to clients too:
+  // "no one can be forced to do appointments. cancellation doesn't need approval."
+  //
+  // Previously inserted a row into schedule_change_requests with status='pending'
+  // and waited for admin approval. Now calls the existing cancel_own_appointment
+  // SECURITY DEFINER RPC which: validates the caller is the appointment's owning
+  // client (clients.profile_id = auth.uid()), flips status to 'cancelled' (or
+  // 'late_cancelled' if <24h away), and records cancelled_at / cancelled_by /
+  // cancel_reason — atomically, no admin step. No automatic hours forfeit.
+  //
+  // Function signature preserved for the existing client-schedule.html caller.
   async function submitCancelRequest({ appointmentId, appointment, reason = '' }) {
     if (!appointmentId && !appointment?.id) throw new Error('submitCancelRequest: appointmentId is required');
-    const apt = appointment || null;
-    const myClientId = await _myClientId();
-    const payload = {
-      client_id: apt?.client_id || myClientId,
-      assistant_id: apt?.assistant_id || null,
-      appointment_id: appointmentId || apt.id,
-      requested_date: null,
-      requested_start: null,
-      requested_end: null,
-      reason: String(reason || '').trim() || null,
-      status: 'pending',
-      request_type: 'cancel',
-      proposed_schedule: null,
-    };
-    const { data, error } = await sb().from('schedule_change_requests').insert([payload]).select().single();
+    const id = appointmentId || appointment.id;
+    const { data, error } = await sb().rpc('cancel_own_appointment', {
+      p_appointment_id: id,
+      p_cancel_reason: String(reason || '').trim() || null,
+    });
     if (error) throw error;
-    return data;
+    return data; // returns the updated appointment row
   }
 
   // requestedDateTimeIso = ISO string of new desired start time. We split into

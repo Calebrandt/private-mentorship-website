@@ -456,7 +456,7 @@
       </div>
       <div class="nx-modal__body">
         <h3 class="nx-modal__title">Cancel this session?</h3>
-        <p class="nx-modal__subtitle" id="cancelSubtitle">Your admin will review and confirm the cancellation.</p>
+        <p class="nx-modal__subtitle" id="cancelSubtitle">The session will be cancelled immediately. You won't be charged any hours.</p>
       </div>
     </div>
     <div class="nx-modal__warn" id="cancelLateWarn" hidden>
@@ -918,21 +918,28 @@
     const apt = activeAppointment;
     const reason = $('cancelReason').value;
     const btn = $('cancelSubmit');
-    btn.disabled = true; btn.textContent = 'Submitting…';
+    btn.disabled = true; btn.textContent = 'Cancelling…';
     try {
-      const created = await window.pmHiring.submitCancelRequest({
+      // Phase 3.5 (clients): cancellation is immediate, no admin approval.
+      // The RPC returns the updated appointment row directly.
+      const updated = await window.pmHiring.submitCancelRequest({
         appointmentId: apt.id, appointment: apt, reason,
       });
-      // Update local state — mark appointment as having pending cancel
-      pendingByApt[apt.id] = { id: created?.id, appointment_id: apt.id, request_type: 'cancel', status: 'pending' };
-      // Re-render upcoming list
+      const isLate = updated?.status === 'late_cancelled';
+      // Reflect immediately in local state: remove from upcoming, mark
+      // the row as terminal-status (rendered elsewhere on page reload).
+      upcoming = (upcoming || []).filter(x => x.id !== apt.id);
+      // If the page is also showing recent history, the next loadAll cycle
+      // will pick it up. For now just re-render upcoming.
       upWrap.innerHTML = `<div class="nx-list">${upcoming.map(a => renderSession(a, true)).join('')}</div>`;
       bindActionButtons();
       closeCancelModal();
-      showToast('Cancel request submitted — your admin will review.');
+      showToast(isLate
+        ? 'Session cancelled (within 24 hours — logged for your admin).'
+        : 'Session cancelled.');
     } catch (e) {
       btn.disabled = false; btn.textContent = 'Submit cancel';
-      showToast(e?.message || 'Failed to submit cancel request', 'error');
+      showToast(e?.message || 'Failed to cancel session', 'error');
     }
   });
 

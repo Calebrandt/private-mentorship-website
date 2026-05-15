@@ -4,7 +4,9 @@
 The owner explicitly asked for it because chat-context limits keep
 killing long sessions and we want continuity.
 
-Last updated: 2026-05-15. Author: Claude session that built the pick-list system.
+Last updated: 2026-05-15 (late-session). Author: Claude session that built
+the **assistant-side dashboard + scheduler Phases 1–3.5** (see §3 first
+entry below). Previous author: session that built the pick-list system.
 Project owner: **Caleb Brandt** (single founder, building this himself).
 
 ---
@@ -132,6 +134,117 @@ A long-running thread did the following — most of it shipped to
 production. **If you can't see a change, hard-refresh the browser
 or bump the cache-bust query string on `<link rel="stylesheet">`
 tags in `index.html`.**
+
+### LATEST (2026-05-15, late-session) — Assistant Dashboard + Scheduler Phases 1-3.5
+
+**Not deployed yet.** Owner is out of Netlify build minutes and asked
+to keep work local. ~13 commits sit ahead of `origin/main` as of this
+write. Push when tokens reload.
+
+**Code shipped (locally):**
+
+1. **Assistant Dashboard Phase 2 + 3** — 6 new pages:
+   - `assistant-clients.html` (roster of assigned families)
+   - `assistant-client.html?id=X` (per-family workspace, now with
+     "Book new session" CTA — Phase 4)
+   - `assistant-profile.html` (edit own public profile)
+   - `assistant-hours.html` (hours ledger + payouts placeholder)
+   - `assistant-schedule.html` (the showpiece — see Phases 1-3.5)
+   - `assistant-resources.html` (Help / Profile shortcuts)
+
+2. **Scheduler Phases (assistant side):**
+   - Phase 1: read-only week grid + upcoming + history, color-coded
+     by status (scheduled / completed / cancelled / late_cancelled /
+     no_show), prev/next/today navigation.
+   - Phase 2: "Mark complete" + "Mark no-show" buttons on past-but-still-
+     scheduled appointments. Atomic RPC writes appointments.status +
+     hours_ledger row in one transaction. SQL file:
+     `supabase-functions/assistant-appointment-status-rpcs.sql`.
+   - Phase 3: Reschedule + Cancel buttons on upcoming sessions.
+     **Reschedule** files `schedule_change_requests` with **multi-slot
+     proposals** (1-3 alternatives) — admin picks one to approve.
+     **Cancel** as of Phase 3.5 is **immediate** (no admin step).
+   - Phase 3.5: Cancellation business rule. "If someone cancels, no
+     one can be forced." New RPC `assistant_cancel_appointment`. Same
+     applied to clients (`cancel_own_appointment` already existed —
+     just routed the service layer to it). Family is NOT charged hours
+     on assistant-initiated cancels (even if late) — they didn't
+     initiate. Files: `supabase-functions/assistant-cancel-appointment-rpc.sql`.
+   - Phase 4 (this session — partial): Assistant "Book new session"
+     CTA on `assistant-client.html` opens a multi-slot picker and files
+     an 'extra' `schedule_change_requests` row. Admin queue handles it.
+
+3. **Bug fixes uncovered by audit (critical):**
+   - `admin_approve_schedule_request` RPC was written before the
+     hours_ledger schema migration. Three INSERT statements used
+     stale column names (`delta_hours`, `reason`) — every approval
+     that touched the ledger failed with `column "delta_hours" does
+     not exist`. Rewritten with `minutes_delta`, `reason_code` enum,
+     `contract_id` (now NOT NULL), `meta` jsonb, `created_by`.
+     Also fixed: enum casts, `'Session'` → `'extra_billable'` kind,
+     `late_cancel` → `late_cancel_forfeit`, `change_token:cancel`
+     → `change_token_spent`. Source: `admin-schedule-request-rpcs.sql`.
+   - `schedule_change_requests.assistant_id` had a stale FK to
+     `public.users(id)` (legacy lowercase-role table). Modern code
+     uses `auth.uid()` via `profiles.user_id`. Dropped the FK to
+     match how `appointments` + `contracts` already work. File:
+     `supabase-functions/drop-stale-assistant-id-fk.sql`.
+   - Four assistant-side `hiring-service.js` functions queried with
+     old column names (`delta_hours`, `reason`, `client_id` filter on
+     ledger). Switched to `minutes_delta` + `reason_code` + filter by
+     contract_id.
+   - `fetchMyHoursLedger` was defined **twice** in `hiring-service.js`
+     — client version overrode assistant version at export time, so
+     `assistant-hours.html` was silently getting the wrong shape.
+     Renamed assistant version to `fetchMyAssistantHoursLedger`.
+   - `is_staff()` only returns true for admins. **Assistants had NO
+     RLS read access** to scheduler tables before this session. Added
+     7 scoped RLS policies via `supabase-functions/assistant-rls-policies.sql`
+     — caused infinite recursion on first deploy (policies on contracts
+     called clients which called contracts again). Fixed with 4
+     SECURITY DEFINER helper functions that bypass RLS on the inner
+     lookup.
+
+4. **Schema fresh dump pulled:**
+   - Old `/Users/calebbrandt/supabase_schema.sql` was 5 months stale
+     (Dec 2024, 9,979 lines). Fresh dump via `pg_dump` (installed
+     postgresql@17 via brew) is now 13,003 lines and includes all
+     lifecycle migrations. **Use the fresh dump as source of truth.**
+
+5. **Sidebar badges (universal):**
+   - Admin: Scheduling, Hiring, Messages (unread), Tools group
+     aggregate, Schedule Requests, Membership Requests, Intro Requests
+   - Client: Inbox (unread), My Assistant (already had)
+   - Assistant: Inbox (unread)
+   - Group-level badge support added to `renderGroup()` so the Tools
+     toggle shows a sum even when collapsed.
+   - Top-level admin "Scheduling" was previously pointing to a non-
+     existent page (`admin-scheduling.html`) — fixed to
+     `admin-schedule-requests.html`.
+
+6. **Admin schedule-requests UX:**
+   - Multi-slot picker pills render when a request has multiple
+     proposed slots — admin clicks one, then Approve. The chosen
+     slot's date/time is UPDATEd into the request's canonical fields
+     before the existing approval RPC fires (so the RPC stays
+     unchanged).
+   - "Cancellation log" added as the **rightmost tab** in the inbox
+     tab bar. Replaces a removed top-banner that wasted real estate.
+     Shows immediate-cancels (audit only, no actions).
+
+7. **Test data seeded** (label `[SEED]`): one fake client + one
+   active contract for `assistant@privatementorship.com` + 10
+   appointments across past/future/all statuses. Cleanup SQL is in
+   the chat history; keys: `notes LIKE '[SEED]%'` /
+   `full_name LIKE '[SEED]%'` / `title LIKE '[SEED]%'`.
+
+**SQL files added this session (all under `website/supabase-functions/`):**
+
+- `assistant-rls-policies.sql` (deployed ✅)
+- `assistant-appointment-status-rpcs.sql` (deployed ✅)
+- `assistant-cancel-appointment-rpc.sql` (deployed ✅)
+- `drop-stale-assistant-id-fk.sql` (deployed ✅)
+- `admin-schedule-request-rpcs.sql` (re-deployed with column fixes ✅)
 
 ### Big wins shipped
 
@@ -758,11 +871,15 @@ codebase. Breaking them will silently corrupt production data.
 
 | File | Functions | Status |
 |---|---|---|
-| `admin-schedule-request-rpcs.sql` | `admin_approve_schedule_request(uuid)`, `admin_reject_schedule_request(uuid, text)` | ✅ deployed |
+| `admin-schedule-request-rpcs.sql` | `admin_approve_schedule_request(uuid)`, `admin_reject_schedule_request(uuid, text)` | ✅ deployed — **re-deployed 2026-05-15 after column-name migration fix (delta_hours → minutes_delta, reason → reason_code, contract_id NOT NULL, enum casts).** Old version was broken for every approval that touched the ledger. |
 | `admin-membership-change-rpcs.sql` | `admin_approve_membership_change(uuid)`, `admin_reject_membership_change(uuid, text)` | ⚠️ verify with `SELECT proname FROM pg_proc WHERE proname LIKE 'admin_approve_membership%';` |
 | `client-end-of-service-rpcs.sql` | `client_request_end_of_service()`, `client_reactivate_auto_renew()` | ⚠️ needs deploy |
 | `system-message-web-push.sql` | `_post_system_message_for_client(...)` | ✅ deployed (option A — JWT verification disabled on `send-web-push` edge fn) |
-| `client-assistant-picks.sql` | `client_submit_picks()`, `admin_update_pick_status(uuid,text,text)` | ✅ deployed 2026-05-15 (table + 6 RLS policies + 2 RPCs) |
+| `client-assistant-picks.sql` | `client_submit_picks()`, `admin_update_pick_status(uuid,text,text)` | ✅ deployed 2026-05-15 |
+| `assistant-rls-policies.sql` | 7 scoped RLS policies + 4 SECURITY DEFINER helpers (`is_my_assistant_client`, `is_my_assistant_contract`, `is_my_assistant_appointment`, `is_my_active_assistant_client`) | ✅ deployed 2026-05-15 |
+| `assistant-appointment-status-rpcs.sql` | `assistant_mark_appointment_complete(uuid)`, `assistant_mark_appointment_no_show(uuid)` | ✅ deployed 2026-05-15 |
+| `assistant-cancel-appointment-rpc.sql` | `assistant_cancel_appointment(uuid, text)` — immediate, no admin step, no family hours forfeit | ✅ deployed 2026-05-15 |
+| `drop-stale-assistant-id-fk.sql` | Drops the stale `schedule_change_requests.assistant_id → public.users(id)` FK so `auth.uid()` works as assistant_id (matches `appointments` + `contracts` behavior) | ✅ deployed 2026-05-15 |
 
 ### Edge functions (Supabase Dashboard → Functions)
 
@@ -799,6 +916,7 @@ codebase. Breaking them will silently corrupt production data.
 
 ## §15. Lifecycle phases shipped
 
+### Client-side lifecycle (original arc)
 | Phase | Description | Status |
 |---|---|---|
 | 1 | Read-only schedule view | ✅ |
@@ -806,10 +924,45 @@ codebase. Breaking them will silently corrupt production data.
 | 3 | Membership changes (plan + schedule) via `membership_change_requests` + admin approval RPC | ✅ |
 | 4 | End of service / "Cancel after term" — `renewal_mode='manual'` + drafts deleted, reversible | ✅ (RPC pending deploy — see §16) |
 | 5 | Admin schedule-request inbox + atomic approval RPC | ✅ |
+| 3.5 | **Client cancellation is now immediate** (no admin step). Calls `cancel_own_appointment` RPC. No automatic hours forfeit. | ✅ (2026-05-15) |
+
+### Assistant-side scheduler (new arc, this session)
+| Phase | Description | Status |
+|---|---|---|
+| 1 | Read-only schedule (weekly grid + upcoming + history, color-coded) | ✅ |
+| 2 | "Mark complete" / "Mark no-show" RPCs (SECURITY DEFINER, atomic) | ✅ |
+| 3 | Multi-slot reschedule + cancel via `schedule_change_requests` engine | ✅ |
+| 3.5 | Cancellation = immediate, no admin step, no family hours forfeit | ✅ |
+| 4 | "Book new session" extra-request UI on per-family workspace | ✅ (UI shipped; uses existing engine) |
+| **5** | **Assistant availability windows (new schema + booking constraints)** | ⏭ **PENDING — biggest remaining piece. Own session.** |
 
 ---
 
 ## §16. Open queue / pending tasks
+
+### TOP PRIORITY — Assistant scheduler Phase 5 (availability windows)
+
+The only remaining piece of the assistant scheduler arc. Estimated
+~6–8 hr; treat as **its own session**.
+
+Scope:
+1. **New table:** `assistant_availability_windows` (id, assistant_id,
+   weekday 0–6, start_time, end_time, kind: recurring | one_off | blackout,
+   active_from, active_until, created_at). RLS: assistant manages own
+   rows; admin sees all.
+2. **Service layer:** list / create / update / delete + a helper
+   `isWithinAvailability(assistantId, startsAtIso, durationMin)` for
+   constraint checks.
+3. **Assistant UI:** a new page (or section on `assistant-profile.html`)
+   where the assistant publishes weekly recurring availability + blackouts.
+4. **Booking constraint:** when an `extra` request is filed or when admin
+   approves a reschedule, validate the proposed slot falls within the
+   assistant's published availability. Surface a clean error if not.
+5. **Family-facing slot picker** (when families book): only shows slots
+   that fall within the assigned assistant's availability windows.
+
+This is the only **genuinely new** schema work in the scheduler arc.
+Phases 1–4 were ports of patterns the app already had.
 
 ### Pending owner tasks (Supabase dashboard, ~5 min each)
 

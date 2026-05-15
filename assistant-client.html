@@ -43,6 +43,100 @@
   .wc-hero__status--paused{background:#FEF3C7;color:#92400E;}
   .wc-hero__status--pending{background:#DBEAFE;color:#1E3A8A;}
   .wc-hero__status--draft{background:#F1F5F9;color:#64748B;}
+  .wc-hero__actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .wc-book-btn{
+    background:#0071e3;color:#fff;border:1px solid #0071e3;
+    font-family:inherit;font-size:13px;font-weight:700;letter-spacing:-.005em;
+    padding:9px 16px;border-radius:9999px;cursor:pointer;
+    transition:background .15s ease;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .wc-book-btn:hover{background:#005CBE;border-color:#005CBE;}
+  .wc-book-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+  /* Modal — reused booking modal */
+  .wc-modal-backdrop{
+    position:fixed;inset:0;background:rgba(15,23,42,0.5);
+    display:none;align-items:center;justify-content:center;z-index:1000;
+  }
+  .wc-modal-backdrop[data-open="true"]{display:flex;}
+  .wc-modal{
+    background:#fff;border-radius:14px;padding:28px;max-width:540px;width:calc(100% - 32px);
+    box-shadow:0 24px 60px -12px rgba(15,23,42,0.35);
+  }
+  .wc-modal__title{font-family:"Archivo","Inter",sans-serif;font-size:18px;font-weight:800;letter-spacing:-.01em;color:#0F172A;margin:0 0 8px;}
+  .wc-modal__body{font-size:13.5px;color:#475569;margin:0 0 18px;line-height:1.6;}
+  .wc-modal__row{
+    background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;
+    padding:10px 14px;margin:0 0 18px;font-size:13px;
+    display:flex;flex-direction:column;gap:3px;
+  }
+  .wc-modal__row b{color:#0F172A;}
+  .wc-modal__actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;}
+  .wc-modal__cancel{
+    background:#fff;color:#475569;border:1px solid #E2E8F0;
+    padding:9px 18px;border-radius:9999px;font:600 13px Inter,sans-serif;cursor:pointer;
+  }
+  .wc-modal__cancel:hover{background:#F8FAFC;}
+  .wc-modal__confirm{
+    background:#0071e3;color:#fff;border:none;padding:9px 18px;border-radius:9999px;
+    font:700 13px Inter,sans-serif;cursor:pointer;
+  }
+  .wc-modal__confirm:hover{background:#005CBE;}
+  .wc-modal__confirm:disabled{opacity:.6;cursor:wait;}
+
+  /* Slot picker (mirrors assistant-schedule slot picker) */
+  .wc-slot-group{
+    background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;
+    padding:12px;margin-bottom:10px;display:grid;grid-template-columns:1fr 1fr auto auto;gap:8px;align-items:end;
+  }
+  .wc-slot-group__label{
+    grid-column:1 / -1;font-size:10.5px;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;color:#64748B;margin:0 0 2px;
+  }
+  .wc-field{display:flex;flex-direction:column;gap:4px;}
+  .wc-field label{font-size:10.5px;font-weight:600;color:#64748B;letter-spacing:.02em;}
+  .wc-field input, .wc-field select{
+    border:1px solid #CBD5E1;border-radius:8px;padding:7px 10px;font:500 13px Inter,sans-serif;
+    color:#0F172A;background:#fff;
+  }
+  .wc-field input:focus, .wc-field select:focus{outline:none;border-color:#0071e3;box-shadow:0 0 0 2px #DCEBFC;}
+  .wc-slot-remove{
+    background:#fff;border:1px solid #E2E8F0;color:#94A3B8;
+    width:32px;height:32px;border-radius:9px;cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;
+    align-self:end;
+  }
+  .wc-slot-remove:hover{border-color:#FCA5A5;color:#B91C1C;background:#FEF2F2;}
+  .wc-add-slot{
+    background:#fff;border:1px dashed #CBD5E1;border-radius:10px;
+    padding:10px 16px;font:600 12.5px Inter,sans-serif;color:#475569;
+    cursor:pointer;width:100%;transition:all .15s ease;
+  }
+  .wc-add-slot:hover{border-color:#0071e3;color:#0071e3;background:#F0F7FF;}
+  .wc-add-slot:disabled{opacity:.45;cursor:not-allowed;}
+  .wc-textarea-row{margin-top:6px;}
+  .wc-textarea-row label{
+    display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;color:#64748B;margin:0 0 5px;
+  }
+  .wc-textarea-row textarea{
+    width:100%;border:1px solid #CBD5E1;border-radius:8px;
+    padding:9px 11px;font:500 13px Inter,sans-serif;color:#0F172A;
+    resize:vertical;min-height:64px;
+  }
+  .wc-textarea-row textarea:focus{outline:none;border-color:#0071e3;box-shadow:0 0 0 2px #DCEBFC;}
+
+  /* Toast */
+  .wc-toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:#0F172A;color:#fff;padding:11px 18px;border-radius:9999px;
+    font-size:13px;font-weight:600;
+    box-shadow:0 10px 30px -6px rgba(15,23,42,0.4);
+    display:none;z-index:1100;
+  }
+  .wc-toast[data-open="true"]{display:block;}
+  .wc-toast--error{background:#991B1B;}
 
   /* KPI tiles */
   .wc-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px;}
@@ -131,7 +225,13 @@
         <h1 class="wc-hero__name" id="wcName">—</h1>
         <p class="wc-hero__sub" id="wcSub">—</p>
       </div>
-      <span class="wc-hero__status" id="wcStatus">—</span>
+      <div class="wc-hero__actions">
+        <span class="wc-hero__status" id="wcStatus">—</span>
+        <button type="button" class="wc-book-btn" id="wcBookBtn" hidden>
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
+          Book new session
+        </button>
+      </div>
     </div>
 
     <!-- KPI tiles -->
@@ -213,6 +313,30 @@
     <p style="font-size:13.5px;line-height:1.65;max-width:480px;margin:0 auto;">You don't currently have an active contract with this family. Return to <a href="assistant-clients.html" style="color:#0071e3;">My Clients</a> to see your current engagements.</p>
   </div>
 </main>
+
+<!-- Book new session modal (Phase 4 — assistant files an 'extra' request) -->
+<div class="wc-modal-backdrop" id="wcBookModal" data-open="false">
+  <div class="wc-modal" role="dialog" aria-modal="true">
+    <h3 class="wc-modal__title">Book new session</h3>
+    <p class="wc-modal__body">Propose one to three slots for an additional session beyond the family's recurring schedule. Admin reviews and approves.</p>
+    <div class="wc-modal__row" id="wcBookContext"></div>
+
+    <div id="wcBookSlots"></div>
+    <button type="button" class="wc-add-slot" id="wcBookAddSlot">+ Add another option</button>
+
+    <div class="wc-textarea-row" style="margin-top:14px;">
+      <label for="wcBookReason">Why this session is needed (optional)</label>
+      <textarea id="wcBookReason" placeholder="Context for the admin…"></textarea>
+    </div>
+
+    <div class="wc-modal__actions">
+      <button type="button" class="wc-modal__cancel" id="wcBookCancel">Cancel</button>
+      <button type="button" class="wc-modal__confirm" id="wcBookSubmit">Submit request</button>
+    </div>
+  </div>
+</div>
+
+<div class="wc-toast" id="wcToast" data-open="false">Done</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515c"></script>
@@ -316,8 +440,162 @@ function renderAppointmentRow(a){
   document.getElementById('ctrMinutes').textContent = ws.contract.included_minutes ? `${ws.contract.included_minutes} min (${planHours} hrs)` : '—';
   document.getElementById('ctrRenewal').textContent = ws.contract.renewal_mode || 'manual';
 
+  // Phase 4: show the "Book new session" button only for ACTIVE contracts.
+  // The admin-approve RPC for 'extra' requires an active contract at the
+  // proposed time; offering the button on a paused/expired contract would
+  // just lead to a failed approval. Match the constraint up front.
+  if (statusKey === 'active') {
+    document.getElementById('wcBookBtn').hidden = false;
+    wireBookModal({ clientId, clientName: name });
+  }
+
   body.hidden = false;
 })();
+
+// ─── Phase 4: Book new session modal ─────────────────────────────────────
+let bookSlots = [];
+let bookCtx = null; // {clientId, clientName}
+
+function wireBookModal(ctx){
+  bookCtx = ctx;
+  document.getElementById('wcBookBtn').addEventListener('click', openBookModal);
+  document.getElementById('wcBookCancel').addEventListener('click', closeBookModal);
+  document.getElementById('wcBookSubmit').addEventListener('click', submitBookModal);
+  document.getElementById('wcBookAddSlot').addEventListener('click', () => {
+    if (bookSlots.length >= 3) return;
+    bookSlots.push(defaultBookSlot());
+    renderBookSlots();
+    updateAddSlotState();
+  });
+  document.getElementById('wcBookModal').addEventListener('click', (e) => {
+    if (e.target.id === 'wcBookModal') closeBookModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.getElementById('wcBookModal').dataset.open === 'true') {
+      closeBookModal();
+    }
+  });
+}
+
+function defaultBookSlot(){
+  // Tomorrow at 10am, 2-hour session (matches PM's 2-hour minimum policy).
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  d.setHours(10, 0, 0, 0);
+  const pad = (n) => String(n).padStart(2, '0');
+  return {
+    date: `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`,
+    time: `${pad(d.getHours())}:${pad(d.getMinutes())}`,
+    durationMin: 120,
+  };
+}
+
+function renderBookSlots(){
+  const wrap = document.getElementById('wcBookSlots');
+  wrap.innerHTML = bookSlots.map((s, idx) => `
+    <div class="wc-slot-group" data-idx="${idx}">
+      <div class="wc-slot-group__label">Option ${idx + 1}${idx === 0 ? ' · primary' : ''}</div>
+      <div class="wc-field">
+        <label>Date</label>
+        <input type="date" data-field="date" data-idx="${idx}" value="${escapeHtml(s.date)}"/>
+      </div>
+      <div class="wc-field">
+        <label>Start time</label>
+        <input type="time" data-field="time" data-idx="${idx}" value="${escapeHtml(s.time)}"/>
+      </div>
+      <div class="wc-field">
+        <label>Hours</label>
+        <select data-field="durationMin" data-idx="${idx}">
+          <option value="120" ${s.durationMin==120?'selected':''}>2 hr</option>
+          <option value="150" ${s.durationMin==150?'selected':''}>2.5 hr</option>
+          <option value="180" ${s.durationMin==180?'selected':''}>3 hr</option>
+          <option value="240" ${s.durationMin==240?'selected':''}>4 hr</option>
+        </select>
+      </div>
+      ${bookSlots.length > 1
+        ? `<button type="button" class="wc-slot-remove" data-action="remove-slot" data-idx="${idx}">×</button>`
+        : `<span style="width:32px;"></span>`}
+    </div>
+  `).join('');
+
+  wrap.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('input', () => {
+      const idx = Number(el.dataset.idx);
+      const field = el.dataset.field;
+      bookSlots[idx][field] = field === 'durationMin' ? Number(el.value) : el.value;
+    });
+  });
+  wrap.querySelectorAll('button[data-action="remove-slot"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      bookSlots.splice(Number(btn.dataset.idx), 1);
+      renderBookSlots();
+      updateAddSlotState();
+    });
+  });
+}
+
+function updateAddSlotState(){
+  const btn = document.getElementById('wcBookAddSlot');
+  btn.disabled = bookSlots.length >= 3;
+  btn.textContent = btn.disabled ? '· Maximum 3 options ·' : '+ Add another option';
+}
+
+function openBookModal(){
+  if (!bookCtx) return;
+  bookSlots = [defaultBookSlot()];
+  document.getElementById('wcBookContext').innerHTML = `
+    <span><b>Family:</b> ${escapeHtml(bookCtx.clientName)}</span>
+    <span><b>Type:</b> Additional session (outside recurring schedule)</span>
+    <span><b>Admin step:</b> Required — admin picks one of your proposed slots</span>
+  `;
+  document.getElementById('wcBookReason').value = '';
+  renderBookSlots();
+  updateAddSlotState();
+  document.getElementById('wcBookModal').dataset.open = 'true';
+}
+
+function closeBookModal(){
+  document.getElementById('wcBookModal').dataset.open = 'false';
+  document.getElementById('wcBookSubmit').disabled = false;
+}
+
+async function submitBookModal(){
+  if (!bookCtx) return;
+  const btn = document.getElementById('wcBookSubmit');
+  btn.disabled = true;
+  try {
+    const slots = bookSlots.map(s => {
+      if (!s.date || !s.time) throw new Error('Each option needs a date and time.');
+      const [hh, mm] = s.time.split(':').map(Number);
+      const [y, m, d] = s.date.split('-').map(Number);
+      return {
+        startsAtIso: new Date(y, m - 1, d, hh, mm).toISOString(),
+        durationMin: Number(s.durationMin) || 120,
+      };
+    });
+    await window.pmHiring.assistantSubmitExtraAppointmentRequest({
+      clientId: bookCtx.clientId,
+      slots,
+      reason: document.getElementById('wcBookReason').value,
+    });
+    showWcToast(`Booking request submitted (${slots.length} option${slots.length>1?'s':''}). Admin will confirm.`);
+    closeBookModal();
+  } catch (err) {
+    console.warn('Booking failed:', err);
+    showWcToast(err?.message || 'Could not submit request.', true);
+    btn.disabled = false;
+  }
+}
+
+let wcToastTimer = null;
+function showWcToast(message, isError = false){
+  const el = document.getElementById('wcToast');
+  el.textContent = message;
+  el.classList.toggle('wc-toast--error', !!isError);
+  el.dataset.open = 'true';
+  if (wcToastTimer) clearTimeout(wcToastTimer);
+  wcToastTimer = setTimeout(() => { el.dataset.open = 'false'; }, isError ? 4500 : 2800);
+}
 </script>
 </body>
 </html>
