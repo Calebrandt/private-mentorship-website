@@ -888,12 +888,32 @@ function openReschedule(apptId){
     <span><b>Current:</b> ${escapeHtml(dateStr)} at ${escapeHtml(time)}</span>
     <span><b>Family:</b> ${escapeHtml(clientName)}</span>
     <span><b>Duration:</b> ${escapeHtml(hoursLabel(durationOf(appt)))}</span>
+    <span data-token-line>—</span>
   `;
 
   document.getElementById('asReschedReason').value = '';
   renderReschedSlots();
   updateAddSlotButton();
   document.getElementById('asReschedModal').dataset.open = 'true';
+
+  // Phase 7: fetch the family's token status and surface it in the modal.
+  (async () => {
+    try {
+      if (!appt.contract_id) return;
+      const ts = await window.pmHiring.fetchContractTokenStatus(appt.contract_id);
+      if (!ts) return;
+      const left = ts.tokens_remaining;
+      const dur = durationOf(appt);
+      const hrs = dur ? Math.round((dur/60)*10)/10 : null;
+      const line = left > 0
+        ? `Family has ${left} free schedule change${left===1?'':'s'} left this period.`
+        : (hrs
+            ? `Family is at free-change limit — this would deduct ${hrs} hr${hrs===1?'':'s'} from their contract.`
+            : `Family is at free-change limit — hours may be deducted.`);
+      const slot = document.querySelector('#asReschedContext [data-token-line]');
+      if (slot) slot.innerHTML = `<b>Tokens:</b> ${escapeHtml(line)}`;
+    } catch (_) {}
+  })();
 }
 
 function closeReschedule(){

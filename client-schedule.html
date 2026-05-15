@@ -697,12 +697,24 @@
   const in30 = new Date(nowDate.getTime() + 30*86400000);
   const past60 = new Date(nowDate.getTime() - 60*86400000);
 
-  let [pattern, upcoming, past, pendingReqs] = await Promise.all([
+  let [pattern, upcoming, past, pendingReqs, tokenStatus] = await Promise.all([
     contract ? window.pmHiring.fetchMyRecurringPattern(contract.id).catch(()=>[]) : Promise.resolve([]),
     window.pmHiring.fetchMyAppointments({ statuses:['scheduled'], fromDate: nowDate.toISOString(), toDate: in30.toISOString(), limit: 30, ascending: true }).catch(()=>[]),
     window.pmHiring.fetchMyAppointments({ statuses:['completed','cancelled','late_cancelled','no_show'], fromDate: past60.toISOString(), toDate: nowDate.toISOString(), limit: 30, ascending: false }).catch(()=>[]),
     window.pmHiring.fetchMyPendingScheduleRequests().catch(()=>[]),
+    contract ? window.pmHiring.fetchContractTokenStatus(contract.id).catch(()=>null) : Promise.resolve(null),
   ]);
+  // Phase 7: helper string for the modal subtitle — "2 free changes left"
+  // or "0 free — next change will cost X session hours".
+  function tokenLine(durationMinutes) {
+    if (!tokenStatus) return '';
+    const left = tokenStatus.tokens_remaining;
+    if (left > 0) return `${left} free schedule change${left===1?'':'s'} left this period.`;
+    const hrs = durationMinutes ? Math.round((durationMinutes/60)*10)/10 : null;
+    return hrs
+      ? `You're at your free-change limit — this would deduct ${hrs} hr${hrs===1?'':'s'} from your contract.`
+      : `You're at your free-change limit — this change may deduct hours from your contract.`;
+  }
 
   // Build a map: appointment_id → pending request type (for badges)
   function buildPendingMap(reqs){
@@ -876,7 +888,8 @@
     const d = new Date(apt.starts_at);
     const dateLabel = d.toLocaleDateString('en-CA', { weekday:'long', month:'long', day:'numeric' });
     const time = fmtTimeOnly(apt.starts_at);
-    $('cancelSubtitle').textContent = `${dateLabel} at ${time} — submit a request and your admin will confirm.`;
+    $('cancelSubtitle').textContent =
+      `${dateLabel} at ${time}. The session is cancelled immediately. You won't be charged any hours.`;
     $('cancelLateWarn').hidden = !window.pmHiring.isLateCancellation(apt.starts_at);
     $('cancelReason').value = '';
     $('cancelSubmit').disabled = false;
@@ -890,7 +903,12 @@
     const d = new Date(apt.starts_at);
     const dateLabel = d.toLocaleDateString('en-CA', { weekday:'long', month:'long', day:'numeric' });
     const time = fmtTimeOnly(apt.starts_at);
-    $('reschedSubtitle').textContent = `Currently ${dateLabel} at ${time}. Choose a new time below.`;
+    const reschedDur = apt.ends_at
+      ? Math.round((new Date(apt.ends_at).getTime() - new Date(apt.starts_at).getTime()) / 60000)
+      : null;
+    const reschedTokenLine = tokenLine(reschedDur);
+    $('reschedSubtitle').textContent =
+      `Currently ${dateLabel} at ${time}. Choose a new time below. ${reschedTokenLine}`.trim();
     // Default new date+time = current appointment + 1 day
     const next = new Date(d.getTime() + 86400000);
     $('reschedDate').value = next.toISOString().split('T')[0];

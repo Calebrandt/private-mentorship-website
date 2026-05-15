@@ -1023,6 +1023,34 @@
     } catch (_) { return 0; }
   }
 
+  // ─── Phase 7: Change-token status (counter + warnings) ──────────────
+  // Reads v_contract_balance + contract_policy_limits via the
+  // get_contract_token_status RPC. Returns {tokens_used, tokens_total,
+  // tokens_remaining, over_budget}. UI shows this on schedule pages
+  // and warns when families are about to (or already did) exceed the
+  // 3-free-changes budget.
+
+  async function fetchContractTokenStatus(contractId) {
+    if (!contractId) return { tokens_used: 0, tokens_total: 0, tokens_remaining: 0, over_budget: false };
+    try {
+      const { data, error } = await sb().rpc('get_contract_token_status', {
+        p_contract_id: contractId,
+      });
+      if (error) { console.warn('fetchContractTokenStatus', error); return null; }
+      return data || null;
+    } catch (_) { return null; }
+  }
+
+  // Convenience wrapper: resolves the signed-in client's active contract
+  // first, then fetches its token status. Used by client-schedule.html.
+  async function fetchMyContractTokenStatus() {
+    try {
+      const contract = await fetchMyActiveContract();
+      if (!contract?.id) return null;
+      return await fetchContractTokenStatus(contract.id);
+    } catch (_) { return null; }
+  }
+
   // ─── Phase 6: Contract pause / freeze ───────────────────────────────
   // Admin-initiated. Family asks via Messages, admin clicks the button.
   // Cancels reserved appointments in window (no hours forfeit) and pushes
@@ -2360,6 +2388,8 @@
     // Phase 6 — contract pause / freeze
     adminFreezeContract, adminUnfreezeContract,
     fetchContractFreezes, adminListContractsForFreezeUI,
+    // Phase 7 — change-token status (3-free policy)
+    fetchContractTokenStatus, fetchMyContractTokenStatus,
     // assistant-side (Phase 3)
     updateMyAssistantProfile, fetchMyAssistantHoursLedger,
     // admin: clients
