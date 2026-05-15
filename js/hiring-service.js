@@ -408,17 +408,58 @@
     return { ok: true };
   }
 
-  // List users in the profiles table whose role is ASSISTANT.
-  // (user_role is a case-sensitive enum — uppercase 'ASSISTANT' is the canonical value.
-  //  The previous lowercase OR variant caused enum cast errors when the enum did not
-  //  contain a 'assistant' literal.)
+  // List candidates eligible to have an assistant_profiles row.
+  //
+  // assistant_profiles.assistant_id has a FK to applicants(id), so the right
+  // place to source candidates is the applicants table — specifically rows
+  // whose status indicates the hiring decision has been made (accepted).
+  // We also pull profile metadata (full_name, email, phone) by joining on
+  // profiles via applicants.id = profiles.user_id (the convention the wizard
+  // establishes by creating an applicants row keyed to auth.uid()).
+  //
+  // Returns the same shape the admin-assistant-profiles.html UI expects:
+  //   { user_id, role, email, full_name, phone_number_e164 }
+  // where `user_id` is the applicants.id that should be saved as assistant_id.
   async function adminListAssistantUsers() {
-    const { data, error } = await sb()
-      .from('profiles')
-      .select('user_id, role, email, full_name, phone_number_e164')
-      .eq('role', 'ASSISTANT');
-    if (error) throw error;
-    return data || [];
+    // Query accepted applicants
+    const { data: applicants, error: applicantsErr } = await sb()
+      .from('applicants')
+      .select('id, email, phone, legal_name, preferred_name, status')
+      .eq('status', 'accepted');
+    if (applicantsErr) {
+      // Fall back to the previous behaviour if applicants is locked-down for the
+      // current role — return profiles tagged ASSISTANT so the admin UI still loads.
+      console.warn('adminListAssistantUsers: applicants query failed, falling back to profiles:', applicantsErr);
+      const { data: profilesFallback, error: pErr } = await sb()
+        .from('profiles')
+        .select('user_id, role, email, full_name, phone_number_e164')
+        .eq('role', 'ASSISTANT');
+      if (pErr) throw pErr;
+      return profilesFallback || [];
+    }
+    const ids = (applicants || []).map(a => a.id);
+    let profilesById = {};
+    if (ids.length) {
+      const { data: profileRows } = await sb()
+        .from('profiles')
+        .select('user_id, full_name, phone_number_e164, email')
+        .in('user_id', ids);
+      (profileRows || []).forEach(p => { profilesById[p.user_id] = p; });
+    }
+    return (applicants || []).map(a => {
+      const p = profilesById[a.id] || {};
+      const fullName =
+        p.full_name ||
+        (a.preferred_name || a.legal_name) ||
+        null;
+      return {
+        user_id: a.id,  // applicants.id is what the FK wants (saved as assistant_id)
+        role: 'ASSISTANT',
+        email: p.email || a.email || null,
+        full_name: fullName,
+        phone_number_e164: p.phone_number_e164 || a.phone || null,
+      };
+    });
   }
 
   // ─── Public: published assistant profiles (anonymous-readable) ─────────
