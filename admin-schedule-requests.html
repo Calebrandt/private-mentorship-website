@@ -837,7 +837,6 @@
         btn.disabled = true; btn.textContent = 'Approving…';
         try {
           if (req && type === 'reschedule') {
-            // Sync chosen slot into canonical columns first
             await applyChosenSlotIfMulti(req);
           }
           if (type === 'cancel') await window.pmHiring.adminApproveCancelRequest(id);
@@ -848,7 +847,16 @@
           await loadAll();
         } catch (e) {
           btn.disabled = false; btn.textContent = 'Approve';
-          showToast(e?.message || 'Failed to approve request', 'error');
+          // Translate common DB constraint errors into friendly admin language.
+          let msg = e?.message || 'Failed to approve request';
+          if (msg.includes('appt_assistant_starts_unique')) {
+            msg = "Can't approve — the assistant already has a session at this exact time. Reject this and ask them to propose a different slot, or reschedule the conflicting session first.";
+          } else if (msg.includes('No active contract found')) {
+            msg = "Can't approve — no active contract for this family at the proposed time. Check the contract dates.";
+          } else if (msg.includes('appt_extra_billable_no_contract') || msg.includes('appt_kind_reserved_requires_contract')) {
+            msg = "Can't approve — the appointment needs a contract attached. The family may not have an active contract right now.";
+          }
+          showToast(msg, 'error');
         }
       });
     });

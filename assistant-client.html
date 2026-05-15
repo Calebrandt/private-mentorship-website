@@ -129,10 +129,30 @@
 
   /* Phase 10: complimentary billing toggle */
   .wc-billing-row{display:flex;flex-direction:column;gap:8px;}
+  .wc-billing-row__head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;}
   .wc-billing-row__label{
     font-size:10.5px;font-weight:700;letter-spacing:.08em;
     text-transform:uppercase;color:#64748B;
   }
+  .wc-billing-row__help{
+    background:none;border:none;padding:0;cursor:pointer;
+    font:600 11.5px Inter,sans-serif;color:#0071e3;letter-spacing:-.005em;
+  }
+  .wc-billing-row__help:hover{text-decoration:underline;}
+  .wc-billing-help{
+    margin-top:6px;background:#F0F7FF;border:1px solid #B3D0F5;border-radius:10px;
+    padding:14px 16px;font-size:12.5px;color:#1E40AF;line-height:1.55;
+  }
+  .wc-billing-help[hidden]{display:none;}
+  .wc-billing-help__head{
+    font-weight:800;font-size:12px;letter-spacing:.04em;text-transform:uppercase;
+    color:#1E3A8A;margin:0 0 8px;
+  }
+  .wc-billing-help ul{margin:0;padding-left:18px;}
+  .wc-billing-help li{margin-bottom:4px;}
+  .wc-billing-help li strong{color:#0F172A;}
+  .wc-billing-help__note{margin:10px 0 0;font-size:12px;color:#475569;font-style:italic;}
+  .wc-billing-help__note strong{color:#0F172A;font-style:normal;}
   .wc-billing-row__opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   @media (max-width:560px){.wc-billing-row__opts{grid-template-columns:1fr;}}
   .wc-billing-opt{
@@ -351,18 +371,32 @@
     <button type="button" class="wc-add-slot" id="wcBookAddSlot">+ Add another option</button>
 
     <div class="wc-billing-row" style="margin-top:16px;">
-      <div class="wc-billing-row__label">Billing</div>
+      <div class="wc-billing-row__head">
+        <div class="wc-billing-row__label">Billing</div>
+        <button type="button" class="wc-billing-row__help" id="wcBookHelpToggle" aria-expanded="false">What's this?</button>
+      </div>
       <div class="wc-billing-row__opts">
         <label class="wc-billing-opt">
           <input type="radio" name="wcBookBilling" value="standard" checked>
           <span class="wc-billing-opt__title">Standard</span>
-          <span class="wc-billing-opt__sub">Hours deduct from contract when complete</span>
+          <span class="wc-billing-opt__sub">Hours deduct from the family's contract when you mark it complete</span>
         </label>
         <label class="wc-billing-opt">
           <input type="radio" name="wcBookBilling" value="complimentary">
           <span class="wc-billing-opt__title">Complimentary</span>
-          <span class="wc-billing-opt__sub">No deduction — make-up, courtesy, follow-up</span>
+          <span class="wc-billing-opt__sub">No deduction — make-up, courtesy, follow-up, brief check-in</span>
         </label>
+      </div>
+      <div class="wc-billing-help" id="wcBookHelp" hidden>
+        <p class="wc-billing-help__head">When to choose Complimentary</p>
+        <ul>
+          <li><strong>Make-up session</strong> — you cancelled a previous one and want to make the family whole.</li>
+          <li><strong>Brief check-in or follow-up</strong> — a quick conversation that isn't a full session.</li>
+          <li><strong>Onboarding / trial session</strong> — a first meeting on the house to get going.</li>
+          <li><strong>Goodwill courtesy</strong> — something you're doing as a kindness, not on the clock.</li>
+        </ul>
+        <p class="wc-billing-help__note">You're a contractor — <strong>you decide</strong> when a session is complimentary. Just remember: every choice is logged in the audit trail forever (sessions can never be erased). If a family ever disputes hours, this record protects everyone.</p>
+        <p class="wc-billing-help__note">Default is <strong>Standard</strong> — most sessions bill normally from the contract.</p>
       </div>
     </div>
 
@@ -509,6 +543,17 @@ function wireBookModal(ctx){
     renderBookSlots();
     updateAddSlotState();
   });
+  // Phase 10: "What's this?" toggle for the billing explainer panel
+  const helpBtn = document.getElementById('wcBookHelpToggle');
+  const helpPanel = document.getElementById('wcBookHelp');
+  if (helpBtn && helpPanel) {
+    helpBtn.addEventListener('click', () => {
+      const isOpen = helpPanel.hidden === false;
+      helpPanel.hidden = isOpen;
+      helpBtn.setAttribute('aria-expanded', String(!isOpen));
+      helpBtn.textContent = isOpen ? "What's this?" : 'Hide explainer';
+    });
+  }
   document.getElementById('wcBookModal').addEventListener('click', (e) => {
     if (e.target.id === 'wcBookModal') closeBookModal();
   });
@@ -594,6 +639,11 @@ function openBookModal(){
   // Reset billing choice to "Standard" each open
   const standardRadio = document.querySelector('input[name="wcBookBilling"][value="standard"]');
   if (standardRadio) standardRadio.checked = true;
+  // Collapse the explainer by default
+  const helpPanel = document.getElementById('wcBookHelp');
+  const helpBtn = document.getElementById('wcBookHelpToggle');
+  if (helpPanel) helpPanel.hidden = true;
+  if (helpBtn) { helpBtn.setAttribute('aria-expanded','false'); helpBtn.textContent = "What's this?"; }
   renderBookSlots();
   updateAddSlotState();
   document.getElementById('wcBookModal').dataset.open = 'true';
