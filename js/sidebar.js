@@ -18,6 +18,7 @@
           { href: 'admin-schedule-requests.html', label: 'Schedule Requests', icon: 'inbox', dynamicBadge: 'admin-schedule-requests' },
           { href: 'admin-membership-requests.html', label: 'Membership Requests', icon: 'inbox', dynamicBadge: 'admin-membership-requests' },
           { href: 'admin-intro-requests.html', label: 'Intro Requests', icon: 'inbox', dynamicBadge: 'admin-intro-requests' },
+          { href: 'admin-freezes.html', label: 'Contract Freezes', icon: 'clock' },
           { href: 'admin-create-client.html', label: 'Create Client', icon: 'user-plus' },
           { href: 'admin-family-management.html', label: 'Family Management', icon: 'users' },
           { href: 'admin-education.html', label: 'Education / Homework', icon: 'book' },

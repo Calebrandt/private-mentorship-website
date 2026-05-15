@@ -1023,6 +1023,68 @@
     } catch (_) { return 0; }
   }
 
+  // ─── Phase 6: Contract pause / freeze ───────────────────────────────
+  // Admin-initiated. Family asks via Messages, admin clicks the button.
+  // Cancels reserved appointments in window (no hours forfeit) and pushes
+  // contract.end_at out by the freeze length so families don't lose time.
+
+  async function adminFreezeContract({ contractId, startsOn, endsOn, reason = null }) {
+    if (!contractId || !startsOn || !endsOn) throw new Error('contractId, startsOn, endsOn required');
+    const { data, error } = await sb().rpc('admin_freeze_contract', {
+      p_contract_id: contractId,
+      p_starts_on: startsOn,
+      p_ends_on: endsOn,
+      p_reason: reason,
+    });
+    if (error) throw error;
+    return data;
+  }
+
+  async function adminUnfreezeContract(freezeId) {
+    if (!freezeId) throw new Error('freezeId required');
+    const { data, error } = await sb().rpc('admin_unfreeze_contract', {
+      p_freeze_id: freezeId,
+    });
+    if (error) throw error;
+    return data;
+  }
+
+  // List freezes. Pass contractId to scope to one contract; otherwise lists
+  // every freeze the caller can see via RLS (admins see all; clients see
+  // their own; assistants see their own).
+  async function fetchContractFreezes({ contractId = null, includeEnded = true } = {}) {
+    let q = sb()
+      .from('contract_freezes')
+      .select('id, contract_id, starts_on, ends_on, reason, created_at, ended_early_at, ended_by')
+      .order('starts_on', { ascending: false });
+    if (contractId) q = q.eq('contract_id', contractId);
+    if (!includeEnded) q = q.is('ended_early_at', null);
+    const { data, error } = await q;
+    if (error) { console.warn('fetchContractFreezes', error); return []; }
+    return data || [];
+  }
+
+  // Admin: list contracts (light shape) for the freeze-management UI.
+  async function adminListContractsForFreezeUI() {
+    try {
+      const { data: contracts, error } = await sb()
+        .from('contracts')
+        .select('id, client_id, status, start_at, end_at, included_minutes, assistant_id, assistant_name')
+        .in('status', ['active', 'draft'])
+        .order('start_at', { ascending: false });
+      if (error) throw error;
+      const rows = contracts || [];
+      if (!rows.length) return [];
+      const clientIds = [...new Set(rows.map(r => r.client_id))].filter(Boolean);
+      const { data: clients } = clientIds.length
+        ? await sb().from('clients').select('id, full_name').in('id', clientIds)
+        : { data: [] };
+      const clientsById = {};
+      (clients || []).forEach(c => { clientsById[c.id] = c; });
+      return rows.map(r => ({ ...r, client: clientsById[r.client_id] || null }));
+    } catch (e) { console.warn('adminListContractsForFreezeUI', e); return []; }
+  }
+
   // ─── Phase 5: Assistant availability windows ─────────────────────────
   // Two tables, mirrored 1:1 in this service layer:
   //   assistant_availability_windows  — recurring weekly time blocks
@@ -2295,6 +2357,9 @@
     fetchMyAvailabilityWindows, addAvailabilityWindow, removeAvailabilityWindow,
     fetchMyAvailabilityBlackouts, addAvailabilityBlackout, removeAvailabilityBlackout,
     checkAssistantAvailable,
+    // Phase 6 — contract pause / freeze
+    adminFreezeContract, adminUnfreezeContract,
+    fetchContractFreezes, adminListContractsForFreezeUI,
     // assistant-side (Phase 3)
     updateMyAssistantProfile, fetchMyAssistantHoursLedger,
     // admin: clients

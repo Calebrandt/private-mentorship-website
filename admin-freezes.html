@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Contract Freezes — Private Mentorship Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
+<link rel="stylesheet" href="js/sidebar.css?v=20260515c" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#F1F5F9;color:#1F2937;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+  :root{--bg:#F1F5F9;--card:#FFFFFF;--border:#E2E8F0;--ink:#1F2937;--ink-2:#0F172A;--ink-mute:#64748B;--ink-tert:#94A3B8;--primary:#5750F1;}
+
+  .nx-topbar{background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:14px 26px;position:sticky;top:0;z-index:20;}
+  .nx-userpod{display:flex;align-items:center;gap:10px;padding:5px 12px 5px 5px;border:1px solid var(--border);border-radius:9999px;background:#fff;}
+  .nx-userpod__avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#5750F1 0%,#0ABEF9 100%);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .nx-userpod__name{font-size:13.5px;font-weight:700;color:var(--ink);}
+
+  .fz-shell{padding:32px 28px 80px;max-width:1240px;margin:0 auto;}
+  .fz-head{margin-bottom:24px;}
+  .fz-h1{font-size:28px;font-weight:800;letter-spacing:-.025em;margin:0 0 6px;color:var(--ink-2);}
+  .fz-sub{font-size:13.5px;color:var(--ink-mute);margin:0;max-width:660px;line-height:1.55;}
+
+  /* Cards */
+  .fz-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:22px 24px;margin-bottom:18px;box-shadow:0 1px 2px rgba(15,23,42,0.04);}
+  .fz-card__head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:14px;}
+  .fz-card__title{font-size:17px;font-weight:800;letter-spacing:-.015em;color:var(--ink-2);margin:0;}
+  .fz-card__sub{font-size:12.5px;color:var(--ink-mute);margin:3px 0 0;line-height:1.5;}
+
+  /* Tables */
+  .fz-row{
+    display:grid;gap:14px;align-items:center;padding:14px 4px;border-bottom:1px solid #EEF2F7;
+  }
+  .fz-row--contracts{grid-template-columns:1fr 1fr auto auto;}
+  .fz-row--freezes{grid-template-columns:1fr 1.2fr 1fr auto;}
+  .fz-row:last-child{border-bottom:0;}
+  .fz-row__client{font-weight:700;color:var(--ink-2);font-size:13.5px;letter-spacing:-.005em;}
+  .fz-row__meta{font-size:12.5px;color:var(--ink-mute);margin-top:2px;}
+  .fz-row__dates{font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .fz-row__dates strong{color:var(--ink-2);font-weight:700;}
+  .fz-row__reason{font-size:12.5px;color:var(--ink-mute);font-style:italic;}
+  .fz-pill{
+    font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+    padding:4px 10px;border-radius:9999px;white-space:nowrap;
+  }
+  .fz-pill--active{background:#DCFCE7;color:#15803D;}
+  .fz-pill--frozen{background:#DBEAFE;color:#1E3A8A;}
+  .fz-pill--ended{background:#F1F5F9;color:#64748B;}
+
+  .fz-btn{
+    font-family:inherit;font-size:12.5px;font-weight:700;letter-spacing:-.005em;
+    padding:7px 14px;border-radius:9999px;cursor:pointer;
+    border:1px solid transparent;transition:all .15s ease;
+  }
+  .fz-btn--primary{background:var(--primary);color:#fff;border-color:var(--primary);}
+  .fz-btn--primary:hover{background:#4640C7;border-color:#4640C7;}
+  .fz-btn--ghost{background:#fff;color:#475569;border-color:var(--border);}
+  .fz-btn--ghost:hover{background:#F8FAFC;border-color:#94A3B8;color:var(--ink-2);}
+  .fz-btn--danger{background:#fff;color:#B91C1C;border-color:#FCA5A5;}
+  .fz-btn--danger:hover{background:#FEF2F2;}
+
+  .fz-empty{text-align:center;padding:36px 16px;color:var(--ink-mute);border:1px dashed var(--border);border-radius:10px;}
+  .fz-loading{text-align:center;padding:36px 16px;color:var(--ink-mute);}
+  .fz-loading__spinner{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--primary);animation:fz-spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px;}
+  @keyframes fz-spin{to{transform:rotate(360deg);}}
+
+  /* Modal */
+  .fz-modal-bg{position:fixed;inset:0;background:rgba(15,23,42,0.5);display:none;align-items:center;justify-content:center;z-index:1000;}
+  .fz-modal-bg[data-open="true"]{display:flex;}
+  .fz-modal{background:#fff;border-radius:14px;padding:24px;max-width:480px;width:calc(100% - 32px);box-shadow:0 24px 60px -12px rgba(15,23,42,0.35);}
+  .fz-modal__title{font-size:18px;font-weight:800;color:var(--ink-2);margin:0 0 6px;letter-spacing:-.01em;}
+  .fz-modal__sub{font-size:13px;color:var(--ink-mute);margin:0 0 16px;line-height:1.55;}
+  .fz-modal__context{
+    background:#F8FAFC;border:1px solid var(--border);border-radius:10px;
+    padding:11px 14px;margin-bottom:14px;font-size:12.5px;
+    display:flex;flex-direction:column;gap:3px;
+  }
+  .fz-modal__context b{color:var(--ink-2);}
+
+  .fz-field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+  .fz-field label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-mute);}
+  .fz-field input, .fz-field textarea{border:1px solid #CBD5E1;border-radius:8px;padding:9px 11px;font:500 13.5px Inter,sans-serif;color:var(--ink-2);background:#fff;}
+  .fz-field input:focus, .fz-field textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 2px #EEF1FB;}
+  .fz-field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .fz-modal__actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;}
+
+  /* Toast */
+  .fz-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink-2);color:#fff;padding:11px 18px;border-radius:9999px;font-size:13px;font-weight:600;display:none;z-index:1100;box-shadow:0 10px 30px -6px rgba(15,23,42,0.4);}
+  .fz-toast[data-open="true"]{display:block;}
+  .fz-toast--error{background:#991B1B;}
+</style>
+</head>
+<body class="pm-has-sidebar">
+<div id="pmSidebar"></div>
+
+<header class="nx-topbar">
+  <div></div>
+  <div class="nx-userpod">
+    <span class="nx-userpod__avatar" id="nxUserAvatar">A</span>
+    <span class="nx-userpod__name" id="nxUserName">Admin</span>
+  </div>
+</header>
+
+<main class="fz-shell">
+  <div class="fz-head">
+    <h1 class="fz-h1">Contract freezes</h1>
+    <p class="fz-sub">Pause a family's contract while they're on a trip (e.g. 2–3 months to China). The system stops auto-generating appointments, no hours are forfeited, and the contract end date is pushed out by the same number of days so they don't lose time.</p>
+  </div>
+
+  <!-- Active freezes -->
+  <div class="fz-card">
+    <div class="fz-card__head">
+      <div>
+        <h2 class="fz-card__title">Active freezes</h2>
+        <p class="fz-card__sub">Contracts currently paused. Click "End early" if a family returns sooner than expected.</p>
+      </div>
+    </div>
+    <div id="fzActiveWrap">
+      <div class="fz-loading"><span class="fz-loading__spinner"></span> Loading…</div>
+    </div>
+  </div>
+
+  <!-- All active contracts (pickable for new freeze) -->
+  <div class="fz-card">
+    <div class="fz-card__head">
+      <div>
+        <h2 class="fz-card__title">Active contracts</h2>
+        <p class="fz-card__sub">Every active contract. Click "Freeze" to start a pause for a family that's heading out.</p>
+      </div>
+    </div>
+    <div id="fzContractsWrap">
+      <div class="fz-loading"><span class="fz-loading__spinner"></span> Loading…</div>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div class="fz-card">
+    <div class="fz-card__head">
+      <div>
+        <h2 class="fz-card__title">Past freezes</h2>
+        <p class="fz-card__sub">Completed and early-ended freezes — audit trail.</p>
+      </div>
+    </div>
+    <div id="fzPastWrap">
+      <div class="fz-loading"><span class="fz-loading__spinner"></span> Loading…</div>
+    </div>
+  </div>
+</main>
+
+<!-- Freeze modal -->
+<div class="fz-modal-bg" id="fzModal" data-open="false">
+  <div class="fz-modal" role="dialog" aria-modal="true">
+    <h3 class="fz-modal__title">Freeze contract</h3>
+    <p class="fz-modal__sub">Cancels reserved sessions in the window. No hours forfeited. The contract's end date is pushed out by the same number of days.</p>
+
+    <div class="fz-modal__context" id="fzModalContext"></div>
+
+    <div class="fz-field-row">
+      <div class="fz-field">
+        <label>Start date</label>
+        <input type="date" id="fzStart"/>
+      </div>
+      <div class="fz-field">
+        <label>End date</label>
+        <input type="date" id="fzEnd"/>
+      </div>
+    </div>
+    <div class="fz-field">
+      <label>Reason (optional)</label>
+      <input type="text" id="fzReason" placeholder="e.g. Family vacation to China"/>
+    </div>
+
+    <div class="fz-modal__actions">
+      <button type="button" class="fz-btn fz-btn--ghost" id="fzCancel">Cancel</button>
+      <button type="button" class="fz-btn fz-btn--primary" id="fzSubmit">Freeze contract</button>
+    </div>
+  </div>
+</div>
+
+<div class="fz-toast" id="fzToast" data-open="false">Done</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260515c"></script>
+<script src="js/hiring-service.js?v=20260515c"></script>
+<script src="js/sidebar.js?v=20260515c"></script>
+<script>
+function esc(s){return (s||'').toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[c]));}
+function fmtDate(iso){
+  if (!iso) return '—';
+  if (typeof iso === 'string' && iso.length === 10) {
+    return new Date(iso + 'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  }
+  return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+function daysBetween(a, b){
+  const d1 = new Date(a + 'T00:00:00');
+  const d2 = new Date(b + 'T00:00:00');
+  return Math.round((d2 - d1) / 86400000) + 1;
+}
+
+(async function init(){
+  await new Promise(r => setTimeout(r, 200));
+  const user = await window.pmHiring.getCurrentUser();
+  if (!user) { location.href = 'signin.html'; return; }
+  const isAdmin = await window.pmHiring.isCurrentUserAdminOrOwner();
+  if (!isAdmin) { location.href = 'signin.html?notauthorized=1'; return; }
+  const profile = await window.pmHiring.fetchCurrentUserProfile().catch(()=>null);
+  const fullName = profile?.full_name || user.email?.split('@')[0] || 'Admin';
+  document.getElementById('nxUserName').textContent = fullName.split(' ')[0];
+  document.getElementById('nxUserAvatar').textContent = (fullName[0] || 'A').toUpperCase();
+
+  await loadAll();
+})();
+
+let allContracts = [];
+let allFreezes = [];
+let modalContract = null;
+
+async function loadAll(){
+  const [contracts, freezes] = await Promise.all([
+    window.pmHiring.adminListContractsForFreezeUI().catch(()=>[]),
+    window.pmHiring.fetchContractFreezes({}).catch(()=>[]),
+  ]);
+  allContracts = contracts;
+  allFreezes = freezes;
+  render();
+}
+
+function render(){
+  const today = new Date().toISOString().slice(0,10);
+  const activeFreezes = allFreezes.filter(f =>
+    !f.ended_early_at && f.starts_on <= today && f.ends_on >= today
+  );
+  const pastFreezes = allFreezes.filter(f =>
+    !!f.ended_early_at || f.ends_on < today
+  );
+  // Mark contracts that are currently frozen
+  const frozenIds = new Set(activeFreezes.map(f => f.contract_id));
+  const contractsById = {};
+  allContracts.forEach(c => { contractsById[c.id] = c; });
+
+  // Active freezes
+  const fa = document.getElementById('fzActiveWrap');
+  if (!activeFreezes.length) {
+    fa.innerHTML = `<div class="fz-empty"><p style="margin:0;font-size:13px;">No contracts are currently frozen.</p></div>`;
+  } else {
+    fa.innerHTML = activeFreezes.map(f => {
+      const c = contractsById[f.contract_id];
+      const clientName = c?.client?.full_name || (f.contract_id ? 'Contract ' + f.contract_id.slice(0,6) : '—');
+      return `<div class="fz-row fz-row--freezes">
+        <div>
+          <div class="fz-row__client">${esc(clientName)}</div>
+          <div class="fz-row__meta">Frozen by admin</div>
+        </div>
+        <div class="fz-row__dates"><strong>${esc(fmtDate(f.starts_on))}</strong> → <strong>${esc(fmtDate(f.ends_on))}</strong> · ${esc(String(daysBetween(f.starts_on, f.ends_on)))} days</div>
+        <div class="fz-row__reason">${esc(f.reason || '—')}</div>
+        <button type="button" class="fz-btn fz-btn--danger" data-unfreeze="${esc(f.id)}">End early</button>
+      </div>`;
+    }).join('');
+    fa.querySelectorAll('button[data-unfreeze]').forEach(btn => {
+      btn.addEventListener('click', () => unfreeze(btn.dataset.unfreeze));
+    });
+  }
+
+  // Active contracts
+  const cw = document.getElementById('fzContractsWrap');
+  if (!allContracts.length) {
+    cw.innerHTML = `<div class="fz-empty"><p style="margin:0;font-size:13px;">No active contracts.</p></div>`;
+  } else {
+    cw.innerHTML = allContracts.map(c => {
+      const clientName = c.client?.full_name || ('Client ' + (c.client_id ? c.client_id.slice(0,6) : '—'));
+      const isFrozen = frozenIds.has(c.id);
+      return `<div class="fz-row fz-row--contracts">
+        <div>
+          <div class="fz-row__client">${esc(clientName)}</div>
+          <div class="fz-row__meta">${esc(c.assistant_name || 'No assistant assigned')}</div>
+        </div>
+        <div class="fz-row__dates"><strong>${esc(fmtDate(c.start_at))}</strong> → <strong>${esc(fmtDate(c.end_at))}</strong></div>
+        <span class="fz-pill ${isFrozen ? 'fz-pill--frozen' : 'fz-pill--active'}">${isFrozen ? 'Frozen now' : 'Active'}</span>
+        ${isFrozen
+          ? `<button type="button" class="fz-btn fz-btn--ghost" disabled>Currently frozen</button>`
+          : `<button type="button" class="fz-btn fz-btn--primary" data-freeze="${esc(c.id)}">Freeze</button>`}
+      </div>`;
+    }).join('');
+    cw.querySelectorAll('button[data-freeze]').forEach(btn => {
+      btn.addEventListener('click', () => openFreezeModal(btn.dataset.freeze));
+    });
+  }
+
+  // Past freezes
+  const pw = document.getElementById('fzPastWrap');
+  if (!pastFreezes.length) {
+    pw.innerHTML = `<div class="fz-empty"><p style="margin:0;font-size:13px;">No past freezes yet.</p></div>`;
+  } else {
+    pw.innerHTML = pastFreezes.slice(0, 30).map(f => {
+      const c = contractsById[f.contract_id];
+      const clientName = c?.client?.full_name || (f.contract_id ? 'Contract ' + f.contract_id.slice(0,6) : '—');
+      const endedEarly = !!f.ended_early_at;
+      return `<div class="fz-row fz-row--freezes">
+        <div>
+          <div class="fz-row__client">${esc(clientName)}</div>
+          <div class="fz-row__meta">${endedEarly ? 'Ended early ' + esc(fmtDate(f.ended_early_at)) : 'Completed'}</div>
+        </div>
+        <div class="fz-row__dates"><strong>${esc(fmtDate(f.starts_on))}</strong> → <strong>${esc(fmtDate(f.ends_on))}</strong></div>
+        <div class="fz-row__reason">${esc(f.reason || '—')}</div>
+        <span class="fz-pill fz-pill--ended">${endedEarly ? 'Ended early' : 'Past'}</span>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ─── Freeze modal ──────────────────────────────────────────────────────
+function openFreezeModal(contractId){
+  const c = allContracts.find(x => x.id === contractId);
+  if (!c) return;
+  modalContract = c;
+
+  const clientName = c.client?.full_name || ('Client ' + c.client_id.slice(0,6));
+  document.getElementById('fzModalContext').innerHTML = `
+    <span><b>Family:</b> ${esc(clientName)}</span>
+    <span><b>Contract:</b> ${esc(fmtDate(c.start_at))} → ${esc(fmtDate(c.end_at))}</span>
+    <span><b>Assistant:</b> ${esc(c.assistant_name || 'Not assigned')}</span>
+  `;
+
+  // Default dates: today and 30 days out
+  const today = new Date();
+  const in30 = new Date(today.getTime() + 30*86400000);
+  const pad = (n) => String(n).padStart(2,'0');
+  const iso = (d) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  document.getElementById('fzStart').value = iso(today);
+  document.getElementById('fzEnd').value = iso(in30);
+  document.getElementById('fzReason').value = '';
+
+  document.getElementById('fzModal').dataset.open = 'true';
+}
+function closeFreezeModal(){
+  modalContract = null;
+  document.getElementById('fzModal').dataset.open = 'false';
+  document.getElementById('fzSubmit').disabled = false;
+}
+async function submitFreeze(){
+  if (!modalContract) return;
+  const startsOn = document.getElementById('fzStart').value;
+  const endsOn = document.getElementById('fzEnd').value;
+  const reason = document.getElementById('fzReason').value.trim() || null;
+  if (!startsOn || !endsOn) { toast('Pick both dates.', true); return; }
+  if (endsOn < startsOn) { toast('End must be on or after start.', true); return; }
+  const btn = document.getElementById('fzSubmit');
+  btn.disabled = true;
+  try {
+    const res = await window.pmHiring.adminFreezeContract({
+      contractId: modalContract.id, startsOn, endsOn, reason,
+    });
+    toast(`Contract frozen for ${res?.days_frozen || '?'} days. ${res?.appointments_cancelled || 0} session${(res?.appointments_cancelled || 0)===1?'':'s'} cancelled.`);
+    closeFreezeModal();
+    await loadAll();
+  } catch (e) {
+    toast(e?.message || 'Failed to freeze contract.', true);
+    btn.disabled = false;
+  }
+}
+
+async function unfreeze(freezeId){
+  if (!confirm('End this freeze early? The contract resumes immediately and any unused days will be refunded from the end-date extension.')) return;
+  try {
+    const res = await window.pmHiring.adminUnfreezeContract(freezeId);
+    toast(`Freeze ended. ${res?.days_refunded || 0} day${(res?.days_refunded || 0)===1?'':'s'} refunded.`);
+    await loadAll();
+  } catch (e) {
+    toast(e?.message || 'Failed to end freeze.', true);
+  }
+}
+
+let toastTimer = null;
+function toast(msg, isError = false){
+  const el = document.getElementById('fzToast');
+  el.textContent = msg;
+  el.classList.toggle('fz-toast--error', !!isError);
+  el.dataset.open = 'true';
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.dataset.open = 'false'; }, isError ? 4500 : 3000);
+}
+
+// Wire
+document.getElementById('fzCancel').addEventListener('click', closeFreezeModal);
+document.getElementById('fzSubmit').addEventListener('click', submitFreeze);
+document.getElementById('fzModal').addEventListener('click', (e) => {
+  if (e.target.id === 'fzModal') closeFreezeModal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('fzModal').dataset.open === 'true') closeFreezeModal();
+});
+</script>
+</body>
+</html>

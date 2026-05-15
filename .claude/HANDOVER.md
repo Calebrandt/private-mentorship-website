@@ -973,6 +973,8 @@ What shipped:
   slots, not just a free-form time input with a warning).
 - Visual week grid on `assistant-availability.html` (currently a table).
 - One-off availability (one-time extra windows outside recurring).
+- **Live chat widget** on marketing site — owner explicitly wants this.
+  Probably Intercom / Crisp / Tawk.to. Embed-only, no backend work needed.
 
 ### Pending owner tasks (Supabase dashboard, ~5 min each)
 
