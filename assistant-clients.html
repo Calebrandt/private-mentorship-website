@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My Clients — Private Mentorship Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,500&display=swap" />
+<link rel="stylesheet" href="js/sidebar.css?v=20260515c" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#F4F5F7;color:#0F172A;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+  .ac-shell{padding:36px 32px 80px;max-width:1240px;margin:0 auto;}
+
+  .ac-head{margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;}
+  .ac-head__body{flex:1;min-width:260px;}
+  .ac-eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#0071e3;margin:0 0 8px;}
+  .ac-h1{font-family:"Archivo","Inter",sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0 0 6px;color:#0F172A;}
+  .ac-sub{font-size:14px;color:#64748B;margin:0;line-height:1.55;max-width:620px;}
+  .ac-count{
+    font-size:11.5px;font-weight:600;letter-spacing:.06em;color:#64748B;
+    background:#fff;border:1px solid #E2E8F0;border-radius:9999px;padding:7px 14px;
+  }
+  .ac-count strong{color:#0F172A;}
+
+  /* Card list */
+  .ac-list{display:flex;flex-direction:column;gap:12px;}
+  .ac-card{
+    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    padding:18px 22px;display:grid;grid-template-columns:48px 1fr auto auto;gap:18px;align-items:center;
+    text-decoration:none;color:inherit;
+    transition:border-color .18s ease, box-shadow .18s ease, transform .15s ease;
+  }
+  .ac-card:hover{border-color:#B3D0F5;box-shadow:0 4px 14px -4px rgba(15,23,42,0.1);transform:translateY(-1px);}
+  .ac-card__avatar{
+    width:48px;height:48px;border-radius:50%;
+    background:linear-gradient(135deg, var(--av-from, #3B82F6), var(--av-to, #1E40AF));
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:800;font-size:15px;
+  }
+  .ac-card__body{min-width:0;}
+  .ac-card__name{font-family:"Archivo","Inter",sans-serif;font-size:16px;font-weight:800;letter-spacing:-.01em;color:#0F172A;margin:0 0 3px;}
+  .ac-card__meta{font-size:12.5px;color:#64748B;margin:0;line-height:1.5;}
+  .ac-card__meta strong{color:#475569;}
+  .ac-card__status{
+    font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    padding:4px 10px;border-radius:9999px;white-space:nowrap;
+  }
+  .ac-card__status--active{background:#D1FAE5;color:#047857;}
+  .ac-card__status--paused{background:#FEF3C7;color:#92400E;}
+  .ac-card__status--pending{background:#DBEAFE;color:#1E3A8A;}
+  .ac-card__status--draft{background:#F1F5F9;color:#64748B;}
+  .ac-card__chev{color:#94A3B8;}
+
+  /* Empty / loading */
+  .ac-empty,.ac-loading{
+    background:#fff;border:1px dashed #CBD5E1;border-radius:14px;
+    padding:60px 32px;text-align:center;color:#64748B;
+  }
+  .ac-empty__title,.ac-loading__title{font-family:"Archivo","Inter",sans-serif;font-size:17px;font-weight:700;color:#0F172A;margin:0 0 6px;}
+  .ac-empty__sub,.ac-loading__sub{font-size:13.5px;margin:0;line-height:1.65;max-width:480px;margin-left:auto;margin-right:auto;}
+  .ac-spinner{
+    width:18px;height:18px;border-radius:50%;
+    border:2px solid #E2E8F0;border-top-color:#0071e3;
+    animation:ac-spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px;
+  }
+  @keyframes ac-spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body class="pm-has-sidebar">
+<div id="pmSidebar"></div>
+
+<main class="ac-shell">
+  <div class="ac-head">
+    <div class="ac-head__body">
+      <p class="ac-eyebrow">Work · Roster</p>
+      <h1 class="ac-h1">My Clients</h1>
+      <p class="ac-sub">Families currently engaged with you. Click any family to open their workspace — sessions, hours, notes, and contract details.</p>
+    </div>
+    <span class="ac-count"><strong id="acCount">—</strong> Active</span>
+  </div>
+
+  <div class="ac-loading" id="acLoading"><span class="ac-spinner"></span> Loading your clients…</div>
+  <div class="ac-empty" id="acEmpty" hidden>
+    <p class="ac-empty__title">No active engagements yet</p>
+    <p class="ac-empty__sub">When Private Mentorship matches you with a family, they will appear here. Until then, your dashboard will show "Coming soon" placeholders.</p>
+  </div>
+  <div class="ac-list" id="acList" hidden></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260515c"></script>
+<script src="js/hiring-service.js?v=20260515c"></script>
+<script src="js/sidebar.js?v=20260515c"></script>
+<script>
+function escapeHtml(s){return (s||'').toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[c]));}
+function initialsFor(name){return (name||'A').split(/\s+/).map(s=>s[0]||'').slice(0,2).join('').toUpperCase()||'A';}
+function formatDateShort(iso){if(!iso)return '—';return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+
+const palettes = [
+  ['#3B82F6','#1E40AF'], ['#10B981','#047857'], ['#F59E0B','#B45309'],
+  ['#A855F7','#6B21A8'], ['#EC4899','#9D174D'], ['#0EA5E9','#075985'],
+];
+function paletteFor(id){
+  const hash = (id||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+  return palettes[hash % palettes.length];
+}
+
+(async function init(){
+  await new Promise(r => setTimeout(r, 300));
+  const loading = document.getElementById('acLoading');
+  const empty = document.getElementById('acEmpty');
+  const list = document.getElementById('acList');
+  const countEl = document.getElementById('acCount');
+
+  let rows = [];
+  try { rows = await window.pmHiring.fetchMyAssignedClients(); } catch (_) {}
+
+  loading.hidden = true;
+  countEl.textContent = rows.length;
+
+  if (!rows.length) {
+    empty.hidden = false;
+    return;
+  }
+
+  list.innerHTML = rows.map(({ contract, client }) => {
+    const name = client?.full_name || ('Client ' + (client?.id ? client.id.slice(0,8) : 'unknown'));
+    const pal = paletteFor(client?.id || contract.id);
+    const periodStart = formatDateShort(contract.start_at);
+    const periodEnd = formatDateShort(contract.end_at);
+    const minutes = contract.included_minutes || 0;
+    const hours = minutes ? Math.round(minutes/60*10)/10 : 0;
+    const statusKey = (contract.status || 'active').toLowerCase();
+    const statusClass = ['active','paused','pending','draft'].includes(statusKey) ? statusKey : 'active';
+    return `<a class="ac-card" href="assistant-client.html?id=${escapeHtml(client?.id || '')}">
+      <div class="ac-card__avatar" style="--av-from:${pal[0]};--av-to:${pal[1]};">${escapeHtml(initialsFor(name))}</div>
+      <div class="ac-card__body">
+        <h3 class="ac-card__name">${escapeHtml(name)}</h3>
+        <p class="ac-card__meta">${hours ? `<strong>${hours} hrs</strong> · ` : ''}${escapeHtml(periodStart)} → ${escapeHtml(periodEnd)}</p>
+      </div>
+      <span class="ac-card__status ac-card__status--${escapeHtml(statusClass)}">${escapeHtml(statusKey)}</span>
+      <svg class="ac-card__chev" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 4 11 8 6 12"/></svg>
+    </a>`;
+  }).join('');
+  list.hidden = false;
+})();
+</script>
+</body>
+</html>

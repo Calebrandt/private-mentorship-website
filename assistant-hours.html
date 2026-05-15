@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hours &amp; Payouts — Private Mentorship Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,500&display=swap" />
+<link rel="stylesheet" href="js/sidebar.css?v=20260515c" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#F4F5F7;color:#0F172A;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+  .ah-shell{padding:36px 32px 80px;max-width:1240px;margin:0 auto;}
+
+  /* Head */
+  .ah-head{margin-bottom:24px;}
+  .ah-eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#0071e3;margin:0 0 8px;}
+  .ah-h1{font-family:"Archivo","Inter",sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0 0 6px;color:#0F172A;}
+  .ah-sub{font-size:14px;color:#64748B;margin:0;line-height:1.55;max-width:660px;}
+
+  /* KPI tiles */
+  .ah-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
+  @media (max-width:780px){.ah-kpis{grid-template-columns:1fr;}}
+  .ah-kpi{
+    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    padding:20px 22px;display:flex;flex-direction:column;gap:6px;
+    transition:box-shadow .18s ease, transform .15s ease;
+  }
+  .ah-kpi:hover{box-shadow:0 4px 14px -4px rgba(15,23,42,0.08);transform:translateY(-1px);}
+  .ah-kpi__label{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#64748B;margin:0;}
+  .ah-kpi__value{font-family:"Archivo","Inter",sans-serif;font-size:30px;font-weight:800;letter-spacing:-.02em;color:#0F172A;margin:0;line-height:1.05;font-variant-numeric:tabular-nums;}
+  .ah-kpi__unit{font-size:14px;color:#64748B;font-weight:600;margin-left:4px;}
+  .ah-kpi__hint{font-size:12px;color:#94A3B8;margin:0;line-height:1.5;}
+
+  /* Cards */
+  .ah-card{
+    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    padding:22px 24px;margin-bottom:18px;
+  }
+  .ah-card__head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .ah-card__title{font-family:"Archivo","Inter",sans-serif;font-size:17px;font-weight:800;letter-spacing:-.01em;color:#0F172A;margin:0;}
+  .ah-card__sub{font-size:12.5px;color:#64748B;margin:3px 0 0;line-height:1.5;}
+
+  /* Ledger table */
+  .ah-table{width:100%;border-collapse:collapse;}
+  .ah-table thead th{
+    text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    color:#94A3B8;padding:10px 12px;border-bottom:1px solid #E2E8F0;
+  }
+  .ah-table tbody td{
+    padding:14px 12px;border-bottom:1px solid #EEF2F7;
+    font-size:13.5px;color:#0F172A;font-weight:500;vertical-align:middle;
+  }
+  .ah-table tbody tr:last-child td{border-bottom:0;}
+  .ah-table tbody tr:hover{background:#FAFBFC;}
+  .ah-table__client{font-weight:700;color:#0F172A;}
+  .ah-table__reason{color:#475569;font-size:13px;}
+  .ah-amount{font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.005em;text-align:right;}
+  .ah-amount--add{color:#16A34A;}
+  .ah-amount--use{color:#DC2626;}
+
+  /* Empty / loading */
+  .ah-empty,.ah-loading{
+    background:#fff;border:1px dashed #CBD5E1;border-radius:14px;
+    padding:60px 32px;text-align:center;color:#64748B;
+  }
+  .ah-empty__title,.ah-loading__title{font-family:"Archivo","Inter",sans-serif;font-size:17px;font-weight:700;color:#0F172A;margin:0 0 6px;}
+  .ah-empty__sub,.ah-loading__sub{font-size:13.5px;margin:0;line-height:1.65;max-width:520px;margin-left:auto;margin-right:auto;}
+  .ah-spinner{
+    width:18px;height:18px;border-radius:50%;
+    border:2px solid #E2E8F0;border-top-color:#0071e3;
+    animation:ah-spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px;
+  }
+  @keyframes ah-spin{to{transform:rotate(360deg);}}
+
+  /* Payouts placeholder */
+  .ah-payout{
+    display:flex;align-items:flex-start;gap:14px;
+    background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;
+    padding:16px 18px;
+  }
+  .ah-payout__icon{
+    width:36px;height:36px;border-radius:10px;flex-shrink:0;
+    background:linear-gradient(135deg,#6366F1,#4338CA);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .ah-payout__body{flex:1;min-width:0;}
+  .ah-payout__title{font-family:"Archivo","Inter",sans-serif;font-size:14px;font-weight:800;color:#0F172A;margin:0 0 4px;}
+  .ah-payout__sub{font-size:12.5px;color:#64748B;margin:0;line-height:1.55;}
+  .ah-payout__pill{
+    font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    background:#EEF2FF;color:#4338CA;padding:4px 9px;border-radius:9999px;white-space:nowrap;
+  }
+</style>
+</head>
+<body class="pm-has-sidebar">
+<div id="pmSidebar"></div>
+
+<main class="ah-shell">
+  <div class="ah-head">
+    <p class="ah-eyebrow">Work · Earnings</p>
+    <h1 class="ah-h1">Hours &amp; Payouts</h1>
+    <p class="ah-sub">Every hour you log through Private Mentorship — added or used — appears here. Payouts post on the schedule in your contractor agreement.</p>
+  </div>
+
+  <!-- KPI tiles -->
+  <div class="ah-kpis">
+    <div class="ah-kpi">
+      <p class="ah-kpi__label">This Month</p>
+      <p class="ah-kpi__value" id="ahMonth">— <span class="ah-kpi__unit">hrs</span></p>
+      <p class="ah-kpi__hint">Total hours moved (added &amp; used) since the 1st.</p>
+    </div>
+    <div class="ah-kpi">
+      <p class="ah-kpi__label">All-time Activity</p>
+      <p class="ah-kpi__value" id="ahAll">— <span class="ah-kpi__unit">hrs</span></p>
+      <p class="ah-kpi__hint">Combined ledger volume across every engagement.</p>
+    </div>
+    <div class="ah-kpi">
+      <p class="ah-kpi__label">Next Payout</p>
+      <p class="ah-kpi__value" id="ahPayout" style="font-size:20px;">Coming soon</p>
+      <p class="ah-kpi__hint">Direct deposits to your account — under setup.</p>
+    </div>
+  </div>
+
+  <!-- Ledger -->
+  <div class="ah-card">
+    <div class="ah-card__head">
+      <div>
+        <h2 class="ah-card__title">Recent ledger</h2>
+        <p class="ah-card__sub">Most recent 50 entries across all of your assigned families.</p>
+      </div>
+    </div>
+
+    <div class="ah-loading" id="ahLoading"><span class="ah-spinner"></span> Loading your ledger…</div>
+    <div class="ah-empty" id="ahEmpty" hidden>
+      <p class="ah-empty__title">No ledger entries yet</p>
+      <p class="ah-empty__sub">Once you start logging completed sessions or families purchase additional hours, every change will be recorded here for transparency.</p>
+    </div>
+    <table class="ah-table" id="ahTable" hidden>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Family</th>
+          <th>Reason</th>
+          <th style="text-align:right;">Hours</th>
+        </tr>
+      </thead>
+      <tbody id="ahTBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Payouts placeholder -->
+  <div class="ah-card">
+    <div class="ah-card__head">
+      <div>
+        <h2 class="ah-card__title">Payouts</h2>
+        <p class="ah-card__sub">How and when you get paid.</p>
+      </div>
+    </div>
+    <div class="ah-payout">
+      <div class="ah-payout__icon">
+        <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="5" width="16" height="11" rx="2"/>
+          <path d="M2 9h16"/>
+          <path d="M6 13h2"/>
+        </svg>
+      </div>
+      <div class="ah-payout__body">
+        <h3 class="ah-payout__title">Direct deposit — coming soon</h3>
+        <p class="ah-payout__sub">We're finishing our Stripe Connect onboarding. For now, payouts continue via the e-transfer schedule outlined in your Contractor Agreement. Once Stripe is live you'll be able to add your bank account here and track each transfer in this section.</p>
+      </div>
+      <span class="ah-payout__pill">In setup</span>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260515c"></script>
+<script src="js/hiring-service.js?v=20260515c"></script>
+<script src="js/sidebar.js?v=20260515c"></script>
+<script>
+function escapeHtml(s){return (s||'').toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[c]));}
+function formatDate(iso){
+  if(!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+function formatHours(n){
+  if(n == null || isNaN(n)) return '0';
+  const rounded = Math.round(Number(n)*10)/10;
+  return (rounded % 1 === 0) ? String(rounded) : rounded.toFixed(1);
+}
+function reasonLabel(r){
+  if(!r) return 'Adjustment';
+  const map = {
+    'session_complete':'Session completed',
+    'session_completed':'Session completed',
+    'purchase':'Hours purchased',
+    'purchased':'Hours purchased',
+    'top_up':'Top-up',
+    'topup':'Top-up',
+    'adjustment':'Manual adjustment',
+    'refund':'Refund',
+    'initial':'Initial allocation',
+    'plan_renewal':'Plan renewal',
+  };
+  return map[(r||'').toLowerCase()] || r;
+}
+
+(async function init(){
+  await new Promise(r => setTimeout(r, 300));
+  const loading = document.getElementById('ahLoading');
+  const empty   = document.getElementById('ahEmpty');
+  const table   = document.getElementById('ahTable');
+  const tbody   = document.getElementById('ahTBody');
+  const monthEl = document.getElementById('ahMonth');
+  const allEl   = document.getElementById('ahAll');
+
+  let data = { entries: [], totalThisMonth: 0, totalAllTime: 0 };
+  try { data = await window.pmHiring.fetchMyHoursLedger({ limit: 50 }); } catch (_) {}
+
+  monthEl.innerHTML = `${escapeHtml(formatHours(data.totalThisMonth))} <span class="ah-kpi__unit">hrs</span>`;
+  allEl.innerHTML   = `${escapeHtml(formatHours(data.totalAllTime))} <span class="ah-kpi__unit">hrs</span>`;
+
+  loading.hidden = true;
+  if (!data.entries.length) {
+    empty.hidden = false;
+    return;
+  }
+
+  tbody.innerHTML = data.entries.map(e => {
+    const delta = Number(e.delta_hours) || 0;
+    const positive = delta >= 0;
+    const cls = positive ? 'ah-amount--add' : 'ah-amount--use';
+    const sign = positive ? '+' : '−';
+    const abs = Math.abs(delta);
+    const clientName = e.client?.full_name || (e.client_id ? 'Client ' + e.client_id.slice(0,6) : '—');
+    return `<tr>
+      <td>${escapeHtml(formatDate(e.created_at))}</td>
+      <td class="ah-table__client">${escapeHtml(clientName)}</td>
+      <td class="ah-table__reason">${escapeHtml(reasonLabel(e.reason))}</td>
+      <td class="ah-amount ${cls}">${sign}${escapeHtml(formatHours(abs))} hrs</td>
+    </tr>`;
+  }).join('');
+  table.hidden = false;
+})();
+</script>
+</body>
+</html>

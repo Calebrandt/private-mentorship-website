@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My Profile — Private Mentorship Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,500&display=swap" />
+<link rel="stylesheet" href="js/sidebar.css?v=20260515c" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#F4F5F7;color:#0F172A;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+  .ap-shell{padding:36px 32px 80px;max-width:880px;margin:0 auto;}
+
+  .ap-head{margin-bottom:24px;}
+  .ap-eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#0071e3;margin:0 0 8px;}
+  .ap-h1{font-family:"Archivo","Inter",sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0 0 6px;color:#0F172A;}
+  .ap-sub{font-size:14px;color:#64748B;margin:0;line-height:1.55;max-width:560px;}
+
+  /* Status pill */
+  .ap-pubstate{
+    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    padding:16px 22px;margin-bottom:18px;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  }
+  .ap-pubstate__label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94A3B8;margin:0 0 4px;}
+  .ap-pubstate__value{font-family:"Archivo","Inter",sans-serif;font-size:18px;font-weight:800;color:#0F172A;margin:0;}
+  .ap-pubpill{
+    display:inline-flex;align-items:center;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    padding:5px 12px;border-radius:9999px;
+  }
+  .ap-pubpill--published{background:#ECFDF5;color:#047857;}
+  .ap-pubpill--draft{background:#F1F5F9;color:#64748B;}
+  .ap-pubpill--missing{background:#FEF3C7;color:#92400E;}
+  .ap-pubstate__note{font-size:12.5px;color:#64748B;max-width:480px;}
+
+  /* Form card */
+  .ap-card{background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:26px 28px;margin-bottom:18px;}
+  .ap-card__title{font-family:"Archivo","Inter",sans-serif;font-size:16px;font-weight:800;color:#0F172A;letter-spacing:-.01em;margin:0 0 4px;}
+  .ap-card__sub{font-size:12.5px;color:#64748B;margin:0 0 18px;line-height:1.5;}
+
+  .ap-field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+  .ap-field__label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748B;}
+  .ap-field__input,.ap-field__textarea{
+    width:100%;padding:11px 14px;border:1px solid #CBD5E1;border-radius:10px;
+    font-family:inherit;font-size:14px;color:#0F172A;background:#fff;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .ap-field__input:focus,.ap-field__textarea:focus{outline:none;border-color:#0071e3;box-shadow:0 0 0 3px rgba(0,113,227,0.12);}
+  .ap-field__textarea{min-height:96px;resize:vertical;line-height:1.5;}
+  .ap-field__hint{font-size:11.5px;color:#94A3B8;margin:0;}
+
+  .ap-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:560px){.ap-row{grid-template-columns:1fr;}}
+
+  .ap-actions{
+    display:flex;justify-content:flex-end;gap:10px;margin-top:8px;flex-wrap:wrap;
+  }
+  .ap-btn{
+    padding:11px 22px;border-radius:9999px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;
+    border:1px solid transparent;transition:background .15s ease, border-color .15s ease;
+  }
+  .ap-btn--primary{background:#0F172A;color:#fff;border-color:#0F172A;}
+  .ap-btn--primary:hover{background:#1E293B;}
+  .ap-btn--ghost{background:transparent;color:#0F172A;border-color:#CBD5E1;}
+  .ap-btn--ghost:hover{background:#F8FAFC;}
+  .ap-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+  .ap-msg{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none;line-height:1.5;}
+  .ap-msg.is-shown{display:block;}
+  .ap-msg--err{background:#FEE2E2;border:1px solid #FCA5A5;color:#991B1B;}
+  .ap-msg--ok{background:#ECFDF5;border:1px solid #86EFAC;color:#047857;}
+
+  .ap-loading{padding:48px 20px;text-align:center;color:#64748B;font-size:13px;}
+  .ap-spinner{
+    width:16px;height:16px;border-radius:50%;
+    border:2px solid #E2E8F0;border-top-color:#0071e3;
+    animation:ap-spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px;
+  }
+  @keyframes ap-spin{to{transform:rotate(360deg);}}
+
+  /* Preview note */
+  .ap-preview{
+    background:linear-gradient(135deg,#EFF6FF,#F0FDF4);
+    border:1px solid #BAE6FD;border-radius:12px;
+    padding:14px 18px;font-size:13px;color:#0F172A;line-height:1.55;
+    margin-bottom:18px;
+  }
+  .ap-preview strong{color:#0F172A;}
+</style>
+</head>
+<body class="pm-has-sidebar">
+<div id="pmSidebar"></div>
+
+<main class="ap-shell">
+  <div class="ap-head">
+    <p class="ap-eyebrow">Profile · What families see</p>
+    <h1 class="ap-h1">My Profile</h1>
+    <p class="ap-sub">Edit the information families see when they browse the roster. Private Mentorship controls publication — once approved, your profile becomes visible.</p>
+  </div>
+
+  <div class="ap-preview">
+    <strong>How this works.</strong> You edit these fields anytime. Private Mentorship reviews changes and toggles the "Published" flag to publish or unpublish your profile to families. Only your own profile is editable here.
+  </div>
+
+  <div class="ap-loading" id="apLoading"><span class="ap-spinner"></span> Loading your profile…</div>
+
+  <div id="apBody" hidden>
+    <div class="ap-pubstate">
+      <div>
+        <p class="ap-pubstate__label">Public status</p>
+        <p class="ap-pubstate__value" id="pubStatusLabel">—</p>
+      </div>
+      <span class="ap-pubpill" id="pubStatusPill">—</span>
+      <p class="ap-pubstate__note" id="pubStatusNote">—</p>
+    </div>
+
+    <div class="ap-msg ap-msg--err" id="apErr"></div>
+    <div class="ap-msg ap-msg--ok" id="apOk"></div>
+
+    <section class="ap-card">
+      <h2 class="ap-card__title">Public profile</h2>
+      <p class="ap-card__sub">These fields appear on your card and detail page when browsing families view the roster.</p>
+
+      <div class="ap-row">
+        <div class="ap-field">
+          <label class="ap-field__label" for="apName">Display name</label>
+          <input class="ap-field__input" type="text" id="apName" placeholder="e.g., Sarah K." />
+          <p class="ap-field__hint">First name + last initial is common.</p>
+        </div>
+        <div class="ap-field">
+          <label class="ap-field__label" for="apCity">City</label>
+          <input class="ap-field__input" type="text" id="apCity" placeholder="Vancouver" />
+        </div>
+      </div>
+
+      <div class="ap-field">
+        <label class="ap-field__label" for="apBio">Bio</label>
+        <textarea class="ap-field__textarea" id="apBio" placeholder="A few sentences in your own voice — what you bring to a family, the kind of support you provide best."></textarea>
+      </div>
+
+      <div class="ap-field">
+        <label class="ap-field__label" for="apLanguages">Languages</label>
+        <input class="ap-field__input" type="text" id="apLanguages" placeholder="English, French, Mandarin" />
+        <p class="ap-field__hint">Comma-separated.</p>
+      </div>
+
+      <div class="ap-field">
+        <label class="ap-field__label" for="apCertifications">Certifications</label>
+        <input class="ap-field__input" type="text" id="apCertifications" placeholder="First Aid, CRC, CPR-C" />
+        <p class="ap-field__hint">Comma-separated.</p>
+      </div>
+
+      <div class="ap-field">
+        <label class="ap-field__label" for="apEducation">Education summary</label>
+        <textarea class="ap-field__textarea" id="apEducation" placeholder="UBC — B.Ed., Education, 2021"></textarea>
+      </div>
+
+      <div class="ap-field">
+        <label class="ap-field__label" for="apExperience">Experience summary</label>
+        <textarea class="ap-field__textarea" id="apExperience" placeholder="3 years tutoring math, focus on ages 9–14."></textarea>
+      </div>
+
+      <div class="ap-actions">
+        <button class="ap-btn ap-btn--ghost" type="button" id="apReset">Reset</button>
+        <button class="ap-btn ap-btn--primary" type="button" id="apSave">Save changes</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="apEmpty" hidden class="ap-card" style="text-align:center;padding:48px 28px;">
+    <h2 class="ap-card__title" style="margin-bottom:8px;">Profile not created yet</h2>
+    <p class="ap-card__sub" style="margin-bottom:18px;">Private Mentorship creates your initial public profile after onboarding. Once it exists, you'll be able to edit it here.</p>
+    <a class="ap-btn ap-btn--ghost" href="assistant-dashboard.html" style="text-decoration:none;">Back to dashboard</a>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260515c"></script>
+<script src="js/hiring-service.js?v=20260515c"></script>
+<script src="js/sidebar.js?v=20260515c"></script>
+<script>
+let original = null;
+const $ = id => document.getElementById(id);
+function csvIn(arr){ return (arr || []).join(', '); }
+function csvOut(s){ return (s || '').split(',').map(x => x.trim()).filter(Boolean); }
+function showMsg(kind, text){
+  const ok = $('apOk'), err = $('apErr');
+  ok.classList.remove('is-shown'); err.classList.remove('is-shown');
+  if (kind === 'ok'){ ok.textContent = text; ok.classList.add('is-shown'); }
+  if (kind === 'err'){ err.textContent = text; err.classList.add('is-shown'); }
+}
+function clearMsg(){ $('apOk').classList.remove('is-shown'); $('apErr').classList.remove('is-shown'); }
+
+function applyProfileToForm(p){
+  $('apName').value = p.display_name || '';
+  $('apCity').value = p.city || '';
+  $('apBio').value = p.bio || '';
+  $('apLanguages').value = csvIn(p.languages);
+  $('apCertifications').value = csvIn(p.certifications);
+  $('apEducation').value = p.education_summary || '';
+  $('apExperience').value = p.experience_summary || '';
+
+  // Public status pill
+  const pillEl = $('pubStatusPill');
+  const labelEl = $('pubStatusLabel');
+  const noteEl = $('pubStatusNote');
+  if (p.is_published){
+    pillEl.textContent = 'Published';
+    pillEl.className = 'ap-pubpill ap-pubpill--published';
+    labelEl.textContent = 'Visible to families';
+    noteEl.textContent = 'Your profile is currently published. Families can find you on the roster.';
+  } else if (!p.display_name || !p.bio){
+    pillEl.textContent = 'Incomplete';
+    pillEl.className = 'ap-pubpill ap-pubpill--missing';
+    labelEl.textContent = 'Profile incomplete';
+    noteEl.textContent = 'Fill in display name and bio. Then PM will review and publish.';
+  } else {
+    pillEl.textContent = 'Draft';
+    pillEl.className = 'ap-pubpill ap-pubpill--draft';
+    labelEl.textContent = 'Awaiting publication';
+    noteEl.textContent = 'Profile complete, not yet published. PM reviews changes and toggles visibility.';
+  }
+}
+
+(async function init(){
+  await new Promise(r => setTimeout(r, 300));
+  let profile = null;
+  try { profile = await window.pmHiring.fetchMyAssistantProfile(); } catch (_) {}
+  $('apLoading').hidden = true;
+  if (!profile){
+    $('apEmpty').hidden = false;
+    return;
+  }
+  original = profile;
+  applyProfileToForm(profile);
+  $('apBody').hidden = false;
+})();
+
+$('apReset').addEventListener('click', () => {
+  if (!original) return;
+  applyProfileToForm(original);
+  clearMsg();
+});
+
+$('apSave').addEventListener('click', async () => {
+  clearMsg();
+  const patch = {
+    display_name: $('apName').value.trim() || null,
+    city: $('apCity').value.trim() || null,
+    bio: $('apBio').value.trim() || null,
+    languages: csvOut($('apLanguages').value),
+    certifications: csvOut($('apCertifications').value),
+    education_summary: $('apEducation').value.trim() || null,
+    experience_summary: $('apExperience').value.trim() || null,
+  };
+  const btn = $('apSave');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    const saved = await window.pmHiring.updateMyAssistantProfile(patch);
+    original = saved;
+    applyProfileToForm(saved);
+    showMsg('ok', 'Saved. Private Mentorship reviews changes before they are published.');
+  } catch (e) {
+    console.error(e);
+    let msg = e?.message || 'Could not save changes.';
+    if (/permission|policy|denied/i.test(msg)){
+      msg = "Profile updates aren't enabled yet — Private Mentorship needs to add a self-update RLS policy to assistant_profiles. Your changes were NOT saved. Please share this message with PM.";
+    }
+    showMsg('err', msg);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save changes';
+  }
+});
+</script>
+</body>
+</html>

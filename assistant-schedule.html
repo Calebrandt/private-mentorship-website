@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My Schedule — Private Mentorship Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&display=swap" />
+<link rel="stylesheet" href="js/sidebar.css?v=20260515c" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#F4F5F7;color:#0F172A;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+  .as-shell{padding:36px 32px 80px;max-width:1240px;margin:0 auto;}
+  .as-head{margin-bottom:24px;}
+  .as-eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#0071e3;margin:0 0 8px;}
+  .as-h1{font-family:"Archivo","Inter",sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0 0 6px;color:#0F172A;}
+  .as-sub{font-size:14px;color:#64748B;margin:0;line-height:1.55;max-width:640px;}
+  .as-soon{
+    background:#fff;border:1px dashed #CBD5E1;border-radius:14px;
+    padding:64px 32px;text-align:center;color:#64748B;
+  }
+  .as-soon__pill{
+    display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    background:#EEF2FF;color:#4338CA;padding:5px 12px;border-radius:9999px;margin-bottom:14px;
+  }
+  .as-soon__title{font-family:"Archivo","Inter",sans-serif;font-size:19px;font-weight:800;color:#0F172A;margin:0 0 8px;letter-spacing:-.01em;}
+  .as-soon__sub{font-size:13.5px;margin:0;line-height:1.65;max-width:520px;margin-left:auto;margin-right:auto;}
+  .as-soon__back{
+    display:inline-block;margin-top:18px;font-size:13px;font-weight:600;
+    color:#0071e3;text-decoration:none;border:1px solid #B3D0F5;border-radius:9999px;
+    padding:8px 16px;transition:background .15s ease;
+  }
+  .as-soon__back:hover{background:#EEF6FF;}
+</style>
+</head>
+<body class="pm-has-sidebar">
+<div id="pmSidebar"></div>
+<main class="as-shell">
+  <div class="as-head">
+    <p class="as-eyebrow">Work · Calendar</p>
+    <h1 class="as-h1">My Schedule</h1>
+    <p class="as-sub">A unified view of every upcoming session across every family — coming soon.</p>
+  </div>
+
+  <div class="as-soon">
+    <span class="as-soon__pill">In build</span>
+    <h2 class="as-soon__title">Custom scheduler is on the way</h2>
+    <p class="as-soon__sub">For now, individual sessions appear in your <strong>Dashboard</strong> under <em>Upcoming sessions</em>, and per-family in <strong>My Clients</strong>. The full week/month view, drag-to-reschedule, and availability windows are being built next.</p>
+    <a class="as-soon__back" href="assistant-dashboard.html">← Back to dashboard</a>
+  </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260515c"></script>
+<script src="js/hiring-service.js?v=20260515c"></script>
+<script src="js/sidebar.js?v=20260515c"></script>
+</body>
+</html>

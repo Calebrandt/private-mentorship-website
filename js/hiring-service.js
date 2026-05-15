@@ -732,6 +732,111 @@
     }
   }
 
+  // List the families this assistant is engaged with — based on contracts.
+  // Returns one row per contract with a `client` shape attached.
+  // Statuses included: active, paused, pending, draft. Closed contracts
+  // (cancelled, ended) are excluded by default; pass `statuses` to override.
+  async function fetchMyAssignedClients({ statuses = ['active','paused','pending','draft'] } = {}) {
+    const user = await getCurrentUser();
+    if (!user) return [];
+    try {
+      const { data: contracts, error } = await sb()
+        .from('contracts')
+        .select('id, client_id, status, start_at, end_at, included_minutes, renewal_mode, notes')
+        .eq('assistant_id', user.id)
+        .in('status', statuses)
+        .order('start_at', { ascending: false });
+      if (error) {
+        console.warn('fetchMyAssignedClients contracts failed:', error);
+        return [];
+      }
+      const clientIds = [...new Set((contracts || []).map(c => c.client_id))].filter(Boolean);
+      let clientsById = {};
+      if (clientIds.length) {
+        const { data: clients } = await sb()
+          .from('clients')
+          .select('id, profile_id, full_name')
+          .in('id', clientIds);
+        (clients || []).forEach(c => { clientsById[c.id] = c; });
+      }
+      return (contracts || []).map(c => ({
+        contract: c,
+        client: clientsById[c.client_id] || { id: c.client_id, full_name: null },
+      }));
+    } catch (e) {
+      console.warn('fetchMyAssignedClients threw:', e);
+      return [];
+    }
+  }
+
+  // Per-client workspace data — for assistant-client.html?id=<clientId>.
+  // Pulls the contract, recent + upcoming appointments, and hours summary
+  // for one specific client this assistant is engaged with.
+  async function fetchAssistantClientWorkspace(clientId) {
+    const user = await getCurrentUser();
+    if (!user || !clientId) return null;
+    const out = {
+      client: null,
+      contract: null,
+      upcomingAppointments: [],
+      recentAppointments: [],
+      hoursUsedMinutes: 0,
+    };
+
+    try {
+      const { data: client } = await sb()
+        .from('clients').select('id, profile_id, full_name')
+        .eq('id', clientId).maybeSingle();
+      out.client = client || { id: clientId };
+    } catch (_) {}
+
+    try {
+      const { data: contract } = await sb()
+        .from('contracts')
+        .select('id, client_id, assistant_id, status, start_at, end_at, included_minutes, renewal_mode, notes')
+        .eq('client_id', clientId)
+        .eq('assistant_id', user.id)
+        .in('status', ['active','paused','pending','draft'])
+        .order('start_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      out.contract = contract;
+    } catch (_) {}
+
+    if (out.contract?.id) {
+      const now = new Date().toISOString();
+      try {
+        const { data: upcoming } = await sb()
+          .from('appointments')
+          .select('id, starts_at, duration_minutes, status, notes')
+          .eq('contract_id', out.contract.id)
+          .gte('starts_at', now)
+          .order('starts_at', { ascending: true })
+          .limit(8);
+        out.upcomingAppointments = upcoming || [];
+      } catch (_) {}
+      try {
+        const { data: recent } = await sb()
+          .from('appointments')
+          .select('id, starts_at, duration_minutes, status, notes')
+          .eq('contract_id', out.contract.id)
+          .lt('starts_at', now)
+          .order('starts_at', { ascending: false })
+          .limit(8);
+        out.recentAppointments = recent || [];
+      } catch (_) {}
+      try {
+        const { data: ledger } = await sb()
+          .from('hours_ledger')
+          .select('delta_hours')
+          .eq('client_id', clientId);
+        const total = (ledger || []).reduce((s, r) => s + Math.abs(Number(r.delta_hours) || 0), 0);
+        out.hoursUsedMinutes = Math.round(total * 60);
+      } catch (_) {}
+    }
+    return out;
+  }
+
   // Get the assistant's own published profile (for the preview card).
   async function fetchMyAssistantProfile() {
     const user = await getCurrentUser();
@@ -749,6 +854,96 @@
       return data;
     } catch (_) {
       return null;
+    }
+  }
+
+  // Save edits to the assistant's own assistant_profiles row.
+  // RLS on assistant_profiles is admin-only for INSERT/UPDATE/DELETE per the
+  // existing policies (assistant_profiles_*_admin_only). For the assistant to
+  // edit their own profile, either:
+  //   (a) an additional self-update RLS policy must be added to Supabase
+  //   (b) edits should route through an admin RPC.
+  // For now: attempt the upsert and surface the error if RLS denies it.
+  // The admin can add this policy later:
+  //   CREATE POLICY "assistants_update_own_profile" ON public.assistant_profiles
+  //     FOR UPDATE TO authenticated
+  //     USING (assistant_id = auth.uid())
+  //     WITH CHECK (assistant_id = auth.uid());
+  async function updateMyAssistantProfile(patch) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not signed in');
+    const safe = {
+      assistant_id: user.id,
+      display_name: patch.display_name ?? null,
+      bio: patch.bio ?? null,
+      city: patch.city ?? null,
+      languages: Array.isArray(patch.languages) ? patch.languages : [],
+      certifications: Array.isArray(patch.certifications) ? patch.certifications : [],
+      education_summary: patch.education_summary ?? null,
+      experience_summary: patch.experience_summary ?? null,
+      updated_at: new Date().toISOString(),
+      // is_published is intentionally NOT touched here — only admin controls visibility.
+    };
+    const { data, error } = await sb()
+      .from('assistant_profiles')
+      .upsert(safe, { onConflict: 'assistant_id' })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  }
+
+  // Hours ledger for the assistant — aggregated across all their clients.
+  // Returns recent ledger entries with the client_id joined when possible.
+  async function fetchMyHoursLedger({ limit = 50 } = {}) {
+    const user = await getCurrentUser();
+    if (!user) return { entries: [], totalThisMonth: 0, totalAllTime: 0 };
+    try {
+      const { data: contracts } = await sb()
+        .from('contracts')
+        .select('client_id')
+        .eq('assistant_id', user.id);
+      const clientIds = [...new Set((contracts || []).map(c => c.client_id))].filter(Boolean);
+      if (!clientIds.length) {
+        return { entries: [], totalThisMonth: 0, totalAllTime: 0 };
+      }
+      const { data: entries, error } = await sb()
+        .from('hours_ledger')
+        .select('id, client_id, delta_hours, reason, appointment_id, created_at')
+        .in('client_id', clientIds)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+      if (error) {
+        console.warn('fetchMyHoursLedger failed:', error);
+        return { entries: [], totalThisMonth: 0, totalAllTime: 0 };
+      }
+      const firstOfMonth = new Date();
+      firstOfMonth.setDate(1); firstOfMonth.setHours(0,0,0,0);
+      const totalThisMonth = (entries || []).reduce((s, e) => {
+        const d = e.created_at ? new Date(e.created_at) : null;
+        if (d && d >= firstOfMonth) return s + Math.abs(Number(e.delta_hours) || 0);
+        return s;
+      }, 0);
+      const totalAllTime = (entries || []).reduce((s, e) => s + Math.abs(Number(e.delta_hours) || 0), 0);
+      // Attach client info for display
+      const { data: clients } = await sb()
+        .from('clients')
+        .select('id, full_name')
+        .in('id', clientIds);
+      const clientsById = {};
+      (clients || []).forEach(c => { clientsById[c.id] = c; });
+      const enriched = (entries || []).map(e => ({
+        ...e,
+        client: clientsById[e.client_id] || null,
+      }));
+      return {
+        entries: enriched,
+        totalThisMonth: Math.round(totalThisMonth * 10) / 10,
+        totalAllTime: Math.round(totalAllTime * 10) / 10,
+      };
+    } catch (e) {
+      console.warn('fetchMyHoursLedger threw:', e);
+      return { entries: [], totalThisMonth: 0, totalAllTime: 0 };
     }
   }
 
@@ -1549,6 +1744,10 @@
     adminListPicks, adminUpdatePickStatus,
     // assistant-side (Phase 1)
     fetchAssistantHomeKpis, fetchAssistantUpcomingAppointments, fetchMyAssistantProfile,
+    // assistant-side (Phase 2)
+    fetchMyAssignedClients, fetchAssistantClientWorkspace,
+    // assistant-side (Phase 3)
+    updateMyAssistantProfile, fetchMyHoursLedger,
     // admin: clients
     adminCreateClientAccount, adminListClients, adminFetchHomeKpis, adminFetchMonthlyStats,
     // client (self)

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Client Workspace — Private Mentorship Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,500&display=swap" />
+<link rel="stylesheet" href="js/sidebar.css?v=20260515c" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#F4F5F7;color:#0F172A;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+  .wc-shell{padding:36px 32px 80px;max-width:1240px;margin:0 auto;}
+
+  /* Breadcrumb */
+  .wc-crumb{font-size:12.5px;color:#64748B;margin:0 0 18px;display:flex;align-items:center;gap:6px;}
+  .wc-crumb a{color:#0071e3;text-decoration:none;}
+  .wc-crumb a:hover{text-decoration:underline;}
+
+  /* Hero */
+  .wc-hero{
+    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    padding:24px 26px;margin-bottom:18px;
+    display:grid;grid-template-columns:64px 1fr auto;gap:20px;align-items:center;
+  }
+  .wc-hero__avatar{
+    width:64px;height:64px;border-radius:50%;
+    background:linear-gradient(135deg, var(--av-from, #3B82F6), var(--av-to, #1E40AF));
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:800;font-size:20px;
+  }
+  .wc-hero__id{min-width:0;}
+  .wc-eyebrow{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#0071e3;margin:0 0 6px;}
+  .wc-hero__name{font-family:"Archivo","Inter",sans-serif;font-size:24px;font-weight:800;letter-spacing:-.018em;line-height:1.1;color:#0F172A;margin:0 0 4px;}
+  .wc-hero__sub{font-size:13px;color:#64748B;margin:0;}
+  .wc-hero__status{
+    font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    padding:5px 12px;border-radius:9999px;white-space:nowrap;
+  }
+  .wc-hero__status--active{background:#D1FAE5;color:#047857;}
+  .wc-hero__status--paused{background:#FEF3C7;color:#92400E;}
+  .wc-hero__status--pending{background:#DBEAFE;color:#1E3A8A;}
+  .wc-hero__status--draft{background:#F1F5F9;color:#64748B;}
+
+  /* KPI tiles */
+  .wc-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px;}
+  @media(max-width:780px){.wc-kpis{grid-template-columns:1fr;}}
+  .wc-kpi{background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:18px 20px;}
+  .wc-kpi__label{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#94A3B8;margin:0 0 6px;}
+  .wc-kpi__value{font-family:"Archivo","Inter",sans-serif;font-size:28px;font-weight:800;color:#0F172A;letter-spacing:-.018em;line-height:1;}
+  .wc-kpi__sub{font-size:12px;color:#64748B;margin:6px 0 0;}
+
+  /* Two-col layout */
+  .wc-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+  @media(max-width:900px){.wc-cols{grid-template-columns:1fr;}}
+
+  /* Section */
+  .wc-section{background:#fff;border:1px solid #E2E8F0;border-radius:14px;overflow:hidden;}
+  .wc-section__head{padding:16px 20px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .wc-section__title{font-family:"Archivo","Inter",sans-serif;font-size:15px;font-weight:800;color:#0F172A;letter-spacing:-.01em;margin:0;}
+  .wc-section__sub{font-size:11.5px;color:#64748B;margin:2px 0 0;}
+
+  .wc-list{padding:0;}
+  .wc-row{
+    padding:13px 20px;display:grid;grid-template-columns:110px 1fr auto;gap:14px;align-items:center;
+    border-top:1px solid #F1F5F9;
+  }
+  .wc-row:first-child{border-top:none;}
+  .wc-row__when strong{display:block;font-size:13px;font-weight:700;color:#0F172A;}
+  .wc-row__when small{display:block;font-size:11.5px;color:#64748B;margin-top:1px;}
+  .wc-row__body p{margin:0;font-size:12.5px;color:#475569;line-height:1.5;}
+  .wc-row__status{
+    font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    padding:3px 9px;border-radius:9999px;white-space:nowrap;
+  }
+  .wc-row__status--scheduled{background:#DBEAFE;color:#1E3A8A;}
+  .wc-row__status--completed{background:#D1FAE5;color:#047857;}
+  .wc-row__status--cancelled{background:#FEE2E2;color:#991B1B;}
+  .wc-row__status--late_cancelled{background:#FEE2E2;color:#991B1B;}
+  .wc-row__status--no_show{background:#F1F5F9;color:#64748B;}
+  .wc-row__status--reserved{background:#F1F5F9;color:#64748B;}
+
+  /* Empty/loading */
+  .wc-empty,.wc-loading{padding:32px 20px;text-align:center;color:#64748B;font-size:12.5px;line-height:1.5;}
+  .wc-empty__title{font-size:14px;font-weight:700;color:#0F172A;margin:0 0 4px;}
+  .wc-spinner{
+    width:14px;height:14px;border-radius:50%;
+    border:2px solid #E2E8F0;border-top-color:#0071e3;
+    animation:wc-spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px;
+  }
+  @keyframes wc-spin{to{transform:rotate(360deg);}}
+
+  /* Contract details card */
+  .wc-contract{background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:20px 22px;margin-bottom:18px;}
+  .wc-contract__title{font-family:"Archivo","Inter",sans-serif;font-size:15px;font-weight:800;color:#0F172A;margin:0 0 12px;letter-spacing:-.01em;}
+  .wc-contract__rows{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+  @media(max-width:600px){.wc-contract__rows{grid-template-columns:1fr;}}
+  .wc-contract__row{display:flex;flex-direction:column;gap:3px;padding:8px 0;border-bottom:1px solid #F1F5F9;}
+  .wc-contract__row:nth-last-child(-n+2){border-bottom:none;padding-bottom:0;}
+  .wc-contract__row dt{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A3B8;margin:0;}
+  .wc-contract__row dd{font-size:13.5px;color:#0F172A;margin:0;font-weight:500;}
+
+  /* Header actions */
+  .wc-actions{display:flex;gap:8px;}
+  .wc-action{
+    font-size:11.5px;font-weight:600;color:#0F172A;text-decoration:none;
+    padding:7px 14px;border:1px solid #CBD5E1;border-radius:9999px;background:#fff;
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .wc-action:hover{background:#F8FAFC;border-color:#94A3B8;}
+</style>
+</head>
+<body class="pm-has-sidebar">
+<div id="pmSidebar"></div>
+
+<main class="wc-shell">
+  <p class="wc-crumb">
+    <a href="assistant-clients.html">← My Clients</a>
+  </p>
+
+  <div id="wcLoading" class="wc-loading"><span class="wc-spinner"></span> Loading workspace…</div>
+
+  <div id="wcBody" hidden>
+    <!-- Hero -->
+    <div class="wc-hero">
+      <div class="wc-hero__avatar" id="wcAvatar">A</div>
+      <div class="wc-hero__id">
+        <p class="wc-eyebrow">Family workspace</p>
+        <h1 class="wc-hero__name" id="wcName">—</h1>
+        <p class="wc-hero__sub" id="wcSub">—</p>
+      </div>
+      <span class="wc-hero__status" id="wcStatus">—</span>
+    </div>
+
+    <!-- KPI tiles -->
+    <section class="wc-kpis">
+      <div class="wc-kpi">
+        <p class="wc-kpi__label">Plan size</p>
+        <span class="wc-kpi__value" id="kpiPlan">—</span>
+        <p class="wc-kpi__sub">hours included</p>
+      </div>
+      <div class="wc-kpi">
+        <p class="wc-kpi__label">Hours used</p>
+        <span class="wc-kpi__value" id="kpiUsed">—</span>
+        <p class="wc-kpi__sub">on the ledger</p>
+      </div>
+      <div class="wc-kpi">
+        <p class="wc-kpi__label">Upcoming</p>
+        <span class="wc-kpi__value" id="kpiUpcoming">—</span>
+        <p class="wc-kpi__sub">scheduled sessions</p>
+      </div>
+    </section>
+
+    <!-- Two columns: upcoming + recent -->
+    <div class="wc-cols">
+      <section class="wc-section">
+        <header class="wc-section__head">
+          <div>
+            <h2 class="wc-section__title">Upcoming sessions</h2>
+            <p class="wc-section__sub">Next sessions on the calendar.</p>
+          </div>
+        </header>
+        <div class="wc-list" id="upcomingList"></div>
+        <div class="wc-empty" id="upcomingEmpty" hidden>
+          <p class="wc-empty__title">No upcoming sessions</p>
+          <p>Sessions will appear here as they are booked.</p>
+        </div>
+      </section>
+
+      <section class="wc-section">
+        <header class="wc-section__head">
+          <div>
+            <h2 class="wc-section__title">Recent sessions</h2>
+            <p class="wc-section__sub">Last 8 completed or past sessions.</p>
+          </div>
+        </header>
+        <div class="wc-list" id="recentList"></div>
+        <div class="wc-empty" id="recentEmpty" hidden>
+          <p class="wc-empty__title">No past sessions yet</p>
+          <p>Completed sessions will appear here.</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- Contract details -->
+    <section class="wc-contract">
+      <h3 class="wc-contract__title">Contract details</h3>
+      <dl class="wc-contract__rows">
+        <div class="wc-contract__row">
+          <dt>Status</dt>
+          <dd id="ctrStatus">—</dd>
+        </div>
+        <div class="wc-contract__row">
+          <dt>Service period</dt>
+          <dd id="ctrPeriod">—</dd>
+        </div>
+        <div class="wc-contract__row">
+          <dt>Included minutes</dt>
+          <dd id="ctrMinutes">—</dd>
+        </div>
+        <div class="wc-contract__row">
+          <dt>Renewal</dt>
+          <dd id="ctrRenewal">—</dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+
+  <div id="wcEmpty" hidden class="wc-empty" style="margin-top:24px;padding:60px 32px;">
+    <p class="wc-empty__title" style="font-size:17px;">No active engagement with this family</p>
+    <p style="font-size:13.5px;line-height:1.65;max-width:480px;margin:0 auto;">You don't currently have an active contract with this family. Return to <a href="assistant-clients.html" style="color:#0071e3;">My Clients</a> to see your current engagements.</p>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260515c"></script>
+<script src="js/hiring-service.js?v=20260515c"></script>
+<script src="js/sidebar.js?v=20260515c"></script>
+<script>
+function escapeHtml(s){return (s||'').toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[c]));}
+function initialsFor(name){return (name||'A').split(/\s+/).map(s=>s[0]||'').slice(0,2).join('').toUpperCase()||'A';}
+function fmtDate(iso){if(!iso)return '—';return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+function fmtDateShort(iso){if(!iso)return '—';return new Date(iso).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});}
+function fmtTime(iso){if(!iso)return '—';return new Date(iso).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});}
+function fmtDuration(mins){if(!mins)return '';if(mins<60)return mins+' min';const h=Math.floor(mins/60),m=mins%60;return m===0?h+' hr':h+'h '+m+'m';}
+
+const palettes = [
+  ['#3B82F6','#1E40AF'], ['#10B981','#047857'], ['#F59E0B','#B45309'],
+  ['#A855F7','#6B21A8'], ['#EC4899','#9D174D'], ['#0EA5E9','#075985'],
+];
+function paletteFor(id){
+  const hash = (id||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+  return palettes[hash % palettes.length];
+}
+
+function renderAppointmentRow(a){
+  const start = a.starts_at ? new Date(a.starts_at) : null;
+  const statusKey = (a.status || 'scheduled').toLowerCase();
+  return `<div class="wc-row">
+    <div class="wc-row__when">
+      ${start ? `<strong>${escapeHtml(fmtDateShort(start))}</strong><small>${escapeHtml(fmtTime(start))}${a.duration_minutes ? ' · ' + escapeHtml(fmtDuration(a.duration_minutes)) : ''}</small>` : '<strong>—</strong>'}
+    </div>
+    <div class="wc-row__body"><p>${a.notes ? escapeHtml(String(a.notes).slice(0,100)) : 'Client session'}</p></div>
+    <span class="wc-row__status wc-row__status--${escapeHtml(statusKey)}">${escapeHtml(statusKey.replace(/_/g,' '))}</span>
+  </div>`;
+}
+
+(async function init(){
+  await new Promise(r => setTimeout(r, 300));
+
+  const params = new URLSearchParams(window.location.search);
+  const clientId = params.get('id');
+  const loading = document.getElementById('wcLoading');
+  const body = document.getElementById('wcBody');
+  const emptyState = document.getElementById('wcEmpty');
+
+  if (!clientId) {
+    loading.hidden = true;
+    emptyState.hidden = false;
+    return;
+  }
+
+  let ws = null;
+  try { ws = await window.pmHiring.fetchAssistantClientWorkspace(clientId); } catch (_) {}
+
+  loading.hidden = true;
+
+  if (!ws || !ws.contract) {
+    emptyState.hidden = false;
+    return;
+  }
+
+  // Hero
+  const name = ws.client?.full_name || ('Client ' + (ws.client?.id ? ws.client.id.slice(0,8) : 'unknown'));
+  const pal = paletteFor(ws.client?.id || ws.contract.id);
+  document.getElementById('wcAvatar').textContent = initialsFor(name);
+  document.getElementById('wcAvatar').style.setProperty('--av-from', pal[0]);
+  document.getElementById('wcAvatar').style.setProperty('--av-to', pal[1]);
+  document.getElementById('wcName').textContent = name;
+  document.getElementById('wcSub').textContent =
+    `${fmtDate(ws.contract.start_at)} → ${fmtDate(ws.contract.end_at)}`;
+  const statusKey = (ws.contract.status || 'active').toLowerCase();
+  const statusClass = ['active','paused','pending','draft'].includes(statusKey) ? statusKey : 'active';
+  const wcStatus = document.getElementById('wcStatus');
+  wcStatus.textContent = statusKey;
+  wcStatus.className = 'wc-hero__status wc-hero__status--' + statusClass;
+
+  // KPIs
+  const planHours = ws.contract.included_minutes ? Math.round(ws.contract.included_minutes/60*10)/10 : 0;
+  const usedHours = ws.hoursUsedMinutes ? Math.round(ws.hoursUsedMinutes/60*10)/10 : 0;
+  document.getElementById('kpiPlan').textContent = planHours;
+  document.getElementById('kpiUsed').textContent = usedHours;
+  document.getElementById('kpiUpcoming').textContent = (ws.upcomingAppointments || []).length;
+
+  // Upcoming
+  const upcomingList = document.getElementById('upcomingList');
+  if ((ws.upcomingAppointments || []).length) {
+    upcomingList.innerHTML = ws.upcomingAppointments.map(renderAppointmentRow).join('');
+  } else {
+    document.getElementById('upcomingEmpty').hidden = false;
+  }
+
+  // Recent
+  const recentList = document.getElementById('recentList');
+  if ((ws.recentAppointments || []).length) {
+    recentList.innerHTML = ws.recentAppointments.map(renderAppointmentRow).join('');
+  } else {
+    document.getElementById('recentEmpty').hidden = false;
+  }
+
+  // Contract details
+  document.getElementById('ctrStatus').textContent = statusKey;
+  document.getElementById('ctrPeriod').textContent = `${fmtDate(ws.contract.start_at)} → ${fmtDate(ws.contract.end_at)}`;
+  document.getElementById('ctrMinutes').textContent = ws.contract.included_minutes ? `${ws.contract.included_minutes} min (${planHours} hrs)` : '—';
+  document.getElementById('ctrRenewal').textContent = ws.contract.renewal_mode || 'manual';
+
+  body.hidden = false;
+})();
+</script>
+</body>
+</html>
