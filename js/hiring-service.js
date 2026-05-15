@@ -408,12 +408,15 @@
     return { ok: true };
   }
 
-  // List users in the profiles table whose role is ASSISTANT (case-insensitive).
+  // List users in the profiles table whose role is ASSISTANT.
+  // (user_role is a case-sensitive enum — uppercase 'ASSISTANT' is the canonical value.
+  //  The previous lowercase OR variant caused enum cast errors when the enum did not
+  //  contain a 'assistant' literal.)
   async function adminListAssistantUsers() {
     const { data, error } = await sb()
       .from('profiles')
       .select('user_id, role, email, full_name, phone_number_e164')
-      .or('role.eq.ASSISTANT,role.eq.assistant');
+      .eq('role', 'ASSISTANT');
     if (error) throw error;
     return data || [];
   }
