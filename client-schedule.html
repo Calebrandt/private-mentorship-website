@@ -129,6 +129,28 @@
   .nx-contract__remaining-num small{font-size:18px;font-weight:700;color:var(--ink-mute);margin-left:6px;letter-spacing:-.015em;}
   .nx-contract__remaining-label{font-size:12px;color:var(--ink-mute);margin:6px 0 0;font-weight:600;letter-spacing:-.005em;}
 
+  /* Token warning — only renders when low or out. Sits below "remaining".
+     Quiet typography, subtle hue. No pill background — premium minimal. */
+  .nx-contract__token-warn{
+    display:inline-flex;align-items:center;gap:6px;
+    margin-top:10px;font-size:11.5px;font-weight:700;
+    letter-spacing:.02em;text-transform:uppercase;
+  }
+  .nx-contract__token-warn::before{
+    content:'';width:6px;height:6px;border-radius:50%;
+  }
+  .nx-contract__token-warn--low{color:#B45309;}
+  .nx-contract__token-warn--low::before{background:#D97706;box-shadow:0 0 0 3px rgba(217,119,6,0.16);}
+  .nx-contract__token-warn--out{color:#B91C1C;}
+  .nx-contract__token-warn--out::before{
+    background:#DC2626;box-shadow:0 0 0 3px rgba(220,38,38,0.18);
+    animation:tokenwarn-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes tokenwarn-pulse{
+    0%,100%{box-shadow:0 0 0 3px rgba(220,38,38,0.18);}
+    50%{box-shadow:0 0 0 5px rgba(220,38,38,0.10);}
+  }
+
   .nx-progress{margin-top:4px;}
   .nx-progress__bar{height:7px;background:#F1F5F9;border-radius:9999px;overflow:hidden;}
   .nx-progress__fill{height:100%;background:linear-gradient(90deg,#5750F1 0%,#0ABEF9 100%);border-radius:9999px;transition:width .4s cubic-bezier(.22,1,.36,1);}
@@ -761,6 +783,16 @@
         <div class="nx-contract__remaining">
           <p class="nx-contract__remaining-num">${formatNum(remaining)}<small>hours</small></p>
           <p class="nx-contract__remaining-label">remaining</p>
+          ${(() => {
+            if (!tokenStatus) return '';
+            const left = tokenStatus.tokens_remaining;
+            if (left >= 2) return ''; // plentiful — keep card clean
+            if (left === 1) {
+              return `<p class="nx-contract__token-warn nx-contract__token-warn--low">1 token left</p>`;
+            }
+            // left === 0
+            return `<p class="nx-contract__token-warn nx-contract__token-warn--out">No tokens left · changes deduct hours</p>`;
+          })()}
         </div>
       </div>
       <div class="nx-progress">
