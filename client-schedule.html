@@ -119,18 +119,71 @@
   }
   .nx-contract__status--manual{color:#EA580C;}
   .nx-contract__status--manual::before{background:#FB923C;box-shadow:0 0 0 3px rgba(251,146,60,0.18);}
-  /* Token line on contract summary — integrates with the existing meta typography */
+  /* Premium token pill on contract summary — soft gradient + subtle glow */
   .nx-contract__tokens-line{
-    font-size:13px;color:var(--ink-mute);margin:8px 0 0;
-    font-weight:500;letter-spacing:-.005em;
+    display:inline-flex;align-items:center;gap:8px;
+    margin-top:12px;padding:7px 14px 7px 12px;
+    font-family:Inter,sans-serif;font-size:12.5px;font-weight:600;
+    letter-spacing:-.005em;color:var(--ink-2);
+    background:linear-gradient(135deg,rgba(87,80,241,0.07),rgba(10,190,249,0.04));
+    border:1px solid rgba(87,80,241,0.18);
+    border-radius:9999px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.7),
+      0 2px 8px -3px rgba(87,80,241,0.18);
+    transition:all .25s ease;
   }
   .nx-contract__tokens-line strong{
-    font-weight:800;letter-spacing:-.01em;
+    font-weight:800;font-size:13.5px;letter-spacing:-.015em;
+    color:var(--primary);
+    font-variant-numeric:tabular-nums;
   }
-  .nx-contract__tokens-line--ok strong{color:var(--ink-2);}
+  .nx-contract__tokens-line::before{
+    content:'';width:6px;height:6px;border-radius:50%;
+    background:var(--primary);
+    box-shadow:0 0 10px 1px rgba(87,80,241,0.55);
+    animation:tokens-pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes tokens-pulse{
+    0%,100%{box-shadow:0 0 10px 1px rgba(87,80,241,0.55);}
+    50%{box-shadow:0 0 14px 2px rgba(87,80,241,0.85);}
+  }
+  /* Low — amber */
+  .nx-contract__tokens-line--low{
+    background:linear-gradient(135deg,rgba(217,119,6,0.07),rgba(245,158,11,0.04));
+    border-color:rgba(217,119,6,0.22);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.7),
+      0 2px 8px -3px rgba(217,119,6,0.22);
+  }
   .nx-contract__tokens-line--low strong{color:#B45309;}
+  .nx-contract__tokens-line--low::before{
+    background:#D97706;
+    box-shadow:0 0 10px 1px rgba(217,119,6,0.55);
+    animation-name:tokens-pulse-amber;
+  }
+  @keyframes tokens-pulse-amber{
+    0%,100%{box-shadow:0 0 10px 1px rgba(217,119,6,0.55);}
+    50%{box-shadow:0 0 14px 2px rgba(217,119,6,0.85);}
+  }
+  /* Out — red */
+  .nx-contract__tokens-line--out{
+    background:linear-gradient(135deg,rgba(185,28,28,0.07),rgba(220,38,38,0.04));
+    border-color:rgba(185,28,28,0.24);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.7),
+      0 2px 8px -3px rgba(185,28,28,0.24);
+  }
   .nx-contract__tokens-line--out strong{color:#B91C1C;}
-  .nx-contract__tokens-line--out{color:#B91C1C;}
+  .nx-contract__tokens-line--out::before{
+    background:#DC2626;
+    box-shadow:0 0 10px 1px rgba(220,38,38,0.55);
+    animation-name:tokens-pulse-red;
+  }
+  @keyframes tokens-pulse-red{
+    0%,100%{box-shadow:0 0 10px 1px rgba(220,38,38,0.55);}
+    50%{box-shadow:0 0 14px 2px rgba(220,38,38,0.9);}
+  }
   .nx-contract__remaining{
     text-align:right;flex-shrink:0;
   }
@@ -770,15 +823,11 @@
             <p class="nx-contract__meta" style="margin-top:8px;"><span class="nx-contract__status${isAuto ? '' : ' nx-contract__status--manual'}">${esc(statusLabel)}</span></p>
             ${(() => {
               if (!tokenStatus) return '';
-              const total = tokenStatus.tokens_total;
               const left = tokenStatus.tokens_remaining;
               const cls = left === 0 ? 'nx-contract__tokens-line--out'
                         : left === 1 ? 'nx-contract__tokens-line--low'
-                        : 'nx-contract__tokens-line--ok';
-              const label = left === 0
-                ? `<strong>0 of ${total}</strong> reschedule / cancel tokens remaining — next change will deduct hours.`
-                : `<strong>${left} of ${total}</strong> reschedule / cancel token${left===1?'':'s'} remaining.`;
-              return `<p class="nx-contract__tokens-line ${cls}">${label}</p>`;
+                        : '';
+              return `<span class="nx-contract__tokens-line ${cls}"><strong>${left}</strong> reschedule/cancel token${left===1?'':'s'} left</span>`;
             })()}
           </div>
         </div>
