@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Private Mentorship — Assistant Independent Contractor Agreement</title>
+<style>
+  :root{
+    --ink:#1a1a1a;
+    --muted:#555;
+    --rule:#d9d9d9;
+    --soft:#f7f7f5;
+    --accent:#0f1a14;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#eceae5;color:var(--ink);font-family:Georgia,"Iowan Old Style","Times New Roman",serif;line-height:1.65;font-size:16px}
+  .page{
+    max-width:780px;
+    margin:48px auto;
+    background:#fff;
+    padding:72px 80px 96px;
+    box-shadow:0 1px 3px rgba(0,0,0,.06),0 10px 40px rgba(0,0,0,.06);
+    border:1px solid #e6e2da;
+  }
+  .doc-header{
+    text-align:center;
+    padding-bottom:28px;
+    border-bottom:2px solid var(--ink);
+    margin-bottom:36px;
+  }
+  .doc-eyebrow{
+    font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+    font-size:11px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:14px;
+  }
+  h1{
+    font-family:Georgia,"Iowan Old Style",serif;
+    font-size:26px;
+    font-weight:700;
+    margin:0 0 6px;
+    letter-spacing:.01em;
+    line-height:1.25;
+  }
+  .doc-subtitle{
+    color:var(--muted);
+    font-size:14px;
+    font-style:italic;
+  }
+  .callout{
+    background:var(--soft);
+    border-left:3px solid var(--accent);
+    padding:14px 18px;
+    margin:24px 0 32px;
+    font-size:14px;
+    color:#333;
+    line-height:1.55;
+  }
+  h2{
+    font-family:Georgia,serif;
+    font-size:17px;
+    font-weight:700;
+    margin:40px 0 12px;
+    padding-bottom:6px;
+    border-bottom:1px solid var(--rule);
+    letter-spacing:.01em;
+  }
+  h2 .num{color:var(--muted);font-weight:400;margin-right:10px;font-variant-numeric:tabular-nums}
+  h3{
+    font-size:15px;
+    font-weight:700;
+    margin:24px 0 8px;
+  }
+  p{margin:8px 0 12px}
+  ul,ol{margin:8px 0 12px;padding-left:26px}
+  li{margin:4px 0}
+  .recital{margin:6px 0 10px;padding-left:32px;text-indent:-32px}
+  .recital strong{display:inline-block;width:22px}
+  .parties-block{
+    background:var(--soft);
+    padding:20px 24px;
+    margin:24px 0;
+    border:1px solid var(--rule);
+  }
+  .parties-block p{margin:6px 0}
+  .fill{display:inline-block;border-bottom:1px solid #333;min-width:220px;padding:0 6px}
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:14px 0 20px;
+    font-size:14.5px;
+  }
+  th,td{
+    border:1px solid var(--rule);
+    padding:8px 10px;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{background:var(--soft);font-weight:700}
+  .sig-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:40px;
+    margin:36px 0 16px;
+  }
+  .sig-block{padding-top:8px}
+  .sig-label{
+    font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:14px;
+    padding-bottom:8px;
+    border-bottom:1px solid #333;
+  }
+  .sig-line{
+    border-bottom:1px solid #999;
+    height:28px;
+    margin:18px 0 4px;
+  }
+  .sig-caption{
+    font-size:12px;
+    color:var(--muted);
+    font-style:italic;
+  }
+  .schedule-divider{
+    text-align:center;
+    margin:60px 0 28px;
+    font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+    font-size:11px;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--muted);
+    position:relative;
+  }
+  .schedule-divider:before,.schedule-divider:after{
+    content:"";
+    display:inline-block;
+    width:80px;
+    height:1px;
+    background:var(--rule);
+    vertical-align:middle;
+    margin:0 14px;
+  }
+  .schedule-title{
+    text-align:center;
+    font-size:18px;
+    font-weight:700;
+    margin:0 0 6px;
+  }
+  .schedule-sub{
+    text-align:center;
+    color:var(--muted);
+    font-style:italic;
+    font-size:13.5px;
+    margin-bottom:20px;
+  }
+  .check-row{
+    display:grid;
+    grid-template-columns:24px 1fr;
+    gap:10px;
+    margin:8px 0;
+    align-items:start;
+  }
+  .check-row .box{
+    width:16px;height:16px;
+    border:1.5px solid #555;
+    margin-top:5px;
+  }
+  .footer-note{
+    margin-top:60px;
+    padding:18px 22px;
+    background:#fff7e8;
+    border:1px solid #f0d9a0;
+    font-size:13.5px;
+    color:#5a4422;
+    line-height:1.55;
+  }
+  @media print{
+    body{background:#fff}
+    .page{box-shadow:none;border:none;margin:0;padding:50px 60px;max-width:none}
+    h2{page-break-after:avoid}
+    .sig-grid,table{page-break-inside:avoid}
+  }
+  @media (max-width:680px){
+    .page{padding:40px 26px;margin:16px 12px}
+    .sig-grid{grid-template-columns:1fr;gap:24px}
+    body{font-size:15px}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="doc-header">
+    <div class="doc-eyebrow">Private Mentorship Inc. &nbsp;·&nbsp; British Columbia</div>
+    <h1>Independent Contractor Agreement</h1>
+    <div class="doc-subtitle">Assistant Engagement — Marketplace Platform Model</div>
+  </header>
+
+  <div class="callout">
+    This Agreement is between Private Mentorship Inc. (a marketplace platform) and a self-employed Assistant who provides in-home support services to Clients introduced through the Platform. Both parties intend, in good faith, an independent-contractor relationship — not employment. Read the entire document carefully before signing. You are encouraged to seek independent legal advice.
+  </div>
+
+  <div class="parties-block">
+    <p><strong>This Agreement is made on:</strong> <span class="fill">&nbsp;</span></p>
+    <p><strong>Between:</strong></p>
+    <p><strong>Private Mentorship Inc.</strong> (the &ldquo;<em>Platform</em>&rdquo; or &ldquo;<em>PM</em>&rdquo;), a British Columbia corporation with its registered office at <span class="fill">&nbsp;</span>.</p>
+    <p><strong>And:</strong></p>
+    <p><span class="fill">&nbsp;</span> (the &ldquo;<em>Assistant</em>&rdquo;), a self-employed individual residing in British Columbia at <span class="fill">&nbsp;</span>.</p>
+    <p>PM and the Assistant are each a &ldquo;<em>Party</em>&rdquo; and together the &ldquo;<em>Parties</em>.&rdquo;</p>
+  </div>
+
+  <h2><span class="num">A.</span>Recitals</h2>
+  <p class="recital"><strong>A.</strong> PM operates a marketplace platform (the &ldquo;<em>Platform</em>&rdquo;) through which families and individuals seeking in-home support (&ldquo;<em>Clients</em>&rdquo;) may identify, evaluate, and engage independent service providers.</p>
+  <p class="recital"><strong>B.</strong> PM is not a staffing agency, employer, or labour supplier. PM does not employ the persons who deliver services through the Platform.</p>
+  <p class="recital"><strong>C.</strong> The Assistant is a self-employed independent contractor who provides in-home support services (the &ldquo;<em>Services</em>&rdquo;) to Clients introduced through the Platform. The Assistant brings their own acquired skills, training, and experience. PM does not train the Assistant in the delivery of the Services.</p>
+  <p class="recital"><strong>D.</strong> The Parties intend an independent contractor relationship in which the Assistant retains control over the methods and manner of performing the Services, bears the financial risks and rewards of their own work, and is free to provide services to other clients and platforms.</p>
+  <p class="recital"><strong>E.</strong> PM is an early-stage business and is not in a position to employ persons. PM operates exclusively on a contractor-engagement basis. The Assistant acknowledges that no offer of employment has been made, is being made, or is implied by this Agreement.</p>
+
+  <h2><span class="num">1.</span>Nature of the Relationship</h2>
+  <p><strong>1.1 Independent Contractor.</strong> The Assistant is engaged as an independent contractor. Nothing in this Agreement creates an employer-employee relationship, partnership, joint venture, agency, or fiduciary relationship.</p>
+  <p><strong>1.2 No Employment.</strong> The Assistant is not an employee of PM for any purpose, including under the <em>Employment Standards Act</em> (BC), the <em>Workers Compensation Act</em> (BC), the <em>Income Tax Act</em> (Canada), the <em>Canada Pension Plan</em>, the <em>Employment Insurance Act</em>, or at common law.</p>
+  <p><strong>1.3 No Employer-Style Entitlements.</strong> The Assistant is not entitled to and will not receive from PM: wages, salary, overtime, statutory holiday pay, vacation pay, sick leave, bereavement leave, severance, termination pay, pay in lieu of notice, group health or dental benefits, RRSP matching, pension contributions, EI or CPP contributions paid by PM, WorkSafeBC coverage paid by PM, or any other employment-related entitlement.</p>
+  <p><strong>1.4 Method and Manner.</strong> The Assistant has full control over the method, manner, sequence, and pace of performing the Services. PM does not direct how the Services are delivered, does not supervise sessions in real time, and does not inspect or evaluate the Assistant's work.</p>
+  <p><strong>1.5 No Training Provided.</strong> PM does not train the Assistant. The Services are delivered using skills, experience, and qualifications the Assistant already possesses. The Assistant represents that they have the necessary skills and experience for the Services they accept.</p>
+  <p><strong>1.6 Substance Over Form.</strong> The Parties intend this characterization in good faith and have structured both this Agreement and the operating relationship to reflect the substance of independent contracting.</p>
+
+  <h2><span class="num">2.</span>Services and Engagement Model</h2>
+  <p><strong>2.1 Per-Engagement Structure.</strong> Each working relationship between the Assistant and a Client constitutes a discrete, term-limited engagement (an &ldquo;<em>Engagement</em>&rdquo;). The end of one Engagement does not entitle the Assistant to a further Engagement, and any renewal with the same Client is a fresh commercial arrangement (see Schedule C).</p>
+  <p><strong>2.2 Right to Decline.</strong> The Assistant may accept or decline any Engagement offered through the Platform for any reason or no reason. Declining is not grounds for removal from the Platform.</p>
+  <p><strong>2.3 Right to Pause.</strong> The Assistant may at any time pause availability, take time off, or work zero hours. No minimum activity is required.</p>
+  <p><strong>2.4 Scheduling.</strong> Once an Engagement begins, scheduling is arranged directly between the Assistant and the Client. The Assistant negotiates days, times, and duration of sessions with the Client. PM does not set schedules.</p>
+  <p><strong>2.5 Cancellations and Sickness.</strong> If the Assistant cannot attend a scheduled session, or if the Client cancels, the Assistant and Client coordinate rescheduling, refund, or other resolution directly. The Assistant is not required to notify PM of routine cancellations. PM imposes no penalty for cancellations. Cancellations reflect on the Assistant's own representation in the marketplace.</p>
+  <p><strong>2.5(a) Client Flex Tokens (Acknowledgment).</strong> The Assistant acknowledges that each Client Engagement includes three (3) "Flex Tokens," which the Client may use to cancel or reschedule any session — including with short notice — without losing the hour. After all three Flex Tokens have been used, late cancellations by the Client (less than 24 hours' notice) result in the Assistant receiving the 70% share for the lost hour. The Assistant agrees to accommodate reasonable Flex Token usage by the Client as part of normal Engagement operations.</p>
+  <p><strong>2.6 Right of Substitution &amp; Backup.</strong> If the Assistant is unable to personally attend a scheduled session, the Assistant may arrange for another qualified Assistant from the PM Platform roster (a "<em>Backup</em>") to attend in their place. The following conditions apply:</p>
+  <ol type="a">
+    <li>the Backup must meet the same baseline qualifications as the primary Assistant (Criminal Record Check, references, and any Client-specific requirements);</li>
+    <li>the Client's prior approval is required for any substitution — the Client is entitled to meet the Backup before agreeing;</li>
+    <li>the Assistant is encouraged to identify and introduce a pre-cleared Backup to the Client at the start of each Engagement, so a last-minute substitution can proceed smoothly;</li>
+    <li>PM may, on request, suggest Backup candidates from the Platform roster, but does not assign or dispatch Backups; the Assistant arranges the substitution and the Client approves it.</li>
+  </ol>
+  <p>The right of substitution under this section is a contractor-class right inconsistent with employment and is one of the structural features distinguishing this Agreement from an employment relationship.</p>
+
+  <h2><span class="num">3.</span>The Platform</h2>
+  <p><strong>3.1 Tool, Not Surveillance.</strong> The PM Platform (website, scheduling and messaging features, hour-logging, document storage, mobile applications) is provided as a tool for the convenience of Assistants and Clients. The Platform is not used by PM to surveil, supervise, evaluate, or discipline the Assistant.</p>
+  <p><strong>3.2 Self-Logging.</strong> Hours worked are logged by the Assistant. PM does not clock the Assistant in or out, does not require check-ins on any PM-set cadence, and does not monitor the Assistant's location.</p>
+  <p><strong>3.3 Marketing and Listing.</strong> PM markets the Platform and the Assistants listed on it. The Assistant's profile is the Assistant's own promotional listing, presenting their skills, experience, and availability to prospective Clients.</p>
+  <p><strong>3.4 No Branding Requirements.</strong> The Assistant is not required to wear PM branding, use PM-branded materials, or present as PM staff. The Assistant identifies themselves to Clients as an independent contractor engaged through the PM Platform.</p>
+  <p><strong>3.5 Platform Access.</strong> PM grants the Assistant a non-exclusive, revocable licence to use the Platform for finding and managing Engagements. PM may modify, restrict, or end Platform access in its discretion.</p>
+
+  <h2><span class="num">4.</span>Fees and Payment</h2>
+  <p><strong>4.1 Engagement Fee.</strong> Each Engagement has an Engagement Fee paid by the Client. The Engagement Fee is collected through the Platform's payment processor (currently Stripe Connect).</p>
+  <p><strong>4.2 Platform Fee.</strong> PM retains a Platform Fee of <strong>thirty percent (30%)</strong> of each Engagement Fee, in consideration of marketing, Client introduction, payment processing, profile hosting, Platform infrastructure, ongoing referral, and access to the Platform.</p>
+  <p><strong>4.3 Assistant's Share.</strong> The Assistant retains <strong>seventy percent (70%)</strong> of each Engagement Fee, routed directly to the Assistant's connected payment account.</p>
+  <p><strong>4.4 No Wages.</strong> Amounts paid to the Assistant are fees for services rendered as an independent contractor. They are not wages, salary, or commissions earned as an employee.</p>
+  <p><strong>4.5 Per-Session Release (where applicable).</strong> Where the Platform holds Client funds in escrow pending delivery, the Assistant's share for each session is released only when that session has been delivered. Undelivered amounts remain held by the Platform and are subject to section 5.</p>
+  <p><strong>4.6 Invoicing.</strong> The Assistant may be required to issue an invoice (manually or via the Platform) for each Engagement period, under the Assistant's own legal or registered business name.</p>
+  <p><strong>4.7 No Source Deductions.</strong> PM does not deduct income tax, CPP, EI, or any other amount from payments to the Assistant.</p>
+  <p><strong>4.8 Tax Reporting.</strong> PM will issue a <strong>T4A</strong> for amounts exceeding the CRA reporting threshold in a calendar year. PM will not issue a T4. The Assistant reports income on <strong>Form T2125</strong> (Statement of Business or Professional Activities).</p>
+  <p><strong>4.9 GST/HST.</strong> If the Assistant's total revenue from all sources exceeds the CRA small-supplier threshold ($30,000 over four consecutive calendar quarters), the Assistant is responsible for registering for, charging, and remitting GST/HST.</p>
+  <p><strong>4.10 Platform Fee Adjustments.</strong> PM may, in its sole discretion, offer a reduced Platform Fee on particular Engagements or to particular Assistants, based on commercial criteria such as volume of Engagements delivered, average Client satisfaction, Engagement type (e.g., overnight, live-in, or hard-to-fill placements), tenure on the Platform, or other strategic factors. Any such reduction is a <strong>commercial fee adjustment</strong> and is expressly <strong>not</strong> a bonus, gift, loyalty payment, retention payment, milestone payment, or employment-related benefit. A reduced Platform Fee applies only to the Engagement(s) for which it is expressly designated; the standard 30% Platform Fee continues to apply to all other Engagements. The Parties acknowledge that this kind of marketplace pricing structure is consistent with — and reinforces — the independent contractor nature of this Agreement, and is comparable to the volume- or performance-tier fee structures offered by other established marketplace platforms.</p>
+
+  <h2><span class="num">5.</span>Completion of Engagement &amp; Refund of Unearned Fees</h2>
+  <p><strong>5.1 Obligation to Deliver.</strong> Where the Assistant has accepted an Engagement and Engagement Fees have been paid or committed by a Client, the Assistant agrees to deliver the agreed number of hours within the agreed term, subject to ordinary rescheduling between the Assistant and Client and subject to the Assistant's right of substitution under section 2.6.</p>
+  <p><strong>5.2 Refund of Unearned Fees.</strong> If the Assistant fails to deliver hours for which the Assistant has been paid (other than due to a Client-side cancellation or a substitution under section 2.6), the Assistant will refund the unearned portion within <strong>fourteen (14) days</strong> of the end of the Engagement period. The refund is made either to PM (which will remit to the Client) or directly to the Client, at PM's election.</p>
+  <p><strong>5.3 Abandonment.</strong> If the Assistant ceases to deliver Services under an active Engagement for more than <strong>fourteen (14) consecutive days</strong> without notice to the Client or PM, the Engagement is deemed abandoned. On abandonment, the Assistant will (a) refund all unearned fees for that Engagement and (b) pay PM the applicable <strong>Abandonment Fee</strong> set out in the table below, as liquidated damages and not as a penalty. The Abandonment Fee scales with the value of the abandoned Engagement, reflecting the increased Client reliance, reputational exposure, and remediation cost that accompanies larger Engagements.</p>
+  <table>
+    <thead>
+      <tr><th style="width:50%">Engagement Fee (total)</th><th>Abandonment Fee (in addition to refund of unearned fees)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Up to $1,500 <span style="color:#777;font-style:italic">(Standard 24h &amp; 40h Engagements)</span></td><td><strong>$350</strong></td></tr>
+      <tr><td>$1,501 to $5,000 <span style="color:#777;font-style:italic">(Custom Plan I &amp; II Engagements)</span></td><td><strong>$900</strong></td></tr>
+      <tr><td>Over $5,000 <span style="color:#777;font-style:italic">(Custom Plan III+ Engagements)</span></td><td><strong>$1,500</strong></td></tr>
+    </tbody>
+  </table>
+  <p>The Parties agree that the Abandonment Fee represents a <em>genuine pre-estimate of the damage</em> caused to PM by abandonment, taking into account: (i) the cost of locating, screening, and onboarding a replacement Assistant for the affected Client; (ii) the cost of communicating with and reassuring the affected Client (including, for larger Engagements, the disruption of senior, disability, or live-in care arrangements involving vulnerable persons); (iii) refund processing and payment-processor costs; (iv) reputational impact on the Platform; (v) the risk of losing the affected Client and any future Platform Fees that would have been earned from that Client; and (vi) the increased legal recovery effort associated with larger Engagement values, including filing in the Provincial Court of British Columbia rather than the Civil Resolution Tribunal.</p>
+  <p><strong>5.4 No Set-Off.</strong> An Assistant's obligation to refund unearned fees is independent of any other Engagement and may not be set off against future fees without PM's written consent.</p>
+  <p><strong>5.5 Remedies Cumulative.</strong> The remedies in this section 5 are in addition to PM's right to recover damages, costs, and disbursements through legal proceedings.</p>
+  <p><strong>5.6 Acknowledgment of Legal Recourse.</strong> The Assistant acknowledges and agrees that:</p>
+  <ol type="a">
+    <li>PM may enforce its rights under this section 5 (and under section 11) by filing a claim in the <strong>Civil Resolution Tribunal of British Columbia</strong> (for amounts up to $5,000), the <strong>Provincial Court of British Columbia, Small Claims Division</strong> (for amounts up to $35,000), or the <strong>Supreme Court of British Columbia</strong> (for amounts above $35,000), at PM's election;</li>
+    <li>this kind of enforcement is a normal commercial remedy between independent contracting parties, and is consistent with — and reinforces — the Assistant's status as a self-employed independent contractor under this Agreement;</li>
+    <li>the Assistant will not raise as a defence the argument that PM's pursuit of these remedies is incompatible with the contractor characterization of this Agreement;</li>
+    <li>the Assistant is responsible for PM's reasonable costs of collection, including filing fees, service fees, and (where awarded by the tribunal or court) party-and-party costs and disbursements; and</li>
+    <li>where a judgment is obtained, PM may register and enforce it through any lawful means in British Columbia, including but not limited to garnishment of bank accounts or wages from other sources.</li>
+  </ol>
+
+  <h2><span class="num">6.</span>Risk of Profit and Loss</h2>
+  <p><strong>6.1 Variable Earnings.</strong> The Assistant's earnings vary with the number, length, and rate of Engagements accepted. The Assistant may earn more by accepting more or higher-value Engagements, or less (including zero) by accepting fewer or none.</p>
+  <p><strong>6.2 No Guaranteed Volume.</strong> PM does not guarantee any volume of Engagements, any minimum income, or any continued listing.</p>
+  <p><strong>6.3 No-Show Risk Borne by Assistant.</strong> If the Assistant fails to attend a scheduled session (other than via a section 2.6 substitution), the Assistant does not earn fees for that time and bears the financial loss of any session not delivered.</p>
+  <p><strong>6.4 Damage and Liability.</strong> The Assistant is responsible for damage to a Client's property or person caused by the Assistant's negligence or wilful conduct. PM does not indemnify the Assistant against such liability.</p>
+
+  <h2><span class="num">7.</span>Tools, Equipment, and Costs</h2>
+  <p><strong>7.1 Assistant's Own Tools.</strong> The Assistant supplies, at the Assistant's own cost:</p>
+  <ul>
+    <li>transportation to and from Engagements,</li>
+    <li>mobile phone and data plan,</li>
+    <li>clothing (PM does not provide a uniform and does not specify dress),</li>
+    <li>personal protective equipment (gloves, masks, etc.) if and as the Assistant chooses to use them,</li>
+    <li>any tools or supplies the Assistant chooses to bring to a session.</li>
+  </ul>
+  <p><strong>7.2 Certifications and Training.</strong> The Assistant is responsible for obtaining and maintaining, at the Assistant's own cost, any certifications or training the Assistant chooses to hold or that a particular Client requires — including Standard First Aid / CPR, Criminal Record Check (vulnerable sector), WorkSafeBC personal optional protection (if elected), driver's licence and vehicle insurance (if driving a Client), and any other professional qualifications. <strong>PM does not reimburse the Assistant for any certification, course, training, exam, or renewal fee.</strong></p>
+  <p><strong>7.3 Insurance.</strong> The Assistant is encouraged to carry their own commercial general liability and professional liability insurance. PM does not provide insurance for the Assistant. If the Assistant elects not to carry insurance, the Assistant bears the financial consequences of any uncovered claim.</p>
+
+  <h2><span class="num">8.</span>Multiple Clients and Non-Exclusivity</h2>
+  <p><strong>8.1 Non-Exclusive.</strong> This Agreement is non-exclusive. The Assistant is expressly free, and is encouraged, to engage with other families, individuals, agencies, or platforms; to operate their own independent business; and to accept Engagements from sources other than the PM Platform.</p>
+  <p><strong>8.2 PM's Encouragement of External Work.</strong> PM affirmatively supports the Assistant's independent business growth and may, from time to time, share external job postings, referrals, or other opportunities outside the PM Platform.</p>
+  <p><strong>8.3 Avoidance of Economic Dependence.</strong> Both Parties acknowledge that over-reliance on a single source of income is inconsistent with the substance of an independent contractor relationship. The Assistant represents that they will maintain or pursue other sources of income and will not rely on PM as a sole or substantially sole source of work. PM <strong>expects</strong> the Assistant to maintain other clients, jobs, or revenue streams.</p>
+
+  <h2><span class="num">9.</span>Professional Conduct and Reputation</h2>
+  <p><strong>9.1 Reputation Standards.</strong> The Assistant acknowledges that PM operates a Platform of good standing in the community and that the Assistant's conduct during an Engagement may reflect on PM. The Assistant agrees to conduct themselves professionally and with respect toward Clients, their families, and any third parties encountered.</p>
+  <p><strong>9.2 Compliance with Law.</strong> The Assistant will comply with all applicable laws, including occupational health and safety laws, in performing the Services.</p>
+  <p><strong>9.3 No Right to Discipline.</strong> Failure to meet professional standards is not grounds for &ldquo;discipline&rdquo; (a concept inapplicable to a contractor relationship) but may result in the end of the Assistant's access to the Platform under section 12.</p>
+
+  <h2><span class="num">10.</span>Confidentiality</h2>
+  <p><strong>10.1 Confidential Information.</strong> &ldquo;<em>Confidential Information</em>&rdquo; means any non-public information the Assistant learns during an Engagement, including a Client's personal, medical, family, or financial information; information about minors or vulnerable persons in the Client's household; and PM's business information, pricing, Platform features, and Client lists.</p>
+  <p><strong>10.2 Use and Disclosure.</strong> The Assistant will hold all Confidential Information in strict confidence and will not use it for any purpose other than performing the Services for the Client to whom it pertains. Disclosure to any third party is prohibited except as required by law.</p>
+  <p><strong>10.3 Survival.</strong> Confidentiality obligations survive the end of this Agreement indefinitely.</p>
+
+  <h2><span class="num">11.</span>Non-Solicitation and Non-Circumvention</h2>
+  <p><strong>11.1 Off-Platform Solicitation Prohibited.</strong> During this Agreement and for <strong>twelve (12) months</strong> after the end of each Engagement, the Assistant will not, directly or indirectly:</p>
+  <ul>
+    <li>solicit, induce, or attempt to induce any Client introduced through the Platform to engage the Assistant's services outside the Platform;</li>
+    <li>accept any direct off-Platform engagement from a Client introduced through the Platform (even where the Client initiates the contact), without first notifying PM and offering PM the opportunity to handle the Engagement through the Platform;</li>
+    <li>provide a Platform-introduced Client with personal contact information for the purpose of off-Platform business;</li>
+    <li>solicit any other Assistant on the Platform to leave the Platform.</li>
+  </ul>
+  <p><strong>11.2 Liquidated Damages.</strong> Quantifying harm from a breach of section 11.1 is difficult. As liquidated damages (not a penalty), a breach entitles PM to recover from the Assistant an amount equal to <strong>twelve (12) months of the Platform Fee</strong> that would have been earned had the Engagement continued through the Platform.</p>
+  <p><strong>11.3 Reasonable Scope.</strong> The Parties acknowledge the duration, geographic scope, and subject-matter of these restrictions are reasonable in light of the legitimate business interests being protected.</p>
+
+  <h2><span class="num">12.</span>End of Agreement</h2>
+  <p><strong>12.1 Term.</strong> This Agreement begins on the date first written and continues until ended under this section 12.</p>
+  <p><strong>12.2 End by Either Party.</strong> Either Party may end this Agreement at any time, with or without cause, on <strong>seven (7) days' written notice</strong> (which may be given by email or through the Platform).</p>
+  <p><strong>12.3 Immediate End.</strong> PM may end this Agreement immediately, without notice, if the Assistant: (a) breaches sections 10 or 11; (b) engages in conduct that, in PM's reasonable judgment, exposes a Client or PM to significant risk of harm; (c) misrepresents qualifications, certifications, or criminal record status; or (d) is the subject of a credible complaint that, in PM's reasonable judgment, warrants immediate removal from the Platform.</p>
+  <p><strong>12.4 End of an Engagement.</strong> Either the Assistant or a Client may end any individual Engagement at any time. Ending an Engagement does not, of itself, end this Agreement.</p>
+  <p><strong>12.5 No Severance.</strong> No severance, termination pay, or pay in lieu of notice is owed by either Party.</p>
+  <p><strong>12.6 Survival.</strong> Sections 5 (Refund of Unearned Fees), 10 (Confidentiality), 11 (Non-Solicitation), 13 (Intellectual Property), 14 (Indemnification), and 16 (Assistant's Acknowledgments) survive the end of this Agreement.</p>
+
+  <h2><span class="num">13.</span>Intellectual Property</h2>
+  <p><strong>13.1 Assistant's Pre-Existing IP.</strong> The Assistant retains ownership of skills, methods, know-how, or materials they bring to an Engagement.</p>
+  <p><strong>13.2 PM's IP.</strong> PM retains ownership of the Platform, the PM brand, all marketing materials, and all software, databases, and content that are part of the Platform. The Assistant receives no licence to PM's intellectual property other than the right to use the Platform as described in this Agreement.</p>
+  <p><strong>13.3 Client Materials.</strong> Materials created for or with a specific Client (e.g., care notes, schedules, lesson plans) belong to that Client unless otherwise agreed in writing.</p>
+
+  <h2><span class="num">14.</span>Indemnification</h2>
+  <p>The Assistant will indemnify and hold harmless PM, its officers, directors, employees, and contractors from any claim, loss, liability, or expense (including reasonable legal fees) arising from: (a) the Assistant's performance or non-performance of any Engagement; (b) the Assistant's breach of this Agreement; (c) any claim that the Assistant is or was an employee of PM (other than a claim resulting from PM's own actions inconsistent with this Agreement); or (d) any tax, CPP, EI, WorkSafeBC, or other assessment levied against PM in respect of the Assistant's status.</p>
+
+  <h2><span class="num">15.</span>Platform Conduct — What PM Does and Does Not Do</h2>
+  <p>For clarity and to give effect to the contractor nature of this relationship, the Parties record the following:</p>
+  <table>
+    <thead><tr><th style="width:50%">PM does NOT</th><th style="width:50%">PM DOES</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>
+          set the Assistant's schedule · require the Assistant to accept any Engagement · supervise sessions in real time · inspect or evaluate work product · require attendance at meetings, huddles, or training · require any particular method, product, or sequence of work · require branded clothing or materials · track the Assistant's location · require check-ins on any PM-set cadence · pay for the Assistant's training, certifications, or equipment · reimburse mileage, phone, or other expenses · discipline, write up, suspend, or performance-review the Assistant · prohibit the Assistant from working for other clients or platforms.
+        </td>
+        <td>
+          market the Platform and the Assistants listed on it · introduce Clients to Assistants · provide software for scheduling, messaging, and hour-logging · collect Client payments and route the Assistant's share via the payment processor · maintain reasonable Platform quality and conduct standards (sections 9, 10, 11) · end the engagement with any Assistant whose conduct, in PM's reasonable judgment, falls below those standards · pursue refund and breach-of-contract remedies under section 5.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2><span class="num">16.</span>Assistant's Acknowledgments and Representations</h2>
+  <p><strong>16.1 Self-Employment.</strong> The Assistant is self-employed. The Assistant understands the difference between an employee (T4, CPP/EI deducted, covered by the <em>Employment Standards Act</em>) and an independent contractor (T4A, files a T2125, remits own CPP and (if elected) EI, not covered by employment-standards legislation). The Assistant has chosen to enter this Agreement as an independent contractor.</p>
+  <p><strong>16.2 Tax Filing.</strong> The Assistant will report income earned under this Agreement on Form T2125 (or equivalent) on their personal tax return. The Assistant — not PM — is responsible for remitting income tax, CPP, and any elected EI premiums to CRA.</p>
+  <p><strong>16.3 Non-Employment Vocabulary.</strong> The Parties will not use the following terms in relation to the Assistant's work for PM: <em>employee, employer, wages, salary, payroll, overtime, statutory holiday pay, vacation, sick leave, termination, dismissal, firing, discipline, write-up, suspension, supervisor, subordinate, manager, hire.</em> The correct vocabulary is: <em>Assistant, contractor, engagement fee, Platform fee, end of engagement, end of agreement, the Parties, Platform, Client.</em></p>
+  <p><strong>16.4 Other Sources of Income.</strong> The Assistant is encouraged to maintain other clients, jobs, or sources of income and intends to operate as a genuinely independent contractor with multiple sources of work over time.</p>
+  <p><strong>16.5 No Employment Promised.</strong> No representative of PM has promised the Assistant employment, implied employment, or used language suggesting employment. The Assistant has not been led to believe that this Agreement is or will become an employment relationship.</p>
+  <p><strong>16.6 Independent Judgment.</strong> The Assistant has read this Agreement, has had the opportunity to seek independent legal advice, and has either obtained such advice or waived the opportunity to do so.</p>
+  <p><strong>16.7 Legal Recourse Understood.</strong> The Assistant has read sections 5 (Completion of Engagement &amp; Refund of Unearned Fees) and 11 (Non-Solicitation), and acknowledges that PM may enforce those sections in the BC Civil Resolution Tribunal, BC Small Claims Court, or BC Supreme Court. The Assistant understands that this is the normal commercial recourse between independent contracting parties and reinforces — rather than contradicts — the contractor nature of this Agreement.</p>
+
+  <h2><span class="num">17.</span>General</h2>
+  <p><strong>17.1 Governing Law.</strong> This Agreement is governed by the laws of the Province of British Columbia and the federal laws of Canada applicable in BC.</p>
+  <p><strong>17.2 Forum.</strong> Any dispute is resolved in the courts of British Columbia, or where applicable, the Civil Resolution Tribunal.</p>
+  <p><strong>17.3 Entire Agreement.</strong> This Agreement (including any signed schedules) is the entire agreement between the Parties on its subject matter and supersedes any prior written or oral understanding.</p>
+  <p><strong>17.4 Amendment.</strong> This Agreement may be amended only in writing signed by both Parties.</p>
+  <p><strong>17.5 Severability.</strong> If any provision is found unenforceable, the remaining provisions remain in full force.</p>
+  <p><strong>17.6 No Waiver.</strong> No failure or delay by PM in enforcing a provision is a waiver of that provision.</p>
+  <p><strong>17.7 Assignment.</strong> The Assistant may not assign this Agreement. PM may assign it to any successor or affiliated entity.</p>
+  <p><strong>17.8 Notices.</strong> Notices may be given by email to the Parties' email addresses on file, or by message through the Platform.</p>
+  <p><strong>17.9 Counterparts and Electronic Signature.</strong> This Agreement may be signed in counterparts and by electronic signature, each of which has the same effect as an original.</p>
+
+  <div class="sig-grid">
+    <div class="sig-block">
+      <div class="sig-label">Private Mentorship Inc.</div>
+      <div class="sig-line"></div>
+      <div class="sig-caption">Signature</div>
+      <div class="sig-line"></div>
+      <div class="sig-caption">Name &amp; Title</div>
+      <div class="sig-line"></div>
+      <div class="sig-caption">Date</div>
+    </div>
+    <div class="sig-block">
+      <div class="sig-label">The Assistant</div>
+      <div class="sig-line"></div>
+      <div class="sig-caption">Signature</div>
+      <div class="sig-line"></div>
+      <div class="sig-caption">Printed Name</div>
+      <div class="sig-line"></div>
+      <div class="sig-caption">Date</div>
+    </div>
+  </div>
+
+  <div class="schedule-divider">Schedule A</div>
+  <h3 class="schedule-title">Assistant Self-Identification Questionnaire</h3>
+  <p class="schedule-sub">Completed by the Assistant at the time of signing — to record self-employment status consistent with this Agreement.</p>
+
+  <div class="check-row"><div></div><div><strong>1. Do you currently operate any business of your own?</strong> (online store, drop-shipping, freelance work, tutoring, dog-walking, cleaning, photography, social media services, e-commerce, etc.)</div></div>
+  <div class="check-row"><div class="box"></div><div>Yes — describe: <span class="fill">&nbsp;</span></div></div>
+  <div class="check-row"><div class="box"></div><div>No</div></div>
+
+  <div class="check-row" style="margin-top:14px"><div></div><div><strong>2. Do you currently hold any other job or paid engagement?</strong> (full-time, part-time, casual, contract — anything paid)</div></div>
+  <div class="check-row"><div class="box"></div><div>Yes — describe: <span class="fill">&nbsp;</span></div></div>
+  <div class="check-row"><div class="box"></div><div>No</div></div>
+
+  <div class="check-row" style="margin-top:14px"><div></div><div><strong>3. Have you, in the past 12 months, earned any income from work other than employment by a single employer?</strong></div></div>
+  <div class="check-row"><div class="box"></div><div>Yes — describe: <span class="fill">&nbsp;</span></div></div>
+  <div class="check-row"><div class="box"></div><div>No</div></div>
+
+  <div class="check-row" style="margin-top:14px"><div></div><div><strong>4. Are you currently looking for additional clients, contracts, or work outside of Private Mentorship?</strong></div></div>
+  <div class="check-row"><div class="box"></div><div>Yes</div></div>
+  <div class="check-row"><div class="box"></div><div>No — please explain: <span class="fill">&nbsp;</span></div></div>
+
+  <div class="check-row" style="margin-top:14px"><div></div><div><strong>5. Do you understand that Private Mentorship encourages and expects you to maintain other clients, contracts, or sources of work?</strong></div></div>
+  <div class="check-row"><div class="box"></div><div>Yes</div></div>
+  <div class="check-row"><div class="box"></div><div>No</div></div>
+
+  <div class="check-row" style="margin-top:14px"><div></div><div><strong>6. Do you understand the difference between a T4 and a T4A, and that you will receive a T4A (not a T4)?</strong></div></div>
+  <div class="check-row"><div class="box"></div><div>Yes</div></div>
+  <div class="check-row"><div class="box"></div><div>No — request explanation before signing.</div></div>
+
+  <div class="check-row" style="margin-top:14px"><div></div><div><strong>7. Do you understand that you will file your income on Form T2125 and remit your own income tax, CPP, and (if elected) EI?</strong></div></div>
+  <div class="check-row"><div class="box"></div><div>Yes</div></div>
+  <div class="check-row"><div class="box"></div><div>No — request explanation before signing.</div></div>
+
+  <div class="check-row" style="margin-top:14px"><div></div><div><strong>8. Do you carry your own commercial or professional liability insurance?</strong></div></div>
+  <div class="check-row"><div class="box"></div><div>Yes — Insurer: <span class="fill">&nbsp;</span> Policy #: <span class="fill">&nbsp;</span></div></div>
+  <div class="check-row"><div class="box"></div><div>No — I understand PM does not provide insurance and I bear the risk.</div></div>
+
+  <div class="check-row" style="margin-top:14px"><div></div><div><strong>9. Do you hold current Standard First Aid / CPR certification?</strong></div></div>
+  <div class="check-row"><div class="box"></div><div>Yes — Expiry: <span class="fill">&nbsp;</span></div></div>
+  <div class="check-row"><div class="box"></div><div>No</div></div>
+
+  <div class="check-row" style="margin-top:14px"><div></div><div><strong>10. Do you hold a current Criminal Record Check (vulnerable sector)?</strong></div></div>
+  <div class="check-row"><div class="box"></div><div>Yes — Date issued: <span class="fill">&nbsp;</span></div></div>
+  <div class="check-row"><div class="box"></div><div>No</div></div>
+
+  <div style="margin-top:30px">
+    <div class="sig-line"></div>
+    <div class="sig-caption">Assistant signature &amp; date</div>
+  </div>
+
+  <div class="schedule-divider">Schedule B</div>
+  <h3 class="schedule-title">Glossary — Vocabulary of this Agreement</h3>
+  <p class="schedule-sub">The terms below preserve the integrity of the independent contractor relationship throughout this document.</p>
+  <table>
+    <thead><tr><th>We use</th><th>Meaning</th><th>We do not use</th></tr></thead>
+    <tbody>
+      <tr><td>Assistant</td><td>A self-employed independent contractor engaged through the Platform</td><td>Employee, staff, worker, hire</td></tr>
+      <tr><td>Engagement</td><td>A discrete service arrangement between an Assistant and a Client</td><td>Shift, job, position</td></tr>
+      <tr><td>Engagement Fee</td><td>Amount paid by a Client for an Engagement</td><td>Wages, salary, pay</td></tr>
+      <tr><td>Platform Fee</td><td>The 30% portion of the Engagement Fee retained by PM</td><td>Deduction, commission</td></tr>
+      <tr><td>End of Engagement</td><td>Conclusion of a specific Engagement</td><td>Termination, dismissal, firing, layoff</td></tr>
+      <tr><td>End of Agreement</td><td>Conclusion of this entire contractor agreement</td><td>Termination of employment</td></tr>
+      <tr><td>The Parties</td><td>PM and the Assistant</td><td>Employer / employee</td></tr>
+      <tr><td>Platform</td><td>The PM website, app, and supporting software</td><td>Workplace, office</td></tr>
+      <tr><td>Client</td><td>A family or individual receiving Services</td><td>Customer of the employer</td></tr>
+    </tbody>
+  </table>
+
+  <div class="schedule-divider">Schedule C</div>
+  <h3 class="schedule-title">Engagement-Level Confirmation</h3>
+  <p class="schedule-sub">Signed at the start of each Engagement, including renewals with a Client previously served. Each Engagement is a fresh, free-standing commercial arrangement.</p>
+  <p><strong>Engagement #:</strong> <span class="fill">&nbsp;</span></p>
+  <p><strong>Client:</strong> <span class="fill">&nbsp;</span></p>
+  <p><strong>Start date:</strong> <span class="fill">&nbsp;</span></p>
+  <p><strong>Anticipated end date:</strong> <span class="fill">&nbsp;</span></p>
+  <p><strong>Engagement Fee structure:</strong> <span class="fill">&nbsp;</span></p>
+
+  <p style="margin-top:18px"><strong>The Assistant confirms:</strong></p>
+  <div class="check-row"><div class="box"></div><div>I have read and continue to be bound by the Independent Contractor Agreement dated <span class="fill">&nbsp;</span>.</div></div>
+  <div class="check-row"><div class="box"></div><div>This is a new Engagement; the end of this Engagement does not entitle me to a further Engagement.</div></div>
+  <div class="check-row"><div class="box"></div><div>I have other sources of work / income or am actively seeking them, and I am not relying on PM as my sole source of work.</div></div>
+  <div class="check-row"><div class="box"></div><div>I will schedule directly with the Client and will not look to PM to set or direct my schedule.</div></div>
+  <div class="check-row"><div class="box"></div><div>I am responsible for my own tax remittances on amounts earned in this Engagement.</div></div>
+
+  <div class="sig-grid" style="margin-top:30px">
+    <div class="sig-block">
+      <div class="sig-label">The Assistant</div>
+      <div class="sig-line"></div>
+      <div class="sig-caption">Signature &amp; date</div>
+    </div>
+    <div class="sig-block">
+      <div class="sig-label">Private Mentorship Inc.</div>
+      <div class="sig-line"></div>
+      <div class="sig-caption">Signature &amp; date</div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <strong>Before use:</strong> This Agreement must be reviewed by a British Columbia employment lawyer prior to being signed with any Assistant. Recommended specialists: Roper Greyell, Mathews Dinsdale, Overholt Law, or Kent Employment Law. A one-hour review typically runs $400–$700 and is the most cost-effective protection against a future classification dispute. Nothing in this document is legal advice.
+  </div>
+
+</div>
+</body>
+</html>

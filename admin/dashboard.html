@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Dashboard — Private Mentorship</title>
+<meta name="description" content="Private Mentorship admin overview.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:opsz,ital,wght@9..144,0,300;9..144,0,400;9..144,0,500;9..144,0,600&display=swap">
+<link rel="stylesheet" href="../css/client.css">
+</head>
+<body class="pm-gated-body">
+
+<!-- Gate -->
+<div class="pm-gate" id="pmGate" role="dialog" aria-modal="true">
+  <div class="pm-gate__card">
+    <div class="pm-gate__eyebrow">Admin · Founder Access</div>
+    <h2 class="pm-gate__h">Sign in to the admin area.</h2>
+    <p class="pm-gate__sub">This area is reserved for Private Mentorship leadership and ops staff.</p>
+    <form class="pm-gate__form" id="pmGateForm">
+      <div>
+        <label class="pm-gate__label" for="pmGateCode">Admin code</label>
+        <input class="pm-gate__input" type="password" id="pmGateCode" autocomplete="off" required>
+      </div>
+      <p class="pm-gate__error" id="pmGateError" role="alert"></p>
+      <button class="pm-gate__btn" type="submit">Enter Admin</button>
+    </form>
+    <p class="pm-gate__note"><strong>Note.</strong> Placeholder gate during development. Real role-based authentication will replace it.</p>
+  </div>
+</div>
+
+<!-- Nav -->
+<nav class="r-nav">
+  <div class="r-nav__inner">
+    <a class="r-nav__logo" href="../index.html">Private Mentorship <span class="r-nav__admin-label">Admin</span></a>
+    <div class="r-nav__links">
+      <a href="../index.html">Site</a>
+      <a href="../assistants.html">Roster</a>
+      <a href="../client/dashboard.html">Client View</a>
+      <a href="dashboard.html" class="is-active">Admin</a>
+    </div>
+    <button class="r-nav__cta" id="pmSignOut" type="button">Sign Out</button>
+  </div>
+</nav>
+
+<div class="cd-shell">
+
+  <!-- Sub-nav (admin sections) -->
+  <nav class="cd-subnav">
+    <div class="cd-subnav__inner">
+      <a class="cd-subnav__item is-active" href="dashboard.html">Overview</a>
+      <a class="cd-subnav__item" href="picks.html">Pick Lists <span class="cd-subnav__count" id="picksQueueCount">3</span></a>
+      <a class="cd-subnav__item" href="applications.html">Applications <span class="cd-subnav__count" id="appsQueueCount">5</span></a>
+      <a class="cd-subnav__item" href="#" aria-disabled="true" style="opacity:.4;cursor:not-allowed;">Roster</a>
+      <a class="cd-subnav__item" href="#" aria-disabled="true" style="opacity:.4;cursor:not-allowed;">Engagements</a>
+      <a class="cd-subnav__item" href="#" aria-disabled="true" style="opacity:.4;cursor:not-allowed;">Settings</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="cd-hero">
+    <div class="cd-hero__eyebrow">Founder Overview · Today</div>
+    <h1 class="cd-hero__title">Welcome back, Caleb.</h1>
+    <p class="cd-hero__sub">Here is the activity across Private Mentorship today. Three new pick lists are waiting for your attention.</p>
+  </section>
+
+  <!-- Stats row -->
+  <section class="ad-stats">
+    <div class="ad-stat">
+      <div class="ad-stat__label">New Applications (7d)</div>
+      <div class="ad-stat__value">5</div>
+      <div class="ad-stat__delta"><strong>+2</strong> vs last week</div>
+    </div>
+    <div class="ad-stat">
+      <div class="ad-stat__label">Pick Lists to Action</div>
+      <div class="ad-stat__value">3</div>
+      <div class="ad-stat__delta">Oldest: 2 days ago</div>
+    </div>
+    <div class="ad-stat">
+      <div class="ad-stat__label">Active Engagements</div>
+      <div class="ad-stat__value">12</div>
+      <div class="ad-stat__delta"><strong>+1</strong> this week</div>
+    </div>
+    <div class="ad-stat">
+      <div class="ad-stat__label">Roster Size</div>
+      <div class="ad-stat__value">4</div>
+      <div class="ad-stat__delta">2 currently accepting families</div>
+    </div>
+  </section>
+
+  <!-- Banner -->
+  <div class="ad-banner">
+    <strong>Heads up:</strong> 3 pick lists submitted this week are waiting for you to schedule intake calls. <a href="picks.html" style="color:#78350f;border-bottom:1px solid #78350f;">View pick queue →</a>
+  </div>
+
+  <!-- Pick queue preview -->
+  <section class="ad-section">
+    <div class="ad-section__head">
+      <div>
+        <h2 class="ad-section__title">Recent pick lists</h2>
+        <p class="ad-section__sub">Families who have submitted their top Assistant picks.</p>
+      </div>
+      <a class="ad-section__count" href="picks.html" style="color:var(--ink);text-decoration:underline;text-underline-offset:3px;">View all →</a>
+    </div>
+
+    <div class="ad-queue">
+      <div class="ad-row">
+        <div class="ad-row__date">
+          <strong>Today</strong>
+          11:42 AM
+        </div>
+        <div class="ad-row__main">
+          <h3 class="ad-row__name">Chen Family</h3>
+          <p class="ad-row__meta"><strong>Vancouver</strong> · Senior care for mother (78) · Picked 2 Assistants</p>
+          <div class="ad-picklist">
+            <span class="ad-pickchip"><span class="ad-pickchip__rank">1st</span>Sarah Y.</span>
+            <span class="ad-pickchip"><span class="ad-pickchip__rank">2nd</span>Priya S.</span>
+          </div>
+        </div>
+        <span class="ad-row__status ad-row__status--new">New</span>
+        <a class="ad-row__action" href="picks.html">Review</a>
+      </div>
+
+      <div class="ad-row">
+        <div class="ad-row__date">
+          <strong>Yesterday</strong>
+          4:18 PM
+        </div>
+        <div class="ad-row__main">
+          <h3 class="ad-row__name">Davies Family</h3>
+          <p class="ad-row__meta"><strong>North Shore</strong> · Childcare for two children (ages 8 &amp; 11) · Picked 3 Assistants</p>
+          <div class="ad-picklist">
+            <span class="ad-pickchip"><span class="ad-pickchip__rank">1st</span>Marcus T.</span>
+            <span class="ad-pickchip"><span class="ad-pickchip__rank">2nd</span>Priya S.</span>
+            <span class="ad-pickchip"><span class="ad-pickchip__rank">3rd</span>Aisha R.</span>
+          </div>
+        </div>
+        <span class="ad-row__status ad-row__status--review">In Review</span>
+        <a class="ad-row__action" href="picks.html">Review</a>
+      </div>
+
+      <div class="ad-row">
+        <div class="ad-row__date">
+          <strong>2 days ago</strong>
+          9:05 AM
+        </div>
+        <div class="ad-row__main">
+          <h3 class="ad-row__name">Patel Family</h3>
+          <p class="ad-row__meta"><strong>Burnaby</strong> · Disability support for adult son · Picked 1 Assistant</p>
+          <div class="ad-picklist">
+            <span class="ad-pickchip"><span class="ad-pickchip__rank">1st</span>Aisha R.</span>
+          </div>
+        </div>
+        <span class="ad-row__status ad-row__status--review">In Review</span>
+        <a class="ad-row__action" href="picks.html">Review</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent activity -->
+  <section class="ad-section">
+    <div class="ad-section__head">
+      <div>
+        <h2 class="ad-section__title">Activity feed</h2>
+        <p class="ad-section__sub">Everything happening across Private Mentorship.</p>
+      </div>
+    </div>
+    <div class="ad-activity">
+      <div class="ad-act">
+        <span class="ad-act__dot"></span>
+        <div class="ad-act__text"><strong>Chen Family</strong> submitted a pick list (Sarah Y., Priya S.)</div>
+        <span class="ad-act__time">11:42 AM</span>
+      </div>
+      <div class="ad-act">
+        <span class="ad-act__dot" style="background:#10b981;"></span>
+        <div class="ad-act__text"><strong>New application</strong> from Olivia M. — General day-to-day · Richmond</div>
+        <span class="ad-act__time">10:30 AM</span>
+      </div>
+      <div class="ad-act">
+        <span class="ad-act__dot" style="background:#3b82f6;"></span>
+        <div class="ad-act__text"><strong>Sarah Y.</strong> logged 4 hours with the Lin Family</div>
+        <span class="ad-act__time">9:15 AM</span>
+      </div>
+      <div class="ad-act">
+        <span class="ad-act__dot"></span>
+        <div class="ad-act__text"><strong>Davies Family</strong> submitted a pick list (Marcus T., Priya S., Aisha R.)</div>
+        <span class="ad-act__time">Yesterday · 4:18 PM</span>
+      </div>
+      <div class="ad-act">
+        <span class="ad-act__dot" style="background:#10b981;"></span>
+        <div class="ad-act__text"><strong>New application</strong> from Thompson Family — Senior care · Vancouver</div>
+        <span class="ad-act__time">Yesterday · 2:02 PM</span>
+      </div>
+      <div class="ad-act">
+        <span class="ad-act__dot" style="background:#f59e0b;"></span>
+        <div class="ad-act__text"><strong>Marcus T.</strong> requested a Backup pre-clearance for the Davies Family</div>
+        <span class="ad-act__time">Yesterday · 11:00 AM</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Footer -->
+<footer class="r-foot">
+  <div>
+    <a href="../index.html">Private Mentorship</a>
+    <a href="../assistants.html">Public Roster</a>
+    <a href="../client/dashboard.html">Client View</a>
+    <a href="dashboard.html">Admin</a>
+  </div>
+  <div class="r-foot__copy">&copy; 2026 Private Mentorship · British Columbia</div>
+</footer>
+
+<script src="../js/pm-help-fab.js" defer></script>
+<script src="../js/pm-admin-gate.js"></script>
+
+</body>
+</html>

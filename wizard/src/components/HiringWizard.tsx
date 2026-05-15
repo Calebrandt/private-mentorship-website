@@ -14,6 +14,7 @@ import WelcomeStep from './steps/WelcomeStep';
 import ConsentStep from './steps/ConsentStep';
 import PositionStrategyStep from './steps/PositionStrategyStep';
 import EarningsStep from './steps/EarningsStep';
+import AgreementStep from './steps/AgreementStep';
 import IdentityStep from './steps/IdentityStep';
 import AddressStep from './steps/AddressStep';
 import TransportationStep from './steps/TransportationStep';
@@ -42,6 +43,28 @@ const VALIDATORS: Partial<Record<StepKey, ValidatorEntry>> = {
   EARNINGS: {
     ok: s => !!s.contractorAck1 && !!s.contractorAck2 && !!s.contractorAck3,
     err: 'Please acknowledge all three terms.',
+  },
+  AGREEMENT: {
+    ok: s => {
+      const bcAck = !!s.agreementBcFactSheetAck;
+      const initialsOk = typeof s.agreementInitialsDataUrl === 'string' && (s.agreementInitialsDataUrl as string).startsWith('data:image/');
+      const clauses = (s.agreementInitialedClauses as Record<string, string> | undefined) || {};
+      const allTwelve = Object.keys(clauses).length === 12;
+      const sigOk = typeof s.agreementSignatureDataUrl === 'string' && (s.agreementSignatureDataUrl as string).startsWith('data:image/');
+      const nameOk = typeof s.agreementSignatureName === 'string' && (s.agreementSignatureName as string).trim().length >= 2;
+      const ackOk = !!s.agreementFinalAck;
+      return bcAck && initialsOk && allTwelve && sigOk && nameOk && ackOk;
+    },
+    err: s => {
+      if (!s.agreementInitialsDataUrl) return 'Please draw your initials in Step A before signing the Agreement.';
+      const clauses = (s.agreementInitialedClauses as Record<string, string> | undefined) || {};
+      if (Object.keys(clauses).length < 12) return `Please initial all 12 clauses (${12 - Object.keys(clauses).length} remaining).`;
+      if (!s.agreementSignatureName || (s.agreementSignatureName as string).trim().length < 2) return 'Please type the Assistant’s full legal name in Step B.';
+      if (!s.agreementSignatureDataUrl) return 'Please draw the full signature in Step B of the Agreement.';
+      if (!s.agreementFinalAck) return 'Please confirm the final acknowledgment checkbox in Step B.';
+      if (!s.agreementBcFactSheetAck) return 'Please read the BC Employment Standards fact sheet in Step C and confirm before continuing.';
+      return 'Please complete the Agreement before continuing.';
+    },
   },
   IDENTITY: {
     ok: s =>
@@ -126,7 +149,7 @@ const VALIDATORS: Partial<Record<StepKey, ValidatorEntry>> = {
   },
 };
 
-const PHASE_1_STEPS: StepKey[] = ['WELCOME', 'CONSENT', 'POSITION_STRATEGY', 'EARNINGS'];
+const PHASE_1_STEPS: StepKey[] = ['WELCOME', 'CONSENT', 'POSITION_STRATEGY', 'EARNINGS', 'AGREEMENT'];
 const PHASE_2_STEPS: StepKey[] = ['IDENTITY', 'ADDRESS', 'TRANSPORTATION', 'WORK_ENV', 'AVAILABILITY', 'WORK_HISTORY', 'CHILD_EXP', 'VALUES'];
 const BUILT_STEPS: Set<StepKey> = new Set([...PHASE_1_STEPS, ...PHASE_2_STEPS]);
 
@@ -252,6 +275,8 @@ function renderStep(
       return <PositionStrategyStep state={state} patch={patch} />;
     case 'EARNINGS':
       return <EarningsStep state={state} patch={patch} />;
+    case 'AGREEMENT':
+      return <AgreementStep state={state} patch={patch} />;
     case 'IDENTITY':
       return <IdentityStep state={state} patch={patch} />;
     case 'ADDRESS':

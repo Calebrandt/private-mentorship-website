@@ -13,6 +13,7 @@ const STEP_LABEL: Record<StepKey, string> = {
   CONSENT: 'Transparency',
   POSITION_STRATEGY: 'The work',
   EARNINGS: 'Pay & terms',
+  AGREEMENT: 'Contract agreement',
   IDENTITY: 'Identity',
   ADDRESS: 'Address',
   TRANSPORTATION: 'Transportation',

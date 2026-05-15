@@ -11,7 +11,7 @@ export default function WorkHistoryStep({ state, patch }: Props) {
 
   return (
     <div className="hw-step-enter">
-      <p className="hw-step__eyebrow">Step 10 of 24 · About You</p>
+      <p className="hw-step__eyebrow">Step 11 of 25 · About You</p>
       <h1 className="hw-step__title">Work History</h1>
       <p className="hw-step__sub">
         A brief overview of your most relevant role. A full résumé is uploaded in the next phase.

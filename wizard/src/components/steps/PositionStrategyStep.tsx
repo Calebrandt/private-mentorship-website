@@ -30,7 +30,7 @@ export default function PositionStrategyStep({ state, patch }: Props) {
 
   return (
     <div className="hw-step-enter">
-      <p className="hw-step__eyebrow">Step 3 of 24 · Role preferences</p>
+      <p className="hw-step__eyebrow">Step 3 of 25 · Role preferences</p>
       <h1 className="hw-step__title">Role and Work Preferences</h1>
       <p className="hw-step__sub">
         Your selections help us match you with the right family contracts. You can update these preferences any time after applying.

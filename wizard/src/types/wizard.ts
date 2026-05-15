@@ -9,6 +9,7 @@ export type StepKey =
   | 'CONSENT'
   | 'POSITION_STRATEGY'
   | 'EARNINGS'
+  | 'AGREEMENT'
   | 'IDENTITY'
   | 'ADDRESS'
   | 'TRANSPORTATION'
@@ -42,7 +43,7 @@ export const PHASES: PhaseDef[] = [
     key: 'ONBOARDING',
     label: 'Welcome',
     illustration: '/illustrations/welcome.svg',
-    steps: ['WELCOME', 'CONSENT', 'POSITION_STRATEGY', 'EARNINGS'],
+    steps: ['WELCOME', 'CONSENT', 'POSITION_STRATEGY', 'EARNINGS', 'AGREEMENT'],
   },
   {
     key: 'ABOUT_YOU',
@@ -92,7 +93,7 @@ export const PHASES: PhaseDef[] = [
 ];
 
 export const ALL_STEPS: StepKey[] = PHASES.flatMap(p => p.steps);
-export const TOTAL_STEPS = ALL_STEPS.length; // 24
+export const TOTAL_STEPS = ALL_STEPS.length; // 25
 
 export function phaseOfStep(step: StepKey): PhaseDef {
   const found = PHASES.find(p => p.steps.includes(step));
@@ -121,6 +122,18 @@ export interface WizardState {
   contractorAck1?: boolean;
   contractorAck2?: boolean;
   contractorAck3?: boolean;
+
+  // Step 5 — Contract Worker Agreement
+  agreementBcFactSheetAck?: boolean;             // confirmed reading BC ESB fact sheet
+  agreementBcFactSheetTimestamp?: string;        // ISO timestamp of fact-sheet ack
+  agreementInitialsDataUrl?: string;             // drawn initials, PNG data URL
+  agreementInitialedClauses?: Record<string, string>; // clauseKey -> ISO timestamp
+  agreementSignatureDataUrl?: string;            // drawn full signature, PNG data URL
+  agreementSignatureName?: string;               // typed legal name
+  agreementSignatureTimestamp?: string;          // ISO timestamp of final signing
+  agreementFinalAck?: boolean;                   // bottom "I have read and agree" checkbox
+  agreementVersion?: string;                     // contract version snapshot, e.g. "2026-05-12-v1"
+
   // Open shape — later phases will add their fields here.
   [key: string]: unknown;
 }

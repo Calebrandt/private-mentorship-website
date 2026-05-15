@@ -1016,3 +1016,417 @@ a { color: inherit; }
   .hw-stage__art img { max-height: 220px; }
   .hw-nav { padding: 14px 18px; }
 }
+
+/* ─── STEP 5 · CONTRACT WORKER AGREEMENT ─── */
+
+/* Small inline link to the full long-form Agreement (top of step 5) */
+.hw-ag-fulllink {
+  margin: -8px 0 22px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.hw-ag-fulllink a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 1px;
+  transition: border-color 160ms var(--ease-out);
+  font-weight: 500;
+}
+.hw-ag-fulllink a:hover,
+.hw-ag-fulllink a:focus-visible {
+  border-bottom-color: var(--accent);
+  outline: none;
+}
+
+/* Required-reading card (BC government fact sheet) */
+.hw-ag-readfirst .hw-card__sub { margin-bottom: 14px; }
+.hw-ag-doclink {
+  display: grid;
+  grid-template-columns: 40px 1fr 18px;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: #fff;
+  border: 1px solid var(--hair);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--ink);
+  transition: border-color 180ms var(--ease-out), background 180ms var(--ease-out);
+  margin-bottom: 14px;
+}
+.hw-ag-doclink:hover,
+.hw-ag-doclink:focus-visible {
+  border-color: var(--accent);
+  background: var(--accent-fade);
+  outline: none;
+}
+.hw-ag-doclink__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: #fef2f2;
+  color: #b91c1c;
+  border-radius: 8px;
+}
+.hw-ag-doclink__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.hw-ag-doclink__text strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.hw-ag-doclink__sub {
+  font-size: 12px;
+  color: var(--ink-mute);
+  line-height: 1.4;
+}
+.hw-ag-doclink__ext {
+  color: var(--ink-mute);
+  display: inline-flex;
+}
+.hw-ag-doclink:hover .hw-ag-doclink__ext { color: var(--accent); }
+
+/* Scope note between contract body and final signature */
+.hw-ag-scope {
+  margin: 18px 0;
+  padding: 14px 18px;
+  background: var(--input-bg);
+  border: 1px solid var(--hair-light);
+  border-left: 3px solid var(--ink-tert);
+  border-radius: 8px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+.hw-ag-scope strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* Initials & signature pad */
+.hw-sigpad {
+  position: relative;
+  width: 100%;
+  background: #fff;
+  border: 1px solid var(--hair);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.hw-sigpad__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: crosshair;
+  background:
+    linear-gradient(to bottom, transparent 0, transparent calc(100% - 32px), var(--hair-light) calc(100% - 32px), var(--hair-light) calc(100% - 31px), transparent calc(100% - 31px)) no-repeat;
+}
+.hw-sigpad__placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Caveat", "Brush Script MT", cursive;
+  font-size: 28px;
+  color: var(--ink-tert);
+  pointer-events: none;
+  letter-spacing: 0.5px;
+}
+.hw-sigpad__clear {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(255,255,255,0.92);
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  padding: 4px 10px;
+  color: var(--ink-mute);
+  cursor: pointer;
+}
+.hw-sigpad__clear:hover { color: var(--ink); border-color: var(--ink-tert); }
+
+/* Initials setup card */
+.hw-ag-initials .hw-card__sub { margin-bottom: 14px; }
+.hw-ag-initials__status { margin: 12px 0 0; font-size: 13.5px; }
+.hw-ag-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.hw-ag-status--ok { color: var(--success-ink); }
+.hw-ag-status--pending { color: var(--ink-mute); font-style: italic; }
+
+/* Contract card */
+.hw-ag-contract {
+  background: #fdfdfb;
+  padding: 0;
+  overflow: hidden;
+}
+.hw-ag-contract__head {
+  text-align: center;
+  padding: 36px 28px 22px;
+  border-bottom: 2px solid var(--ink);
+}
+.hw-ag-contract__eyebrow {
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-bottom: 10px;
+}
+.hw-ag-contract__title {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 6px;
+  color: var(--ink);
+}
+.hw-ag-contract__sub {
+  color: var(--ink-mute);
+  font-style: italic;
+  font-size: 13px;
+}
+.hw-ag-contract__intro {
+  padding: 22px 32px 4px;
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink-2);
+}
+
+/* Clause block */
+.hw-clause {
+  display: grid;
+  grid-template-columns: 1fr 180px;
+  gap: 18px;
+  padding: 20px 32px;
+  border-top: 1px solid var(--hair-light);
+  position: relative;
+  align-items: start;
+}
+.hw-clause::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--warn-border);
+  opacity: 0.55;
+}
+.hw-clause.is-signed::before {
+  background: var(--success);
+  opacity: 0.9;
+}
+.hw-clause__heading {
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  letter-spacing: 0.005em;
+  color: var(--ink);
+}
+.hw-clause__body p {
+  font-family: var(--serif);
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--ink-2);
+  margin: 0 0 8px;
+  text-wrap: pretty;
+}
+.hw-clause__plain {
+  margin-top: 10px !important;
+  padding: 10px 12px;
+  background: var(--input-bg);
+  border-left: 2px solid var(--ink-tert);
+  border-radius: 4px;
+  font-family: var(--sans) !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  color: var(--ink-mute) !important;
+}
+.hw-clause__plain strong {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+.hw-clause__table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0 10px;
+  font-family: var(--sans);
+  font-size: 13px;
+}
+.hw-clause__table th,
+.hw-clause__table td {
+  border: 1px solid var(--hair);
+  padding: 6px 10px;
+  text-align: left;
+}
+.hw-clause__table th {
+  background: var(--input-bg);
+  font-weight: 600;
+}
+
+/* Sign-here column */
+.hw-clause__sign {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 4px;
+}
+.hw-stamp {
+  width: 140px;
+  height: 70px;
+  border: 1.5px dashed var(--hair);
+  background: rgba(255,255,255,0.6);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-mute);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: all 180ms var(--ease-out);
+  padding: 6px;
+  font-family: var(--sans);
+}
+.hw-stamp:hover:not(:disabled):not(.is-locked) {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-fade);
+}
+.hw-stamp.is-locked {
+  cursor: not-allowed;
+  border-style: dotted;
+  color: var(--ink-tert);
+  background: transparent;
+}
+.hw-stamp.is-signed {
+  border: 1px solid var(--success);
+  background: var(--success-fade);
+  cursor: default;
+}
+.hw-stamp__img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+  filter: contrast(1.15);
+}
+.hw-stamp__label {
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* Final signature card */
+.hw-ag-final { margin-top: 16px; }
+.hw-ag-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--input-bg);
+  color: var(--ink-mute);
+  font-size: 13px;
+  margin: 4px 0 16px;
+}
+.hw-ag-progress.is-complete {
+  background: var(--success-fade);
+  color: var(--success-ink);
+}
+.hw-ag-progress svg { flex-shrink: 0; }
+
+.hw-field {
+  display: block;
+  margin: 16px 0;
+}
+.hw-field__label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-bottom: 6px;
+}
+.hw-field__input {
+  width: 100%;
+  padding: 11px 14px;
+  font-size: 15px;
+  font-family: var(--sans);
+  border: 1px solid var(--hair);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--ink);
+}
+.hw-field__input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: #fff;
+  box-shadow: 0 0 0 3px var(--accent-fade);
+}
+
+.hw-ag-meta {
+  margin-top: 18px;
+  padding: 14px 18px;
+  background: var(--input-bg);
+  border-radius: 8px;
+  border: 1px solid var(--hair-light);
+}
+.hw-ag-meta__row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 4px 0;
+}
+.hw-ag-meta__k {
+  color: var(--ink-mute);
+  font-weight: 500;
+}
+.hw-ag-meta__v {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.hw-ag-foot {
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-border);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--warn-ink);
+  line-height: 1.5;
+}
+
+@media (max-width: 760px) {
+  .hw-clause {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 18px 22px;
+  }
+  .hw-clause__sign {
+    justify-content: flex-start;
+  }
+  .hw-stamp {
+    width: 100%;
+    max-width: 220px;
+  }
+  .hw-ag-contract__head { padding: 28px 22px 18px; }
+  .hw-ag-contract__intro { padding: 18px 22px 4px; }
+}

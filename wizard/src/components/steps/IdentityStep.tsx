@@ -8,7 +8,7 @@ interface Props {
 export default function IdentityStep({ state, patch }: Props) {
   return (
     <div className="hw-step-enter">
-      <p className="hw-step__eyebrow">Step 5 of 24 · About You</p>
+      <p className="hw-step__eyebrow">Step 6 of 25 · About You</p>
       <h1 className="hw-step__title">Personal Information</h1>
       <p className="hw-step__sub">
         This information is used for identity verification and contract paperwork. It is not shared with families.

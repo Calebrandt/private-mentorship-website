@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Our Roster — Private Mentorship</title>
+<meta name="description" content="A small, hand-vetted group of Private Family Assistants serving Greater Vancouver. Apply to view individual profiles and request an introduction.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&display=swap">
+<style>
+:root{
+  --ink:#1a1a1a;
+  --ink-2:#3a3a3a;
+  --ink-3:#6a6a6a;
+  --ink-mute:#9a9a9a;
+  --hair:#d8d4cc;
+  --hair-soft:#ebe7df;
+  --cream:#f5f1ea;
+  --cream-2:#faf7f1;
+  --surface:#ffffff;
+  --accent:#8a6c3a;
+  --gold:#a07c3c;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--cream-2);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;font-weight:400;}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+
+/* ─── TOP NAV ─── */
+.r-nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(250,247,241,0.94);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--hair-soft);
+}
+.r-nav__inner{
+  max-width:1440px;margin:0 auto;
+  padding:18px 36px;
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+}
+.r-nav__logo{
+  font-family:Fraunces,Georgia,serif;
+  font-size:19px;font-weight:500;letter-spacing:-.008em;
+  color:var(--ink);
+}
+.r-nav__links{display:flex;align-items:center;gap:34px;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);font-weight:500;}
+.r-nav__links a{color:var(--ink-2);transition:color .15s ease;}
+.r-nav__links a:hover{color:var(--ink);}
+.r-nav__cta{
+  padding:10px 22px;
+  border:1px solid var(--ink);
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;
+  color:var(--ink) !important;
+  background:transparent;
+  transition:background .2s ease, color .2s ease;
+}
+.r-nav__cta:hover{background:var(--ink);color:#fff !important;}
+@media(max-width:760px){
+  .r-nav__links{display:none}
+  .r-nav__inner{padding:16px 22px}
+}
+
+/* ─── HERO ─── */
+.r-hero{
+  padding:84px 36px 56px;
+  border-bottom:1px solid var(--hair-soft);
+  text-align:center;
+}
+.r-hero__eyebrow{
+  font-size:11px;letter-spacing:.32em;text-transform:uppercase;
+  color:var(--gold);font-weight:500;margin-bottom:28px;
+}
+.r-hero__title{
+  font-family:Fraunces,Georgia,serif;
+  font-size:64px;font-weight:300;line-height:1;letter-spacing:-.022em;
+  margin:0 auto 24px;color:var(--ink);
+  max-width:920px;
+  text-wrap:balance;
+}
+.r-hero__sub{
+  font-size:15px;line-height:1.7;color:var(--ink-3);
+  max-width:580px;margin:0 auto 28px;
+  text-wrap:pretty;
+  font-weight:400;
+}
+.r-hero__cta{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:14px 28px;
+  background:var(--ink);color:#fff;
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:500;
+  transition:background .2s ease;
+}
+.r-hero__cta:hover{background:#2a2a2a;}
+.r-hero__cta svg{width:13px;height:13px;}
+@media(max-width:760px){
+  .r-hero{padding:54px 22px 40px}
+  .r-hero__title{font-size:38px}
+  .r-hero__sub{font-size:14.5px}
+  .r-hero__eyebrow{margin-bottom:20px;letter-spacing:.24em;}
+}
+
+/* ─── FILTER BAR ─── */
+.r-filterbar{
+  background:var(--surface);
+  border-bottom:1px solid var(--hair-soft);
+  padding:24px 36px;
+}
+.r-filterbar__inner{
+  max-width:1440px;margin:0 auto;
+  display:flex;flex-wrap:wrap;gap:24px;align-items:flex-end;
+}
+.r-filter{display:flex;flex-direction:column;gap:6px;min-width:200px;flex:1;max-width:280px;}
+.r-filter__label{
+  font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-mute);font-weight:500;
+}
+.r-filter__select{
+  appearance:none;
+  -webkit-appearance:none;
+  background:transparent;
+  border:none;
+  border-bottom:1px solid var(--hair);
+  padding:8px 24px 8px 0;
+  font-family:inherit;font-size:14px;color:var(--ink);
+  cursor:pointer;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'><path d='M3 4.5L6 7.5L9 4.5' stroke='%231a1a1a' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat:no-repeat;
+  background-position:right 4px center;
+}
+.r-filter__select:focus{outline:none;border-bottom-color:var(--ink);}
+.r-filterbar__count{
+  margin-left:auto;
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-mute);font-weight:500;
+  padding-bottom:10px;
+}
+.r-filterbar__count strong{color:var(--ink);font-weight:600;}
+@media(max-width:760px){
+  .r-filterbar{padding:20px 22px}
+  .r-filterbar__inner{gap:16px;}
+  .r-filter{min-width:48%;flex:1 1 48%;}
+  .r-filterbar__count{margin-left:0;width:100%;padding-bottom:0;padding-top:8px;border-top:1px solid var(--hair-soft);}
+}
+
+/* ─── GRID ─── */
+.r-page{
+  max-width:1440px;margin:0 auto;
+  padding:56px 36px 80px;
+}
+.r-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:48px 36px;
+}
+@media(max-width:1024px){
+  .r-grid{grid-template-columns:repeat(2,1fr);gap:40px 28px;}
+  .r-page{padding:44px 22px 64px;}
+}
+@media(max-width:600px){
+  .r-grid{grid-template-columns:1fr;gap:36px;}
+}
+
+/* ─── CARD ─── */
+.r-card{
+  display:block;
+  text-decoration:none;
+  color:inherit;
+  transition:opacity .2s ease;
+}
+.r-card[hidden]{display:none;}
+.r-card:hover{opacity:0.94;}
+.r-card:hover .r-card__photo::after{opacity:1;}
+.r-card:hover .r-card__photo-hover{transform:translateY(0);opacity:1;}
+
+.r-card__photo{
+  position:relative;
+  aspect-ratio:3/4;
+  background:linear-gradient(160deg, var(--photo-from, #2a2a2a), var(--photo-to, #5a5a5a));
+  overflow:hidden;
+  margin-bottom:18px;
+  display:flex;align-items:center;justify-content:center;
+}
+.r-card__photo::after{
+  content:"";
+  position:absolute;inset:0;
+  background:linear-gradient(to top, rgba(0,0,0,0.5), transparent 50%);
+  opacity:0;
+  transition:opacity .25s ease;
+  pointer-events:none;
+}
+.r-card__photo-initials{
+  font-family:Fraunces,Georgia,serif;
+  font-size:88px;font-weight:300;color:rgba(255,255,255,0.92);
+  letter-spacing:-.02em;
+  z-index:1;
+}
+.r-card__photo-anon{
+  display:flex;align-items:center;justify-content:center;
+  width:96px;height:96px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.08);
+  color:rgba(255,255,255,0.78);
+  z-index:1;
+}
+.r-card__photo-anon svg{width:48px;height:48px;display:block;}
+.r-card__photo-hover{
+  position:absolute;
+  bottom:18px;left:18px;right:18px;
+  z-index:2;
+  color:#fff;
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:500;
+  display:flex;align-items:center;justify-content:space-between;
+  transform:translateY(8px);opacity:0;
+  transition:transform .3s ease, opacity .25s ease;
+}
+.r-card__photo-hover svg{width:14px;height:14px;}
+
+.r-card__rec{
+  position:absolute;top:14px;left:14px;
+  z-index:2;
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,0.94);
+  color:var(--gold);
+  padding:6px 10px;
+  font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;
+}
+.r-card__rec svg{width:10px;height:10px;}
+
+.r-card__name{
+  font-family:Fraunces,Georgia,serif;
+  font-size:24px;font-weight:400;letter-spacing:-.01em;line-height:1.15;
+  margin:0 0 6px;color:var(--ink);
+}
+.r-card__role{
+  font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--gold);font-weight:500;
+  margin:0 0 12px;
+}
+.r-card__meta{
+  font-size:13px;color:var(--ink-3);
+  line-height:1.5;
+  margin:0;
+  display:flex;flex-direction:column;gap:3px;
+}
+.r-card__meta-row{
+  display:flex;align-items:center;gap:8px;
+}
+.r-card__meta-row svg{flex-shrink:0;color:var(--ink-mute);width:12px;height:12px;}
+
+/* ─── BOTTOM CTA ─── */
+.r-bottom{
+  margin:80px auto 0;
+  max-width:1440px;
+  padding:0 36px;
+}
+.r-bottom__card{
+  background:var(--ink);
+  color:#fff;
+  padding:56px 48px;
+  display:flex;align-items:center;justify-content:space-between;gap:32px;
+  flex-wrap:wrap;
+}
+.r-bottom__text{max-width:600px;}
+.r-bottom__eyebrow{
+  font-size:10.5px;letter-spacing:.32em;text-transform:uppercase;
+  color:rgba(255,255,255,0.55);font-weight:500;margin-bottom:14px;
+}
+.r-bottom__h{
+  font-family:Fraunces,Georgia,serif;
+  font-size:34px;font-weight:300;letter-spacing:-.018em;
+  margin:0 0 14px;color:#fff;line-height:1.15;
+}
+.r-bottom__sub{
+  font-size:14.5px;color:rgba(255,255,255,0.72);
+  margin:0;line-height:1.65;
+}
+.r-bottom__cta{
+  display:inline-flex;align-items:center;gap:12px;
+  padding:14px 28px;
+  border:1px solid #fff;
+  color:#fff;
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:500;
+  transition:background .2s ease, color .2s ease;
+}
+.r-bottom__cta:hover{background:#fff;color:var(--ink);}
+@media(max-width:760px){
+  .r-bottom{padding:0 22px;margin-top:64px;}
+  .r-bottom__card{padding:40px 28px;}
+  .r-bottom__h{font-size:26px;}
+}
+
+/* ─── FOOTER ─── */
+.r-foot{
+  margin-top:80px;
+  border-top:1px solid var(--hair-soft);
+  padding:36px 36px;
+  text-align:center;
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:500;
+}
+.r-foot a{color:var(--ink-3);transition:color .15s ease;margin:0 14px;}
+.r-foot a:hover{color:var(--ink);}
+.r-foot__copy{margin-top:18px;font-size:10.5px;letter-spacing:.16em;color:var(--ink-mute);}
+@media(max-width:760px){
+  .r-foot{padding:30px 22px}
+  .r-foot a{margin:0 8px;display:inline-block;padding:4px 0;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═════ TOP NAV ═════ -->
+<nav class="r-nav">
+  <div class="r-nav__inner">
+    <a class="r-nav__logo" href="index.html">Private Mentorship</a>
+    <div class="r-nav__links">
+      <a href="the-assistant.html">The Assistant</a>
+      <a href="custom-plans.html">Custom Plans</a>
+      <a href="assistants.html">Assistants</a>
+      <a href="hiring.html">Hiring</a>
+    </div>
+    <a class="r-nav__cta" href="mailto:hello@privatementorship.ca?subject=Introduction%20request">Request an Introduction</a>
+  </div>
+</nav>
+
+<!-- ═════ HERO ═════ -->
+<section class="r-hero">
+  <div class="r-hero__eyebrow">The Roster · Greater Vancouver</div>
+  <h1 class="r-hero__title">A small, hand-vetted roster.</h1>
+  <p class="r-hero__sub">Every Assistant on Private Mentorship is interviewed in person, reference-checked, and signed to a contractor agreement before being placed with a family. Individual profiles, photos, and names are kept private out of respect for our Assistants and Clients. Apply to view the full roster.</p>
+  <a class="r-hero__cta" href="apply.html">
+    Apply to View the Full Roster
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l5 5-5 5"/></svg>
+  </a>
+</section>
+
+<!-- ═════ FILTER BAR ═════ -->
+<section class="r-filterbar">
+  <div class="r-filterbar__inner">
+    <div class="r-filter">
+      <label class="r-filter__label" for="fService">Service</label>
+      <select class="r-filter__select" id="fService">
+        <option value="all">All Categories</option>
+        <option value="senior">Senior Care</option>
+        <option value="childcare">Childcare</option>
+        <option value="disability">Disability Support</option>
+        <option value="general">General Day-to-Day</option>
+      </select>
+    </div>
+    <div class="r-filter">
+      <label class="r-filter__label" for="fLocation">Location</label>
+      <select class="r-filter__select" id="fLocation">
+        <option value="all">All of Greater Vancouver</option>
+        <option value="vancouver">Vancouver</option>
+        <option value="north-shore">North Shore</option>
+        <option value="burnaby">Burnaby</option>
+        <option value="richmond">Richmond</option>
+      </select>
+    </div>
+    <div class="r-filter">
+      <label class="r-filter__label" for="fLanguage">Language</label>
+      <select class="r-filter__select" id="fLanguage">
+        <option value="all">Any Language</option>
+        <option value="en">English</option>
+        <option value="fr">French</option>
+        <option value="cantonese">Cantonese</option>
+        <option value="mandarin">Mandarin</option>
+        <option value="hindi">Hindi</option>
+        <option value="asl">ASL</option>
+      </select>
+    </div>
+    <div class="r-filterbar__count"><strong id="resultCount">4</strong> Assistants Found</div>
+  </div>
+</section>
+
+<!-- ═════ DIRECTORY GRID ═════ -->
+<div class="r-page">
+  <div class="r-grid" id="rosterGrid">
+
+    <!-- ─ Anonymous Card 1 — Senior Care Specialist ─ -->
+    <a class="r-card" href="apply.html?category=senior" data-category="senior general" data-location="vancouver" data-lang="en cantonese" data-recommended="1">
+      <div class="r-card__photo" style="--photo-from:#1c4956;--photo-to:#3a7d8f;">
+        <span class="r-card__rec">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="8 1.5 10.2 5.9 15 6.6 11.5 10 12.4 14.8 8 12.5 3.6 14.8 4.5 10 1 6.6 5.8 5.9"/></svg>
+          PM Recommends
+        </span>
+        <span class="r-card__photo-anon">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="24" cy="16" r="6"/>
+            <path d="M10 40c0-8 6-12 14-12s14 4 14 12"/>
+          </svg>
+        </span>
+        <div class="r-card__photo-hover">
+          <span>Apply to View Profile</span>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l5 5-5 5"/></svg>
+        </div>
+      </div>
+      <h2 class="r-card__name">Senior Care Specialist</h2>
+      <p class="r-card__role">Companion · Heavy Housekeeping</p>
+      <div class="r-card__meta">
+        <div class="r-card__meta-row">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5C5 1.5 3 4 3 7c0 4 5 7.5 5 7.5s5-3.5 5-7.5c0-3-2-5.5-5-5.5z"/><circle cx="8" cy="7" r="2"/></svg>
+          Vancouver
+        </div>
+        <div class="r-card__meta-row">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><polyline points="8 4 8 8 11 10"/></svg>
+          On PM since 2023 · 8 Engagements
+        </div>
+        <div class="r-card__meta-row">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 3 4.5 3 6.5s-1 4.5-3 6.5M8 1.5c-2 2-3 4.5-3 6.5s1 4.5 3 6.5"/></svg>
+          English · Cantonese
+        </div>
+      </div>
+    </a>
+
+    <!-- ─ Anonymous Card 2 — Childcare Specialist ─ -->
+    <a class="r-card" href="apply.html?category=childcare" data-category="childcare general" data-location="north-shore" data-lang="en fr" data-recommended="0">
+      <div class="r-card__photo" style="--photo-from:#5a3a1f;--photo-to:#8a6238;">
+        <span class="r-card__photo-anon">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="24" cy="16" r="6"/>
+            <path d="M10 40c0-8 6-12 14-12s14 4 14 12"/>
+          </svg>
+        </span>
+        <div class="r-card__photo-hover">
+          <span>Apply to View Profile</span>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l5 5-5 5"/></svg>
+        </div>
+      </div>
+      <h2 class="r-card__name">Childcare Specialist</h2>
+      <p class="r-card__role">Afterschool &amp; Academic Support</p>
+      <div class="r-card__meta">
+        <div class="r-card__meta-row">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5C5 1.5 3 4 3 7c0 4 5 7.5 5 7.5s5-3.5 5-7.5c0-3-2-5.5-5-5.5z"/><circle cx="8" cy="7" r="2"/></svg>
+          North Shore
+        </div>
+        <div class="r-card__meta-row">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><polyline points="8 4 8 8 11 10"/></svg>
+          On PM since 2024 · 5 Engagements
+        </div>
+        <div class="r-card__meta-row">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 3 4.5 3 6.5s-1 4.5-3 6.5M8 1.5c-2 2-3 4.5-3 6.5s1 4.5 3 6.5"/></svg>
+          English · French
+        </div>
+      </div>
+    </a>
+
+    <!-- ─ Anonymous Card 3 — Disability Support Specialist ─ -->
+    <a class="r-card" href="apply.html?category=disability" data-category="disability" data-location="burnaby" data-lang="en asl" data-recommended="1">
+      <div class="r-card__photo" style="--photo-from:#3d2a5c;--photo-to:#6a4d96;">
+        <span class="r-card__rec">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="8 1.5 10.2 5.9 15 6.6 11.5 10 12.4 14.8 8 12.5 3.6 14.8 4.5 10 1 6.6 5.8 5.9"/></svg>
+          PM Recommends
+        </span>
+        <span class="r-card__photo-anon">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="24" cy="16" r="6"/>
+            <path d="M10 40c0-8 6-12 14-12s14 4 14 12"/>
+          </svg>
+        </span>
+        <div class="r-card__photo-hover">
+          <span>Apply to View Profile</span>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l5 5-5 5"/></svg>
+        </div>
+      </div>
+      <h2 class="r-card__name">Disability Support Specialist</h2>
+      <p class="r-card__role">Life Skills &amp; Community Access</p>
+      <div class="r-card__meta">
+        <div class="r-card__meta-row">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5C5 1.5 3 4 3 7c0 4 5 7.5 5 7.5s5-3.5 5-7.5c0-3-2-5.5-5-5.5z"/><circle cx="8" cy="7" r="2"/></svg>
+          Burnaby
+        </div>
+        <div class="r-card__meta-row">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><polyline points="8 4 8 8 11 10"/></svg>
+          On PM since 2024 · 4 Engagements
+        </div>
+        <div class="r-card__meta-row">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 3 4.5 3 6.5s-1 4.5-3 6.5M8 1.5c-2 2-3 4.5-3 6.5s1 4.5 3 6.5"/></svg>
+          English · ASL
+        </div>
+      </div>
+    </a>
+
+    <!-- ─ Anonymous Card 4 — Family Operations Specialist ─ -->
+    <a class="r-card" href="apply.html?category=general" data-category="general childcare" data-location="richmond" data-lang="en mandarin hindi" data-recommended="0">
+      <div class="r-card__photo" style="--photo-from:#3f5024;--photo-to:#6a8240;">
+        <span class="r-card__photo-anon">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="24" cy="16" r="6"/>
+            <path d="M10 40c0-8 6-12 14-12s14 4 14 12"/>
+          </svg>
+        </span>
+        <div class="r-card__photo-hover">
+          <span>Apply to View Profile</span>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l5 5-5 5"/></svg>
+        </div>
+      </div>
+      <h2 class="r-card__name">Family Operations Specialist</h2>
+      <p class="r-card__role">Errands · Driving · Day-to-Day</p>
+      <div class="r-card__meta">
+        <div class="r-card__meta-row">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5C5 1.5 3 4 3 7c0 4 5 7.5 5 7.5s5-3.5 5-7.5c0-3-2-5.5-5-5.5z"/><circle cx="8" cy="7" r="2"/></svg>
+          Richmond
+        </div>
+        <div class="r-card__meta-row">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><polyline points="8 4 8 8 11 10"/></svg>
+          On PM since 2025 · 2 Engagements
+        </div>
+        <div class="r-card__meta-row">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 3 4.5 3 6.5s-1 4.5-3 6.5M8 1.5c-2 2-3 4.5-3 6.5s1 4.5 3 6.5"/></svg>
+          English · Mandarin · Hindi
+        </div>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<!-- ═════ BOTTOM CTA ═════ -->
+<aside class="r-bottom">
+  <div class="r-bottom__card">
+    <div class="r-bottom__text">
+      <div class="r-bottom__eyebrow">Apply to View the Full Roster</div>
+      <h3 class="r-bottom__h">Full Assistant profiles are unlocked after you apply.</h3>
+      <p class="r-bottom__sub">Names, photos, full bios, languages, schedules — every detail is reserved for families who have applied. One brief application gives you access to the complete roster in your Client Dashboard.</p>
+    </div>
+    <a class="r-bottom__cta" href="apply.html">
+      Apply Now
+      <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l5 5-5 5"/></svg>
+    </a>
+  </div>
+</aside>
+
+<!-- ═════ FOOTER ═════ -->
+<footer class="r-foot">
+  <div>
+    <a href="index.html">Private Mentorship</a>
+    <a href="the-assistant.html">The Assistant</a>
+    <a href="custom-plans.html">Custom Plans</a>
+    <a href="assistants.html">Assistants</a>
+    <a href="hiring.html">Hiring</a>
+    <a href="family-help.html">Help</a>
+  </div>
+  <div class="r-foot__copy">&copy; 2026 Private Mentorship · British Columbia</div>
+</footer>
+
+<script src="js/pm-help-fab.js" defer></script>
+
+<script>
+  // Combined filter logic
+  (function(){
+    var fService = document.getElementById('fService');
+    var fLocation = document.getElementById('fLocation');
+    var fLanguage = document.getElementById('fLanguage');
+    var cards = document.querySelectorAll('#rosterGrid .r-card');
+    var countEl = document.getElementById('resultCount');
+
+    function apply(){
+      var svc = fService.value;
+      var loc = fLocation.value;
+      var lang = fLanguage.value;
+      var visible = 0;
+      cards.forEach(function(card){
+        var cats = (card.getAttribute('data-category') || '').split(/\s+/);
+        var locs = (card.getAttribute('data-location') || '').split(/\s+/);
+        var langs = (card.getAttribute('data-lang') || '').split(/\s+/);
+        var svcMatch = svc === 'all' || cats.indexOf(svc) !== -1;
+        var locMatch = loc === 'all' || locs.indexOf(loc) !== -1;
+        var langMatch = lang === 'all' || langs.indexOf(lang) !== -1;
+        var show = svcMatch && locMatch && langMatch;
+        card.hidden = !show;
+        if (show) visible++;
+      });
+      if (countEl) countEl.textContent = visible;
+    }
+
+    [fService, fLocation, fLanguage].forEach(function(sel){
+      sel.addEventListener('change', apply);
+    });
+    apply();
+  })();
+</script>
+
+</body>
+</html>

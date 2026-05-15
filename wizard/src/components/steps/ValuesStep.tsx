@@ -20,7 +20,7 @@ export default function ValuesStep({ state, patch }: Props) {
 
   return (
     <div className="hw-step-enter">
-      <p className="hw-step__eyebrow">Step 12 of 24 · About You</p>
+      <p className="hw-step__eyebrow">Step 13 of 25 · About You</p>
       <h1 className="hw-step__title">Values and Approach</h1>
       <p className="hw-step__sub">
         Select the values that best reflect how you work with families and clients. Choose only those that genuinely apply.

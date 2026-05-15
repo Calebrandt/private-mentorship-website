@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Client Dashboard — Private Mentorship</title>
+<meta name="description" content="Your Private Mentorship Client Dashboard. View the full Assistant roster and manage your introduction picks.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:opsz,ital,wght@9..144,0,300;9..144,0,400;9..144,0,500;9..144,0,600&display=swap">
+<link rel="stylesheet" href="../css/client.css">
+</head>
+<body class="pm-gated-body">
+
+<!-- ═════ GATE ═════ -->
+<div class="pm-gate" id="pmGate" role="dialog" aria-modal="true">
+  <div class="pm-gate__card">
+    <div class="pm-gate__eyebrow">Client Dashboard · Access Required</div>
+    <h2 class="pm-gate__h">Sign in to your Client Dashboard.</h2>
+    <p class="pm-gate__sub">Your Client Dashboard becomes available after you complete the application. Enter your access code or apply now.</p>
+    <form class="pm-gate__form" id="pmGateForm">
+      <div>
+        <label class="pm-gate__label" for="pmGateCode">Access code</label>
+        <input class="pm-gate__input" type="password" id="pmGateCode" autocomplete="off" required>
+      </div>
+      <p class="pm-gate__error" id="pmGateError" role="alert"></p>
+      <button class="pm-gate__btn" type="submit">Enter Dashboard</button>
+    </form>
+    <div class="pm-gate__alt">
+      Not yet applied? <a href="../apply.html">Apply now</a>
+    </div>
+    <p class="pm-gate__note"><strong>Note.</strong> Placeholder gate during development. Real authentication via the Client Dashboard sign-in will replace it.</p>
+  </div>
+</div>
+
+<!-- ═════ NAV ═════ -->
+<nav class="r-nav">
+  <div class="r-nav__inner">
+    <a class="r-nav__logo" href="../index.html">Private Mentorship</a>
+    <div class="r-nav__links">
+      <a href="../the-assistant.html">The Assistant</a>
+      <a href="../custom-plans.html">Custom Plans</a>
+      <a href="../assistants.html">The Roster</a>
+      <a href="dashboard.html" class="is-active">Dashboard</a>
+    </div>
+    <button class="r-nav__cta" id="pmSignOut" type="button">Sign Out</button>
+  </div>
+</nav>
+
+<!-- ═════ DASHBOARD SHELL ═════ -->
+<div class="cd-shell">
+
+  <!-- Sub-nav (client area) -->
+  <nav class="cd-subnav">
+    <div class="cd-subnav__inner">
+      <a class="cd-subnav__item is-active" href="dashboard.html">Overview</a>
+      <a class="cd-subnav__item" href="roster.html">The Roster</a>
+      <a class="cd-subnav__item" href="picks.html">My Picks <span class="cd-subnav__count" id="picksCount">0</span></a>
+      <a class="cd-subnav__item" href="#" aria-disabled="true" style="opacity:.4;cursor:not-allowed;">Messages</a>
+      <a class="cd-subnav__item" href="#" aria-disabled="true" style="opacity:.4;cursor:not-allowed;">Settings</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="cd-hero">
+    <div class="cd-hero__eyebrow">Welcome to Private Mentorship</div>
+    <h1 class="cd-hero__title">Your application is in motion.</h1>
+    <p class="cd-hero__sub">Private Mentorship is reviewing your application. In the meantime, browse the full Assistant roster and build a list of top picks. We will follow up to schedule your intake call within one business day.</p>
+  </section>
+
+  <!-- Status cards -->
+  <section class="cd-status">
+    <div class="cd-card">
+      <div class="cd-card__eyebrow">Step 1 · Complete</div>
+      <h3 class="cd-card__h">Application submitted</h3>
+      <p class="cd-card__sub">Private Mentorship has received your application. We will review it within one business day.</p>
+      <div class="cd-card__status cd-card__status--done">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 8 7 12 13 4"/></svg>
+        Received
+      </div>
+    </div>
+
+    <div class="cd-card">
+      <div class="cd-card__eyebrow">Step 2 · You are here</div>
+      <h3 class="cd-card__h">Browse the full roster</h3>
+      <p class="cd-card__sub">Individual Assistant profiles are now unlocked. Add the ones that look right for your family to your pick list.</p>
+      <a class="cd-card__cta" href="roster.html">View The Roster →</a>
+    </div>
+
+    <div class="cd-card">
+      <div class="cd-card__eyebrow">Step 3 · Next</div>
+      <h3 class="cd-card__h">Submit your top picks</h3>
+      <p class="cd-card__sub">Once you have 1–3 Assistants in mind, submit your picks. Private Mentorship will schedule introduction meetings for each.</p>
+      <a class="cd-card__cta" href="picks.html">Go to My Picks →</a>
+    </div>
+
+    <div class="cd-card">
+      <div class="cd-card__eyebrow">Step 4 · Coming up</div>
+      <h3 class="cd-card__h">Meet your Assistants</h3>
+      <p class="cd-card__sub">Private Mentorship facilitates a 30-minute introduction meeting with each pick. Meet in person or by video.</p>
+      <div class="cd-card__status cd-card__status--pending">Pending picks</div>
+    </div>
+  </section>
+
+  <!-- Help block -->
+  <section class="cd-help">
+    <div class="cd-help__inner">
+      <div>
+        <div class="cd-help__eyebrow">Need a hand?</div>
+        <h3 class="cd-help__h">Private Mentorship is one message away.</h3>
+        <p class="cd-help__sub">If you have questions while browsing the roster or building your picks, message support or read the Family Help Center.</p>
+      </div>
+      <div class="cd-help__actions">
+        <a class="cd-help__alt" href="../family-help.html">Family Help</a>
+        <a class="cd-help__cta" href="mailto:support@privatementorship.ca?subject=Client%20Dashboard%20question">Email Support</a>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ═════ FOOTER ═════ -->
+<footer class="r-foot">
+  <div>
+    <a href="../index.html">Private Mentorship</a>
+    <a href="../assistants.html">Roster</a>
+    <a href="../family-help.html">Family Help</a>
+    <a href="../custom-plans.html">Custom Plans</a>
+  </div>
+  <div class="r-foot__copy">&copy; 2026 Private Mentorship · British Columbia</div>
+</footer>
+
+<script src="../js/pm-help-fab.js" defer></script>
+<script src="../js/pm-client-gate.js"></script>
+<script>
+  // Pick count badge
+  (function(){
+    try {
+      var picks = JSON.parse(localStorage.getItem('pm_picks') || '[]');
+      var el = document.getElementById('picksCount');
+      if (el) el.textContent = picks.length;
+    } catch(e){}
+  })();
+</script>
+
+</body>
+</html>

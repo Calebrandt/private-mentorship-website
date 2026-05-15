@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pick Lists — Admin · Private Mentorship</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:opsz,ital,wght@9..144,0,300;9..144,0,400;9..144,0,500;9..144,0,600&display=swap">
+<link rel="stylesheet" href="../css/client.css">
+</head>
+<body class="pm-gated-body">
+
+<!-- Gate -->
+<div class="pm-gate" id="pmGate" role="dialog" aria-modal="true">
+  <div class="pm-gate__card">
+    <div class="pm-gate__eyebrow">Admin · Founder Access</div>
+    <h2 class="pm-gate__h">Sign in to view pick lists.</h2>
+    <p class="pm-gate__sub">This area is reserved for Private Mentorship leadership and ops staff.</p>
+    <form class="pm-gate__form" id="pmGateForm">
+      <div>
+        <label class="pm-gate__label" for="pmGateCode">Admin code</label>
+        <input class="pm-gate__input" type="password" id="pmGateCode" autocomplete="off" required>
+      </div>
+      <p class="pm-gate__error" id="pmGateError" role="alert"></p>
+      <button class="pm-gate__btn" type="submit">Enter Admin</button>
+    </form>
+    <p class="pm-gate__note"><strong>Note.</strong> Placeholder gate during development.</p>
+  </div>
+</div>
+
+<!-- Nav -->
+<nav class="r-nav">
+  <div class="r-nav__inner">
+    <a class="r-nav__logo" href="../index.html">Private Mentorship <span class="r-nav__admin-label">Admin</span></a>
+    <div class="r-nav__links">
+      <a href="../index.html">Site</a>
+      <a href="../assistants.html">Roster</a>
+      <a href="../client/dashboard.html">Client View</a>
+      <a href="dashboard.html" class="is-active">Admin</a>
+    </div>
+    <button class="r-nav__cta" id="pmSignOut" type="button">Sign Out</button>
+  </div>
+</nav>
+
+<div class="cd-shell">
+
+  <!-- Sub-nav -->
+  <nav class="cd-subnav">
+    <div class="cd-subnav__inner">
+      <a class="cd-subnav__item" href="dashboard.html">Overview</a>
+      <a class="cd-subnav__item is-active" href="picks.html">Pick Lists <span class="cd-subnav__count">3</span></a>
+      <a class="cd-subnav__item" href="applications.html">Applications <span class="cd-subnav__count">5</span></a>
+      <a class="cd-subnav__item" href="#" aria-disabled="true" style="opacity:.4;cursor:not-allowed;">Roster</a>
+      <a class="cd-subnav__item" href="#" aria-disabled="true" style="opacity:.4;cursor:not-allowed;">Engagements</a>
+      <a class="cd-subnav__item" href="#" aria-disabled="true" style="opacity:.4;cursor:not-allowed;">Settings</a>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <header class="cd-picks-head">
+    <div class="cd-picks-head__eyebrow">Incoming · Pick Lists</div>
+    <h1 class="cd-picks-head__title">Pick lists awaiting introductions.</h1>
+    <p class="cd-picks-head__sub">Families have submitted their top Assistant picks. Review each list, schedule a 30-minute intake call with the family, then arrange the introduction meetings.</p>
+  </header>
+
+  <!-- Live pick (from current browser's localStorage) -->
+  <section class="ad-section" id="livePickSection" style="display:none;">
+    <div class="ad-section__head">
+      <div>
+        <h2 class="ad-section__title">Live submission · your test session</h2>
+        <p class="ad-section__sub">This is the pick list you submitted from the Client Dashboard in this browser.</p>
+      </div>
+      <span class="ad-section__count" id="liveCount"></span>
+    </div>
+    <div class="ad-queue" id="livePickList"></div>
+  </section>
+
+  <!-- Mock incoming picks -->
+  <section class="ad-section">
+    <div class="ad-section__head">
+      <div>
+        <h2 class="ad-section__title">All incoming pick lists</h2>
+        <p class="ad-section__sub">Demo data shown while Supabase backend is being wired up. Real submissions will appear here once auth + database are live.</p>
+      </div>
+      <span class="ad-section__count">3 awaiting action</span>
+    </div>
+
+    <div class="ad-queue">
+
+      <div class="ad-row">
+        <div class="ad-row__date">
+          <strong>Today</strong>
+          11:42 AM
+        </div>
+        <div class="ad-row__main">
+          <h3 class="ad-row__name">Chen Family</h3>
+          <p class="ad-row__meta"><strong>Vancouver</strong> · Senior care for mother (78, post-stroke) · 40 hr/mo desired · Email: maria.chen@example.com</p>
+          <div class="ad-picklist">
+            <span class="ad-pickchip"><span class="ad-pickchip__rank">1st</span>Sarah Y.</span>
+            <span class="ad-pickchip"><span class="ad-pickchip__rank">2nd</span>Priya S.</span>
+          </div>
+        </div>
+        <span class="ad-row__status ad-row__status--new">New</span>
+        <button class="ad-row__action" type="button">Schedule</button>
+      </div>
+
+      <div class="ad-row">
+        <div class="ad-row__date">
+          <strong>Yesterday</strong>
+          4:18 PM
+        </div>
+        <div class="ad-row__main">
+          <h3 class="ad-row__name">Davies Family</h3>
+          <p class="ad-row__meta"><strong>North Shore</strong> · Childcare for two children (8 &amp; 11) · 24 hr/mo · Driving required · Email: t.davies@example.com</p>
+          <div class="ad-picklist">
+            <span class="ad-pickchip"><span class="ad-pickchip__rank">1st</span>Marcus T.</span>
+            <span class="ad-pickchip"><span class="ad-pickchip__rank">2nd</span>Priya S.</span>
+            <span class="ad-pickchip"><span class="ad-pickchip__rank">3rd</span>Aisha R.</span>
+          </div>
+        </div>
+        <span class="ad-row__status ad-row__status--review">In Review</span>
+        <button class="ad-row__action" type="button">Schedule</button>
+      </div>
+
+      <div class="ad-row">
+        <div class="ad-row__date">
+          <strong>2 days ago</strong>
+          9:05 AM
+        </div>
+        <div class="ad-row__main">
+          <h3 class="ad-row__name">Patel Family</h3>
+          <p class="ad-row__meta"><strong>Burnaby</strong> · Disability support for adult son (CLBC-funded) · 20 hr/mo · ASL preferred · Email: r.patel@example.com</p>
+          <div class="ad-picklist">
+            <span class="ad-pickchip"><span class="ad-pickchip__rank">1st</span>Aisha R.</span>
+          </div>
+        </div>
+        <span class="ad-row__status ad-row__status--review">In Review</span>
+        <button class="ad-row__action" type="button">Schedule</button>
+      </div>
+
+      <div class="ad-row">
+        <div class="ad-row__date">
+          <strong>Last week</strong>
+          Wed · 2:30 PM
+        </div>
+        <div class="ad-row__main">
+          <h3 class="ad-row__name">Lin Family</h3>
+          <p class="ad-row__meta"><strong>Vancouver West</strong> · Senior care for father (82) + light housekeeping · 40 hr/mo · Cantonese preferred</p>
+          <div class="ad-picklist">
+            <span class="ad-pickchip"><span class="ad-pickchip__rank">1st</span>Sarah Y.</span>
+          </div>
+        </div>
+        <span class="ad-row__status ad-row__status--handled">Engaged</span>
+        <button class="ad-row__action" type="button">View</button>
+      </div>
+
+      <div class="ad-row">
+        <div class="ad-row__date">
+          <strong>Last week</strong>
+          Mon · 11:00 AM
+        </div>
+        <div class="ad-row__main">
+          <h3 class="ad-row__name">Singh Family</h3>
+          <p class="ad-row__meta"><strong>Richmond</strong> · General day-to-day + errands · 24 hr/mo · Hindi/Mandarin preferred</p>
+          <div class="ad-picklist">
+            <span class="ad-pickchip"><span class="ad-pickchip__rank">1st</span>Priya S.</span>
+            <span class="ad-pickchip"><span class="ad-pickchip__rank">2nd</span>Marcus T.</span>
+          </div>
+        </div>
+        <span class="ad-row__status ad-row__status--handled">Engaged</span>
+        <button class="ad-row__action" type="button">View</button>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<!-- Footer -->
+<footer class="r-foot">
+  <div>
+    <a href="../index.html">Private Mentorship</a>
+    <a href="../assistants.html">Public Roster</a>
+    <a href="../client/dashboard.html">Client View</a>
+    <a href="dashboard.html">Admin</a>
+  </div>
+  <div class="r-foot__copy">&copy; 2026 Private Mentorship · British Columbia</div>
+</footer>
+
+<script src="../js/pm-help-fab.js" defer></script>
+<script src="../js/pm-admin-gate.js"></script>
+<script>
+  // Show "Live submission" section if the test browser has picks submitted
+  // OR currently has picks in the basket
+  var ASSISTANTS = {
+    'sarah-y': { name: 'Sarah Y.', role: 'Senior Care & Companion' },
+    'marcus-t': { name: 'Marcus T.', role: 'Childcare & Academic Support' },
+    'aisha-r': { name: 'Aisha R.', role: 'Disability Support & Life Skills' },
+    'priya-s': { name: 'Priya S.', role: 'General Day-to-Day & Family Operations' }
+  };
+  var RANK = ['1st','2nd','3rd'];
+
+  (function(){
+    var picks = [];
+    try { picks = JSON.parse(localStorage.getItem('pm_picks') || '[]'); } catch(e){}
+    var submittedAt = null;
+    try { submittedAt = localStorage.getItem('pm_picks_submitted_at'); } catch(e){}
+
+    if (picks.length === 0 && !submittedAt) return;
+
+    var section = document.getElementById('livePickSection');
+    var list = document.getElementById('livePickList');
+    var count = document.getElementById('liveCount');
+
+    var displayPicks = picks.length > 0 ? picks : [];
+    var status = picks.length > 0 ? 'In Cart (not yet submitted)' : 'Submitted';
+    var statusClass = picks.length > 0 ? 'ad-row__status--review' : 'ad-row__status--new';
+    var dateLabel = picks.length > 0 ? 'Now' : 'Just submitted';
+    var dateTime = picks.length > 0 ? 'Live' : (submittedAt ? new Date(submittedAt).toLocaleTimeString() : '');
+
+    if (picks.length === 0 && submittedAt) {
+      list.innerHTML = '<div class="ad-row"><div class="ad-row__date"><strong>' + dateLabel + '</strong>' + dateTime + '</div><div class="ad-row__main"><h3 class="ad-row__name">Your test family</h3><p class="ad-row__meta">Picks were submitted at ' + new Date(submittedAt).toLocaleString() + '. List cleared after submission.</p></div><span class="ad-row__status ' + statusClass + '">' + status + '</span><button class="ad-row__action" type="button">Reviewed</button></div>';
+    } else {
+      var chips = displayPicks.map(function(key, i){
+        var a = ASSISTANTS[key];
+        return '<span class="ad-pickchip"><span class="ad-pickchip__rank">' + (RANK[i] || (i+1)) + '</span>' + (a ? a.name : key) + '</span>';
+      }).join('');
+      list.innerHTML = '<div class="ad-row"><div class="ad-row__date"><strong>' + dateLabel + '</strong>' + dateTime + '</div><div class="ad-row__main"><h3 class="ad-row__name">Your test family</h3><p class="ad-row__meta">Currently in the client basket. Not yet submitted.</p><div class="ad-picklist">' + chips + '</div></div><span class="ad-row__status ' + statusClass + '">' + status + '</span><button class="ad-row__action" type="button">Schedule</button></div>';
+    }
+    count.textContent = picks.length > 0 ? (picks.length + ' picks in cart') : 'Recently submitted';
+    section.style.display = 'block';
+  })();
+</script>
+
+</body>
+</html>

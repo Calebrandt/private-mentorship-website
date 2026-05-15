@@ -17,7 +17,7 @@ export default function ChildExpStep({ state, patch }: Props) {
 
   return (
     <div className="hw-step-enter">
-      <p className="hw-step__eyebrow">Step 11 of 24 · About You</p>
+      <p className="hw-step__eyebrow">Step 12 of 25 · About You</p>
       <h1 className="hw-step__title">Child and Family Experience</h1>
       <p className="hw-step__sub">
         Most contracts involve children or young adults. Tell us about your direct experience working with younger people.

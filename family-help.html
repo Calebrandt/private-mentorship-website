@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Family Help &amp; Support — Private Mentorship</title>
+<meta name="description" content="Answers to common questions for Private Mentorship families. Get help with scheduling, payments, your Assistant, and anything else.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:opsz,ital,wght@9..144,0,300;9..144,0,400;9..144,0,500;9..144,0,600;9..144,1,400;9..144,1,500&display=swap">
+<style>
+:root{--ink:#1a1a1a;--ink-2:#3a3a3a;--ink-3:#6a6a6a;--ink-mute:#9a9a9a;--hair:#d8d4cc;--hair-soft:#ebe7df;--cream:#f5f1ea;--cream-2:#faf7f1;--surface:#ffffff;--accent:#8a6c3a;--gold:#a07c3c;}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--cream-2);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;font-weight:400;}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+
+/* ─── NAV ─── */
+.r-nav{position:sticky;top:0;z-index:50;background:rgba(250,247,241,0.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--hair-soft);}
+.r-nav__inner{max-width:1440px;margin:0 auto;padding:18px 36px;display:flex;align-items:center;justify-content:space-between;gap:24px;}
+.r-nav__logo{font-family:Fraunces,Georgia,serif;font-size:19px;font-weight:500;letter-spacing:-.008em;color:var(--ink);}
+.r-nav__links{display:flex;align-items:center;gap:34px;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);font-weight:500;}
+.r-nav__links a{color:var(--ink-2);transition:color .15s ease;}
+.r-nav__links a:hover{color:var(--ink);}
+.r-nav__cta{padding:10px 22px;border:1px solid var(--ink);font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;color:var(--ink) !important;background:transparent;transition:background .2s ease, color .2s ease;}
+.r-nav__cta:hover{background:var(--ink);color:#fff !important;}
+@media(max-width:760px){.r-nav__links{display:none}.r-nav__inner{padding:16px 22px}}
+
+/* ─── HERO ─── */
+.r-hero{padding:84px 36px 40px;text-align:center;}
+.r-hero__eyebrow{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);font-weight:500;margin-bottom:24px;}
+.r-hero__title{font-family:Fraunces,Georgia,serif;font-size:56px;font-weight:300;line-height:1.05;letter-spacing:-.022em;margin:0 auto 18px;color:var(--ink);max-width:780px;text-wrap:balance;}
+.r-hero__sub{font-size:16px;line-height:1.7;color:var(--ink-3);max-width:560px;margin:0 auto;text-wrap:pretty;}
+@media(max-width:760px){.r-hero{padding:54px 22px 32px}.r-hero__title{font-size:36px}.r-hero__sub{font-size:14.5px}}
+
+/* ─── TOPIC CHIPS ─── */
+.r-topics{background:var(--surface);border-top:1px solid var(--hair-soft);border-bottom:1px solid var(--hair-soft);padding:24px 36px;position:sticky;top:62px;z-index:40;}
+.r-topics__inner{max-width:1100px;margin:0 auto;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.r-topic{display:inline-flex;align-items:center;padding:10px 18px;border:1px solid var(--hair);background:transparent;font-size:12px;letter-spacing:.06em;color:var(--ink-2);font-family:inherit;cursor:pointer;text-decoration:none;transition:all .15s ease;font-weight:500;}
+.r-topic:hover{border-color:var(--ink);color:var(--ink);}
+@media(max-width:760px){.r-topics{padding:18px 22px;top:56px;}.r-topic{padding:8px 14px;font-size:11.5px;}}
+
+/* ─── BODY ─── */
+.r-page{max-width:920px;margin:0 auto;padding:64px 36px 80px;}
+@media(max-width:760px){.r-page{padding:44px 22px 60px;}}
+
+.r-section{padding:48px 0;border-top:1px solid var(--hair-soft);scroll-margin-top:160px;}
+.r-section:first-child{border-top:none;padding-top:8px;}
+.r-section__eyebrow{font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);font-weight:500;margin-bottom:14px;}
+.r-section__h{font-family:Fraunces,Georgia,serif;font-size:36px;font-weight:300;letter-spacing:-.018em;line-height:1.15;margin:0 0 12px;color:var(--ink);text-wrap:balance;}
+.r-section__sub{font-size:15px;line-height:1.7;color:var(--ink-3);margin:0 0 28px;max-width:640px;}
+@media(max-width:760px){.r-section{padding:36px 0;scroll-margin-top:140px;}.r-section__h{font-size:26px;}}
+
+/* ─── ACCORDION ─── */
+.r-acc{margin:0;padding:0;list-style:none;}
+.r-acc__item{
+  border-top:1px solid var(--hair-soft);
+}
+.r-acc__item:last-child{border-bottom:1px solid var(--hair-soft);}
+.r-acc__item summary{
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+  padding:22px 0;
+  font-size:16px;font-weight:500;color:var(--ink);
+  cursor:pointer;list-style:none;
+  line-height:1.45;
+  -webkit-tap-highlight-color:transparent;
+}
+.r-acc__item summary::-webkit-details-marker{display:none;}
+.r-acc__item summary:hover{color:var(--gold);}
+.r-acc__item summary::after{
+  content:"";
+  flex-shrink:0;
+  width:14px;height:14px;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none'><path d='M3 5.5l4 4 4-4' stroke='%231a1a1a' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat:no-repeat;background-position:center;
+  transition:transform .25s ease;
+}
+.r-acc__item[open] summary::after{transform:rotate(180deg);}
+.r-acc__body{
+  font-size:15px;line-height:1.75;color:var(--ink-2);
+  padding:0 0 24px;
+  max-width:680px;
+  text-wrap:pretty;
+}
+.r-acc__body p{margin:0 0 12px;}
+.r-acc__body p:last-child{margin-bottom:0;}
+.r-acc__body strong{color:var(--ink);font-weight:600;}
+.r-acc__body a{color:var(--gold);border-bottom:1px solid var(--gold);}
+.r-acc__body a:hover{border-bottom-color:transparent;}
+
+/* ─── CONTACT ─── */
+.r-contact{background:var(--surface);border-top:1px solid var(--hair-soft);padding:80px 36px;}
+.r-contact__inner{max-width:760px;margin:0 auto;text-align:center;}
+.r-contact__eyebrow{font-size:10.5px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);font-weight:500;margin-bottom:18px;}
+.r-contact__h{font-family:Fraunces,Georgia,serif;font-size:38px;font-weight:300;letter-spacing:-.018em;line-height:1.15;margin:0 0 14px;color:var(--ink);text-wrap:balance;}
+.r-contact__sub{font-size:15px;line-height:1.7;color:var(--ink-3);margin:0 auto 38px;max-width:560px;}
+.r-form{text-align:left;display:grid;gap:18px;}
+.r-form__row{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+@media(max-width:600px){.r-form__row{grid-template-columns:1fr;}}
+.r-field{display:flex;flex-direction:column;gap:6px;}
+.r-field__label{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-mute);font-weight:500;}
+.r-field__input,.r-field__select,.r-field__area{
+  padding:13px 16px;
+  font-family:inherit;font-size:15px;color:var(--ink);
+  background:var(--cream-2);
+  border:1px solid var(--hair);
+  width:100%;
+}
+.r-field__input:focus,.r-field__select:focus,.r-field__area:focus{outline:none;border-color:var(--ink);background:var(--surface);}
+.r-field__area{min-height:140px;resize:vertical;line-height:1.6;}
+.r-field__select{
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'><path d='M3 4.5L6 7.5L9 4.5' stroke='%231a1a1a' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 16px center;
+  padding-right:42px;cursor:pointer;
+}
+.r-form__submit{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  padding:16px 28px;
+  background:var(--ink);color:#fff;
+  font-family:inherit;
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:500;
+  border:none;cursor:pointer;
+  transition:background .2s ease;
+  justify-self:start;
+}
+.r-form__submit:hover{background:#2a2a2a;}
+.r-form__submit svg{width:13px;height:13px;}
+.r-form__note{font-size:12px;color:var(--ink-mute);margin-top:6px;line-height:1.6;}
+
+.r-contact__alt{
+  margin-top:48px;padding-top:36px;
+  border-top:1px solid var(--hair-soft);
+  display:flex;flex-wrap:wrap;gap:28px;justify-content:center;
+  font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:500;
+}
+.r-contact__alt strong{display:block;color:var(--ink-mute);margin-bottom:6px;font-size:10.5px;letter-spacing:.18em;font-weight:500;}
+.r-contact__alt a{color:var(--ink);transition:color .15s ease;letter-spacing:.04em;text-transform:none;font-size:14px;font-weight:400;}
+.r-contact__alt a:hover{color:var(--gold);}
+
+@media(max-width:760px){.r-contact{padding:56px 22px;}.r-contact__h{font-size:28px;}}
+
+/* ─── FOOTER ─── */
+.r-foot{margin-top:0;border-top:1px solid var(--hair-soft);padding:36px;text-align:center;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);font-weight:500;}
+.r-foot a{color:var(--ink-3);transition:color .15s ease;margin:0 14px;}
+.r-foot a:hover{color:var(--ink);}
+.r-foot__copy{margin-top:18px;font-size:10.5px;letter-spacing:.16em;color:var(--ink-mute);}
+@media(max-width:760px){.r-foot{padding:30px 22px}.r-foot a{margin:0 8px;display:inline-block;padding:4px 0;}}
+</style>
+</head>
+<body>
+
+<!-- ═════ NAV ═════ -->
+<nav class="r-nav">
+  <div class="r-nav__inner">
+    <a class="r-nav__logo" href="index.html">Private Mentorship</a>
+    <div class="r-nav__links">
+      <a href="the-assistant.html">The Assistant</a>
+      <a href="custom-plans.html">Custom Plans</a>
+      <a href="assistants.html">Assistants</a>
+      <a href="hiring.html">Hiring</a>
+    </div>
+    <a class="r-nav__cta" href="mailto:hello@privatementorship.ca">Contact</a>
+  </div>
+</nav>
+
+<!-- ═════ HERO ═════ -->
+<section class="r-hero">
+  <div class="r-hero__eyebrow">Help &amp; Support · For Families</div>
+  <h1 class="r-hero__title">How can we help?</h1>
+  <p class="r-hero__sub">Answers to common questions about working with Private Mentorship — scheduling, payments, your Assistant, and what to do if something isn't working.</p>
+</section>
+
+<!-- ═════ TOPIC CHIPS ═════ -->
+<nav class="r-topics" aria-label="Help topics">
+  <div class="r-topics__inner">
+    <a class="r-topic" href="#getting-started">Getting Started</a>
+    <a class="r-topic" href="#scheduling">Scheduling &amp; Flex Tokens</a>
+    <a class="r-topic" href="#payments">Payments &amp; Billing</a>
+    <a class="r-topic" href="#working-with">Working with Your Assistant</a>
+    <a class="r-topic" href="#cancellations">Cancellations &amp; Changes</a>
+    <a class="r-topic" href="#issues">Issues &amp; Concerns</a>
+    <a class="r-topic" href="#contact">Contact Us</a>
+  </div>
+</nav>
+
+<!-- ═════ FAQ SECTIONS ═════ -->
+<main class="r-page">
+
+  <!-- Getting Started -->
+  <section class="r-section" id="getting-started">
+    <div class="r-section__eyebrow">01 · Getting Started</div>
+    <h2 class="r-section__h">How working with Private Mentorship begins.</h2>
+    <p class="r-section__sub">Every introduction is curated and facilitated. Below are the most common questions families ask before their first Engagement.</p>
+
+    <ul class="r-acc">
+      <li class="r-acc__item"><details>
+        <summary>How does Private Mentorship work?</summary>
+        <div class="r-acc__body">
+          <p>Private Mentorship is a marketplace platform that introduces families to self-employed Private Family Assistants. We curate and vet the roster; the day-to-day work happens directly between the family and the Assistant.</p>
+          <p>You browse the roster, request an introduction, meet your selected Assistant in a 3-way intake meeting facilitated by Private Mentorship, then begin the Engagement. We handle the booking, payment, and quality of the roster.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>How are Assistants vetted?</summary>
+        <div class="r-acc__body">
+          <p>Every Assistant on the Platform has been interviewed in person by Private Mentorship, reference-checked, and required to hold a current Criminal Record Check (vulnerable sector) and Standard First Aid + CPR-C. Each Assistant has signed an independent contractor agreement before being introduced to a family.</p>
+          <p>Approximately 30% of applicants are invited to the roster.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>How do I request an introduction?</summary>
+        <div class="r-acc__body">
+          <p>Visit the <a href="assistants.html">Assistants</a> page, browse the roster, and click "Request Introduction" on any profile. Private Mentorship will follow up by email within one business day to schedule a 20-minute intake call.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>What happens at the intake call?</summary>
+        <div class="r-acc__body">
+          <p>The intake call is a brief conversation between you and Private Mentorship. We learn about the family's situation, schedule, and what you are looking for. We confirm that the Assistant you have selected is the right fit — or, if not, we suggest alternatives.</p>
+          <p>After the intake call, we schedule a 30-minute 3-way meeting in person or by video — you, the Assistant, and Private Mentorship.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>How is this different from a typical home-care agency?</summary>
+        <div class="r-acc__body">
+          <p>A typical agency employs caregivers, dispatches them on shifts, and adds significant overhead to your hourly rate. Private Mentorship operates differently: the Assistant is an independent contractor who works directly with you, on a schedule the two of you agree on, at a flat hourly rate.</p>
+          <p>We are responsible for the quality of the roster, the introduction, and the contractual framework. The Assistant is responsible for delivering the Services.</p>
+        </div>
+      </details></li>
+    </ul>
+  </section>
+
+  <!-- Scheduling -->
+  <section class="r-section" id="scheduling">
+    <div class="r-section__eyebrow">02 · Scheduling &amp; Flex Tokens</div>
+    <h2 class="r-section__h">Hours, calendar, and changes.</h2>
+    <p class="r-section__sub">How sessions are scheduled, and how to make changes without losing hours.</p>
+
+    <ul class="r-acc">
+      <li class="r-acc__item"><details>
+        <summary>How is the schedule set?</summary>
+        <div class="r-acc__body">
+          <p>Once your Engagement begins, you and your Assistant agree on the days, times, and duration of sessions directly. Private Mentorship provides the platform with scheduling and messaging tools, but does not set or direct the schedule.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>What are Flex Tokens?</summary>
+        <div class="r-acc__body">
+          <p>Each Engagement includes <strong>three Flex Tokens</strong>. A Flex Token is a single-use credit that lets you cancel or reschedule any session — including with short notice — without losing the hour from the Engagement balance. Tokens are pooled, so they cover any combination of cancellations and reschedules.</p>
+          <p>Flex Tokens reset at the start of each new Engagement and do not roll over.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>What happens after my Flex Tokens are used?</summary>
+        <div class="r-acc__body">
+          <p>After your three Flex Tokens are used, the standard rule applies:</p>
+          <p>· Cancellations or reschedules <strong>more than 24 hours</strong> before the scheduled start: no charge, the hour is preserved.<br>· Cancellations or reschedules <strong>less than 24 hours</strong> before the scheduled start: the hour counts as used.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>Can I change the schedule mid-contract?</summary>
+        <div class="r-acc__body">
+          <p>Yes. Schedule changes are coordinated directly between you and your Assistant through the Platform's messaging. As long as the change happens with reasonable notice (24+ hours), there is no penalty.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>What if my Assistant is sick?</summary>
+        <div class="r-acc__body">
+          <p>If your Assistant cannot attend a session, the hour is rescheduled at no cost to you. If a Backup Assistant has been pre-cleared with you at the start of the Engagement, they may step in for individual sessions.</p>
+          <p>You always retain the right to decline a substitute and reschedule with your primary Assistant instead.</p>
+        </div>
+      </details></li>
+    </ul>
+  </section>
+
+  <!-- Payments -->
+  <section class="r-section" id="payments">
+    <div class="r-section__eyebrow">03 · Payments &amp; Billing</div>
+    <h2 class="r-section__h">How payment works.</h2>
+    <p class="r-section__sub">One payment per Engagement. Automatically split between the Assistant and Private Mentorship.</p>
+
+    <ul class="r-acc">
+      <li class="r-acc__item"><details>
+        <summary>How much does it cost?</summary>
+        <div class="r-acc__body">
+          <p>Standard Engagements are <strong>$30 per hour</strong>. Common contract sizes:</p>
+          <p>· 24 hours per month — $720<br>· 40 hours per month — $1,200<br>· Custom Plans (80 / 160 / 240 hours) — $2,400 / $4,800 / $7,200</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>How and when do I pay?</summary>
+        <div class="r-acc__body">
+          <p>You pay the full Engagement Fee through the Platform at the start of the Engagement. Payment is processed by Stripe.</p>
+          <p>The fee is automatically split: <strong>70%</strong> is routed to the Assistant as each session is delivered. <strong>30%</strong> is retained by Private Mentorship as a Platform Fee.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>What does the 30% Platform Fee cover?</summary>
+        <div class="r-acc__body">
+          <p>The Platform Fee covers vetting and recruitment of every Assistant, payment processing, the booking and messaging platform, ongoing introduction to qualified families, dispute resolution, and the contractual framework that makes the engagement secure for both sides.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>Can I pay bi-weekly instead of upfront?</summary>
+        <div class="r-acc__body">
+          <p>For Custom Plans III and IV (engagements over $5,000), bi-weekly billing is available on request. Please ask during the intake call.</p>
+          <p>Standard 24-hour and 40-hour Engagements are paid upfront.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>What happens to unused hours?</summary>
+        <div class="r-acc__body">
+          <p>Hours unused at the end of an Engagement period either roll forward into a new Engagement (with mutual agreement) or are refunded out of the unreleased Platform escrow.</p>
+        </div>
+      </details></li>
+    </ul>
+  </section>
+
+  <!-- Working with -->
+  <section class="r-section" id="working-with">
+    <div class="r-section__eyebrow">04 · Working with Your Assistant</div>
+    <h2 class="r-section__h">Day-to-day expectations.</h2>
+    <p class="r-section__sub">Once the Engagement starts, the working relationship is between you and the Assistant.</p>
+
+    <ul class="r-acc">
+      <li class="r-acc__item"><details>
+        <summary>What can my Assistant help with?</summary>
+        <div class="r-acc__body">
+          <p>Each Assistant's profile lists their specialties. Common categories include: senior care, childcare, disability support, life skills, light housekeeping, errands, driving, tutoring, and general family operations. Discuss specifics with your Assistant during the introduction meeting.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>Who directs the day-to-day work?</summary>
+        <div class="r-acc__body">
+          <p>You do. The family directs the day-to-day work in the home. Private Mentorship does not supervise sessions or dictate how the Assistant delivers the work. If you would like the Assistant to focus more time on a particular area, simply ask them.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>Can I ask my Assistant to do extra tasks?</summary>
+        <div class="r-acc__body">
+          <p>Yes, within their specialties and within the agreed hours. If the task is significantly outside their stated specialties (for example, a complex medical task), discuss it with the Assistant first. Tasks that require additional time beyond your booked hours should be booked through the Platform.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>Should I tip my Assistant?</summary>
+        <div class="r-acc__body">
+          <p>Tipping is not expected. The Engagement Fee is the agreed compensation. If you would like to acknowledge exceptional work, a thank-you note or a small holiday gift is more in keeping with the spirit of the relationship than cash tipping.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>What if my Assistant needs to bring a Backup?</summary>
+        <div class="r-acc__body">
+          <p>If your Assistant cannot personally attend a session, they may arrange for another vetted Assistant from the Platform roster to attend in their place — but only with your prior approval. You are entitled to meet the Backup before agreeing. We recommend pre-clearing one Backup at the start of every Engagement.</p>
+        </div>
+      </details></li>
+    </ul>
+  </section>
+
+  <!-- Cancellations -->
+  <section class="r-section" id="cancellations">
+    <div class="r-section__eyebrow">05 · Cancellations &amp; Changes</div>
+    <h2 class="r-section__h">Ending or changing an Engagement.</h2>
+    <p class="r-section__sub">Engagements are flexible. Here is what to expect when things change.</p>
+
+    <ul class="r-acc">
+      <li class="r-acc__item"><details>
+        <summary>How do I cancel or reschedule a single session?</summary>
+        <div class="r-acc__body">
+          <p>Message your Assistant directly through the Platform. If a Flex Token is available, the change is free of charge. If your Flex Tokens have been used and the change is within 24 hours of the scheduled session, the hour counts as used.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>Can I cancel the whole Engagement early?</summary>
+        <div class="r-acc__body">
+          <p>Yes. Either you or your Assistant may end the Engagement at any time. Unused hours are either credited toward an Engagement with a different Assistant on the Platform, or refunded out of the unreleased Platform escrow.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>What if my Assistant cancels often?</summary>
+        <div class="r-acc__body">
+          <p>If you are experiencing repeated short-notice cancellations from your Assistant, please contact Private Mentorship. We will review the pattern and either work with the Assistant directly or suggest a switch.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>Can I switch to a different Assistant?</summary>
+        <div class="r-acc__body">
+          <p>Yes, at any time. Unused hours from your existing Engagement are credited against a new Engagement with the replacement Assistant. There is no penalty.</p>
+        </div>
+      </details></li>
+    </ul>
+  </section>
+
+  <!-- Issues -->
+  <section class="r-section" id="issues">
+    <div class="r-section__eyebrow">06 · Issues &amp; Concerns</div>
+    <h2 class="r-section__h">When something isn't working.</h2>
+    <p class="r-section__sub">Private Mentorship stands behind every match. Reach out anytime.</p>
+
+    <ul class="r-acc">
+      <li class="r-acc__item"><details>
+        <summary>What if I'm not happy with my Assistant?</summary>
+        <div class="r-acc__body">
+          <p>Tell us. Private Mentorship will speak with both parties and either resolve the issue, switch you to a different Assistant on the roster, or refund the unused portion of your Engagement Fee.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>What if my Assistant damages something?</summary>
+        <div class="r-acc__body">
+          <p>Every Assistant on the Platform is required to carry personal commercial liability insurance. Notify Private Mentorship immediately and we will help you connect with the Assistant's insurer.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>What if there is a safety concern?</summary>
+        <div class="r-acc__body">
+          <p>For any immediate safety concern, call <strong>911</strong> first. Then notify Private Mentorship as soon as practicable. We take all safety concerns seriously and will investigate within 24 hours.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>How do I escalate to Private Mentorship?</summary>
+        <div class="r-acc__body">
+          <p>The contact form at the bottom of this page reaches us directly. For urgent matters, email <a href="mailto:support@privatementorship.ca">support@privatementorship.ca</a>. We respond to all messages within one business day.</p>
+        </div>
+      </details></li>
+    </ul>
+  </section>
+
+</main>
+
+<!-- ═════ CONTACT FORM ═════ -->
+<section class="r-contact" id="contact">
+  <div class="r-contact__inner">
+    <div class="r-contact__eyebrow">Didn't Find Your Answer?</div>
+    <h2 class="r-contact__h">Send us a note.</h2>
+    <p class="r-contact__sub">Use the form below and we will reply within one business day. For urgent matters, email <a href="mailto:support@privatementorship.ca" style="color:var(--gold);border-bottom:1px solid var(--gold);">support@privatementorship.ca</a>.</p>
+
+    <form class="r-form" id="helpForm" name="family-help" method="POST" data-netlify="true" data-netlify-honeypot="bot-field">
+      <input type="hidden" name="form-name" value="family-help">
+      <p style="position:absolute;left:-5000px;" aria-hidden="true">
+        <label>Do not fill: <input name="bot-field" tabindex="-1" autocomplete="off"></label>
+      </p>
+
+      <div class="r-form__row">
+        <div class="r-field">
+          <label class="r-field__label" for="hName">Name</label>
+          <input class="r-field__input" type="text" id="hName" name="name" required>
+        </div>
+        <div class="r-field">
+          <label class="r-field__label" for="hEmail">Email</label>
+          <input class="r-field__input" type="email" id="hEmail" name="email" required>
+        </div>
+      </div>
+
+      <div class="r-field">
+        <label class="r-field__label" for="hTopic">What is your question about?</label>
+        <select class="r-field__select" id="hTopic" name="topic" required>
+          <option value="">Please select a topic</option>
+          <option value="Getting started">Getting started with Private Mentorship</option>
+          <option value="My Assistant">My Assistant</option>
+          <option value="Scheduling &amp; Flex Tokens">Scheduling and Flex Tokens</option>
+          <option value="Payments &amp; billing">Payments and billing</option>
+          <option value="A specific session">A specific session</option>
+          <option value="Cancellation or change">Cancellation or change</option>
+          <option value="Issues or concerns">Issues or concerns</option>
+          <option value="Switching Assistants">Switching Assistants</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="r-field">
+        <label class="r-field__label" for="hMessage">Message</label>
+        <textarea class="r-field__area" id="hMessage" name="message" placeholder="Briefly describe what you need help with." required></textarea>
+      </div>
+
+      <button class="r-form__submit" type="submit" id="hSubmit">
+        <span class="r-form__submit-label">Send Message</span>
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l5 5-5 5"/></svg>
+      </button>
+      <p class="r-form__note" id="hStatus">Submits to Private Mentorship support. Replies within one business day.</p>
+    </form>
+
+    <div class="r-contact__alt">
+      <div>
+        <strong>Direct Email</strong>
+        <a href="mailto:hello@privatementorship.ca">hello@privatementorship.ca</a>
+      </div>
+      <div>
+        <strong>Support</strong>
+        <a href="mailto:support@privatementorship.ca">support@privatementorship.ca</a>
+      </div>
+      <div>
+        <strong>Emergencies</strong>
+        <a href="tel:911">Call 911 first</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════ FOOTER ═════ -->
+<footer class="r-foot">
+  <div>
+    <a href="index.html">Private Mentorship</a>
+    <a href="the-assistant.html">The Assistant</a>
+    <a href="custom-plans.html">Custom Plans</a>
+    <a href="assistants.html">Assistants</a>
+    <a href="hiring.html">Hiring</a>
+    <a href="family-help.html">Family Help</a>
+    <a href="assistant-help.html">Assistant Help</a>
+  </div>
+  <div class="r-foot__copy">&copy; 2026 Private Mentorship · British Columbia</div>
+</footer>
+
+<script src="js/pm-help-fab.js" defer></script>
+<script>
+  // Submit handler — tries Netlify Forms first, falls back to mailto for dev/non-Netlify.
+  (function(){
+    var form = document.getElementById('helpForm');
+    if (!form) return;
+    var btn = document.getElementById('hSubmit');
+    var btnLabel = btn.querySelector('.r-form__submit-label');
+    var status = document.getElementById('hStatus');
+
+    function encode(data){
+      return Object.keys(data).map(function(k){
+        return encodeURIComponent(k) + '=' + encodeURIComponent(data[k]);
+      }).join('&');
+    }
+    function setBusy(b){
+      btn.disabled = b;
+      btnLabel.textContent = b ? 'Sending…' : 'Send Message';
+    }
+    function fallbackMailto(name, email, topic, message){
+      var subject = encodeURIComponent('Family Help: ' + topic);
+      var body = encodeURIComponent('Name: ' + name + '\nEmail: ' + email + '\nTopic: ' + topic + '\n\n' + message);
+      window.location.href = 'mailto:support@privatementorship.ca?subject=' + subject + '&body=' + body;
+    }
+
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var name = document.getElementById('hName').value.trim();
+      var email = document.getElementById('hEmail').value.trim();
+      var topic = document.getElementById('hTopic').value;
+      var message = document.getElementById('hMessage').value.trim();
+      if (!name || !email || !topic || !message) return;
+
+      setBusy(true);
+      var data = { 'form-name': 'family-help', name: name, email: email, topic: topic, message: message };
+
+      fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: encode(data)
+      }).then(function(r){
+        if (r.ok) {
+          form.style.display = 'none';
+          status.style.display = 'block';
+          status.style.color = '#047857';
+          status.style.fontSize = '15px';
+          status.textContent = 'Thank you. Your message has been sent — Private Mentorship will reply within one business day.';
+        } else {
+          // Probably running locally (Netlify not handling the POST). Fall back to mailto.
+          setBusy(false);
+          fallbackMailto(name, email, topic, message);
+        }
+      }).catch(function(){
+        // Network failure — fall back to mailto.
+        setBusy(false);
+        fallbackMailto(name, email, topic, message);
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

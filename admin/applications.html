@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Applications — Admin · Private Mentorship</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:opsz,ital,wght@9..144,0,300;9..144,0,400;9..144,0,500;9..144,0,600&display=swap">
+<link rel="stylesheet" href="../css/client.css">
+</head>
+<body class="pm-gated-body">
+
+<!-- Gate -->
+<div class="pm-gate" id="pmGate" role="dialog" aria-modal="true">
+  <div class="pm-gate__card">
+    <div class="pm-gate__eyebrow">Admin · Founder Access</div>
+    <h2 class="pm-gate__h">Sign in to view applications.</h2>
+    <p class="pm-gate__sub">This area is reserved for Private Mentorship leadership and ops staff.</p>
+    <form class="pm-gate__form" id="pmGateForm">
+      <div>
+        <label class="pm-gate__label" for="pmGateCode">Admin code</label>
+        <input class="pm-gate__input" type="password" id="pmGateCode" autocomplete="off" required>
+      </div>
+      <p class="pm-gate__error" id="pmGateError" role="alert"></p>
+      <button class="pm-gate__btn" type="submit">Enter Admin</button>
+    </form>
+    <p class="pm-gate__note"><strong>Note.</strong> Placeholder gate during development.</p>
+  </div>
+</div>
+
+<!-- Nav -->
+<nav class="r-nav">
+  <div class="r-nav__inner">
+    <a class="r-nav__logo" href="../index.html">Private Mentorship <span class="r-nav__admin-label">Admin</span></a>
+    <div class="r-nav__links">
+      <a href="../index.html">Site</a>
+      <a href="../assistants.html">Roster</a>
+      <a href="../client/dashboard.html">Client View</a>
+      <a href="dashboard.html" class="is-active">Admin</a>
+    </div>
+    <button class="r-nav__cta" id="pmSignOut" type="button">Sign Out</button>
+  </div>
+</nav>
+
+<div class="cd-shell">
+
+  <!-- Sub-nav -->
+  <nav class="cd-subnav">
+    <div class="cd-subnav__inner">
+      <a class="cd-subnav__item" href="dashboard.html">Overview</a>
+      <a class="cd-subnav__item" href="picks.html">Pick Lists <span class="cd-subnav__count">3</span></a>
+      <a class="cd-subnav__item is-active" href="applications.html">Applications <span class="cd-subnav__count">5</span></a>
+      <a class="cd-subnav__item" href="#" aria-disabled="true" style="opacity:.4;cursor:not-allowed;">Roster</a>
+      <a class="cd-subnav__item" href="#" aria-disabled="true" style="opacity:.4;cursor:not-allowed;">Engagements</a>
+      <a class="cd-subnav__item" href="#" aria-disabled="true" style="opacity:.4;cursor:not-allowed;">Settings</a>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <header class="cd-picks-head">
+    <div class="cd-picks-head__eyebrow">Incoming · Family Applications</div>
+    <h1 class="cd-picks-head__title">Applications awaiting an intake call.</h1>
+    <p class="cd-picks-head__sub">Families have completed the application form. Each family needs a 20-minute intake call with Private Mentorship to confirm fit and discuss next steps.</p>
+  </header>
+
+  <!-- Mock applications -->
+  <section class="ad-section">
+    <div class="ad-section__head">
+      <div>
+        <h2 class="ad-section__title">All family applications</h2>
+        <p class="ad-section__sub">Demo data shown while Supabase backend is being wired up. Real submissions will appear here once auth + database are live.</p>
+      </div>
+      <span class="ad-section__count">5 awaiting intake</span>
+    </div>
+
+    <div class="ad-queue">
+
+      <div class="ad-row">
+        <div class="ad-row__date">
+          <strong>Today</strong>
+          10:30 AM
+        </div>
+        <div class="ad-row__main">
+          <h3 class="ad-row__name">Olivia Martin</h3>
+          <p class="ad-row__meta"><strong>Richmond</strong> · General day-to-day · 24 hr/mo · Email: o.martin@example.com · Phone: 604-555-1188</p>
+          <p class="ad-row__meta" style="margin-top:4px;color:var(--ink-mute);">Family situation: Working parents, two children (5 &amp; 9), need afterschool support and errand help.</p>
+        </div>
+        <span class="ad-row__status ad-row__status--new">New</span>
+        <button class="ad-row__action" type="button">Schedule Intake</button>
+      </div>
+
+      <div class="ad-row">
+        <div class="ad-row__date">
+          <strong>Yesterday</strong>
+          2:02 PM
+        </div>
+        <div class="ad-row__main">
+          <h3 class="ad-row__name">Thompson Family</h3>
+          <p class="ad-row__meta"><strong>Vancouver West</strong> · Senior care · 40 hr/mo · Email: thompson.fam@example.com · Phone: 604-555-2244</p>
+          <p class="ad-row__meta" style="margin-top:4px;color:var(--ink-mute);">Family situation: Mother (84) needs companion care + light housekeeping while son works remotely.</p>
+        </div>
+        <span class="ad-row__status ad-row__status--review">Intake scheduled</span>
+        <button class="ad-row__action" type="button">View</button>
+      </div>
+
+      <div class="ad-row">
+        <div class="ad-row__date">
+          <strong>3 days ago</strong>
+          11:18 AM
+        </div>
+        <div class="ad-row__main">
+          <h3 class="ad-row__name">Park Family</h3>
+          <p class="ad-row__meta"><strong>Burnaby</strong> · Childcare · 24 hr/mo · Email: jpark@example.com · Phone: 604-555-3377</p>
+          <p class="ad-row__meta" style="margin-top:4px;color:var(--ink-mute);">Family situation: Single dad, two teens (13 &amp; 15), need someone to drive to activities and supervise homework.</p>
+        </div>
+        <span class="ad-row__status ad-row__status--new">New</span>
+        <button class="ad-row__action" type="button">Schedule Intake</button>
+      </div>
+
+      <div class="ad-row">
+        <div class="ad-row__date">
+          <strong>4 days ago</strong>
+          9:45 AM
+        </div>
+        <div class="ad-row__main">
+          <h3 class="ad-row__name">Anderson Family</h3>
+          <p class="ad-row__meta"><strong>North Shore</strong> · Custom plan (live-in) · 160+ hr/mo · Email: anderson.h@example.com · Phone: 604-555-4499</p>
+          <p class="ad-row__meta" style="margin-top:4px;color:var(--ink-mute);">Family situation: Father recovering from major surgery, needs structured live-in care 7 days/week for 2 months.</p>
+        </div>
+        <span class="ad-row__status ad-row__status--review">Intake scheduled</span>
+        <button class="ad-row__action" type="button">View</button>
+      </div>
+
+      <div class="ad-row">
+        <div class="ad-row__date">
+          <strong>1 week ago</strong>
+          3:22 PM
+        </div>
+        <div class="ad-row__main">
+          <h3 class="ad-row__name">Kim Family</h3>
+          <p class="ad-row__meta"><strong>Richmond</strong> · Disability support · 20 hr/mo · Email: jkim@example.com · Phone: 604-555-5511</p>
+          <p class="ad-row__meta" style="margin-top:4px;color:var(--ink-mute);">Family situation: Adult son (28) with developmental disability. CLBC-funded. Need community access support.</p>
+        </div>
+        <span class="ad-row__status ad-row__status--handled">Engaged</span>
+        <button class="ad-row__action" type="button">View</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Stats footer -->
+  <section class="ad-stats" style="margin-top:36px;">
+    <div class="ad-stat">
+      <div class="ad-stat__label">This Week</div>
+      <div class="ad-stat__value">5</div>
+      <div class="ad-stat__delta">New applications</div>
+    </div>
+    <div class="ad-stat">
+      <div class="ad-stat__label">Awaiting Intake</div>
+      <div class="ad-stat__value">2</div>
+      <div class="ad-stat__delta">Schedule today</div>
+    </div>
+    <div class="ad-stat">
+      <div class="ad-stat__label">Conversion to Engagement</div>
+      <div class="ad-stat__value">68%</div>
+      <div class="ad-stat__delta"><strong>+8%</strong> vs last month</div>
+    </div>
+    <div class="ad-stat">
+      <div class="ad-stat__label">Average Time to Intake</div>
+      <div class="ad-stat__value">1.2d</div>
+      <div class="ad-stat__delta">Target: under 1 business day</div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Footer -->
+<footer class="r-foot">
+  <div>
+    <a href="../index.html">Private Mentorship</a>
+    <a href="../assistants.html">Public Roster</a>
+    <a href="../client/dashboard.html">Client View</a>
+    <a href="dashboard.html">Admin</a>
+  </div>
+  <div class="r-foot__copy">&copy; 2026 Private Mentorship · British Columbia</div>
+</footer>
+
+<script src="../js/pm-help-fab.js" defer></script>
+<script src="../js/pm-admin-gate.js"></script>
+
+</body>
+</html>

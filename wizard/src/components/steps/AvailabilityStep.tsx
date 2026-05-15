@@ -17,7 +17,7 @@ export default function AvailabilityStep({ state, patch }: Props) {
 
   return (
     <div className="hw-step-enter">
-      <p className="hw-step__eyebrow">Step 9 of 24 · About You</p>
+      <p className="hw-step__eyebrow">Step 10 of 25 · About You</p>
       <h1 className="hw-step__title">Availability</h1>
       <p className="hw-step__sub">
         When you're typically free for sessions. Each contract's exact schedule is co-created with the family at orientation.

@@ -10,7 +10,7 @@ export default function ConsentStep({ state, patch }: Props) {
   const consentReview = !!state.consentReview;
   return (
     <div className="hw-step-enter">
-      <p className="hw-step__eyebrow">Step 2 of 24 · Privacy</p>
+      <p className="hw-step__eyebrow">Step 2 of 25 · Privacy</p>
       <h1 className="hw-step__title">Privacy and Information Sharing</h1>
       <p className="hw-step__sub">
         If accepted, certain profile information is shared with families you're matched with. All personal documents and verification materials remain confidential at all times.

@@ -9,7 +9,7 @@ export default function WelcomeStep({ state, patch }: Props) {
   const ack = !!state.welcomeAck;
   return (
     <div className="hw-step-enter">
-      <p className="hw-step__eyebrow">Step 1 of 24 · Welcome</p>
+      <p className="hw-step__eyebrow">Step 1 of 25 · Welcome</p>
       <h1 className="hw-step__title">Welcome to the Application</h1>
       <p className="hw-step__sub">
         Thank you for your interest in joining Private Mentorship as a Private Family Assistant. Each application is reviewed individually and typically takes about thirty minutes to complete.

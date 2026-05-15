@@ -54,7 +54,7 @@ export default function EarningsStep({ state, patch }: Props) {
 
   return (
     <div className="hw-step-enter">
-      <p className="hw-step__eyebrow">Step 4 of 24 · Compensation</p>
+      <p className="hw-step__eyebrow">Step 4 of 25 · Compensation</p>
       <h1 className="hw-step__title">Compensation and Contract Structure</h1>
       <p className="hw-step__sub">
         Private Family Assistants are engaged as independent contractors. Compensation is built around the type of contract you take on. Below are the standard take-home amounts per contract.

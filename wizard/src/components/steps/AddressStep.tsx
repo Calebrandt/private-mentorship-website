@@ -47,7 +47,7 @@ export default function AddressStep({ state, patch }: Props) {
 
   return (
     <div className="hw-step-enter">
-      <p className="hw-step__eyebrow">Step 6 of 24 · About You</p>
+      <p className="hw-step__eyebrow">Step 7 of 25 · About You</p>
       <h1 className="hw-step__title">Residential Address</h1>
       <p className="hw-step__sub">
         Your address helps us match you with families in your service area. Personal address details are not shared with matched families.

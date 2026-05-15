@@ -267,7 +267,7 @@
   </section>
 
   <footer class="jd-foot">
-    © Private Mentorship · <a href="index.html">Home</a> · <a href="custom-plans.html">Custom Plans</a> · <a href="hiring.html">Hiring</a> · <a href="signin.html">Sign in</a>
+    © Private Mentorship · <a href="index.html">Home</a> · <a href="custom-plans.html">Custom Plans</a> · <a href="assistants.html">Assistants</a> · <a href="hiring.html">Hiring</a> · <a href="family-help.html">Help</a> · <a href="signin.html">Sign in</a>
   </footer>
 
   <div class="jd-toast" id="jdToast"><span id="jdToastText">Done</span></div>
@@ -276,5 +276,6 @@
     (function(){var a=document.getElementById('jd-header-anchor'),b=document.getElementById('jdStickybar');if(!a||!b)return;var o=new IntersectionObserver(function(e){e.forEach(function(x){if(!x.isIntersecting&&x.boundingClientRect.top<0)b.classList.add('is-visible');else b.classList.remove('is-visible');})},{threshold:0});o.observe(a);})();
     (function(){var f=document.getElementById('cpQuoteForm');if(!f)return;f.addEventListener('submit',function(e){e.preventDefault();var n=document.getElementById('cpName').value.trim(),m=document.getElementById('cpEmail').value.trim();if(!n||!m){t('Please fill in your name and email.');return;}t('Got it — we\'ll be in touch within one business day.');f.reset();});var z=null;function t(x){var e=document.getElementById('jdToast');document.getElementById('jdToastText').textContent=x;e.classList.add('is-shown');if(z)clearTimeout(z);z=setTimeout(function(){e.classList.remove('is-shown');},3500);}})();
   </script>
+  <script src="js/pm-help-fab.js" defer></script>
 </body>
 </html>

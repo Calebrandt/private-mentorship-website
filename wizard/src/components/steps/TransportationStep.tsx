@@ -38,7 +38,7 @@ function YesNo({ label, value, onChange }: YesNoProps) {
 export default function TransportationStep({ state, patch }: Props) {
   return (
     <div className="hw-step-enter">
-      <p className="hw-step__eyebrow">Step 7 of 24 · About You</p>
+      <p className="hw-step__eyebrow">Step 8 of 25 · About You</p>
       <h1 className="hw-step__title">Transportation</h1>
       <p className="hw-step__sub">
         Your transportation options affect which contracts you can accept, especially for in-person sessions and community outings.

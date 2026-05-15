@@ -58,7 +58,7 @@ export default function WorkEnvStep({ state, patch }: Props) {
 
   return (
     <div className="hw-step-enter">
-      <p className="hw-step__eyebrow">Step 8 of 24 · About You</p>
+      <p className="hw-step__eyebrow">Step 9 of 25 · About You</p>
       <h1 className="hw-step__title">Session Locations</h1>
       <p className="hw-step__sub">
         Sessions are delivered at the client's home, the assistant's home, in the community, or online. Please confirm where you are comfortable delivering sessions.
