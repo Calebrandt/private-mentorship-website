@@ -50,7 +50,7 @@
       { type: 'link', href: 'messages.html', label: 'Inbox', icon: 'message', dynamicBadge: 'messages-unread' },
       { type: 'section', label: 'Work' },
       { type: 'link', href: 'assistant-clients.html', label: 'My Clients', icon: 'users' },
-      { type: 'link', href: 'assistant-schedule.html', label: 'My Schedule', icon: 'calendar' },
+      { type: 'link', href: 'assistant-schedule.html', label: 'My Schedule', icon: 'calendar', dynamicBadge: 'assistant-needs-attention' },
       { type: 'section', label: 'Earnings' },
       { type: 'link', href: 'assistant-hours.html', label: 'Hours & Payouts', icon: 'clock' },
       { type: 'section', label: 'Profile' },
@@ -404,6 +404,13 @@
       // they participate in.
       try {
         return await window.pmHiring.fetchMyUnreadMessagesCount();
+      } catch (_) { return 0; }
+    }
+    if (kind === 'assistant-needs-attention' && role === 'assistant') {
+      // Past appointments still in 'scheduled' state — assistant must
+      // mark complete or no-show.
+      try {
+        return await window.pmHiring.fetchAssistantNeedsAttentionCount();
       } catch (_) { return 0; }
     }
     if (kind === 'client-picks' && role === 'client') {

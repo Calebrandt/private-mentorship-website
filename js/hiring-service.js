@@ -1023,6 +1023,24 @@
     } catch (_) { return 0; }
   }
 
+  // Assistant: count of past-but-still-scheduled appointments that need the
+  // assistant to mark complete or no-show. Drives the My Schedule sidebar
+  // badge so the assistant sees it without needing to open the page.
+  async function fetchAssistantNeedsAttentionCount() {
+    const user = await getCurrentUser();
+    if (!user) return 0;
+    try {
+      const { count, error } = await sb()
+        .from('appointments')
+        .select('id', { count: 'exact', head: true })
+        .eq('assistant_id', user.id)
+        .eq('status', 'scheduled')
+        .lt('starts_at', new Date().toISOString());
+      if (error) return 0;
+      return Number(count) || 0;
+    } catch (_) { return 0; }
+  }
+
   // Unread message count for the signed-in user, across all conversations
   // they participate in. Used by the Messages sidebar badge for every role.
   // Definition: messages I haven't read AND that weren't sent by me.
@@ -2156,6 +2174,8 @@
     adminFetchPendingMembershipRequestsCount, adminFetchPendingApplicationsCount,
     // sidebar badges — messages unread (any role)
     fetchMyUnreadMessagesCount,
+    // sidebar badge — assistant My Schedule
+    fetchAssistantNeedsAttentionCount,
     // assistant-side (Phase 3)
     updateMyAssistantProfile, fetchMyAssistantHoursLedger,
     // admin: clients
