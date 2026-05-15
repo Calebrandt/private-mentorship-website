@@ -258,7 +258,13 @@
   async function fetchCurrentUserProfile() {
     const user = await getCurrentUser();
     if (!user) return null;
-    const { data, error } = await sb().from('profiles').select('id, role, email, phone_number_e164, phone_verified, full_name').eq('id', user.id).maybeSingle();
+    // NOTE: profiles PK is user_id (not id). Earlier code queried `id=eq.X`
+    // and silently failed on every page that called this — fixed 2026-05-15.
+    const { data, error } = await sb()
+      .from('profiles')
+      .select('user_id, role, email, phone_number_e164, phone_verified, full_name')
+      .eq('user_id', user.id)
+      .maybeSingle();
     if (error) {
       console.warn('fetchCurrentUserProfile failed', error);
       return null;
@@ -1094,9 +1100,11 @@
 
   // List the families this assistant is engaged with — based on contracts.
   // Returns one row per contract with a `client` shape attached.
-  // Statuses included: active, paused, pending, draft. Closed contracts
-  // (cancelled, ended) are excluded by default; pass `statuses` to override.
-  async function fetchMyAssignedClients({ statuses = ['active','paused','pending','draft'] } = {}) {
+  // Default statuses match the contract_status enum: active + draft.
+  // (Older versions of this function included 'paused' and 'pending' which
+  // are NOT in the enum — Postgres 400'd the entire query. Fixed 2026-05-15.)
+  // Pass `statuses` to override.
+  async function fetchMyAssignedClients({ statuses = ['active','draft'] } = {}) {
     const user = await getCurrentUser();
     if (!user) return [];
     try {
@@ -1156,7 +1164,8 @@
         .select('id, client_id, assistant_id, status, start_at, end_at, included_minutes, renewal_mode, notes')
         .eq('client_id', clientId)
         .eq('assistant_id', user.id)
-        .in('status', ['active','paused','pending','draft'])
+        // contract_status enum: draft/active/expired/completed/cancelled
+        .in('status', ['active','draft'])
         .order('start_at', { ascending: false })
         .limit(1)
         .maybeSingle();
