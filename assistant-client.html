@@ -61,9 +61,13 @@
   }
   .wc-modal-backdrop[data-open="true"]{display:flex;}
   .wc-modal{
-    background:#fff;border-radius:14px;padding:28px;max-width:540px;width:calc(100% - 32px);
+    background:#fff;border-radius:14px;padding:22px 24px;max-width:540px;width:calc(100% - 32px);
+    max-height:calc(100vh - 40px);overflow-y:auto;
     box-shadow:0 24px 60px -12px rgba(15,23,42,0.35);
   }
+  .wc-modal__title{margin-bottom:6px;}
+  .wc-modal__body{margin:0 0 14px;line-height:1.5;}
+  .wc-modal__row{margin:0 0 14px;padding:9px 13px;}
   .wc-modal__title{font-family:"Archivo","Inter",sans-serif;font-size:18px;font-weight:800;letter-spacing:-.01em;color:#0F172A;margin:0 0 8px;}
   .wc-modal__body{font-size:13.5px;color:#475569;margin:0 0 18px;line-height:1.6;}
   .wc-modal__row{
@@ -88,7 +92,7 @@
   /* Slot picker (mirrors assistant-schedule slot picker) */
   .wc-slot-group{
     background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;
-    padding:12px;margin-bottom:10px;display:grid;grid-template-columns:1fr 1fr auto auto;gap:8px;align-items:end;
+    padding:10px 12px;margin-bottom:8px;display:grid;grid-template-columns:1fr 1fr auto auto;gap:8px;align-items:end;
   }
   .wc-slot-group__label{
     grid-column:1 / -1;font-size:10.5px;font-weight:700;letter-spacing:.08em;
@@ -123,7 +127,7 @@
   .wc-textarea-row textarea{
     width:100%;border:1px solid #CBD5E1;border-radius:8px;
     padding:9px 11px;font:500 13px Inter,sans-serif;color:#0F172A;
-    resize:vertical;min-height:64px;
+    resize:vertical;min-height:52px;
   }
   .wc-textarea-row textarea:focus{outline:none;border-color:#0071e3;box-shadow:0 0 0 2px #DCEBFC;}
 
@@ -370,33 +374,40 @@
     <div id="wcBookSlots"></div>
     <button type="button" class="wc-add-slot" id="wcBookAddSlot">+ Add another option</button>
 
-    <div class="wc-billing-row" style="margin-top:16px;">
+    <div class="wc-billing-row" style="margin-top:14px;">
       <div class="wc-billing-row__head">
         <div class="wc-billing-row__label">Billing</div>
-        <button type="button" class="wc-billing-row__help" id="wcBookHelpToggle" aria-expanded="false">What's this?</button>
+        <button type="button" class="wc-billing-row__help" id="wcBookHelpToggle" aria-expanded="false">How billing works</button>
       </div>
       <div class="wc-billing-row__opts">
         <label class="wc-billing-opt">
           <input type="radio" name="wcBookBilling" value="standard" checked>
           <span class="wc-billing-opt__title">Standard</span>
-          <span class="wc-billing-opt__sub">Hours deduct from the family's contract when you mark it complete</span>
+          <span class="wc-billing-opt__sub">Hours deduct from the family's contract on completion</span>
         </label>
         <label class="wc-billing-opt">
           <input type="radio" name="wcBookBilling" value="complimentary">
           <span class="wc-billing-opt__title">Complimentary</span>
-          <span class="wc-billing-opt__sub">No deduction — make-up, courtesy, follow-up, brief check-in</span>
+          <span class="wc-billing-opt__sub">No deduction — make-up, courtesy, brief check-in</span>
         </label>
       </div>
       <div class="wc-billing-help" id="wcBookHelp" hidden>
-        <p class="wc-billing-help__head">When to choose Complimentary</p>
+        <p class="wc-billing-help__head">Standard billing</p>
+        <p>Each family bought a contract with a set number of hours (e.g. 24 hr/month). When you mark a Standard session <strong>complete</strong>, the session's hours are deducted from that contract balance automatically. This is the default — most sessions are Standard.</p>
+
+        <p class="wc-billing-help__head" style="margin-top:12px;">Complimentary billing</p>
+        <p>No deduction. Use it when the session shouldn't cost the family hours:</p>
         <ul>
-          <li><strong>Make-up session</strong> — you cancelled a previous one and want to make the family whole.</li>
-          <li><strong>Brief check-in or follow-up</strong> — a quick conversation that isn't a full session.</li>
-          <li><strong>Onboarding / trial session</strong> — a first meeting on the house to get going.</li>
-          <li><strong>Goodwill courtesy</strong> — something you're doing as a kindness, not on the clock.</li>
+          <li><strong>Make-up</strong> — you cancelled a previous session and want to make the family whole.</li>
+          <li><strong>Brief check-in / follow-up</strong> — a short conversation that isn't a real session.</li>
+          <li><strong>Onboarding or trial session</strong> — a first meeting on the house.</li>
+          <li><strong>Goodwill</strong> — extra time you're giving as a kindness.</li>
         </ul>
-        <p class="wc-billing-help__note">You're a contractor — <strong>you decide</strong> when a session is complimentary. Just remember: every choice is logged in the audit trail forever (sessions can never be erased). If a family ever disputes hours, this record protects everyone.</p>
-        <p class="wc-billing-help__note">Default is <strong>Standard</strong> — most sessions bill normally from the contract.</p>
+
+        <p class="wc-billing-help__head" style="margin-top:12px;">Carry-over hours (coming soon)</p>
+        <p>When a contract ends with unused hours (almost every family has 2–15 left over), those hours move into a "bank balance" the family can use for longer sessions, study intensives, special outings, or extras outside the recurring schedule. Once that system is live, you'll be able to suggest the family use those banked hours instead of letting them sit.</p>
+
+        <p class="wc-billing-help__note">You're a contractor — you decide which billing fits each session. Every choice is logged in the audit trail forever (sessions can never be erased or rewritten). If a family ever disputes hours, this record protects you and them.</p>
       </div>
     </div>
 
