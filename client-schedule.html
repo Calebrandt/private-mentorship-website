@@ -939,6 +939,24 @@
     if (!activeAppointment) return;
     const apt = activeAppointment;
     const reason = $('cancelReason').value;
+
+    // Phase 7.2: if family is at/over their token budget, require explicit
+    // confirmation since hours will be deducted. (Soft pre-check; the RPC
+    // does the actual deduction atomically.)
+    if (tokenStatus && tokenStatus.over_budget) {
+      const dur = apt.ends_at
+        ? Math.round((new Date(apt.ends_at).getTime() - new Date(apt.starts_at).getTime()) / 60000)
+        : null;
+      const hrs = dur ? Math.round((dur/60)*10)/10 : null;
+      const proceed = confirm(
+        `You're out of reschedule/cancel tokens for this contract.\n\n` +
+        `If you cancel this session, ${hrs ? hrs + ' hr' + (hrs===1?'':'s') : 'the full session length'} ` +
+        `will be deducted from your contract.\n\n` +
+        `Continue?`
+      );
+      if (!proceed) return; // button stays enabled, nothing changes
+    }
+
     const btn = $('cancelSubmit');
     btn.disabled = true; btn.textContent = 'Cancelling…';
     try {
@@ -986,14 +1004,28 @@
     const newStart = new Date(`${date}T${time}:00`);
     if (Number.isNaN(newStart.getTime())) { showToast('Invalid date/time', 'error'); return; }
     if (newStart.getTime() < Date.now()) { showToast('New time must be in the future', 'error'); return; }
-    const btn = $('reschedSubmit');
-    btn.disabled = true; btn.textContent = 'Submitting…';
-
     // Compute duration from current appointment if available
     let durationMin = 60;
     if (apt.ends_at) {
       durationMin = Math.round((new Date(apt.ends_at).getTime() - new Date(apt.starts_at).getTime()) / 60000);
     }
+
+    // Phase 7.2: if at/over token budget, warn that hours will be deducted
+    // when admin approves. (Reschedules consume a token at admin-approval
+    // time, not at submit, so the warning is about the eventual outcome.)
+    if (tokenStatus && tokenStatus.over_budget) {
+      const hrs = Math.round((durationMin/60)*10)/10;
+      const proceed = confirm(
+        `You're out of reschedule/cancel tokens for this contract.\n\n` +
+        `If your admin approves this reschedule, ${hrs} hr${hrs===1?'':'s'} ` +
+        `will be deducted from your contract.\n\n` +
+        `Send the request anyway?`
+      );
+      if (!proceed) return;
+    }
+
+    const btn = $('reschedSubmit');
+    btn.disabled = true; btn.textContent = 'Submitting…';
 
     // Phase 5.5: soft availability check against the assigned assistant.
     try {
