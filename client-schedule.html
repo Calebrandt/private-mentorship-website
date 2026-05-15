@@ -129,6 +129,20 @@
   .nx-contract__remaining-num small{font-size:18px;font-weight:700;color:var(--ink-mute);margin-left:6px;letter-spacing:-.015em;}
   .nx-contract__remaining-label{font-size:12px;color:var(--ink-mute);margin:6px 0 0;font-weight:600;letter-spacing:-.005em;}
 
+  /* Phase 12: bank-hours chip — only renders when banked_hours > 0 */
+  .nx-contract__bank{
+    display:inline-flex;align-items:center;gap:6px;
+    margin-top:10px;font-size:11.5px;font-weight:700;
+    letter-spacing:.04em;text-transform:uppercase;
+    padding:4px 11px;border-radius:9999px;
+    background:linear-gradient(135deg,#FFFBEB,#FEF3C7);
+    color:#92400E;border:1px solid #FDE68A;
+  }
+  .nx-contract__bank::before{
+    content:'';width:6px;height:6px;border-radius:50%;background:#D97706;
+    box-shadow:0 0 0 2px rgba(217,119,6,0.18);
+  }
+
   /* Token warning — only renders when low or out. Sits below "remaining".
      Quiet typography, subtle hue. No pill background — premium minimal. */
   .nx-contract__token-warn{
@@ -719,12 +733,13 @@
   const in30 = new Date(nowDate.getTime() + 30*86400000);
   const past60 = new Date(nowDate.getTime() - 60*86400000);
 
-  let [pattern, upcoming, past, pendingReqs, tokenStatus] = await Promise.all([
+  let [pattern, upcoming, past, pendingReqs, tokenStatus, bankSummary] = await Promise.all([
     contract ? window.pmHiring.fetchMyRecurringPattern(contract.id).catch(()=>[]) : Promise.resolve([]),
     window.pmHiring.fetchMyAppointments({ statuses:['scheduled'], fromDate: nowDate.toISOString(), toDate: in30.toISOString(), limit: 30, ascending: true }).catch(()=>[]),
     window.pmHiring.fetchMyAppointments({ statuses:['completed','cancelled','late_cancelled','no_show'], fromDate: past60.toISOString(), toDate: nowDate.toISOString(), limit: 30, ascending: false }).catch(()=>[]),
     window.pmHiring.fetchMyPendingScheduleRequests().catch(()=>[]),
     contract ? window.pmHiring.fetchContractTokenStatus(contract.id).catch(()=>null) : Promise.resolve(null),
+    window.pmHiring.fetchMyBankSummary().catch(()=>null),
   ]);
   // Phase 7: helper string for the modal subtitle — uses contract token language
   // throughout (no "free changes" — they're reschedule/cancel tokens).
@@ -786,12 +801,18 @@
           ${(() => {
             if (!tokenStatus) return '';
             const left = tokenStatus.tokens_remaining;
-            if (left >= 2) return ''; // plentiful — keep card clean
+            if (left >= 2) return '';
             if (left === 1) {
               return `<p class="nx-contract__token-warn nx-contract__token-warn--low">1 token left</p>`;
             }
-            // left === 0
             return `<p class="nx-contract__token-warn nx-contract__token-warn--out">No tokens left · changes deduct hours</p>`;
+          })()}
+          ${(() => {
+            // Phase 12: surface banked hours when there are any. Premium
+            // gold chip; only renders when bankSummary.banked_hours > 0.
+            const banked = Number(bankSummary?.banked_hours || 0);
+            if (banked <= 0) return '';
+            return `<p class="nx-contract__bank">+${banked} hr banked</p>`;
           })()}
         </div>
       </div>

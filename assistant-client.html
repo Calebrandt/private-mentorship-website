@@ -189,12 +189,19 @@
   .wc-toast--error{background:#991B1B;}
 
   /* KPI tiles */
-  .wc-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px;}
-  @media(max-width:780px){.wc-kpis{grid-template-columns:1fr;}}
+  .wc-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:18px;}
   .wc-kpi{background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:18px 20px;}
   .wc-kpi__label{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#94A3B8;margin:0 0 6px;}
   .wc-kpi__value{font-family:"Archivo","Inter",sans-serif;font-size:28px;font-weight:800;color:#0F172A;letter-spacing:-.018em;line-height:1;}
   .wc-kpi__sub{font-size:12px;color:#64748B;margin:6px 0 0;}
+  /* Phase 12: bank-hours tile — premium gold treatment so it reads as "saved up" */
+  .wc-kpi--bank{
+    background:linear-gradient(135deg,#FFFBEB,#FEF3C7);
+    border-color:#FDE68A;
+  }
+  .wc-kpi--bank .wc-kpi__label{color:#92400E;}
+  .wc-kpi--bank .wc-kpi__value{color:#78350F;}
+  .wc-kpi--bank .wc-kpi__sub{color:#92400E;}
 
   /* Two-col layout */
   .wc-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
@@ -300,6 +307,11 @@
         <p class="wc-kpi__label">Upcoming</p>
         <span class="wc-kpi__value" id="kpiUpcoming">—</span>
         <p class="wc-kpi__sub">scheduled sessions</p>
+      </div>
+      <div class="wc-kpi wc-kpi--bank" id="kpiBankTile" hidden>
+        <p class="wc-kpi__label">Bank hours</p>
+        <span class="wc-kpi__value" id="kpiBank">—</span>
+        <p class="wc-kpi__sub">carried over from past contracts</p>
       </div>
     </section>
 
@@ -504,6 +516,18 @@ function renderAppointmentRow(a){
   document.getElementById('kpiPlan').textContent = planHours;
   document.getElementById('kpiUsed').textContent = usedHours;
   document.getElementById('kpiUpcoming').textContent = (ws.upcomingAppointments || []).length;
+
+  // Phase 12: show bank-hours tile if the family has any saved-up hours
+  // (or has had carryover events). Hidden when zero AND no history, so
+  // the layout stays clean for new families.
+  try {
+    const bank = await window.pmHiring.fetchClientBankSummary(clientId);
+    const bankHrs = bank?.banked_hours || 0;
+    if (bankHrs > 0) {
+      document.getElementById('kpiBank').textContent = bankHrs;
+      document.getElementById('kpiBankTile').hidden = false;
+    }
+  } catch (_) {}
 
   // Upcoming
   const upcomingList = document.getElementById('upcomingList');

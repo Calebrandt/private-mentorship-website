@@ -1030,6 +1030,56 @@
     } catch (_) { return 0; }
   }
 
+  // ─── Phase 12: Bank-hours (carryover store) ─────────────────────────
+  // Reads client_bank_balance and contract_carryover_events. UI surfaces
+  // banked hours so families can use leftover minutes after a contract
+  // expires, instead of having them silently vanish.
+
+  async function fetchClientBankSummary(clientId) {
+    if (!clientId) return { banked_minutes: 0, banked_hours: 0 };
+    try {
+      const { data, error } = await sb().rpc('get_client_bank_summary', {
+        p_client_id: clientId,
+      });
+      if (error) { console.warn('fetchClientBankSummary', error); return null; }
+      return data || { banked_minutes: 0, banked_hours: 0 };
+    } catch (_) { return null; }
+  }
+
+  async function fetchMyBankSummary() {
+    try {
+      const clientId = await _myClientId();
+      if (!clientId) return null;
+      return await fetchClientBankSummary(clientId);
+    } catch (_) { return null; }
+  }
+
+  async function fetchClientBankHistory(clientId, { limit = 50 } = {}) {
+    if (!clientId) return [];
+    try {
+      const { data, error } = await sb()
+        .from('contract_carryover_events')
+        .select('id, source_contract_id, minutes_delta, reason, meta, created_at, created_by')
+        .eq('client_id', clientId)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+      if (error) return [];
+      return data || [];
+    } catch (_) { return []; }
+  }
+
+  async function adminAdjustBankBalance({ clientId, minutesDelta, reason = null }) {
+    if (!clientId) throw new Error('clientId required');
+    if (!minutesDelta || Number.isNaN(Number(minutesDelta))) throw new Error('minutesDelta required');
+    const { data, error } = await sb().rpc('admin_adjust_bank_balance', {
+      p_client_id: clientId,
+      p_minutes_delta: Number(minutesDelta),
+      p_reason: reason,
+    });
+    if (error) throw error;
+    return data;
+  }
+
   // ─── Phase 7: Change-token status (counter + warnings) ──────────────
   // Reads v_contract_balance + contract_policy_limits via the
   // get_contract_token_status RPC. Returns {tokens_used, tokens_total,
@@ -2400,6 +2450,9 @@
     fetchContractFreezes, adminListContractsForFreezeUI,
     // Phase 7 — change-token status (3-free policy)
     fetchContractTokenStatus, fetchMyContractTokenStatus,
+    // Phase 12 — bank-hours (leftover carryover)
+    fetchClientBankSummary, fetchMyBankSummary, fetchClientBankHistory,
+    adminAdjustBankBalance,
     // assistant-side (Phase 3)
     updateMyAssistantProfile, fetchMyAssistantHoursLedger,
     // admin: clients

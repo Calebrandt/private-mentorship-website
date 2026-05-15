@@ -251,9 +251,143 @@ body.is-gated .pm-gate{opacity:1;pointer-events:auto;}
     </ul>
   </section>
 
+  <!-- How the System Works (new, Phase 13) -->
+  <section class="r-section" id="how-it-works">
+    <div class="r-section__eyebrow">03 · How the System Works</div>
+    <h2 class="r-section__h">The contract, hours, and automation behind every session.</h2>
+    <p class="r-section__sub">Behind the friendly buttons is a precise system that tracks every minute, every contract, every change. Understanding it makes you a better contractor and protects you if anything is ever disputed.</p>
+
+    <ul class="r-acc">
+
+      <li class="r-acc__item"><details>
+        <summary>What is a contract? Why does it matter to me?</summary>
+        <div class="r-acc__body">
+          <p>A <strong>contract</strong> is the agreement between Private Mentorship and the family. It defines:</p>
+          <ul>
+            <li>How many hours they bought (e.g. 24 hours per month)</li>
+            <li>The service period (start date → end date)</li>
+            <li>Whether it auto-renews when it ends</li>
+            <li>Which assistant is assigned (you, in your case)</li>
+          </ul>
+          <p>Every session you do is attached to a contract. The contract is the source of truth for what the family is owed and what they've used. If the contract ends or pauses, the system behavior changes automatically — you don't have to remember the dates.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>What happens behind the scenes every 15 minutes?</summary>
+        <div class="r-acc__body">
+          <p>A background job runs every 15 minutes that does the following automatically:</p>
+          <ul>
+            <li>Expires contracts past their end date</li>
+            <li>For families on auto-renew, creates the next contract</li>
+            <li>Generates the next batch of reserved appointments for active contracts (the recurring weekly slots)</li>
+            <li>Updates the contract history log</li>
+            <li>Migrates any leftover hours to the family's "bank balance" so they don't disappear</li>
+          </ul>
+          <p>You don't have to trigger this. You don't have to remember. It just runs.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>Standard vs Complimentary sessions — what's the difference?</summary>
+        <div class="r-acc__body">
+          <p>When you book a new session, you pick the billing type:</p>
+          <p><strong>Standard</strong> (the default) — the session deducts hours from the family's contract when you mark it complete. This is most sessions.</p>
+          <p><strong>Complimentary</strong> — no hours are deducted. Use this for:</p>
+          <ul>
+            <li><strong>Make-ups</strong> when you cancelled an earlier session and want to make the family whole</li>
+            <li><strong>Brief check-ins</strong> or follow-ups that aren't a full session</li>
+            <li><strong>Onboarding or trial sessions</strong> — a first meeting on the house</li>
+            <li><strong>Goodwill courtesy</strong> — extra time you're giving as a kindness</li>
+          </ul>
+          <p>You decide which fits. Every choice is permanently logged. Comp sessions still show up in the family's history — just without the hours charge.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>What are "tokens"? Why am I sometimes warned about hours being deducted?</summary>
+        <div class="r-acc__body">
+          <p>Every family gets <strong>3 free reschedule/cancel tokens per contract period</strong>. Using one of these doesn't cost them hours — it just consumes a token. After all 3 are used, any further reschedule or cancel deducts the full session length from the family's contract.</p>
+          <p>This is the same rule whether the family or you (the assistant) initiates the change. The system enforces it automatically — you'll see a confirmation popup before any change that would deduct hours.</p>
+          <p>This is why you sometimes see "X reschedule/cancel tokens remaining" in the booking modals — it's the family's protection against overspending without warning.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>What are "bank hours" or "carryover hours"?</summary>
+        <div class="r-acc__body">
+          <p>Almost every contract ends with a few hours unused — life happens. Those hours don't disappear. They migrate to a <strong>bank balance</strong> on the family's account.</p>
+          <p>Bank hours are great for:</p>
+          <ul>
+            <li>A <strong>longer-than-usual session</strong> the family wants</li>
+            <li>An <strong>extra session</strong> outside the recurring weekly schedule</li>
+            <li><strong>Special situations</strong> — study intensives, life-skills outings, sports time</li>
+            <li>A make-up window weeks after the original missed session</li>
+          </ul>
+          <p>You'll see the family's bank balance in their per-family workspace. If they have hours sitting there, you can suggest using them rather than letting them accumulate.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>When does an action need admin approval vs happen immediately?</summary>
+        <div class="r-acc__body">
+          <p><strong>Immediate (no admin step):</strong></p>
+          <ul>
+            <li><strong>Cancelling</strong> a session — yours or the family's. No one can be forced to do an appointment, so cancels go through right away.</li>
+            <li><strong>Marking a session complete</strong> or as a no-show — your call as the assistant.</li>
+            <li><strong>Editing your profile</strong>, publishing your availability, setting blackouts — your domain.</li>
+          </ul>
+          <p><strong>Needs admin approval:</strong></p>
+          <ul>
+            <li><strong>Rescheduling</strong> a session — admin confirms the new time works.</li>
+            <li><strong>Booking a new (extra) session</strong> outside the recurring schedule — admin reviews.</li>
+            <li><strong>Changing a family's plan / contract size</strong> — never something the assistant does.</li>
+          </ul>
+          <p>Anything that needs admin will be filed for review automatically when you submit. You'll see "Pending review" until it's approved.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>What if a family pauses (e.g. goes on a long trip)?</summary>
+        <div class="r-acc__body">
+          <p>Families sometimes take long trips — 2-3 months overseas, summer travel, etc. When this happens, the admin can <strong>freeze the contract</strong>. While frozen:</p>
+          <ul>
+            <li>No new sessions get auto-generated</li>
+            <li>No hours are deducted</li>
+            <li>The contract's end date gets pushed out by the freeze length, so they don't lose time</li>
+            <li>When they return, the freeze ends and service resumes normally</li>
+          </ul>
+          <p>If a family tells you they'll be away for a while, route it through admin — they'll set up the freeze.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>Is anything I do ever erased? Can I undo things?</summary>
+        <div class="r-acc__body">
+          <p><strong>No. Nothing is ever erased.</strong> Sessions can't be deleted. Cancellations stay in the history. Mark-completes can't be reverted by you. Hours ledger entries are immutable.</p>
+          <p>This is on purpose. If a family ever disputes whether a session happened, what was charged, or what was offered for free — the audit trail is the definitive record. It protects you as much as it protects the business.</p>
+          <p>If something is genuinely wrong (e.g. you marked the wrong session complete by accident), reach out to admin — they can write a correcting entry, but the original entry stays forever as part of the audit trail.</p>
+        </div>
+      </details></li>
+
+      <li class="r-acc__item"><details>
+        <summary>What if I'm not sure what something means?</summary>
+        <div class="r-acc__body">
+          <p>Two paths:</p>
+          <ul>
+            <li>Most booking modals have a <strong>"How billing works"</strong> or similar explainer link — open it. It's there for exactly this moment.</li>
+            <li>If it's a one-off question and you can't find an answer in this help page, message Caleb directly. Some things are easier to explain in person, and over time those answers will end up back in this document.</li>
+          </ul>
+          <p>You're a contractor, not an employee. Asking is how good contractors stay sharp.</p>
+        </div>
+      </details></li>
+
+    </ul>
+  </section>
+
   <!-- Payments & Taxes -->
   <section class="r-section" id="payments-taxes">
-    <div class="r-section__eyebrow">03 · Payments &amp; Taxes</div>
+    <div class="r-section__eyebrow">04 · Payments &amp; Taxes</div>
     <h2 class="r-section__h">Getting paid and filing your taxes.</h2>
     <p class="r-section__sub">You are self-employed. Here is how that works in practice.</p>
 
@@ -316,7 +450,7 @@ body.is-gated .pm-gate{opacity:1;pointer-events:auto;}
 
   <!-- Working with Clients -->
   <section class="r-section" id="clients">
-    <div class="r-section__eyebrow">04 · Working with Clients</div>
+    <div class="r-section__eyebrow">05 · Working with Clients</div>
     <h2 class="r-section__h">Day-to-day Client relationships.</h2>
     <p class="r-section__sub">Communication, boundaries, and the things that come up.</p>
 
@@ -361,7 +495,7 @@ body.is-gated .pm-gate{opacity:1;pointer-events:auto;}
 
   <!-- Cancellations & Backups -->
   <section class="r-section" id="cancellations">
-    <div class="r-section__eyebrow">05 · Cancellations &amp; Backups</div>
+    <div class="r-section__eyebrow">06 · Cancellations &amp; Backups</div>
     <h2 class="r-section__h">When you can't make it.</h2>
     <p class="r-section__sub">Illness, emergencies, and how Backups work.</p>
 
@@ -407,7 +541,7 @@ body.is-gated .pm-gate{opacity:1;pointer-events:auto;}
 
   <!-- Your Contractor Status -->
   <section class="r-section" id="status">
-    <div class="r-section__eyebrow">06 · Your Contractor Status</div>
+    <div class="r-section__eyebrow">07 · Your Contractor Status</div>
     <h2 class="r-section__h">Self-employment basics.</h2>
     <p class="r-section__sub">What it means to be an independent contractor, and what to do if anyone questions your status.</p>
 
