@@ -7,7 +7,7 @@
     admin: [
       { type: 'link', href: 'admin-dashboard.html', label: 'Dashboard', icon: 'dashboard' },
       { type: 'link', href: 'admin-clients.html', label: 'Clients', icon: 'users' },
-      { type: 'link', href: 'admin-scheduling.html', label: 'Scheduling', icon: 'calendar' },
+      { type: 'link', href: 'admin-schedule-requests.html', label: 'Scheduling', icon: 'calendar', dynamicBadge: 'admin-schedule-requests', match: ['admin-schedule-requests.html', 'admin-scheduling.html'] },
       { type: 'link', href: 'admin-hiring.html', label: 'Hiring', icon: 'briefcase', badge: null, match: ['admin-hiring.html', 'admin-application.html'] },
       { type: 'link', href: 'admin-financials.html', label: 'Financials', icon: 'dollar' },
       { type: 'link', href: 'messages.html', label: 'Messages', icon: 'message' },
