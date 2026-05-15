@@ -577,9 +577,25 @@
 
   // Submit all shortlisted picks → status becomes 'introduction_requested'.
   // Returns { ok, submitted_count, submitted_at }.
+  //
+  // Side-effect: fires the notify-pick-submission edge function asynchronously
+  // so the owner gets an email when picks land. Failure to email is silent —
+  // the picks have still been recorded server-side.
   async function submitPicks() {
     const { data, error } = await sb().rpc('client_submit_picks');
     if (error) throw error;
+
+    // Best-effort email notification — never blocks the user.
+    (async () => {
+      try {
+        const clientId = await getCurrentClientId();
+        if (!clientId) return;
+        await sb().functions.invoke('notify-pick-submission', { body: { clientId } });
+      } catch (e) {
+        console.warn('notify-pick-submission failed (non-blocking):', e);
+      }
+    })();
+
     return data;
   }
 

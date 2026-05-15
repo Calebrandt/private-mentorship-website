@@ -384,8 +384,31 @@ async function reload(){
 
 (async function init(){
   await new Promise(r => setTimeout(r, 300));  // wait for sidebar.js auth
-  reload();
+  await reload();
+  subscribeToPicks();
 })();
+
+// ─── Realtime: refresh when client_assistant_picks changes anywhere ────
+function subscribeToPicks(){
+  if (!window.pmSupabase || !window.pmSupabase.channel) return;
+  let pending = false;
+  const channel = window.pmSupabase
+    .channel('admin-intro-requests')
+    .on('postgres_changes',
+      { event: '*', schema: 'public', table: 'client_assistant_picks' },
+      () => {
+        // Coalesce rapid bursts into a single reload
+        if (pending) return;
+        pending = true;
+        setTimeout(async () => { pending = false; await reload(); }, 400);
+      }
+    )
+    .subscribe();
+  // Tidy on unload
+  window.addEventListener('beforeunload', () => {
+    try { window.pmSupabase.removeChannel(channel); } catch(_) {}
+  });
+}
 </script>
 
 </body>

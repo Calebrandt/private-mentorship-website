@@ -621,7 +621,32 @@ document.getElementById('caModalAddBtn').addEventListener('click', async () => {
   }
   await refreshPicks();
   renderRoster();
+  subscribeToMyPicks();
 })();
+
+/* ─── Realtime: pick status updates from admin show up live ─── */
+function subscribeToMyPicks(){
+  if (!window.pmSupabase || !window.pmSupabase.channel) return;
+  let pending = false;
+  const channel = window.pmSupabase
+    .channel('client-assistants-picks')
+    .on('postgres_changes',
+      { event: '*', schema: 'public', table: 'client_assistant_picks' },
+      () => {
+        if (pending) return;
+        pending = true;
+        setTimeout(async () => {
+          pending = false;
+          await refreshPicks();
+          renderRoster();
+        }, 400);
+      }
+    )
+    .subscribe();
+  window.addEventListener('beforeunload', () => {
+    try { window.pmSupabase.removeChannel(channel); } catch(_) {}
+  });
+}
 </script>
 
 </body>

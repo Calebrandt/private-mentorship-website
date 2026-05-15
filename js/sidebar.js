@@ -16,10 +16,9 @@
         type: 'group', label: 'Tools', icon: 'tools',
         items: [
           { href: 'admin-schedule-requests.html', label: 'Schedule Requests', icon: 'inbox' },
-          { href: 'admin-membership-requests.html', label: 'Membership Requests', icon: 'briefcase' },
-          { href: 'admin-create-client.html', label: 'Create Client', icon: 'user-plus' },
-          { href: 'admin-intro-requests.html', label: 'Intro Requests', icon: 'inbox' },
           { href: 'admin-membership-requests.html', label: 'Membership Requests', icon: 'inbox' },
+          { href: 'admin-intro-requests.html', label: 'Intro Requests', icon: 'inbox', dynamicBadge: 'admin-intro-requests' },
+          { href: 'admin-create-client.html', label: 'Create Client', icon: 'user-plus' },
           { href: 'admin-family-management.html', label: 'Family Management', icon: 'users' },
           { href: 'admin-education.html', label: 'Education / Homework', icon: 'book' },
           { href: 'admin-tasks.html', label: 'Tasks', icon: 'check' },
@@ -40,7 +39,7 @@
       { type: 'link', href: 'client-membership.html', label: 'Membership', icon: 'briefcase' },
       { type: 'link', href: 'client-contract.html', label: 'Contract Details', icon: 'file-clock' },
       { type: 'section', label: 'People' },
-      { type: 'link', href: 'client-assistants.html', label: 'My Assistant', icon: 'user-circle' },
+      { type: 'link', href: 'client-assistants.html', label: 'My Assistant', icon: 'user-circle', dynamicBadge: 'client-picks' },
       { type: 'link', href: 'client-account.html', label: 'My Family', icon: 'users' },
       { type: 'link', href: 'client-resources.html', label: 'Resources', icon: 'folder' },
       { type: 'section', label: 'Give' },
@@ -89,18 +88,25 @@
   function renderLink(item){
     const active = isLinkActive(item) ? ' is-active' : '';
     const badge = item.badge ? `<span class="pm-sb-link__badge">${escapeHtml(item.badge)}</span>` : '';
-    return `<a class="pm-sb-link${active}" href="${escapeHtml(item.href)}">
+    const dynAttr = item.dynamicBadge ? ` data-dynamic-badge="${escapeHtml(item.dynamicBadge)}"` : '';
+    const dynSlot = item.dynamicBadge ? `<span class="pm-sb-link__badge" data-badge-slot hidden></span>` : '';
+    return `<a class="pm-sb-link${active}" href="${escapeHtml(item.href)}"${dynAttr}>
       <span class="pm-sb-link__icon">${ICONS[item.icon] || ICONS.folder}</span>
       <span class="pm-sb-link__label">${escapeHtml(item.label)}</span>
-      ${badge}
+      ${badge}${dynSlot}
     </a>`;
   }
 
   function renderGroup(group){
-    const items = (group.items || []).map(it => `<a class="pm-sb-link${isLinkActive(it) ? ' is-active' : ''}" href="${escapeHtml(it.href)}">
-      <span class="pm-sb-link__icon">${ICONS[it.icon] || ICONS.folder}</span>
-      <span class="pm-sb-link__label">${escapeHtml(it.label)}</span>
-    </a>`).join('');
+    const items = (group.items || []).map(it => {
+      const dynAttr = it.dynamicBadge ? ` data-dynamic-badge="${escapeHtml(it.dynamicBadge)}"` : '';
+      const dynSlot = it.dynamicBadge ? `<span class="pm-sb-link__badge" data-badge-slot hidden></span>` : '';
+      return `<a class="pm-sb-link${isLinkActive(it) ? ' is-active' : ''}" href="${escapeHtml(it.href)}"${dynAttr}>
+        <span class="pm-sb-link__icon">${ICONS[it.icon] || ICONS.folder}</span>
+        <span class="pm-sb-link__label">${escapeHtml(it.label)}</span>
+        ${dynSlot}
+      </a>`;
+    }).join('');
     const anyActive = (group.items || []).some(isLinkActive);
     return `<div class="pm-sb-group${anyActive ? ' is-open' : ''}">
       <button class="pm-sb-group__toggle" type="button" data-toggle-group>
@@ -274,7 +280,62 @@
     target.outerHTML = buildSidebar({ user, profile, role });
     document.body.classList.add('pm-has-sidebar');
     wire();
+    loadDynamicBadges(role).catch(() => {});
   }
+
+  // ─── Dynamic sidebar badges ─────────────────────────────────────────────
+  // After the sidebar renders, each link with a [data-dynamic-badge] attribute
+  // looks up an async count and renders a number badge if > 0. Counts are
+  // computed via the existing service layer functions — no extra RPCs.
+  async function loadDynamicBadges(role){
+    if (!window.pmHiring) return;
+
+    const slots = document.querySelectorAll('[data-dynamic-badge]');
+    if (!slots.length) return;
+
+    // Compute counts in parallel
+    const tasks = {};
+    slots.forEach(el => {
+      const kind = el.getAttribute('data-dynamic-badge');
+      if (!tasks[kind]) tasks[kind] = computeBadgeCount(kind, role);
+    });
+
+    await Promise.all(Object.entries(tasks).map(async ([kind, task]) => {
+      let count = 0;
+      try { count = await task; } catch (_) { count = 0; }
+      document.querySelectorAll(`[data-dynamic-badge="${kind}"] [data-badge-slot]`).forEach(slot => {
+        if (count > 0) {
+          slot.textContent = String(count);
+          slot.hidden = false;
+        } else {
+          slot.hidden = true;
+        }
+      });
+    }));
+  }
+
+  async function computeBadgeCount(kind, role){
+    if (kind === 'admin-intro-requests' && role === 'admin') {
+      // Open picks = anything not yet engaged/declined
+      try {
+        const picks = await window.pmHiring.adminListPicks({ statuses: [
+          'introduction_requested','meeting_scheduled','meeting_complete'
+        ]});
+        return (picks || []).length;
+      } catch (_) { return 0; }
+    }
+    if (kind === 'client-picks' && role === 'client') {
+      try {
+        const picks = await window.pmHiring.fetchMyPicks();
+        // Only count open picks (not declined/engaged)
+        return (picks || []).filter(p =>
+          ['shortlisted','introduction_requested','meeting_scheduled','meeting_complete'].includes(p.status)
+        ).length;
+      } catch (_) { return 0; }
+    }
+    return 0;
+  }
+
 
   if (document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', mount);
