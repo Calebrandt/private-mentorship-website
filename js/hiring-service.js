@@ -793,6 +793,32 @@
     }
   }
 
+  // ─── Phase 2: Appointment status writes (RPC wrappers) ───────────────────
+  // Each of these calls a SECURITY DEFINER RPC that:
+  //   • verifies the caller is the appointment's assistant
+  //   • verifies status='scheduled' and the session has started
+  //   • flips status to the terminal state
+  //   • writes exactly one hours_ledger row in the same transaction
+  //
+  // Both throw if the RPC raises an exception — callers should catch and
+  // surface the error message to the user.
+
+  async function assistantMarkAppointmentComplete(appointmentId) {
+    const { data, error } = await sb().rpc('assistant_mark_appointment_complete', {
+      p_appointment_id: appointmentId,
+    });
+    if (error) throw error;
+    return data;
+  }
+
+  async function assistantMarkAppointmentNoShow(appointmentId) {
+    const { data, error } = await sb().rpc('assistant_mark_appointment_no_show', {
+      p_appointment_id: appointmentId,
+    });
+    if (error) throw error;
+    return data;
+  }
+
   // List the families this assistant is engaged with — based on contracts.
   // Returns one row per contract with a `client` shape attached.
   // Statuses included: active, paused, pending, draft. Closed contracts
@@ -1837,6 +1863,8 @@
     // assistant-side (Phase 2)
     fetchMyAssignedClients, fetchAssistantClientWorkspace,
     fetchAssistantAppointmentsRange,
+    // scheduler Phase 2 — appointment status writes
+    assistantMarkAppointmentComplete, assistantMarkAppointmentNoShow,
     // assistant-side (Phase 3)
     updateMyAssistantProfile, fetchMyAssistantHoursLedger,
     // admin: clients

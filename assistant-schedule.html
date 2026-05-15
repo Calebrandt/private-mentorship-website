@@ -128,6 +128,82 @@
     text-align:center;padding:28px 16px;color:#94A3B8;
     font-size:12.5px;line-height:1.55;border:1px dashed #E2E8F0;border-radius:10px;
   }
+
+  /* "Needs your attention" — action row */
+  .as-action-card{border:1px solid #FED7AA;background:linear-gradient(to bottom right, #FFFBEB, #FFFFFF);}
+  .as-action-card .as-card__title{color:#9A3412;}
+  .as-action-row{
+    display:grid;grid-template-columns:90px 1fr auto auto;gap:14px;align-items:center;
+    padding:16px 4px;border-bottom:1px solid #FEF3C7;
+  }
+  .as-action-row:last-child{border-bottom:0;}
+  .as-action-row__hours{font-size:12.5px;font-weight:700;color:#475569;font-variant-numeric:tabular-nums;}
+  .as-action-row__btns{display:flex;gap:8px;}
+  .as-btn{
+    font-size:12px;font-weight:700;letter-spacing:-.005em;
+    padding:7px 14px;border-radius:9999px;cursor:pointer;
+    border:1px solid transparent;transition:all .15s ease;
+    font-family:inherit;
+    display:inline-flex;align-items:center;gap:5px;
+  }
+  .as-btn--complete{background:#16A34A;color:#fff;border-color:#15803D;}
+  .as-btn--complete:hover{background:#15803D;}
+  .as-btn--complete:disabled{background:#94A3B8;border-color:#94A3B8;cursor:wait;}
+  .as-btn--no-show{background:#fff;color:#B91C1C;border-color:#FECACA;}
+  .as-btn--no-show:hover{background:#FEF2F2;border-color:#FCA5A5;}
+  .as-btn--no-show:disabled{opacity:.5;cursor:wait;}
+
+  /* Confirm modal */
+  .as-modal-backdrop{
+    position:fixed;inset:0;background:rgba(15,23,42,0.5);
+    display:none;align-items:center;justify-content:center;z-index:1000;
+    animation:as-fade .15s ease;
+  }
+  .as-modal-backdrop[data-open="true"]{display:flex;}
+  @keyframes as-fade{from{opacity:0}to{opacity:1}}
+  .as-modal{
+    background:#fff;border-radius:14px;padding:28px;max-width:440px;width:calc(100% - 32px);
+    box-shadow:0 24px 60px -12px rgba(15,23,42,0.35);
+    animation:as-pop .15s ease;
+  }
+  @keyframes as-pop{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
+  .as-modal__title{font-family:"Archivo","Inter",sans-serif;font-size:18px;font-weight:800;letter-spacing:-.01em;color:#0F172A;margin:0 0 8px;}
+  .as-modal__body{font-size:13.5px;color:#475569;margin:0 0 18px;line-height:1.6;}
+  .as-modal__body strong{color:#0F172A;}
+  .as-modal__row{
+    background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;
+    padding:10px 14px;margin:0 0 18px;font-size:13px;
+    display:flex;flex-direction:column;gap:3px;
+  }
+  .as-modal__row b{color:#0F172A;}
+  .as-modal__actions{display:flex;gap:10px;justify-content:flex-end;}
+  .as-modal__cancel{
+    background:#fff;color:#475569;border:1px solid #E2E8F0;
+    padding:9px 18px;border-radius:9999px;font:600 13px Inter,sans-serif;cursor:pointer;
+  }
+  .as-modal__cancel:hover{background:#F8FAFC;}
+  .as-modal__confirm{
+    color:#fff;border:none;padding:9px 18px;border-radius:9999px;
+    font:700 13px Inter,sans-serif;cursor:pointer;
+  }
+  .as-modal__confirm--complete{background:#16A34A;}
+  .as-modal__confirm--complete:hover{background:#15803D;}
+  .as-modal__confirm--no-show{background:#DC2626;}
+  .as-modal__confirm--no-show:hover{background:#B91C1C;}
+  .as-modal__confirm:disabled{opacity:.6;cursor:wait;}
+
+  /* Toast */
+  .as-toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:#0F172A;color:#fff;padding:11px 18px;border-radius:9999px;
+    font-size:13px;font-weight:600;letter-spacing:-.005em;
+    box-shadow:0 10px 30px -6px rgba(15,23,42,0.4);
+    display:none;z-index:1100;
+    animation:as-slide-up .25s ease;
+  }
+  .as-toast[data-open="true"]{display:block;}
+  .as-toast--error{background:#991B1B;}
+  @keyframes as-slide-up{from{transform:translate(-50%,12px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 </style>
 </head>
 <body class="pm-has-sidebar">
@@ -179,6 +255,17 @@
     </div>
   </div>
 
+  <!-- Needs your attention (past sessions still scheduled — assistant must mark) -->
+  <div class="as-card as-action-card" id="asNeedsCard" hidden>
+    <div class="as-card__head">
+      <div class="as-card__titleBlock">
+        <h2 class="as-card__title">Needs your attention</h2>
+        <p class="as-card__sub">Sessions that have already happened — mark each one complete or no-show.</p>
+      </div>
+    </div>
+    <div id="asNeedsWrap"></div>
+  </div>
+
   <!-- Recent history (last 30 days) -->
   <div class="as-card">
     <div class="as-card__head">
@@ -192,6 +279,22 @@
     </div>
   </div>
 </main>
+
+<!-- Confirm modal (mark complete / mark no-show) -->
+<div class="as-modal-backdrop" id="asModal" data-open="false">
+  <div class="as-modal" role="dialog" aria-modal="true" aria-labelledby="asModalTitle">
+    <h3 class="as-modal__title" id="asModalTitle">Confirm</h3>
+    <p class="as-modal__body" id="asModalBody">—</p>
+    <div class="as-modal__row" id="asModalDetails"></div>
+    <div class="as-modal__actions">
+      <button type="button" class="as-modal__cancel" id="asModalCancel">Cancel</button>
+      <button type="button" class="as-modal__confirm" id="asModalConfirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast (success / error) -->
+<div class="as-toast" id="asToast" data-open="false">Done</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515c"></script>
@@ -254,13 +357,16 @@ const state = {
   weekStart: startOfWeek(new Date()),
   appointments: [], // full range (week + ±2w for context)
   upcoming: [],
+  needsAttention: [], // past starts_at && status='scheduled'
   history: [],
 };
 
 async function loadAll(){
   // Pull a wide range in one call so week-paging stays snappy.
+  // Widen the lookback so "needs your attention" can surface past
+  // appointments older than 7 days that nobody's marked yet.
   const now = new Date();
-  const from = addDays(state.weekStart, -7);
+  const from = addDays(state.weekStart, -45);
   const to   = addDays(state.weekStart, 28);
   try {
     state.appointments = await window.pmHiring.fetchAssistantAppointmentsRange({
@@ -269,7 +375,7 @@ async function loadAll(){
     });
   } catch (_) { state.appointments = []; }
 
-  // Upcoming: next 14 days, status=scheduled.
+  // Upcoming: next 14 days, status=scheduled, future.
   const upFrom = now, upTo = addDays(now, 14);
   state.upcoming = (state.appointments || [])
     .filter(a => a.status === 'scheduled')
@@ -278,6 +384,13 @@ async function loadAll(){
       return s >= upFrom && s <= upTo;
     })
     .sort((a,b) => new Date(a.starts_at) - new Date(b.starts_at));
+
+  // Needs attention: status=scheduled but starts_at is in the past.
+  // These are the actionable sessions — assistant must mark complete or no-show.
+  state.needsAttention = (state.appointments || [])
+    .filter(a => a.status === 'scheduled')
+    .filter(a => new Date(a.starts_at) < now)
+    .sort((a,b) => new Date(b.starts_at) - new Date(a.starts_at));
 
   // History: last 30 days, terminal statuses.
   const histFrom = addDays(now, -30);
@@ -291,6 +404,7 @@ async function loadAll(){
 
   renderWeek();
   renderUpcoming();
+  renderNeedsAttention();
   renderHistory();
 }
 
@@ -369,6 +483,141 @@ function rowHtml(a){
     <span class="as-row__hours">${escapeHtml(hoursLabel(min))}</span>
     <span class="as-status as-status--${escapeHtml(status)}">${escapeHtml(statusLabel(status))}</span>
   </div>`;
+}
+
+// ─── Phase 2: Needs-attention rendering + actions ──────────────────────
+function renderNeedsAttention(){
+  const card = document.getElementById('asNeedsCard');
+  const wrap = document.getElementById('asNeedsWrap');
+  if (!state.needsAttention.length) {
+    card.hidden = true;
+    wrap.innerHTML = '';
+    return;
+  }
+  card.hidden = false;
+  wrap.innerHTML = `<div class="as-list">` + state.needsAttention.map(a => {
+    const d = new Date(a.starts_at);
+    const dateMain = d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    const dateYear = d.getFullYear();
+    const time = fmtTime(d);
+    const clientName = a.client?.full_name || (a.client_id ? 'Client ' + a.client_id.slice(0,6) : '—');
+    const min = durationOf(a);
+    return `<div class="as-action-row" data-appt-id="${escapeHtml(a.id)}">
+      <div class="as-row__date">${escapeHtml(dateMain)}<small>${escapeHtml(String(dateYear))} · ${escapeHtml(time)}</small></div>
+      <div class="as-row__body">
+        <div class="as-row__client">${escapeHtml(clientName)}</div>
+        <div class="as-row__meta">${escapeHtml(a.title || a.notes || 'Session')}</div>
+      </div>
+      <span class="as-action-row__hours">${escapeHtml(hoursLabel(min))}</span>
+      <div class="as-action-row__btns">
+        <button type="button" class="as-btn as-btn--complete" data-action="complete" data-appt-id="${escapeHtml(a.id)}">
+          ✓ Mark complete
+        </button>
+        <button type="button" class="as-btn as-btn--no-show" data-action="no-show" data-appt-id="${escapeHtml(a.id)}">
+          No-show
+        </button>
+      </div>
+    </div>`;
+  }).join('') + `</div>`;
+
+  // Wire up button clicks
+  wrap.querySelectorAll('button[data-action]').forEach(btn => {
+    btn.addEventListener('click', () => openConfirm(btn.dataset.action, btn.dataset.apptId));
+  });
+}
+
+// ─── Confirm modal ─────────────────────────────────────────────────────
+let pendingAction = null; // { kind: 'complete'|'no-show', apptId }
+
+function openConfirm(kind, apptId){
+  const appt = state.needsAttention.find(a => a.id === apptId);
+  if (!appt) return;
+  pendingAction = { kind, apptId };
+
+  const d = new Date(appt.starts_at);
+  const dateStr = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+  const time = fmtTime(d);
+  const min = durationOf(appt);
+  const clientName = appt.client?.full_name || '—';
+
+  const modal = document.getElementById('asModal');
+  const title = document.getElementById('asModalTitle');
+  const body  = document.getElementById('asModalBody');
+  const details = document.getElementById('asModalDetails');
+  const confirm = document.getElementById('asModalConfirm');
+
+  if (kind === 'complete') {
+    title.textContent = 'Mark session complete?';
+    body.innerHTML = `This will record the session as <strong>completed</strong> and deduct <strong>${escapeHtml(hoursLabel(min))}</strong> from this family's contract.`;
+    confirm.className = 'as-modal__confirm as-modal__confirm--complete';
+    confirm.textContent = 'Mark complete';
+  } else {
+    title.textContent = 'Mark as no-show?';
+    body.innerHTML = `This will record a <strong>no-show</strong> for this session and forfeit <strong>${escapeHtml(hoursLabel(min))}</strong> from this family's contract.`;
+    confirm.className = 'as-modal__confirm as-modal__confirm--no-show';
+    confirm.textContent = 'Mark no-show';
+  }
+
+  details.innerHTML = `
+    <span><b>Family:</b> ${escapeHtml(clientName)}</span>
+    <span><b>When:</b> ${escapeHtml(dateStr)} at ${escapeHtml(time)}</span>
+    <span><b>Duration:</b> ${escapeHtml(hoursLabel(min))}</span>
+    <span><b>Session:</b> ${escapeHtml(appt.title || appt.notes || '—')}</span>
+  `;
+  modal.dataset.open = 'true';
+}
+
+function closeConfirm(){
+  pendingAction = null;
+  const modal = document.getElementById('asModal');
+  modal.dataset.open = 'false';
+  const confirm = document.getElementById('asModalConfirm');
+  confirm.disabled = false;
+}
+
+async function executeConfirm(){
+  if (!pendingAction) return;
+  const { kind, apptId } = pendingAction;
+  const confirm = document.getElementById('asModalConfirm');
+  confirm.disabled = true;
+  try {
+    if (kind === 'complete') {
+      await window.pmHiring.assistantMarkAppointmentComplete(apptId);
+      toast('Session marked complete.');
+    } else {
+      await window.pmHiring.assistantMarkAppointmentNoShow(apptId);
+      toast('Session marked as no-show.');
+    }
+    closeConfirm();
+    await loadAll(); // re-fetch so the row moves to Recent history
+  } catch (err) {
+    console.warn('Action failed:', err);
+    const msg = err?.message || 'Something went wrong. Try again.';
+    toast(msg, /* isError */ true);
+    confirm.disabled = false;
+  }
+}
+
+document.getElementById('asModalCancel').addEventListener('click', closeConfirm);
+document.getElementById('asModalConfirm').addEventListener('click', executeConfirm);
+document.getElementById('asModal').addEventListener('click', (e) => {
+  if (e.target.id === 'asModal') closeConfirm(); // click on backdrop
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('asModal').dataset.open === 'true') {
+    closeConfirm();
+  }
+});
+
+// ─── Toast ────────────────────────────────────────────────────────────
+let toastTimer = null;
+function toast(message, isError = false){
+  const el = document.getElementById('asToast');
+  el.textContent = message;
+  el.classList.toggle('as-toast--error', !!isError);
+  el.dataset.open = 'true';
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.dataset.open = 'false'; }, isError ? 4500 : 2200);
 }
 
 // Wire week nav
