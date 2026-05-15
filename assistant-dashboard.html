@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard — Private Mentorship Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,500&display=swap" />
+<link rel="stylesheet" href="js/sidebar.css?v=20260515a" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#F4F5F7;color:#0F172A;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+
+  .ad-shell{padding:36px 32px 80px;max-width:1240px;margin:0 auto;}
+
+  /* Hero */
+  .ad-hero{margin-bottom:28px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+  .ad-hero__body{flex:1;min-width:260px;}
+  .ad-eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#0071e3;margin:0 0 8px;}
+  .ad-h1{font-family:"Archivo","Inter",sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0 0 6px;color:#0F172A;}
+  .ad-sub{font-size:14px;color:#64748B;margin:0;line-height:1.55;max-width:620px;}
+  .ad-hero__date{
+    font-size:13px;color:#475569;font-weight:600;letter-spacing:.02em;
+    background:#fff;border:1px solid #E2E8F0;border-radius:9999px;padding:8px 18px;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+
+  /* KPI tiles */
+  .ad-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;}
+  @media(max-width:780px){.ad-kpis{grid-template-columns:1fr;}}
+  .ad-kpi{
+    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    padding:22px;display:flex;flex-direction:column;gap:6px;
+  }
+  .ad-kpi__label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#94A3B8;margin:0;}
+  .ad-kpi__value{font-family:"Archivo","Inter",sans-serif;font-size:36px;font-weight:800;letter-spacing:-.02em;color:#0F172A;line-height:1;}
+  .ad-kpi__sub{font-size:12.5px;color:#64748B;margin:6px 0 0;}
+
+  /* Section card */
+  .ad-section{
+    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    margin-bottom:18px;overflow:hidden;
+  }
+  .ad-section__head{padding:18px 22px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .ad-section__title{font-family:"Archivo","Inter",sans-serif;font-size:17px;font-weight:800;letter-spacing:-.01em;color:#0F172A;margin:0;}
+  .ad-section__sub{font-size:12.5px;color:#64748B;margin:2px 0 0;line-height:1.5;}
+  .ad-section__action{
+    font-size:12.5px;font-weight:600;color:#0071e3;
+    text-decoration:none;display:inline-flex;align-items:center;gap:4px;
+  }
+  .ad-section__action:hover{text-decoration:underline;}
+
+  /* Upcoming row */
+  .ad-list{padding:0;}
+  .ad-row{
+    padding:14px 22px;display:grid;grid-template-columns:120px 1fr 90px;gap:18px;align-items:center;
+    border-top:1px solid #F1F5F9;
+  }
+  .ad-row:first-child{border-top:none;}
+  .ad-row__when{font-size:13px;color:#0F172A;}
+  .ad-row__when strong{display:block;font-weight:700;}
+  .ad-row__when small{color:#64748B;font-size:12px;display:block;margin-top:1px;}
+  .ad-row__body{min-width:0;}
+  .ad-row__body p{margin:0;font-size:13px;color:#475569;line-height:1.5;}
+  .ad-row__body p strong{color:#0F172A;}
+  .ad-row__status{
+    font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;
+    padding:4px 10px;border-radius:9999px;text-align:center;justify-self:end;
+    background:#DBEAFE;color:#1E3A8A;white-space:nowrap;
+  }
+
+  /* Empty state */
+  .ad-empty{
+    padding:48px 28px;text-align:center;color:#64748B;
+  }
+  .ad-empty__title{font-family:"Archivo","Inter",sans-serif;font-size:16px;font-weight:700;color:#0F172A;margin:0 0 6px;}
+  .ad-empty__sub{font-size:13px;margin:0;line-height:1.55;}
+
+  /* Loading */
+  .ad-loading{padding:28px;text-align:center;color:#64748B;font-size:13px;}
+  .ad-spinner{
+    width:16px;height:16px;border-radius:50%;
+    border:2px solid #E2E8F0;border-top-color:#0071e3;
+    animation:ad-spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px;
+  }
+  @keyframes ad-spin{to{transform:rotate(360deg);}}
+
+  /* Two-column layout for "right now" cards */
+  .ad-cols{display:grid;grid-template-columns:1fr 360px;gap:18px;margin-bottom:18px;}
+  @media(max-width:1024px){.ad-cols{grid-template-columns:1fr;}}
+
+  /* Profile preview card */
+  .ad-prof{padding:22px;display:flex;gap:18px;align-items:center;}
+  .ad-prof__avatar{
+    flex:0 0 64px;width:64px;height:64px;border-radius:50%;
+    background:linear-gradient(135deg, #3B82F6, #1E40AF);
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:800;font-size:22px;
+  }
+  .ad-prof__body{min-width:0;}
+  .ad-prof__name{font-family:"Archivo","Inter",sans-serif;font-size:18px;font-weight:800;letter-spacing:-.01em;color:#0F172A;margin:0 0 3px;}
+  .ad-prof__city{font-size:13px;color:#64748B;margin:0 0 8px;}
+  .ad-prof__pill{
+    display:inline-flex;align-items:center;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    padding:3px 9px;border-radius:9999px;
+  }
+  .ad-prof__pill--published{background:#ECFDF5;color:#047857;}
+  .ad-prof__pill--draft{background:#F1F5F9;color:#64748B;}
+  .ad-prof__pill--missing{background:#FEF3C7;color:#92400E;}
+  .ad-prof__edit{
+    font-size:12.5px;font-weight:600;color:#0071e3;text-decoration:none;
+    margin-left:auto;align-self:flex-start;
+    border:1px solid #DBEAFE;background:#EFF6FF;padding:6px 14px;border-radius:9999px;
+  }
+  .ad-prof__edit:hover{background:#DBEAFE;}
+
+  /* Quick links grid (placeholder for Phase 2/3 destinations) */
+  .ad-quicklinks{
+    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    padding:20px 22px;
+  }
+  .ad-quicklinks__title{font-family:"Archivo","Inter",sans-serif;font-size:15px;font-weight:800;color:#0F172A;margin:0 0 12px;}
+  .ad-quicklinks__list{display:flex;flex-direction:column;gap:8px;}
+  .ad-quicklinks__item{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:11px 14px;border-radius:10px;
+    background:#F8FAFC;border:1px solid #F1F5F9;
+    font-size:13px;color:#0F172A;font-weight:600;
+    text-decoration:none;cursor:pointer;
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .ad-quicklinks__item:hover{background:#EFF6FF;border-color:#DBEAFE;}
+  .ad-quicklinks__item--soon{opacity:.55;cursor:default;}
+  .ad-quicklinks__item--soon:hover{background:#F8FAFC;border-color:#F1F5F9;}
+  .ad-quicklinks__chev{color:#94A3B8;}
+  .ad-quicklinks__soon{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A3B8;}
+
+  /* Welcome banner for new assistants */
+  .ad-welcome{
+    background:linear-gradient(135deg, #EFF6FF, #F0FDF4);
+    border:1px solid #BAE6FD;border-radius:14px;
+    padding:18px 22px;margin-bottom:18px;
+    display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
+  }
+  .ad-welcome__body{flex:1;min-width:260px;}
+  .ad-welcome__title{font-family:"Archivo","Inter",sans-serif;font-size:15px;font-weight:800;color:#0F172A;margin:0 0 4px;}
+  .ad-welcome__sub{font-size:13px;color:#475569;margin:0;line-height:1.55;}
+</style>
+</head>
+<body class="pm-has-sidebar">
+
+<div id="pmSidebar"></div>
+
+<main class="ad-shell">
+
+  <div class="ad-hero">
+    <div class="ad-hero__body">
+      <p class="ad-eyebrow">Today · Your Work</p>
+      <h1 class="ad-h1" id="adGreeting">Welcome back.</h1>
+      <p class="ad-sub">Your day-to-day on Private Mentorship — active engagements, upcoming sessions, and your public profile at a glance.</p>
+    </div>
+    <span class="ad-hero__date" id="adDate">—</span>
+  </div>
+
+  <!-- New-assistant welcome (shown only when KPIs are all zero) -->
+  <div class="ad-welcome" id="adWelcome" hidden>
+    <div class="ad-welcome__body">
+      <h3 class="ad-welcome__title">You're on the Private Mentorship roster.</h3>
+      <p class="ad-welcome__sub">Private Mentorship will introduce you to families as the right match comes through. Make sure your profile is complete and published so families can find you.</p>
+    </div>
+    <a class="ad-prof__edit" href="assistant-profile.html">Review my profile →</a>
+  </div>
+
+  <!-- KPI tiles -->
+  <section class="ad-kpis" id="adKpis">
+    <div class="ad-kpi">
+      <p class="ad-kpi__label">Active Engagements</p>
+      <span class="ad-kpi__value" id="kpiEngagements">—</span>
+      <p class="ad-kpi__sub">Families currently assigned to you</p>
+    </div>
+    <div class="ad-kpi">
+      <p class="ad-kpi__label">Hours This Month</p>
+      <span class="ad-kpi__value" id="kpiHours">—</span>
+      <p class="ad-kpi__sub">Across all your Engagements</p>
+    </div>
+    <div class="ad-kpi">
+      <p class="ad-kpi__label">Upcoming Sessions</p>
+      <span class="ad-kpi__value" id="kpiUpcoming">—</span>
+      <p class="ad-kpi__sub">Booked from today onward</p>
+    </div>
+  </section>
+
+  <!-- Two columns: upcoming + profile preview -->
+  <div class="ad-cols">
+
+    <!-- Upcoming sessions -->
+    <section class="ad-section">
+      <header class="ad-section__head">
+        <div>
+          <h2 class="ad-section__title">Upcoming sessions</h2>
+          <p class="ad-section__sub">Next sessions you have on the calendar.</p>
+        </div>
+        <a class="ad-section__action" href="assistant-schedule.html">View all →</a>
+      </header>
+      <div class="ad-loading" id="upcomingLoading"><span class="ad-spinner"></span> Loading…</div>
+      <div class="ad-list" id="upcomingList" hidden></div>
+      <div class="ad-empty" id="upcomingEmpty" hidden>
+        <p class="ad-empty__title">No upcoming sessions yet</p>
+        <p class="ad-empty__sub">When families book sessions with you, they'll appear here. Make sure your availability is up to date in your profile.</p>
+      </div>
+    </section>
+
+    <!-- Right column: profile preview + quick links -->
+    <div>
+      <section class="ad-section" id="profileSection">
+        <header class="ad-section__head">
+          <div>
+            <h2 class="ad-section__title">Your profile</h2>
+            <p class="ad-section__sub">What families see when browsing the roster.</p>
+          </div>
+        </header>
+        <div class="ad-loading" id="profileLoading"><span class="ad-spinner"></span> Loading…</div>
+        <div class="ad-prof" id="profileCard" hidden>
+          <div class="ad-prof__avatar" id="profAvatar">A</div>
+          <div class="ad-prof__body">
+            <h3 class="ad-prof__name" id="profName">—</h3>
+            <p class="ad-prof__city" id="profCity">—</p>
+            <span class="ad-prof__pill" id="profStatus">—</span>
+          </div>
+          <a class="ad-prof__edit" href="assistant-profile.html">Edit</a>
+        </div>
+        <div class="ad-empty" id="profileEmpty" hidden>
+          <p class="ad-empty__title">No public profile yet</p>
+          <p class="ad-empty__sub">Private Mentorship will create your initial profile after onboarding. You'll see it here once it's set.</p>
+        </div>
+      </section>
+
+      <div class="ad-quicklinks" style="margin-top:16px;">
+        <h3 class="ad-quicklinks__title">Coming next</h3>
+        <div class="ad-quicklinks__list">
+          <a class="ad-quicklinks__item ad-quicklinks__item--soon">
+            <span>My Clients · per-family workspace</span>
+            <span class="ad-quicklinks__soon">Soon</span>
+          </a>
+          <a class="ad-quicklinks__item ad-quicklinks__item--soon">
+            <span>Hours & Payouts ledger</span>
+            <span class="ad-quicklinks__soon">Soon</span>
+          </a>
+          <a class="ad-quicklinks__item ad-quicklinks__item--soon">
+            <span>Edit your public profile</span>
+            <span class="ad-quicklinks__soon">Soon</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260515a"></script>
+<script src="js/hiring-service.js?v=20260515a"></script>
+<script src="js/sidebar.js?v=20260515a"></script>
+<script>
+/* ============================================================================
+ * assistant-dashboard.html — Phase 1 read-only home
+ * ============================================================================ */
+function escapeHtml(s){ return (s || '').toString().replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[c])); }
+
+function formatDateLong(d){
+  return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+}
+function formatDateShort(d){
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+}
+function formatTime(d){
+  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+function formatDuration(mins){
+  if (!mins) return '';
+  if (mins < 60) return mins + ' min';
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return m === 0 ? h + ' hr' : h + 'h ' + m + 'm';
+}
+
+function initialsFor(name){
+  return (name || 'A').split(/\s+/).map(s => s[0] || '').slice(0, 2).join('').toUpperCase() || 'A';
+}
+
+(async function init(){
+  // Date header
+  document.getElementById('adDate').textContent = formatDateLong(new Date());
+
+  // Wait briefly for sidebar.js to settle auth
+  await new Promise(r => setTimeout(r, 300));
+
+  // Greeting (best-effort name from profile)
+  try {
+    const profile = await window.pmHiring.fetchCurrentUserProfile();
+    if (profile?.full_name) {
+      const first = profile.full_name.split(/\s+/)[0];
+      document.getElementById('adGreeting').textContent = 'Welcome back, ' + first + '.';
+    }
+  } catch (_) {}
+
+  // KPIs
+  let kpis = { activeEngagements: 0, hoursThisMonth: 0, upcomingSessions: 0 };
+  try { kpis = await window.pmHiring.fetchAssistantHomeKpis(); } catch (_) {}
+  document.getElementById('kpiEngagements').textContent = kpis.activeEngagements;
+  document.getElementById('kpiHours').textContent = kpis.hoursThisMonth;
+  document.getElementById('kpiUpcoming').textContent = kpis.upcomingSessions;
+
+  // Welcome banner if assistant has nothing yet
+  if (kpis.activeEngagements === 0 && kpis.upcomingSessions === 0 && kpis.hoursThisMonth === 0) {
+    document.getElementById('adWelcome').hidden = false;
+  }
+
+  // Upcoming sessions
+  loadUpcoming();
+
+  // Profile preview
+  loadProfile();
+})();
+
+async function loadUpcoming(){
+  const loading = document.getElementById('upcomingLoading');
+  const list = document.getElementById('upcomingList');
+  const empty = document.getElementById('upcomingEmpty');
+  loading.hidden = false; list.hidden = true; empty.hidden = true;
+  let appts = [];
+  try { appts = await window.pmHiring.fetchAssistantUpcomingAppointments({ limit: 6 }); } catch (_) {}
+  loading.hidden = true;
+  if (!appts.length) {
+    empty.hidden = false;
+    return;
+  }
+  list.innerHTML = appts.map(a => {
+    const start = a.starts_at ? new Date(a.starts_at) : null;
+    const dur = a.duration_minutes;
+    return `<div class="ad-row">
+      <div class="ad-row__when">
+        ${start ? `<strong>${escapeHtml(formatDateShort(start))}</strong><small>${escapeHtml(formatTime(start))}${dur ? ' · ' + escapeHtml(formatDuration(dur)) : ''}</small>` : '<strong>—</strong>'}
+      </div>
+      <div class="ad-row__body">
+        <p><strong>Client session</strong>${a.notes ? ' — ' + escapeHtml(String(a.notes).slice(0, 80)) : ''}</p>
+      </div>
+      <span class="ad-row__status">${escapeHtml((a.status || 'scheduled').replace(/_/g,' '))}</span>
+    </div>`;
+  }).join('');
+  list.hidden = false;
+}
+
+async function loadProfile(){
+  const loading = document.getElementById('profileLoading');
+  const card = document.getElementById('profileCard');
+  const empty = document.getElementById('profileEmpty');
+  loading.hidden = false; card.hidden = true; empty.hidden = true;
+  let profile = null;
+  try { profile = await window.pmHiring.fetchMyAssistantProfile(); } catch (_) {}
+  loading.hidden = true;
+  if (!profile) {
+    empty.hidden = false;
+    return;
+  }
+  const displayName = profile.display_name || 'Private Family Assistant';
+  document.getElementById('profAvatar').textContent = initialsFor(displayName);
+  document.getElementById('profName').textContent = displayName;
+  document.getElementById('profCity').textContent = profile.city || 'Greater Vancouver';
+  const status = document.getElementById('profStatus');
+  if (profile.is_published) {
+    status.textContent = 'Published';
+    status.className = 'ad-prof__pill ad-prof__pill--published';
+  } else if (!profile.display_name || !profile.bio) {
+    status.textContent = 'Incomplete';
+    status.className = 'ad-prof__pill ad-prof__pill--missing';
+  } else {
+    status.textContent = 'Draft';
+    status.className = 'ad-prof__pill ad-prof__pill--draft';
+  }
+  card.hidden = false;
+}
+</script>
+
+</body>
+</html>

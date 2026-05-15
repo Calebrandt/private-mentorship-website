@@ -606,6 +606,8 @@ async function routeAfterAuth(user){
   let dest;
   if (isAdmin){
     dest = 'admin-dashboard.html';
+  } else if (profile && /^assistant$/i.test(String(profile.role || ''))){
+    dest = 'assistant-dashboard.html';
   } else if (profile && /^client$/i.test(String(profile.role || ''))){
     dest = 'client-dashboard.html';
   } else if (isApplicant){

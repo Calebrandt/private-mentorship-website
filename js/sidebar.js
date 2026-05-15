@@ -45,6 +45,18 @@
       { type: 'section', label: 'Give' },
       { type: 'link', href: 'client-gift.html', label: 'Send a Gift', icon: 'gift' },
     ],
+    assistant: [
+      { type: 'link', href: 'assistant-dashboard.html', label: 'Dashboard', icon: 'dashboard' },
+      { type: 'link', href: 'messages.html', label: 'Inbox', icon: 'message' },
+      { type: 'section', label: 'Work' },
+      { type: 'link', href: 'assistant-clients.html', label: 'My Clients', icon: 'users' },
+      { type: 'link', href: 'assistant-schedule.html', label: 'My Schedule', icon: 'calendar' },
+      { type: 'section', label: 'Earnings' },
+      { type: 'link', href: 'assistant-hours.html', label: 'Hours & Payouts', icon: 'clock' },
+      { type: 'section', label: 'Profile' },
+      { type: 'link', href: 'assistant-profile.html', label: 'My Profile', icon: 'user-circle' },
+      { type: 'link', href: 'assistant-resources.html', label: 'Resources', icon: 'folder' },
+    ],
   };
 
   const SETTINGS_LINK = { href: 'settings.html', label: 'Settings', icon: 'settings' };
@@ -199,6 +211,7 @@
     } catch (_) {}
     try {
       const profile = await window.pmHiring.fetchCurrentUserProfile();
+      if (profile && /^assistant$/i.test(String(profile.role || ''))) return 'assistant';
       if (profile && /^client$/i.test(String(profile.role || ''))) return 'client';
     } catch (_) {}
     return 'client';

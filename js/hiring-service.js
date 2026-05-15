@@ -639,6 +639,119 @@
     return data;
   }
 
+  // ─── Assistant-side (logged-in Assistant viewing own work) ─────────────
+  // Read-only Phase 1. RLS for assistant-owned rows is enforced server-side
+  // (contracts.assistant_id = auth.uid() is the convention).
+
+  // KPI snapshot for the assistant dashboard hero — counts only, defensive.
+  async function fetchAssistantHomeKpis() {
+    const user = await getCurrentUser();
+    if (!user) return { activeEngagements: 0, hoursThisMonth: 0, upcomingSessions: 0 };
+    const out = { activeEngagements: 0, hoursThisMonth: 0, upcomingSessions: 0 };
+
+    // Active engagements = active contracts assigned to me
+    try {
+      const { count } = await sb()
+        .from('contracts')
+        .select('id', { count: 'exact', head: true })
+        .eq('assistant_id', user.id)
+        .eq('status', 'active');
+      out.activeEngagements = count || 0;
+    } catch (_) {}
+
+    // Upcoming sessions = appointments tied to my contracts, starting in the future
+    try {
+      const { data: contractIds } = await sb()
+        .from('contracts')
+        .select('id')
+        .eq('assistant_id', user.id);
+      const ids = (contractIds || []).map(c => c.id);
+      if (ids.length) {
+        const { count } = await sb()
+          .from('appointments')
+          .select('id', { count: 'exact', head: true })
+          .in('contract_id', ids)
+          .gte('starts_at', new Date().toISOString())
+          .in('status', ['scheduled', 'reserved']);
+        out.upcomingSessions = count || 0;
+      }
+    } catch (_) {}
+
+    // Hours this month — sum of |delta_hours| across hours_ledger for my clients in this calendar month.
+    // Best-effort; if the ledger query is RLS-protected, returns 0.
+    try {
+      const firstOfMonth = new Date();
+      firstOfMonth.setDate(1);
+      firstOfMonth.setHours(0, 0, 0, 0);
+      const { data: contractIds } = await sb()
+        .from('contracts')
+        .select('client_id')
+        .eq('assistant_id', user.id);
+      const clientIds = [...new Set((contractIds || []).map(c => c.client_id))];
+      if (clientIds.length) {
+        const { data: ledger } = await sb()
+          .from('hours_ledger')
+          .select('delta_hours')
+          .in('client_id', clientIds)
+          .gte('created_at', firstOfMonth.toISOString());
+        const total = (ledger || []).reduce((sum, r) => sum + Math.abs(Number(r.delta_hours) || 0), 0);
+        out.hoursThisMonth = Math.round(total * 10) / 10;
+      }
+    } catch (_) {}
+
+    return out;
+  }
+
+  // Next N upcoming appointments for this assistant.
+  async function fetchAssistantUpcomingAppointments({ limit = 8 } = {}) {
+    const user = await getCurrentUser();
+    if (!user) return [];
+    try {
+      const { data: contractIds } = await sb()
+        .from('contracts')
+        .select('id, client_id')
+        .eq('assistant_id', user.id);
+      const ids = (contractIds || []).map(c => c.id);
+      if (!ids.length) return [];
+      const { data, error } = await sb()
+        .from('appointments')
+        .select('id, contract_id, client_id, starts_at, duration_minutes, status, notes')
+        .in('contract_id', ids)
+        .gte('starts_at', new Date().toISOString())
+        .in('status', ['scheduled', 'reserved'])
+        .order('starts_at', { ascending: true })
+        .limit(limit);
+      if (error) {
+        console.warn('fetchAssistantUpcomingAppointments failed:', error);
+        return [];
+      }
+      return data || [];
+    } catch (e) {
+      console.warn('fetchAssistantUpcomingAppointments threw:', e);
+      return [];
+    }
+  }
+
+  // Get the assistant's own published profile (for the preview card).
+  async function fetchMyAssistantProfile() {
+    const user = await getCurrentUser();
+    if (!user) return null;
+    try {
+      const { data, error } = await sb()
+        .from('assistant_profiles')
+        .select('*')
+        .eq('assistant_id', user.id)
+        .maybeSingle();
+      if (error) {
+        console.warn('fetchMyAssistantProfile failed:', error);
+        return null;
+      }
+      return data;
+    } catch (_) {
+      return null;
+    }
+  }
+
   // ─── Admin: create a client account ──────────────────────────────────────
   // Calls the admin-create-client edge function. Server-side it verifies the caller
   // is OWNER/ADMIN/SUPERADMIN, creates the auth user, lets the trigger create the
@@ -1434,6 +1547,8 @@
     getCurrentClientId, fetchMyPicks, addPick, removePick, updatePick, submitPicks,
     // admin pick queue
     adminListPicks, adminUpdatePickStatus,
+    // assistant-side (Phase 1)
+    fetchAssistantHomeKpis, fetchAssistantUpcomingAppointments, fetchMyAssistantProfile,
     // admin: clients
     adminCreateClientAccount, adminListClients, adminFetchHomeKpis, adminFetchMonthlyStats,
     // client (self)
