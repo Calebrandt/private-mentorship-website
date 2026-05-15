@@ -119,22 +119,6 @@
   }
   .nx-contract__status--manual{color:#EA580C;}
   .nx-contract__status--manual::before{background:#FB923C;box-shadow:0 0 0 3px rgba(251,146,60,0.18);}
-  /* Token info — integrated into the renewal status line */
-  .nx-contract__tokens-inline{
-    display:inline-flex;align-items:center;margin-left:8px;
-    font-weight:600;color:var(--ink-mute);letter-spacing:-.005em;
-    font-variant-numeric:tabular-nums;
-  }
-  .nx-contract__tokens-inline::before{
-    content:'·';margin:0 8px;color:var(--ink-tert);
-  }
-  .nx-contract__tokens-inline strong{
-    font-weight:800;color:var(--ink-2);letter-spacing:-.01em;margin-right:4px;
-  }
-  .nx-contract__tokens-inline--low strong{color:#B45309;}
-  .nx-contract__tokens-inline--low{color:#B45309;}
-  .nx-contract__tokens-inline--out strong{color:#B91C1C;}
-  .nx-contract__tokens-inline--out{color:#B91C1C;font-weight:700;}
   .nx-contract__remaining{
     text-align:right;flex-shrink:0;
   }
@@ -771,17 +755,7 @@
           <div style="min-width:0;">
             <p class="nx-contract__name">Active contract</p>
             <p class="nx-contract__meta">${esc(start)} – ${esc(end)}${contract.assistant_name ? ' · with ' + esc(contract.assistant_name) : ''}</p>
-            <p class="nx-contract__meta" style="margin-top:8px;">
-              <span class="nx-contract__status${isAuto ? '' : ' nx-contract__status--manual'}">${esc(statusLabel)}</span>
-              ${(() => {
-                if (!tokenStatus) return '';
-                const left = tokenStatus.tokens_remaining;
-                const cls = left === 0 ? 'nx-contract__tokens-inline--out'
-                          : left === 1 ? 'nx-contract__tokens-inline--low'
-                          : '';
-                return `<span class="nx-contract__tokens-inline ${cls}"><strong>${left}</strong>reschedule/cancel token${left===1?'':'s'} left</span>`;
-              })()}
-            </p>
+            <p class="nx-contract__meta" style="margin-top:8px;"><span class="nx-contract__status${isAuto ? '' : ' nx-contract__status--manual'}">${esc(statusLabel)}</span></p>
           </div>
         </div>
         <div class="nx-contract__remaining">
