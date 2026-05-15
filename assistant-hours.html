@@ -218,7 +218,7 @@ function reasonLabel(r){
   const allEl   = document.getElementById('ahAll');
 
   let data = { entries: [], totalThisMonth: 0, totalAllTime: 0 };
-  try { data = await window.pmHiring.fetchMyHoursLedger({ limit: 50 }); } catch (_) {}
+  try { data = await window.pmHiring.fetchMyAssistantHoursLedger({ limit: 50 }); } catch (_) {}
 
   monthEl.innerHTML = `${escapeHtml(formatHours(data.totalThisMonth))} <span class="ah-kpi__unit">hrs</span>`;
   allEl.innerHTML   = `${escapeHtml(formatHours(data.totalAllTime))} <span class="ah-kpi__unit">hrs</span>`;

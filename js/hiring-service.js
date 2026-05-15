@@ -659,7 +659,8 @@
       out.activeEngagements = count || 0;
     } catch (_) {}
 
-    // Upcoming sessions = appointments tied to my contracts, starting in the future
+    // Upcoming sessions = scheduled appointments tied to my contracts, starting in the future.
+    // Note: `reserved` is an appointments.kind, not a status. Status filter is just 'scheduled'.
     try {
       const { data: contractIds } = await sb()
         .from('contracts')
@@ -672,30 +673,30 @@
           .select('id', { count: 'exact', head: true })
           .in('contract_id', ids)
           .gte('starts_at', new Date().toISOString())
-          .in('status', ['scheduled', 'reserved']);
+          .eq('status', 'scheduled');
         out.upcomingSessions = count || 0;
       }
     } catch (_) {}
 
-    // Hours this month — sum of |delta_hours| across hours_ledger for my clients in this calendar month.
-    // Best-effort; if the ledger query is RLS-protected, returns 0.
+    // Hours this month — sum of |minutes_delta|/60 across hours_ledger for my contracts
+    // in this calendar month. Filter by contract_id (canonical) not client_id.
     try {
       const firstOfMonth = new Date();
       firstOfMonth.setDate(1);
       firstOfMonth.setHours(0, 0, 0, 0);
-      const { data: contractIds } = await sb()
+      const { data: contractRows } = await sb()
         .from('contracts')
-        .select('client_id')
+        .select('id')
         .eq('assistant_id', user.id);
-      const clientIds = [...new Set((contractIds || []).map(c => c.client_id))];
-      if (clientIds.length) {
+      const contractIds = [...new Set((contractRows || []).map(c => c.id))];
+      if (contractIds.length) {
         const { data: ledger } = await sb()
           .from('hours_ledger')
-          .select('delta_hours')
-          .in('client_id', clientIds)
+          .select('minutes_delta')
+          .in('contract_id', contractIds)
           .gte('created_at', firstOfMonth.toISOString());
-        const total = (ledger || []).reduce((sum, r) => sum + Math.abs(Number(r.delta_hours) || 0), 0);
-        out.hoursThisMonth = Math.round(total * 10) / 10;
+        const totalMinutes = (ledger || []).reduce((sum, r) => sum + Math.abs(Number(r.minutes_delta) || 0), 0);
+        out.hoursThisMonth = Math.round((totalMinutes / 60) * 10) / 10;
       }
     } catch (_) {}
 
@@ -715,10 +716,10 @@
       if (!ids.length) return [];
       const { data, error } = await sb()
         .from('appointments')
-        .select('id, contract_id, client_id, starts_at, duration_minutes, status, notes')
+        .select('id, contract_id, client_id, starts_at, ends_at, duration_minutes, status, kind, title, notes')
         .in('contract_id', ids)
         .gte('starts_at', new Date().toISOString())
-        .in('status', ['scheduled', 'reserved'])
+        .eq('status', 'scheduled')
         .order('starts_at', { ascending: true })
         .limit(limit);
       if (error) {
@@ -728,6 +729,66 @@
       return data || [];
     } catch (e) {
       console.warn('fetchAssistantUpcomingAppointments threw:', e);
+      return [];
+    }
+  }
+
+  // Range query over the signed-in assistant's appointments.
+  // Phase 1 read-only — used by the weekly grid + recent-history list on
+  // assistant-schedule.html. Filters by contracts assigned to the user.
+  //
+  // Returns rows enriched with `client` ({id, full_name}) when resolvable.
+  // Any status is allowed; pass `statuses` to narrow (default: all known statuses).
+  async function fetchAssistantAppointmentsRange({
+    fromDate, toDate,
+    statuses = ['scheduled','completed','cancelled','late_cancelled','no_show'],
+    limit = 500,
+  } = {}) {
+    const user = await getCurrentUser();
+    if (!user) return [];
+    try {
+      const { data: contracts } = await sb()
+        .from('contracts')
+        .select('id, client_id')
+        .eq('assistant_id', user.id);
+      const contractIds = (contracts || []).map(c => c.id);
+      if (!contractIds.length) return [];
+
+      let q = sb()
+        .from('appointments')
+        .select('id, contract_id, client_id, starts_at, ends_at, duration_minutes, status, kind, title, notes, cancelled_at, cancel_reason')
+        .in('contract_id', contractIds)
+        .in('status', statuses)
+        .order('starts_at', { ascending: true })
+        .limit(limit);
+      if (fromDate) q = q.gte('starts_at', new Date(fromDate).toISOString());
+      if (toDate)   q = q.lte('starts_at', new Date(toDate).toISOString());
+
+      const { data: appts, error } = await q;
+      if (error) {
+        console.warn('fetchAssistantAppointmentsRange failed:', error);
+        return [];
+      }
+
+      // Enrich with client info via contracts → clients.
+      const contractToClient = {};
+      (contracts || []).forEach(c => { contractToClient[c.id] = c.client_id; });
+      const clientIds = [...new Set(Object.values(contractToClient))].filter(Boolean);
+      const { data: clients } = clientIds.length
+        ? await sb().from('clients').select('id, full_name').in('id', clientIds)
+        : { data: [] };
+      const clientsById = {};
+      (clients || []).forEach(c => { clientsById[c.id] = c; });
+
+      return (appts || []).map(a => {
+        const clientId = a.client_id || contractToClient[a.contract_id] || null;
+        return {
+          ...a,
+          client: (clientId && clientsById[clientId]) || null,
+        };
+      });
+    } catch (e) {
+      console.warn('fetchAssistantAppointmentsRange threw:', e);
       return [];
     }
   }
@@ -808,9 +869,10 @@
       try {
         const { data: upcoming } = await sb()
           .from('appointments')
-          .select('id, starts_at, duration_minutes, status, notes')
+          .select('id, starts_at, ends_at, duration_minutes, status, kind, title, notes')
           .eq('contract_id', out.contract.id)
           .gte('starts_at', now)
+          .eq('status', 'scheduled')
           .order('starts_at', { ascending: true })
           .limit(8);
         out.upcomingAppointments = upcoming || [];
@@ -818,20 +880,25 @@
       try {
         const { data: recent } = await sb()
           .from('appointments')
-          .select('id, starts_at, duration_minutes, status, notes')
+          .select('id, starts_at, ends_at, duration_minutes, status, kind, title, notes')
           .eq('contract_id', out.contract.id)
           .lt('starts_at', now)
           .order('starts_at', { ascending: false })
           .limit(8);
         out.recentAppointments = recent || [];
       } catch (_) {}
+      // Hours used = sum of negative minutes_delta (consumption) on this contract's ledger.
+      // Positive deltas are top-ups / refunds and should not count as "used".
       try {
         const { data: ledger } = await sb()
           .from('hours_ledger')
-          .select('delta_hours')
-          .eq('client_id', clientId);
-        const total = (ledger || []).reduce((s, r) => s + Math.abs(Number(r.delta_hours) || 0), 0);
-        out.hoursUsedMinutes = Math.round(total * 60);
+          .select('minutes_delta')
+          .eq('contract_id', out.contract.id);
+        const usedMin = (ledger || []).reduce((s, r) => {
+          const v = Number(r.minutes_delta) || 0;
+          return v < 0 ? s + Math.abs(v) : s;
+        }, 0);
+        out.hoursUsedMinutes = Math.round(usedMin);
       } catch (_) {}
     }
     return out;
@@ -893,56 +960,79 @@
     return data;
   }
 
-  // Hours ledger for the assistant — aggregated across all their clients.
-  // Returns recent ledger entries with the client_id joined when possible.
-  async function fetchMyHoursLedger({ limit = 50 } = {}) {
+  // Hours ledger for the assistant — aggregated across all their contracts.
+  // Canonical columns: minutes_delta (signed, in minutes), reason_code, contract_id.
+  // Totals returned in HOURS (rounded to 1 decimal) for display convenience.
+  // Each entry is enriched with the resolved client (via contracts → clients).
+  //
+  // NOTE: distinct from the *client*-side `fetchMyHoursLedger` defined below,
+  // which targets the signed-in client's own ledger. Naming them the same
+  // caused a silent shadow at export time. Keep them separate.
+  async function fetchMyAssistantHoursLedger({ limit = 50 } = {}) {
     const user = await getCurrentUser();
     if (!user) return { entries: [], totalThisMonth: 0, totalAllTime: 0 };
     try {
       const { data: contracts } = await sb()
         .from('contracts')
-        .select('client_id')
+        .select('id, client_id')
         .eq('assistant_id', user.id);
-      const clientIds = [...new Set((contracts || []).map(c => c.client_id))].filter(Boolean);
-      if (!clientIds.length) {
+      const contractIds = [...new Set((contracts || []).map(c => c.id))].filter(Boolean);
+      if (!contractIds.length) {
         return { entries: [], totalThisMonth: 0, totalAllTime: 0 };
       }
+      // contract_id → client_id map so we can enrich each ledger row.
+      const contractToClient = {};
+      (contracts || []).forEach(c => { contractToClient[c.id] = c.client_id; });
+
       const { data: entries, error } = await sb()
         .from('hours_ledger')
-        .select('id, client_id, delta_hours, reason, appointment_id, created_at')
-        .in('client_id', clientIds)
+        .select('id, contract_id, appointment_id, minutes_delta, reason_code, created_at')
+        .in('contract_id', contractIds)
         .order('created_at', { ascending: false })
         .limit(limit);
       if (error) {
-        console.warn('fetchMyHoursLedger failed:', error);
+        console.warn('fetchMyAssistantHoursLedger failed:', error);
         return { entries: [], totalThisMonth: 0, totalAllTime: 0 };
       }
+
       const firstOfMonth = new Date();
       firstOfMonth.setDate(1); firstOfMonth.setHours(0,0,0,0);
-      const totalThisMonth = (entries || []).reduce((s, e) => {
+      const totalMinutesThisMonth = (entries || []).reduce((s, e) => {
         const d = e.created_at ? new Date(e.created_at) : null;
-        if (d && d >= firstOfMonth) return s + Math.abs(Number(e.delta_hours) || 0);
+        if (d && d >= firstOfMonth) return s + Math.abs(Number(e.minutes_delta) || 0);
         return s;
       }, 0);
-      const totalAllTime = (entries || []).reduce((s, e) => s + Math.abs(Number(e.delta_hours) || 0), 0);
-      // Attach client info for display
-      const { data: clients } = await sb()
-        .from('clients')
-        .select('id, full_name')
-        .in('id', clientIds);
+      const totalMinutesAllTime = (entries || []).reduce(
+        (s, e) => s + Math.abs(Number(e.minutes_delta) || 0), 0
+      );
+
+      // Attach client info for display.
+      const clientIds = [...new Set(Object.values(contractToClient))].filter(Boolean);
+      const { data: clients } = clientIds.length
+        ? await sb().from('clients').select('id, full_name').in('id', clientIds)
+        : { data: [] };
       const clientsById = {};
       (clients || []).forEach(c => { clientsById[c.id] = c; });
-      const enriched = (entries || []).map(e => ({
-        ...e,
-        client: clientsById[e.client_id] || null,
-      }));
+
+      const enriched = (entries || []).map(e => {
+        const clientId = contractToClient[e.contract_id] || null;
+        return {
+          ...e,
+          // Back-compat fields for any consumer still reading the old names.
+          delta_hours: (Number(e.minutes_delta) || 0) / 60,
+          reason: e.reason_code,
+          client_id: clientId,
+          client: (clientId && clientsById[clientId]) || null,
+        };
+      });
+
       return {
         entries: enriched,
-        totalThisMonth: Math.round(totalThisMonth * 10) / 10,
-        totalAllTime: Math.round(totalAllTime * 10) / 10,
+        totalThisMonth: Math.round((totalMinutesThisMonth / 60) * 10) / 10,
+        totalAllTime: Math.round((totalMinutesAllTime / 60) * 10) / 10,
       };
     } catch (e) {
-      console.warn('fetchMyHoursLedger threw:', e);
+      console.warn('fetchMyAssistantHoursLedger threw:', e);
       return { entries: [], totalThisMonth: 0, totalAllTime: 0 };
     }
   }
@@ -1746,8 +1836,9 @@
     fetchAssistantHomeKpis, fetchAssistantUpcomingAppointments, fetchMyAssistantProfile,
     // assistant-side (Phase 2)
     fetchMyAssignedClients, fetchAssistantClientWorkspace,
+    fetchAssistantAppointmentsRange,
     // assistant-side (Phase 3)
-    updateMyAssistantProfile, fetchMyHoursLedger,
+    updateMyAssistantProfile, fetchMyAssistantHoursLedger,
     // admin: clients
     adminCreateClientAccount, adminListClients, adminFetchHomeKpis, adminFetchMonthlyStats,
     // client (self)
