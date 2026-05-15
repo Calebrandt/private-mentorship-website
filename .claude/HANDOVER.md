@@ -4,7 +4,7 @@
 The owner explicitly asked for it because chat-context limits keep
 killing long sessions and we want continuity.
 
-Last updated: 2026-05-10. Author: previous Claude session.
+Last updated: 2026-05-15. Author: Claude session that built the pick-list system.
 Project owner: **Caleb Brandt** (single founder, building this himself).
 
 ---
@@ -182,6 +182,72 @@ tags in `index.html`.**
     `supabase-functions/system-message-web-push.sql` (already
     deployed; option A — JWT verification disabled on the edge
     function — was chosen).
+11. **Pick list system end-to-end** (Phases A/B/C — 2026-05-14/15) —
+    A pre-engagement family flow: family applies → browses curated
+    roster → builds top-3 pick list → submits → admin facilitates
+    intro meetings → lifecycle to engaged or declined. **Critical
+    context:** this session began with a parallel-system build that
+    duplicated existing production pages (separate `/client/`,
+    `/admin/`, `/assistants/` dashboards with hardcoded data and
+    passcode gates). An audit caught the duplication and the work was
+    cleaned up to integrate with the existing Supabase + sidebar
+    architecture instead.
+    - **Cleanup** (commit `f3618a2`) — deleted 9 duplicate files
+      (`/client/dashboard.html`, `/admin/dashboard.html`, mock
+      `/assistants/sarah-y.html` etc., gate scripts). Reverted a
+      script-block addition to `apply.html`. Snapshot tag
+      `pre-cleanup-2026-05-14` preserves the messy state.
+    - **Public roster wiring** (commit `428a2f0`) — `assistants.html`
+      (a new public page) now fetches `assistant_profiles WHERE
+      is_published=true` via new public function
+      `listPublishedAssistantProfiles()`. Anonymized rendering: no
+      real names, generic person icon, city + languages only. Empty
+      state if no published profiles. Requires RLS policy
+      "anon read published profiles" (deployed manually 2026-05-14).
+    - **Pick list schema + service** (commit `926d478`) — new table
+      `client_assistant_picks`, 6 RLS policies (4 own-row for clients
+      via `clients.profile_id = auth.uid()`, 2 admin/owner). Two RPCs:
+      `client_submit_picks()` (transitions shortlisted →
+      introduction_requested) and `admin_update_pick_status(p_pick_id,
+      p_new_status, p_notes)`. Status lifecycle: `shortlisted →
+      introduction_requested → meeting_scheduled → meeting_complete
+      → engaged | declined`. Schema file:
+      `supabase-functions/client-assistant-picks.sql`. Service
+      additions: `getCurrentClientId`, `fetchMyPicks`, `addPick`,
+      `removePick`, `updatePick`, `submitPicks`, `adminListPicks`,
+      `adminUpdatePickStatus` on `window.pmHiring`.
+    - **Client UI** (commit `1e90061`) — `client-assistants.html`
+      (matches the existing sidebar entry "My Assistant", which was
+      previously a dead link). Two tabs: Browse Roster (full names
+      visible because user is authenticated client) and My Picks
+      (1st/2nd/3rd Choice rows, Submit Picks bar, status pills per
+      pick). Filters: Location, Language.
+    - **Admin UI** (commit `1e90061`) — `admin-intro-requests.html`
+      (matches the existing sidebar entry "Intro Requests", also
+      previously a dead link). Filter pills (Open · New · Scheduled ·
+      Met · All) with live counts. Families grouped together with
+      submitted timestamps. Per-row "Move to…" select that calls
+      `admin_update_pick_status` RPC. Toast notifications.
+    - **Service-layer fix** (commit `543c2a1`) — `adminListAssistantUsers()`
+      was using `.or('role.eq.ASSISTANT,role.eq.assistant')` which
+      crashed on the lowercase variant because `user_role` is a
+      case-sensitive enum (uppercase by convention per §12). Now uses
+      `.eq('role','ASSISTANT')`. Required adding `'ASSISTANT'` to the
+      `user_role` enum in Supabase (deployed 2026-05-15).
+    - **Testing artifact:** A test user `assistant@privatementorship.com`
+      ("TYASSISTANT") was promoted to role=ASSISTANT and given an
+      `applicants` row manually so the demo profile (Sarah K.) could
+      be published. The end-to-end loop was verified: family submitted
+      picks, admin received them, status transitions worked.
+    - **Known schema mismatch** (carry-forward — see §16):
+      `assistant_profiles.assistant_id` has FK to `applicants(id)`,
+      but `hiring-service.js` `adminListAssistantUsers()` queries
+      `profiles` and treats `user_id` as the assistant_id. This works
+      only when `applicants.id = user_id`, which is the convention
+      we used manually. Real applicants flowing through the hiring
+      wizard probably already have this — but the service-layer code
+      should either query `applicants` directly OR the FK should be
+      relaxed.
 
 ### Earlier in the same thread (not in this short list but verified
 shipped):
@@ -696,6 +762,7 @@ codebase. Breaking them will silently corrupt production data.
 | `admin-membership-change-rpcs.sql` | `admin_approve_membership_change(uuid)`, `admin_reject_membership_change(uuid, text)` | ⚠️ verify with `SELECT proname FROM pg_proc WHERE proname LIKE 'admin_approve_membership%';` |
 | `client-end-of-service-rpcs.sql` | `client_request_end_of_service()`, `client_reactivate_auto_renew()` | ⚠️ needs deploy |
 | `system-message-web-push.sql` | `_post_system_message_for_client(...)` | ✅ deployed (option A — JWT verification disabled on `send-web-push` edge fn) |
+| `client-assistant-picks.sql` | `client_submit_picks()`, `admin_update_pick_status(uuid,text,text)` | ✅ deployed 2026-05-15 (table + 6 RLS policies + 2 RPCs) |
 
 ### Edge functions (Supabase Dashboard → Functions)
 
@@ -723,6 +790,10 @@ codebase. Breaking them will silently corrupt production data.
   `conversation_messages`, `task_lists`, `task_items`, `invoices`,
   `invoice_lines`, `sales_receipts`, `assistant_profiles`,
   `web_push_subscriptions`, `call_logs`
+- **Pre-engagement picks** (added 2026-05-15): `client_assistant_picks`
+  — family shortlist of Assistants before active engagement. RLS:
+  clients see/write own via `clients.profile_id = auth.uid()`;
+  admins see/update all via `profiles.role IN OWNER/ADMIN/SUPERADMIN`.
 
 ---
 
@@ -779,6 +850,42 @@ codebase. Breaking them will silently corrupt production data.
   Other pages still hide `.nav-links` ≤600px with no replacement
   → mobile users see no navigation. Lift the hamburger markup
   + JS into a shared partial.
+
+### Pick list system — pending polish
+
+(Added 2026-05-15 after the Phase A/B/C build.)
+
+- [ ] **Fix `adminListAssistantUsers()` service-layer query** —
+  currently queries `public.profiles WHERE role='ASSISTANT'` and
+  passes `user_id` as the `assistant_id` when upserting profiles.
+  This only works because the FK
+  (`assistant_profiles.assistant_id → applicants.id`) is satisfied
+  when applicants.id happens to equal user_id. The wizard's
+  `ensureApplicantDraft()` RPC almost certainly already enforces
+  this convention, so today's manual `INSERT INTO applicants` for
+  TYASSISTANT is an artifact of skipping the wizard. Cleaner fix:
+  query `applicants` directly and only show ones with status='accepted'.
+- [ ] **Auto-publish on hiring acceptance** — when an applicant's
+  status moves to `accepted`, automatically:
+  1. Update their `profiles.role` → `'ASSISTANT'`
+  2. Insert a draft `assistant_profiles` row (unpublished)
+  3. Notify admin to fill in display_name + city + bio
+  Currently all three steps are manual.
+- [ ] **Email on pick submission** — when `client_submit_picks()`
+  fires, send a Resend email to `support@privatementorship.ca`
+  with the family's picks. Use the existing `notify-submission`
+  edge-function pattern.
+- [ ] **Realtime updates on `admin-intro-requests.html`** —
+  subscribe to `client_assistant_picks` changes via Supabase
+  Realtime so new picks appear without page refresh.
+- [ ] **Pick-list count badge in sidebar** — admin sidebar entry
+  "Intro Requests" should show a number badge when there are
+  unactioned picks (status in `introduction_requested`,
+  `meeting_scheduled`, `meeting_complete`).
+- [ ] **Client-side status updates without refresh** — after
+  admin transitions a pick, the client's `client-assistants.html`
+  doesn't reflect the change until they refresh. Same Realtime
+  subscription as above would solve it.
 
 ### Bigger porting arcs (each is its own session, ~3–5 hr)
 
