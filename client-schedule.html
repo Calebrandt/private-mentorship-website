@@ -888,8 +888,12 @@
     const d = new Date(apt.starts_at);
     const dateLabel = d.toLocaleDateString('en-CA', { weekday:'long', month:'long', day:'numeric' });
     const time = fmtTimeOnly(apt.starts_at);
+    const dur = apt.ends_at
+      ? Math.round((new Date(apt.ends_at).getTime() - new Date(apt.starts_at).getTime()) / 60000)
+      : null;
+    const tLine = tokenLine(dur);
     $('cancelSubtitle').textContent =
-      `${dateLabel} at ${time}. The session is cancelled immediately. You won't be charged any hours.`;
+      `${dateLabel} at ${time}. Cancelled immediately. ${tLine}`.trim();
     $('cancelLateWarn').hidden = !window.pmHiring.isLateCancellation(apt.starts_at);
     $('cancelReason').value = '';
     $('cancelSubmit').disabled = false;
@@ -944,17 +948,28 @@
         appointmentId: apt.id, appointment: apt, reason,
       });
       const isLate = updated?.status === 'late_cancelled';
-      // Reflect immediately in local state: remove from upcoming, mark
-      // the row as terminal-status (rendered elsewhere on page reload).
       upcoming = (upcoming || []).filter(x => x.id !== apt.id);
-      // If the page is also showing recent history, the next loadAll cycle
-      // will pick it up. For now just re-render upcoming.
       upWrap.innerHTML = `<div class="nx-list">${upcoming.map(a => renderSession(a, true)).join('')}</div>`;
       bindActionButtons();
       closeCancelModal();
-      showToast(isLate
+
+      // Phase 7.1: refresh token status so the next modal shows the right
+      // counter, and surface the remaining count in the success toast.
+      let toastMsg = isLate
         ? 'Session cancelled (within 24 hours — logged for your admin).'
-        : 'Session cancelled.');
+        : 'Session cancelled.';
+      try {
+        if (contract?.id) {
+          tokenStatus = await window.pmHiring.fetchContractTokenStatus(contract.id);
+          if (tokenStatus) {
+            const left = tokenStatus.tokens_remaining;
+            toastMsg += left > 0
+              ? ` ${left} free change${left===1?'':'s'} left this period.`
+              : ` You're now at your free-change limit — the next change may deduct hours.`;
+          }
+        }
+      } catch (_) {}
+      showToast(toastMsg);
     } catch (e) {
       btn.disabled = false; btn.textContent = 'Submit cancel';
       showToast(e?.message || 'Failed to cancel session', 'error');
