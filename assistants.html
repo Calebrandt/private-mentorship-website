@@ -8,6 +8,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&display=swap">
+<!-- Supabase + service layer (for live assistant_profiles roster) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260514a"></script>
+<script src="js/hiring-service.js?v=20260514a"></script>
 <style>
 :root{
   --ink:#1a1a1a;
@@ -377,146 +381,55 @@ img{max-width:100%;display:block}
 
 <!-- ═════ DIRECTORY GRID ═════ -->
 <div class="r-page">
-  <div class="r-grid" id="rosterGrid">
+  <!-- Loading state -->
+  <div class="r-roster-loading" id="rosterLoading" style="text-align:center;padding:60px 22px;color:var(--ink-mute);font-size:13px;letter-spacing:.06em;">
+    Loading the roster…
+  </div>
 
-    <!-- ─ Anonymous Card 1 — Senior Care Specialist ─ -->
-    <a class="r-card" href="apply.html?category=senior" data-category="senior general" data-location="vancouver" data-lang="en cantonese" data-recommended="1">
-      <div class="r-card__photo" style="--photo-from:#1c4956;--photo-to:#3a7d8f;">
-        <span class="r-card__rec">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="8 1.5 10.2 5.9 15 6.6 11.5 10 12.4 14.8 8 12.5 3.6 14.8 4.5 10 1 6.6 5.8 5.9"/></svg>
-          PM Recommends
-        </span>
-        <span class="r-card__photo-anon">
-          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="24" cy="16" r="6"/>
-            <path d="M10 40c0-8 6-12 14-12s14 4 14 12"/>
-          </svg>
-        </span>
-        <div class="r-card__photo-hover">
-          <span>Apply to View Profile</span>
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l5 5-5 5"/></svg>
-        </div>
-      </div>
-      <h2 class="r-card__name">Senior Care Specialist</h2>
-      <p class="r-card__role">Companion · Heavy Housekeeping</p>
-      <div class="r-card__meta">
-        <div class="r-card__meta-row">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5C5 1.5 3 4 3 7c0 4 5 7.5 5 7.5s5-3.5 5-7.5c0-3-2-5.5-5-5.5z"/><circle cx="8" cy="7" r="2"/></svg>
-          Vancouver
-        </div>
-        <div class="r-card__meta-row">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><polyline points="8 4 8 8 11 10"/></svg>
-          On PM since 2023 · 8 Engagements
-        </div>
-        <div class="r-card__meta-row">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 3 4.5 3 6.5s-1 4.5-3 6.5M8 1.5c-2 2-3 4.5-3 6.5s1 4.5 3 6.5"/></svg>
-          English · Cantonese
-        </div>
-      </div>
-    </a>
+  <!-- Empty state -->
+  <div class="r-roster-empty" id="rosterEmpty" hidden style="text-align:center;padding:80px 22px;max-width:580px;margin:0 auto;">
+    <div style="font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);font-weight:500;margin-bottom:14px;">The Roster · Currently Curating</div>
+    <h3 style="font-family:Fraunces,Georgia,serif;font-size:30px;font-weight:300;line-height:1.15;margin:0 0 12px;letter-spacing:-.012em;">No Assistants are currently published.</h3>
+    <p style="font-size:14.5px;color:var(--ink-3);line-height:1.7;margin:0 0 24px;">Private Mentorship is in the middle of vetting and onboarding the next group of Assistants. Apply now to be the first to see the full roster as soon as profiles are published.</p>
+    <a href="apply.html" style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;background:var(--ink);color:#fff;font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:500;">Apply Now</a>
+  </div>
 
-    <!-- ─ Anonymous Card 2 — Childcare Specialist ─ -->
-    <a class="r-card" href="apply.html?category=childcare" data-category="childcare general" data-location="north-shore" data-lang="en fr" data-recommended="0">
-      <div class="r-card__photo" style="--photo-from:#5a3a1f;--photo-to:#8a6238;">
-        <span class="r-card__photo-anon">
-          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="24" cy="16" r="6"/>
-            <path d="M10 40c0-8 6-12 14-12s14 4 14 12"/>
-          </svg>
-        </span>
-        <div class="r-card__photo-hover">
-          <span>Apply to View Profile</span>
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l5 5-5 5"/></svg>
-        </div>
-      </div>
-      <h2 class="r-card__name">Childcare Specialist</h2>
-      <p class="r-card__role">Afterschool &amp; Academic Support</p>
-      <div class="r-card__meta">
-        <div class="r-card__meta-row">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5C5 1.5 3 4 3 7c0 4 5 7.5 5 7.5s5-3.5 5-7.5c0-3-2-5.5-5-5.5z"/><circle cx="8" cy="7" r="2"/></svg>
-          North Shore
-        </div>
-        <div class="r-card__meta-row">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><polyline points="8 4 8 8 11 10"/></svg>
-          On PM since 2024 · 5 Engagements
-        </div>
-        <div class="r-card__meta-row">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 3 4.5 3 6.5s-1 4.5-3 6.5M8 1.5c-2 2-3 4.5-3 6.5s1 4.5 3 6.5"/></svg>
-          English · French
-        </div>
-      </div>
-    </a>
+  <!-- Roster grid (populated by JS) -->
+  <div class="r-grid" id="rosterGrid" hidden>
 
-    <!-- ─ Anonymous Card 3 — Disability Support Specialist ─ -->
-    <a class="r-card" href="apply.html?category=disability" data-category="disability" data-location="burnaby" data-lang="en asl" data-recommended="1">
-      <div class="r-card__photo" style="--photo-from:#3d2a5c;--photo-to:#6a4d96;">
-        <span class="r-card__rec">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="8 1.5 10.2 5.9 15 6.6 11.5 10 12.4 14.8 8 12.5 3.6 14.8 4.5 10 1 6.6 5.8 5.9"/></svg>
-          PM Recommends
-        </span>
-        <span class="r-card__photo-anon">
-          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="24" cy="16" r="6"/>
-            <path d="M10 40c0-8 6-12 14-12s14 4 14 12"/>
-          </svg>
-        </span>
-        <div class="r-card__photo-hover">
-          <span>Apply to View Profile</span>
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l5 5-5 5"/></svg>
+    <!-- Hidden template for one card (cloned by JS) -->
+    <template id="rosterCardTemplate">
+      <a class="r-card" data-category="" data-location="" data-lang="">
+        <div class="r-card__photo">
+          <span class="r-card__photo-anon">
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="24" cy="16" r="6"/>
+              <path d="M10 40c0-8 6-12 14-12s14 4 14 12"/>
+            </svg>
+          </span>
+          <div class="r-card__photo-hover">
+            <span>Apply to View Profile</span>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l5 5-5 5"/></svg>
+          </div>
         </div>
-      </div>
-      <h2 class="r-card__name">Disability Support Specialist</h2>
-      <p class="r-card__role">Life Skills &amp; Community Access</p>
-      <div class="r-card__meta">
-        <div class="r-card__meta-row">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5C5 1.5 3 4 3 7c0 4 5 7.5 5 7.5s5-3.5 5-7.5c0-3-2-5.5-5-5.5z"/><circle cx="8" cy="7" r="2"/></svg>
-          Burnaby
+        <h2 class="r-card__name"></h2>
+        <p class="r-card__role"></p>
+        <div class="r-card__meta">
+          <div class="r-card__meta-row r-card__meta-row--city">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5C5 1.5 3 4 3 7c0 4 5 7.5 5 7.5s5-3.5 5-7.5c0-3-2-5.5-5-5.5z"/><circle cx="8" cy="7" r="2"/></svg>
+            <span class="r-card__city"></span>
+          </div>
+          <div class="r-card__meta-row r-card__meta-row--lang">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 3 4.5 3 6.5s-1 4.5-3 6.5M8 1.5c-2 2-3 4.5-3 6.5s1 4.5 3 6.5"/></svg>
+            <span class="r-card__langs"></span>
+          </div>
         </div>
-        <div class="r-card__meta-row">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><polyline points="8 4 8 8 11 10"/></svg>
-          On PM since 2024 · 4 Engagements
-        </div>
-        <div class="r-card__meta-row">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 3 4.5 3 6.5s-1 4.5-3 6.5M8 1.5c-2 2-3 4.5-3 6.5s1 4.5 3 6.5"/></svg>
-          English · ASL
-        </div>
-      </div>
-    </a>
-
-    <!-- ─ Anonymous Card 4 — Family Operations Specialist ─ -->
-    <a class="r-card" href="apply.html?category=general" data-category="general childcare" data-location="richmond" data-lang="en mandarin hindi" data-recommended="0">
-      <div class="r-card__photo" style="--photo-from:#3f5024;--photo-to:#6a8240;">
-        <span class="r-card__photo-anon">
-          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="24" cy="16" r="6"/>
-            <path d="M10 40c0-8 6-12 14-12s14 4 14 12"/>
-          </svg>
-        </span>
-        <div class="r-card__photo-hover">
-          <span>Apply to View Profile</span>
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l5 5-5 5"/></svg>
-        </div>
-      </div>
-      <h2 class="r-card__name">Family Operations Specialist</h2>
-      <p class="r-card__role">Errands · Driving · Day-to-Day</p>
-      <div class="r-card__meta">
-        <div class="r-card__meta-row">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5C5 1.5 3 4 3 7c0 4 5 7.5 5 7.5s5-3.5 5-7.5c0-3-2-5.5-5-5.5z"/><circle cx="8" cy="7" r="2"/></svg>
-          Richmond
-        </div>
-        <div class="r-card__meta-row">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><polyline points="8 4 8 8 11 10"/></svg>
-          On PM since 2025 · 2 Engagements
-        </div>
-        <div class="r-card__meta-row">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 3 4.5 3 6.5s-1 4.5-3 6.5M8 1.5c-2 2-3 4.5-3 6.5s1 4.5 3 6.5"/></svg>
-          English · Mandarin · Hindi
-        </div>
-      </div>
-    </a>
+      </a>
+    </template>
 
   </div>
 </div>
+
 
 <!-- ═════ BOTTOM CTA ═════ -->
 <aside class="r-bottom">
@@ -549,37 +462,149 @@ img{max-width:100%;display:block}
 <script src="js/pm-help-fab.js" defer></script>
 
 <script>
-  // Combined filter logic
+  // ─── Live roster loader ────────────────────────────────────────────────
+  // Fetches published profiles from assistant_profiles via the hiring-service
+  // public function. Renders anonymized cards. Falls back to empty state if
+  // the table is empty or RLS blocks anonymous reads.
+  //
+  // Anonymization rule for the public page:
+  //   - Hide display_name (real first name + last initial)
+  //   - Show role label only ("Private Family Assistant")
+  //   - Show city, languages
+  //   - Click → apply.html (no profile detail page until logged-in dashboard)
+  // ─────────────────────────────────────────────────────────────────────────
   (function(){
+    var loadingEl = document.getElementById('rosterLoading');
+    var emptyEl = document.getElementById('rosterEmpty');
+    var gridEl = document.getElementById('rosterGrid');
+    var template = document.getElementById('rosterCardTemplate');
+    var countEl = document.getElementById('resultCount');
     var fService = document.getElementById('fService');
     var fLocation = document.getElementById('fLocation');
     var fLanguage = document.getElementById('fLanguage');
-    var cards = document.querySelectorAll('#rosterGrid .r-card');
-    var countEl = document.getElementById('resultCount');
 
-    function apply(){
-      var svc = fService.value;
-      var loc = fLocation.value;
-      var lang = fLanguage.value;
+    var allProfiles = [];
+
+    function cityToFilterKey(city){
+      if (!city) return '';
+      var c = String(city).toLowerCase();
+      if (/north\s*shore|north\s*van|west\s*van/.test(c)) return 'north-shore';
+      if (/burnaby/.test(c)) return 'burnaby';
+      if (/richmond/.test(c)) return 'richmond';
+      if (/vancouver|west\s*end|kits|kitsilano|downtown/.test(c)) return 'vancouver';
+      return c.replace(/\s+/g, '-');
+    }
+
+    function langToFilterKeys(languages){
+      var arr = Array.isArray(languages) ? languages : [];
+      return arr.map(function(l){
+        var s = String(l).toLowerCase();
+        if (/english/.test(s)) return 'en';
+        if (/french|fran/.test(s)) return 'fr';
+        if (/cantonese|粵|廣/.test(s)) return 'cantonese';
+        if (/mandarin|chinese|中文|普/.test(s)) return 'mandarin';
+        if (/hindi|हिं/.test(s)) return 'hindi';
+        if (/asl|sign/.test(s)) return 'asl';
+        return s.replace(/\s+/g, '-');
+      });
+    }
+
+    function buildCard(profile){
+      var node = template.content.firstElementChild.cloneNode(true);
+      node.setAttribute('href', 'apply.html');
+      node.setAttribute('data-location', cityToFilterKey(profile.city));
+      node.setAttribute('data-lang', langToFilterKeys(profile.languages).join(' '));
+      // Service category isn't a column yet — leave data-category blank
+      // (Service filter is effectively neutral until schema adds a category)
+      node.setAttribute('data-category', 'all');
+
+      // Anonymized label — no real name
+      node.querySelector('.r-card__name').textContent = 'Private Family Assistant';
+      node.querySelector('.r-card__role').textContent = profile.city ? ('Available in ' + profile.city) : 'Greater Vancouver';
+      var cityEl = node.querySelector('.r-card__city');
+      if (cityEl) cityEl.textContent = profile.city || 'Greater Vancouver';
+      var langsEl = node.querySelector('.r-card__langs');
+      if (langsEl) {
+        var langs = Array.isArray(profile.languages) ? profile.languages : [];
+        langsEl.textContent = langs.length ? langs.join(' · ') : 'Languages on request';
+      }
+
+      // Subtle deterministic gradient per profile (cycles through a palette)
+      var palette = [
+        ['#1c4956','#3a7d8f'], ['#5a3a1f','#8a6238'],
+        ['#3d2a5c','#6a4d96'], ['#3f5024','#6a8240'],
+        ['#4a3a52','#7a6080'], ['#403a2c','#6e6047'],
+      ];
+      var photo = node.querySelector('.r-card__photo');
+      var hash = (profile.assistant_id || '').split('').reduce(function(a,c){ return (a + c.charCodeAt(0)) % palette.length; }, 0);
+      var pick = palette[hash] || palette[0];
+      photo.style.setProperty('--photo-from', pick[0]);
+      photo.style.setProperty('--photo-to', pick[1]);
+
+      return node;
+    }
+
+    function renderGrid(profiles){
+      gridEl.innerHTML = '';
+      // Keep the template element inside the grid (needed for cloning on filter)
+      gridEl.appendChild(template);
+      profiles.forEach(function(p){ gridEl.appendChild(buildCard(p)); });
+    }
+
+    function applyFilters(){
+      if (!gridEl) return;
+      var loc = fLocation ? fLocation.value : 'all';
+      var lang = fLanguage ? fLanguage.value : 'all';
       var visible = 0;
-      cards.forEach(function(card){
-        var cats = (card.getAttribute('data-category') || '').split(/\s+/);
+      gridEl.querySelectorAll('.r-card').forEach(function(card){
         var locs = (card.getAttribute('data-location') || '').split(/\s+/);
         var langs = (card.getAttribute('data-lang') || '').split(/\s+/);
-        var svcMatch = svc === 'all' || cats.indexOf(svc) !== -1;
         var locMatch = loc === 'all' || locs.indexOf(loc) !== -1;
         var langMatch = lang === 'all' || langs.indexOf(lang) !== -1;
-        var show = svcMatch && locMatch && langMatch;
+        var show = locMatch && langMatch;
         card.hidden = !show;
         if (show) visible++;
       });
       if (countEl) countEl.textContent = visible;
     }
 
+    async function load(){
+      try {
+        // Wait briefly for pmHiring to initialize from the <script> tags
+        var tries = 0;
+        while (!window.pmHiring && tries < 30) {
+          await new Promise(r => setTimeout(r, 100));
+          tries++;
+        }
+        if (!window.pmHiring || typeof window.pmHiring.listPublishedAssistantProfiles !== 'function') {
+          throw new Error('listPublishedAssistantProfiles not available');
+        }
+        var profiles = await window.pmHiring.listPublishedAssistantProfiles();
+        allProfiles = profiles || [];
+        loadingEl.hidden = true;
+        if (allProfiles.length === 0) {
+          emptyEl.hidden = false;
+          gridEl.hidden = true;
+          if (countEl) countEl.textContent = '0';
+          return;
+        }
+        renderGrid(allProfiles);
+        gridEl.hidden = false;
+        if (countEl) countEl.textContent = allProfiles.length;
+      } catch (e) {
+        console.warn('Roster load failed — showing empty state.', e);
+        loadingEl.hidden = true;
+        emptyEl.hidden = false;
+        gridEl.hidden = true;
+      }
+    }
+
+    // Wire filters
     [fService, fLocation, fLanguage].forEach(function(sel){
-      sel.addEventListener('change', apply);
+      if (sel) sel.addEventListener('change', applyFilters);
     });
-    apply();
+
+    load();
   })();
 </script>
 

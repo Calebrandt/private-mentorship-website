@@ -418,6 +418,30 @@
     return data || [];
   }
 
+  // ─── Public: published assistant profiles (anonymous-readable) ─────────
+  // Returns only the safe subset of fields suitable for an anonymous public
+  // roster page. Requires an RLS policy on `assistant_profiles` like:
+  //   CREATE POLICY "anon read published profiles" ON public.assistant_profiles
+  //   FOR SELECT TO anon, authenticated USING (is_published = true);
+  // If the policy isn't in place, this returns an empty array gracefully.
+  async function listPublishedAssistantProfiles() {
+    try {
+      const { data, error } = await sb()
+        .from('assistant_profiles')
+        .select('assistant_id, display_name, bio, city, languages, certifications, education_summary, experience_summary, updated_at')
+        .eq('is_published', true)
+        .order('updated_at', { ascending: false });
+      if (error) {
+        console.warn('listPublishedAssistantProfiles: RLS may not be set up for anon read.', error);
+        return [];
+      }
+      return data || [];
+    } catch (e) {
+      console.warn('listPublishedAssistantProfiles failed:', e);
+      return [];
+    }
+  }
+
   // ─── Admin: create a client account ──────────────────────────────────────
   // Calls the admin-create-client edge function. Server-side it verifies the caller
   // is OWNER/ADMIN/SUPERADMIN, creates the auth user, lets the trigger create the
@@ -1207,6 +1231,8 @@
     // admin: assistant profiles
     adminListAssistantProfiles, adminFetchAssistantProfile, adminUpsertAssistantProfile,
     adminDeleteAssistantProfile, adminListAssistantUsers,
+    // public: anonymous-readable roster
+    listPublishedAssistantProfiles,
     // admin: clients
     adminCreateClientAccount, adminListClients, adminFetchHomeKpis, adminFetchMonthlyStats,
     // client (self)
