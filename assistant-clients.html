@@ -139,7 +139,9 @@ function paletteFor(id){
       <div class="ac-card__avatar" style="--av-from:${pal[0]};--av-to:${pal[1]};">${escapeHtml(initialsFor(name))}</div>
       <div class="ac-card__body">
         <h3 class="ac-card__name">${escapeHtml(name)}</h3>
-        <p class="ac-card__meta">${hours ? `<strong>${hours} hrs</strong> · ` : ''}${escapeHtml(periodStart)} → ${escapeHtml(periodEnd)}</p>
+        <p class="ac-card__meta">
+          ${hours ? `<strong>${hours}-hour plan</strong> · ` : ''}Contract: ${escapeHtml(periodStart)} → ${escapeHtml(periodEnd)}
+        </p>
       </div>
       <span class="ac-card__status ac-card__status--${escapeHtml(statusClass)}">${escapeHtml(statusKey)}</span>
       <svg class="ac-card__chev" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 4 11 8 6 12"/></svg>

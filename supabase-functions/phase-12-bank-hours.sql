@@ -168,6 +168,13 @@ BEGIN
            WHERE cce.source_contract_id = c.id
              AND cce.reason = 'contract_expired_carryover'
         )
+        -- Phase 12.1: only process contracts with actual ledger entries.
+        -- Legacy contracts (no session_completed rows) would otherwise
+        -- bank their full plan minutes — but those hours were actually
+        -- used, just not migrated to the new ledger schema.
+        AND EXISTS (
+          SELECT 1 FROM public.hours_ledger l WHERE l.contract_id = c.id
+        )
   LOOP
     SELECT COALESCE(remaining_minutes, 0)
       INTO v_remaining
