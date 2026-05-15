@@ -1769,59 +1769,5 @@
 })();
 </script>
 
-<!-- ═════ URL PARAM PREFILL + POST-SUBMIT DASHBOARD HOOK ═════ -->
-<script>
-(function(){
-  // Read URL params (?category=senior or ?assistant=Sarah%20Y.) and surface
-  // a small banner so the family knows we know what brought them here.
-  var params = new URLSearchParams(window.location.search);
-  var category = params.get('category');
-  var assistant = params.get('assistant');
-
-  var CATEGORY_LABELS = {
-    senior: 'Senior Care',
-    childcare: 'Childcare',
-    disability: 'Disability Support',
-    general: 'General Day-to-Day'
-  };
-
-  if (category || assistant) {
-    var banner = document.createElement('div');
-    banner.style.cssText = 'background:#1a1a1a;color:#fff;padding:14px 22px;text-align:center;font-size:13px;letter-spacing:.02em;line-height:1.55;';
-    var text = 'You came from the roster page.';
-    if (category && CATEGORY_LABELS[category]) {
-      text += ' We have noted you are interested in <strong style="color:#a07c3c;">' + CATEGORY_LABELS[category] + '</strong>.';
-    }
-    if (assistant) {
-      text += ' We have noted your interest in <strong style="color:#a07c3c;">' + assistant + '</strong>.';
-    }
-    text += ' Complete the application below and we will follow up to schedule the intake call.';
-    banner.innerHTML = text;
-    document.body.insertBefore(banner, document.body.firstChild);
-
-    // Also store the context for the dashboard once it exists
-    try {
-      var ctx = JSON.parse(localStorage.getItem('pm_apply_context') || '{}');
-      if (category) ctx.category = category;
-      if (assistant) ctx.assistant = assistant;
-      localStorage.setItem('pm_apply_context', JSON.stringify(ctx));
-    } catch(e){}
-  }
-
-  // Post-submit hook — when the form is successfully submitted, set the
-  // "applied" flag in localStorage so the Client Dashboard knows this
-  // family has applied. Real auth will replace this in the Supabase build.
-  // We watch for a successful submit by listening to all form submits and
-  // checking for the existing success state used by the app.
-  document.addEventListener('submit', function(e){
-    // Mark applied on any form submit attempt — admin can always revoke later
-    try {
-      localStorage.setItem('pm_client_applied', 'true');
-      localStorage.setItem('pm_client_applied_at', new Date().toISOString());
-    } catch(err){}
-  }, true);
-})();
-</script>
-
 </body>
 </html>
