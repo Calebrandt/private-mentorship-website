@@ -10,7 +10,7 @@
       { type: 'link', href: 'admin-schedule-requests.html', label: 'Scheduling', icon: 'calendar', dynamicBadge: 'admin-schedule-requests', match: ['admin-schedule-requests.html', 'admin-scheduling.html'] },
       { type: 'link', href: 'admin-hiring.html', label: 'Hiring', icon: 'briefcase', dynamicBadge: 'admin-hiring', match: ['admin-hiring.html', 'admin-application.html'] },
       { type: 'link', href: 'admin-financials.html', label: 'Financials', icon: 'dollar' },
-      { type: 'link', href: 'messages.html', label: 'Messages', icon: 'message' },
+      { type: 'link', href: 'messages.html', label: 'Messages', icon: 'message', dynamicBadge: 'messages-unread' },
       { type: 'divider' },
       {
         type: 'group', label: 'Tools', icon: 'tools', dynamicBadge: 'admin-tools-aggregate',
@@ -30,7 +30,7 @@
     ],
     client: [
       { type: 'link', href: 'client-dashboard.html', label: 'Dashboard', icon: 'dashboard' },
-      { type: 'link', href: 'messages.html', label: 'Inbox', icon: 'message' },
+      { type: 'link', href: 'messages.html', label: 'Inbox', icon: 'message', dynamicBadge: 'messages-unread' },
       { type: 'section', label: 'Daily' },
       { type: 'link', href: 'client-schedule.html', label: 'Schedule', icon: 'calendar' },
       { type: 'link', href: 'client-education.html', label: 'Education', icon: 'book' },
@@ -47,7 +47,7 @@
     ],
     assistant: [
       { type: 'link', href: 'assistant-dashboard.html', label: 'Dashboard', icon: 'dashboard' },
-      { type: 'link', href: 'messages.html', label: 'Inbox', icon: 'message' },
+      { type: 'link', href: 'messages.html', label: 'Inbox', icon: 'message', dynamicBadge: 'messages-unread' },
       { type: 'section', label: 'Work' },
       { type: 'link', href: 'assistant-clients.html', label: 'My Clients', icon: 'users' },
       { type: 'link', href: 'assistant-schedule.html', label: 'My Schedule', icon: 'calendar' },
@@ -396,6 +396,14 @@
           }).then(p => (p || []).length).catch(() => 0),
         ]);
         return Number(sched) + Number(memb) + Number(intro);
+      } catch (_) { return 0; }
+    }
+    if (kind === 'messages-unread') {
+      // Role-agnostic — works for admin, client, and assistant. Each
+      // signed-in user sees their own unread count across all conversations
+      // they participate in.
+      try {
+        return await window.pmHiring.fetchMyUnreadMessagesCount();
       } catch (_) { return 0; }
     }
     if (kind === 'client-picks' && role === 'client') {

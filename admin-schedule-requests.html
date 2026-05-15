@@ -283,26 +283,13 @@
     <p class="nx-sub" id="nxSub">Review pending cancel, reschedule, and additional-session requests from clients.</p>
   </header>
 
-  <!-- Phase 3.5: Recent cancellations audit log — moved to top of page so
-       admin sees it without scrolling past dozens of pending approvals.
-       Cancellations are immediate (no approval queue), but admin still
-       needs visibility. Collapsible to save real estate. -->
-  <section class="nx-cancellations" style="margin-bottom:22px;">
-    <button id="nxCxToggle" type="button" class="nx-cx-toggle">
-      <span class="nx-cx-toggle__caret">▾</span>
-      <span class="nx-cx-toggle__label">Recent cancellations</span>
-      <span class="nx-cx-toggle__count" id="nxCxCount">—</span>
-      <span class="nx-cx-toggle__sub">Immediate · no approval needed · this is an audit log</span>
-    </button>
-    <div id="nxCxList" class="nx-cx-body"></div>
-  </section>
-
   <div class="nx-tabs" id="nxTabs">
     <button class="nx-tab is-active" type="button" data-tab="all">All <span class="nx-tab__count" data-count="all">0</span></button>
     <button class="nx-tab" type="button" data-tab="cancel">Cancellations <span class="nx-tab__count" data-count="cancel">0</span></button>
     <button class="nx-tab" type="button" data-tab="reschedule">Reschedules <span class="nx-tab__count" data-count="reschedule">0</span></button>
     <button class="nx-tab" type="button" data-tab="extra">Additional <span class="nx-tab__count" data-count="extra">0</span></button>
     <button class="nx-tab" type="button" data-tab="reviewed">Reviewed</button>
+    <button class="nx-tab" type="button" data-tab="cancellation-log">Cancellation log <span class="nx-tab__count" data-count="cancellation-log">0</span></button>
   </div>
 
   <div id="reqList"><div class="nx-empty">Loading…</div></div>
@@ -448,6 +435,7 @@
   let currentTab = 'all';
   let allPending = [];
   let allReviewed = [];
+  let allCancellations = []; // Phase 3.5: immediate cancellations (audit log)
   let clientsById = {};
   let appointmentsById = {};
   // Phase 3: which proposed slot has the admin chosen for each multi-slot request?
@@ -469,26 +457,30 @@
 
   // Phase 3.5: read-only cancellations audit log (immediate cancels by
   // assistants or clients no longer flow through the approval queue).
+  // Now rendered as the rightmost tab in the inbox tab bar.
   async function loadCancellations(){
-    const wrap = document.getElementById('nxCxList');
-    const counter = document.getElementById('nxCxCount');
     let data = { rows: [] };
-    try { data = await window.pmHiring.adminFetchRecentCancellations({ limit: 50 }); } catch (_) {}
-    const rows = data.rows || [];
-    counter.textContent = rows.length === 0 ? 'None' : String(rows.length);
-    if (!rows.length) {
-      wrap.innerHTML = `<div class="nx-empty" style="padding:18px 16px;border:1px dashed var(--border);border-radius:10px;text-align:center;">
-        <p style="margin:0;font-size:13px;color:var(--ink-mute);">No cancellations in recent history.</p>
+    try { data = await window.pmHiring.adminFetchRecentCancellations({ limit: 100 }); } catch (_) {}
+    allCancellations = data.rows || [];
+    refreshTabCounts();
+    if (currentTab === 'cancellation-log') render();
+  }
+
+  function renderCancellationLog(){
+    if (!allCancellations.length) {
+      const inboxIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>';
+      return `<div class="nx-empty">
+        <div class="nx-empty__icon">${inboxIcon}</div>
+        <p class="nx-empty__title">No cancellations yet</p>
+        <p class="nx-empty__sub">Cancellations happen immediately — no approval needed. When sessions are cancelled, they appear here for your records.</p>
       </div>`;
-      return;
     }
-    wrap.innerHTML = `<div class="nx-cx-table">` + rows.map(r => {
+    return `<div class="nx-cx-table">` + allCancellations.map(r => {
       const d = new Date(r.starts_at);
       const dateMain = d.toLocaleDateString('en-CA',{month:'short',day:'numeric'});
       const dateTime = d.toLocaleTimeString('en-CA',{hour:'numeric',minute:'2-digit'});
       const dateYear = d.getFullYear();
-      const cxAt = r.cancelled_at ? new Date(r.cancelled_at) : null;
-      const cxAgo = cxAt ? timeAgo(r.cancelled_at) : '—';
+      const cxAgo = r.cancelled_at ? timeAgo(r.cancelled_at) : '—';
       const clientName = r.client?.full_name || (r.client_id ? `Client ${r.client_id.slice(0,6)}` : '—');
       const cancellerName = r.canceller?.full_name || 'Unknown';
       const cancellerRole = r.canceller?.role || '';
@@ -507,24 +499,13 @@
     }).join('') + `</div>`;
   }
 
-  // Phase 3.5: collapsible toggle for the recent-cancellations section.
-  // Default is OPEN so admin sees it on first load. Toggling persists for
-  // the page session via the .is-collapsed class on the parent <section>.
-  (function wireCxToggle(){
-    const btn = document.getElementById('nxCxToggle');
-    if (!btn) return;
-    btn.addEventListener('click', () => {
-      const sec = btn.closest('.nx-cancellations');
-      if (sec) sec.classList.toggle('is-collapsed');
-    });
-  })();
-
   function refreshTabCounts(){
     const counts = {
       all: allPending.length,
       cancel: allPending.filter(r => r.request_type === 'cancel').length,
       reschedule: allPending.filter(r => r.request_type === 'reschedule').length,
       extra: allPending.filter(r => r.request_type === 'extra').length,
+      'cancellation-log': allCancellations.length,
     };
     Object.entries(counts).forEach(([k,v]) => {
       const el = document.querySelector(`[data-count="${k}"]`);
@@ -653,6 +634,14 @@
 
   function render(){
     const wrap = $('reqList');
+
+    // Phase 3.5: dedicated render path for the cancellation log tab —
+    // it shows appointment rows (audit), not schedule_change_requests.
+    if (currentTab === 'cancellation-log') {
+      wrap.innerHTML = renderCancellationLog();
+      return;
+    }
+
     let list, mode = 'pending';
     if (currentTab === 'reviewed') {
       list = allReviewed; mode = 'reviewed';

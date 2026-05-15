@@ -1017,6 +1017,37 @@
     } catch (_) { return 0; }
   }
 
+  // Unread message count for the signed-in user, across all conversations
+  // they participate in. Used by the Messages sidebar badge for every role.
+  // Definition: messages I haven't read AND that weren't sent by me.
+  // read_by is a jsonb array of user_ids (auth.uid strings).
+  async function fetchMyUnreadMessagesCount() {
+    const user = await getCurrentUser();
+    if (!user) return 0;
+    try {
+      const { data: parts } = await sb()
+        .from('conversation_participants')
+        .select('conversation_id')
+        .eq('profile_id', user.id);
+      const convIds = (parts || []).map(p => p.conversation_id);
+      if (!convIds.length) return 0;
+
+      const { data: msgs } = await sb()
+        .from('conversation_messages')
+        .select('id, read_by')
+        .in('conversation_id', convIds)
+        .neq('profile_id', user.id);
+      if (!msgs) return 0;
+
+      let unread = 0;
+      for (const m of msgs) {
+        const readBy = Array.isArray(m.read_by) ? m.read_by : [];
+        if (!readBy.includes(user.id)) unread++;
+      }
+      return unread;
+    } catch (_) { return 0; }
+  }
+
   // Phase 3.5: read-only audit log of recent cancellations (assistant- or
   // client-initiated). Surfaced on admin-schedule-requests.html as a separate
   // section below the approval inbox since they no longer flow through it.
@@ -2113,6 +2144,8 @@
     // scheduler Phase 3.5 — admin badges + cancellations audit
     adminFetchPendingScheduleRequestsCount, adminFetchRecentCancellations,
     adminFetchPendingMembershipRequestsCount, adminFetchPendingApplicationsCount,
+    // sidebar badges — messages unread (any role)
+    fetchMyUnreadMessagesCount,
     // assistant-side (Phase 3)
     updateMyAssistantProfile, fetchMyAssistantHoursLedger,
     // admin: clients
