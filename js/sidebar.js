@@ -8,15 +8,15 @@
       { type: 'link', href: 'admin-dashboard.html', label: 'Dashboard', icon: 'dashboard' },
       { type: 'link', href: 'admin-clients.html', label: 'Clients', icon: 'users' },
       { type: 'link', href: 'admin-schedule-requests.html', label: 'Scheduling', icon: 'calendar', dynamicBadge: 'admin-schedule-requests', match: ['admin-schedule-requests.html', 'admin-scheduling.html'] },
-      { type: 'link', href: 'admin-hiring.html', label: 'Hiring', icon: 'briefcase', badge: null, match: ['admin-hiring.html', 'admin-application.html'] },
+      { type: 'link', href: 'admin-hiring.html', label: 'Hiring', icon: 'briefcase', dynamicBadge: 'admin-hiring', match: ['admin-hiring.html', 'admin-application.html'] },
       { type: 'link', href: 'admin-financials.html', label: 'Financials', icon: 'dollar' },
       { type: 'link', href: 'messages.html', label: 'Messages', icon: 'message' },
       { type: 'divider' },
       {
-        type: 'group', label: 'Tools', icon: 'tools',
+        type: 'group', label: 'Tools', icon: 'tools', dynamicBadge: 'admin-tools-aggregate',
         items: [
           { href: 'admin-schedule-requests.html', label: 'Schedule Requests', icon: 'inbox', dynamicBadge: 'admin-schedule-requests' },
-          { href: 'admin-membership-requests.html', label: 'Membership Requests', icon: 'inbox' },
+          { href: 'admin-membership-requests.html', label: 'Membership Requests', icon: 'inbox', dynamicBadge: 'admin-membership-requests' },
           { href: 'admin-intro-requests.html', label: 'Intro Requests', icon: 'inbox', dynamicBadge: 'admin-intro-requests' },
           { href: 'admin-create-client.html', label: 'Create Client', icon: 'user-plus' },
           { href: 'admin-family-management.html', label: 'Family Management', icon: 'users' },
@@ -120,10 +120,16 @@
       </a>`;
     }).join('');
     const anyActive = (group.items || []).some(isLinkActive);
+    // Group-level badge — sits on the toggle button so it's visible even
+    // when the group is collapsed. Used for aggregates (e.g. Tools sums
+    // pending schedule + membership + intro requests).
+    const gAttr = group.dynamicBadge ? ` data-dynamic-badge="${escapeHtml(group.dynamicBadge)}"` : '';
+    const gSlot = group.dynamicBadge ? `<span class="pm-sb-link__badge" data-badge-slot hidden></span>` : '';
     return `<div class="pm-sb-group${anyActive ? ' is-open' : ''}">
-      <button class="pm-sb-group__toggle" type="button" data-toggle-group>
+      <button class="pm-sb-group__toggle" type="button" data-toggle-group${gAttr}>
         <span class="pm-sb-link__icon">${ICONS[group.icon] || ICONS.tools}</span>
         <span class="pm-sb-link__label">${escapeHtml(group.label)}</span>
+        ${gSlot}
         <span class="pm-sb-group__chev">${ICONS.chev}</span>
       </button>
       <div class="pm-sb-group__items">${items}</div>
@@ -364,6 +370,32 @@
       // Cancels are immediate as of Phase 3.5 — they don't queue here.
       try {
         return await window.pmHiring.adminFetchPendingScheduleRequestsCount();
+      } catch (_) { return 0; }
+    }
+    if (kind === 'admin-membership-requests' && role === 'admin') {
+      try {
+        return await window.pmHiring.adminFetchPendingMembershipRequestsCount();
+      } catch (_) { return 0; }
+    }
+    if (kind === 'admin-hiring' && role === 'admin') {
+      // Submitted + under_review = needs admin eyes.
+      try {
+        return await window.pmHiring.adminFetchPendingApplicationsCount();
+      } catch (_) { return 0; }
+    }
+    if (kind === 'admin-tools-aggregate' && role === 'admin') {
+      // Sum of every queue under the Tools group: schedule + membership +
+      // intro. Visible on the group toggle so the admin sees a total even
+      // when the group is collapsed.
+      try {
+        const [sched, memb, intro] = await Promise.all([
+          window.pmHiring.adminFetchPendingScheduleRequestsCount().catch(() => 0),
+          window.pmHiring.adminFetchPendingMembershipRequestsCount().catch(() => 0),
+          window.pmHiring.adminListPicks({
+            statuses: ['introduction_requested','meeting_scheduled','meeting_complete']
+          }).then(p => (p || []).length).catch(() => 0),
+        ]);
+        return Number(sched) + Number(memb) + Number(intro);
       } catch (_) { return 0; }
     }
     if (kind === 'client-picks' && role === 'client') {

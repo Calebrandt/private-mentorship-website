@@ -988,6 +988,35 @@
     } catch (_) { return 0; }
   }
 
+  // Count pending membership change requests (plan + schedule combined).
+  // Per adminListMembershipRequests default: 'pending', 'client_accepted_review',
+  // and 'awaiting_client_review' all count as "open / needs eyes."
+  async function adminFetchPendingMembershipRequestsCount() {
+    try {
+      const { count, error } = await sb()
+        .from('membership_change_requests')
+        .select('id', { count: 'exact', head: true })
+        .in('status', ['pending', 'client_accepted_review', 'awaiting_client_review']);
+      if (error) return 0;
+      return Number(count) || 0;
+    } catch (_) { return 0; }
+  }
+
+  // Count applications submitted by candidates that need admin review.
+  // applicants.status enum: draft / submitted / under_review / correction_requested
+  // / rejected / accepted / archived. "Needs admin attention" = submitted +
+  // under_review (correction_requested is waiting on the applicant).
+  async function adminFetchPendingApplicationsCount() {
+    try {
+      const { count, error } = await sb()
+        .from('applicants')
+        .select('id', { count: 'exact', head: true })
+        .in('status', ['submitted', 'under_review']);
+      if (error) return 0;
+      return Number(count) || 0;
+    } catch (_) { return 0; }
+  }
+
   // Phase 3.5: read-only audit log of recent cancellations (assistant- or
   // client-initiated). Surfaced on admin-schedule-requests.html as a separate
   // section below the approval inbox since they no longer flow through it.
@@ -2083,6 +2112,7 @@
     assistantSubmitExtraAppointmentRequest, fetchAssistantPendingScheduleRequests,
     // scheduler Phase 3.5 — admin badges + cancellations audit
     adminFetchPendingScheduleRequestsCount, adminFetchRecentCancellations,
+    adminFetchPendingMembershipRequestsCount, adminFetchPendingApplicationsCount,
     // assistant-side (Phase 3)
     updateMyAssistantProfile, fetchMyAssistantHoursLedger,
     // admin: clients
