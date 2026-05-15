@@ -4,9 +4,13 @@
 The owner explicitly asked for it because chat-context limits keep
 killing long sessions and we want continuity.
 
-Last updated: 2026-05-15 (late-session). Author: Claude session that built
-the **assistant-side dashboard + scheduler Phases 1–3.5** (see §3 first
-entry below). Previous author: session that built the pick-list system.
+Last updated: 2026-05-15 (marathon session, ~16 hours of work).
+Author: Claude session that took the website from "assistant scheduler
+Phase 1 stub" to a fully verified contract-lifecycle production system —
+9 new pages, 15 SQL migrations deployed, 5 audit-discovered bugs caught
+and fixed, the full contract lifecycle (bank-hours included) end-to-end
+verified. Phases 1 through 13 shipped. See §3 first entry below for the
+full chronological breakdown.
 Project owner: **Caleb Brandt** (single founder, building this himself).
 
 ---
@@ -135,11 +139,240 @@ production. **If you can't see a change, hard-refresh the browser
 or bump the cache-bust query string on `<link rel="stylesheet">`
 tags in `index.html`.**
 
-### LATEST (2026-05-15, late-session) — Assistant Dashboard + Scheduler Phases 1-3.5
+### LATEST (2026-05-15, marathon ~16 hr session) — Phases 1–13 complete
 
-**Not deployed yet.** Owner is out of Netlify build minutes and asked
-to keep work local. ~13 commits sit ahead of `origin/main` as of this
-write. Push when tokens reload.
+**Not deployed to Netlify yet.** Owner ran out of Netlify build minutes
+mid-session and asked to keep all work local. **41 commits sit ahead of
+`origin/main` as of this write.** Push when tokens reload — one push
+deploys the entire arc.
+
+**The arc, in chronological order:**
+
+1. **Assistant Dashboard Phase 2 + 3** — 6 new pages (clients roster,
+   per-family workspace, profile editor, hours, schedule placeholder,
+   resources hub). Phase 2 = list/workspace, Phase 3 = profile/hours.
+
+2. **Scheduler Phase 1** (read-only) — replaced the stub
+   `assistant-schedule.html` with a real weekly grid + upcoming +
+   recent-history. Color-coded by status. Required adding 7 scoped
+   RLS policies for the assistant role (file:
+   `assistant-rls-policies.sql`). Initial deploy hit infinite recursion;
+   fixed by introducing 4 SECURITY DEFINER helper functions
+   (`is_my_assistant_client`, `is_my_assistant_contract`,
+   `is_my_assistant_appointment`, `is_my_active_assistant_client`).
+
+3. **Scheduler Phase 2** — `assistant_mark_appointment_complete` +
+   `assistant_mark_appointment_no_show` SECURITY DEFINER RPCs.
+   Atomic appointment-status update + hours_ledger insert.
+
+4. **Scheduler Phase 3** — multi-slot reschedule + cancel via the
+   existing `schedule_change_requests` engine. Admin queue gets a slot
+   picker UI for multi-slot reschedule requests. Fixed a stale FK on
+   `schedule_change_requests.assistant_id` (was pointing to legacy
+   `public.users` which doesn't have all the auth users).
+
+5. **Scheduler Phase 3.5** — cancellation made immediate (no admin
+   approval) per owner's rule: *"if someone cancels, an assistant
+   can't say no. no one can be forced to do appointments."* New RPC
+   `assistant_cancel_appointment`. Family held harmless: no hours
+   forfeited on assistant-initiated cancels. Admin gets a
+   "Cancellation log" audit tab in the inbox + sidebar badge.
+
+6. **Scheduler Phase 4** — assistant books an extra/new session for
+   a family. Reuses the `extra` request type that already flows
+   through admin approval. Uses multi-slot proposals like Phase 3.
+
+7. **Scheduler Phase 5** — assistant availability windows (recurring
+   weekday/time blocks + date-range blackouts). 2 new tables, 8 RLS
+   policies, helper RPC `is_assistant_available_at`. New page
+   `/assistant-availability.html`.
+
+8. **Scheduler Phase 5.5** — soft availability checks on every booking
+   surface (client reschedule, client request-additional, assistant
+   reschedule, assistant book-new, admin approve). Override-confirm
+   dialog if outside the assistant's published availability.
+
+9. **Phase 6: Contract pause/freeze** — `contract_freezes` table,
+   `admin_freeze_contract` + `admin_unfreeze_contract` RPCs.
+   Admin-initiated; cancels reserved appointments in the window
+   without hours forfeit; pushes `contract.end_at` out by the freeze
+   length. Real customer scenario: 2-3 month trips to China.
+
+10. **Phase 7 / 7.1 / 7.2: Change-token enforcement** — uses existing
+    `contract_policy_limits.change_tokens_total` (default 3) and
+    `v_contract_balance.change_tokens_used`. New helper RPC
+    `get_contract_token_status`. Owner's rule: 3 free reschedule/cancel
+    changes per contract; after that hours auto-deduct as a penalty.
+    UI shows the counter on contract card + cancel/reschedule modals.
+    7.1 added authz to the helper + made client cancels consume tokens.
+    7.2 made the deduction automatic via RPC change + added pre-action
+    confirm dialogs showing the hours math (current/deduct/after).
+
+11. **Phase 8: Multi-timezone** — `assistant_profiles.timezone` column
+    (default America/Vancouver), 7-zone picker on profile editor,
+    `is_assistant_available_at` reads the assistant's own timezone
+    instead of hardcoding Vancouver.
+
+12. **Phase 9 (critical bug fix): apply_hours_ledger trigger restored**
+    — audit caught that `clients.hours_balance` was NEVER updated by
+    anything. The trigger that should sync it from `hours_ledger`
+    was dropped in the schema migration and never restored. 9 UI
+    surfaces were silently lying to users about remaining hours.
+    File: `restore-apply-hours-ledger-trigger.sql`. Includes a
+    one-time UPDATE to backfill every client's hours_balance from
+    `v_contract_balance.remaining_minutes / 60`.
+
+13. **Phase 10 / 10.1: Complimentary sessions** — assistant can book
+    a session as Complimentary (no hours deduction) for make-ups,
+    courtesy follow-ups, brief check-ins, or onboarding. `appointments`
+    gets `is_complimentary` boolean. Admin queue shows a Complimentary
+    chip. Assistant schedule shows COMP badge + gold tint. Audit row
+    still written at mark-complete time (auto_generated, minutes_delta=0)
+    so the audit trail captures the comp completion. 10.1 added a
+    "How billing works" explainer toggle in the booking modal that
+    covers Standard, Complimentary, and Carry-over hours in plain
+    English — designed to be the language used in new-assistant
+    onboarding.
+
+14. **Phase 11 (audit fix): contract_history_ledger usage columns** —
+    `sync_contract_history_ledger_row` was leaving `hours_used` and
+    `hours_remaining_display` always NULL. Audit history was incomplete
+    — if a family disputed hours, the table couldn't prove what they
+    consumed. Fixed to pull from `v_contract_balance` on every sync.
+    File: `phase-11-history-ledger-and-plan-freezes.sql`. Also marks
+    `plan_freezes` deprecated (its FK references the removed
+    `client_plans` table; replaced by `contract_freezes` from Phase 6).
+
+15. **Phase 12 / 12.1 (the big one): Bank-hours / carryover** —
+    confirmed-real production-data-loss bug: when a contract expired,
+    `run_contract_lifecycle()` created a fresh successor with full
+    `included_minutes`, and the leftover hours from the expired
+    contract became unreachable. Built:
+    - `client_bank_balance` table (per-client store)
+    - `contract_carryover_events` table (append-only audit)
+    - Trigger that updates balance on every event insert
+    - `apply_contract_carryover_on_expire()` runs as part of the
+      lifecycle tick; idempotent (NOT EXISTS guard)
+    - `run_contract_lifecycle_tick()` extended to call the new
+      function at the end of each tick (cron stays pointed at same
+      function name)
+    - `admin_adjust_bank_balance(client_id, minutes_delta, reason)`
+      RPC for manual corrections
+    - `get_client_bank_summary(client_id)` RPC for the UI
+    - UI: gold "Bank hours" KPI tile on `assistant-client.html`,
+      gold pill on `client-schedule.html` contract card
+    File: `phase-12-bank-hours.sql`.
+    12.1 added a critical filter: only auto-carry-over contracts that
+    have at least one `hours_ledger` entry. Legacy contracts with no
+    ledger data would otherwise bank their full plan (because
+    consumed_minutes=0 → remaining=full). Admin can still bank legacy
+    leftovers manually via `admin_adjust_bank_balance`.
+
+16. **Phase 13: Assistant help center** — filled out
+    `/assistant-help.html` with a new §03 "How the System Works"
+    section. 9 FAQ items covering: what a contract is, what the cron
+    does every 15 min, Standard vs Complimentary, change tokens,
+    bank hours, when admin approval is required vs when actions are
+    immediate, contract pauses, audit-trail immutability, and "what
+    if I'm not sure what something means." Designed to be the
+    onboarding doc for new contractors so the owner stops having to
+    explain everything in person. New sidebar entry: "Help &
+    How-it-works."
+
+**Audit findings caught and fixed during the session:**
+
+| # | Finding | Fix |
+|---|---|---|
+| 1 | Schema dump 5 months stale (Dec 2024) | Pulled fresh dump via `pg_dump`; verified against current Postgres 17 |
+| 2 | `is_staff()` excludes assistants | Built scoped RLS for the assistant role (Phase 1 enabler) |
+| 3 | `fetchMyHoursLedger` defined twice, second silently shadowing first | Renamed assistant version to `fetchMyAssistantHoursLedger` |
+| 4 | Four service-layer functions queried stale column names (delta_hours / reason / paused/pending enum) | Migrated to canonical `minutes_delta` / `reason_code` / valid contract_status values |
+| 5 | `fetchCurrentUserProfile` filtered by `id` but profiles PK is `user_id` | Fixed — every page that called this was silently returning null |
+| 6 | `schedule_change_requests.assistant_id` had stale FK to `public.users` | Dropped FK (legacy `users` table doesn't have all auth users) |
+| 7 | `admin_approve_schedule_request` wrote to old `delta_hours`/`reason` columns | Migrated to `minutes_delta` + `reason_code` enum + `contract_id` |
+| 8 | `apply_hours_ledger` trigger missing — `clients.hours_balance` always stale | Restored (Phase 9) |
+| 9 | `contract_history_ledger.hours_used` / `hours_remaining_display` always NULL | Wired to `v_contract_balance` (Phase 11) |
+| 10 | Bank-hours unbuilt — real production-data-loss risk | Built end-to-end (Phase 12) |
+
+**SQL files deployed during the session** (all under `website/supabase-functions/`):
+
+| File | Status |
+|---|---|
+| `assistant-rls-policies.sql` | ✅ deployed |
+| `assistant-appointment-status-rpcs.sql` | ✅ deployed |
+| `assistant-cancel-appointment-rpc.sql` | ✅ deployed |
+| `drop-stale-assistant-id-fk.sql` | ✅ deployed |
+| `admin-schedule-request-rpcs.sql` | ✅ re-deployed with column fixes |
+| `assistant-availability.sql` | ✅ deployed |
+| `contract-freezes.sql` | ✅ deployed |
+| `contract-token-status-helper.sql` | ✅ deployed |
+| `token-status-authz-and-client-cancel-token.sql` | ✅ deployed |
+| `auto-deduct-over-token-budget.sql` | ✅ deployed |
+| `complimentary-sessions.sql` | ✅ deployed |
+| `multi-timezone-support.sql` | ✅ deployed |
+| `restore-apply-hours-ledger-trigger.sql` | ✅ deployed |
+| `phase-11-history-ledger-and-plan-freezes.sql` | ✅ deployed (note: backfill needed JOIN to filter orphan rows; file updated) |
+| `phase-12-bank-hours.sql` | ✅ deployed (note: legacy filter added in 12.1) |
+
+**Bugs discovered but NOT fixed** (carry-forward):
+
+- `ensure_future_contract_drafts()` copies `assistant_name` but not
+  `assistant_id` when auto-creating the renewal draft. When a real
+  customer auto-renews, their next contract loses the family↔assistant
+  link, and the assistant's My Clients page goes empty for that family.
+  **Fix is one line** — `INSERT INTO contracts (..., assistant_id, ...)`
+  in that function. Carry forward to next session.
+
+- Cancellation behavior diverges between web (immediate) and the React
+  Native app (still routes through approval queue per the manual).
+  Business decision: should the app match web's immediate behavior?
+  Or stay diverged intentionally? Owner has not chosen.
+
+- Renewals create a contract with the same `included_minutes` as the
+  expiring contract. If the family has accumulated significant bank
+  hours, they have to spend bank separately. There's no "spend from
+  bank first" wiring on the appointment-complete path yet (Phase 12 set
+  up the STORAGE side; the SPEND side is queued).
+
+**Test data state at end of session:**
+
+- TYASSISTANT account = `assistant@privatementorship.com`, user_id
+  `186282d5-96e8-45b6-a9f5-718db4c60913`
+- Michael Yang account = the test client (id `c88867d6-68e4-4df5-bbd1-7a08f670da6a`)
+- During the session his contract `0f98a08b-...` was force-expired and
+  a successor was activated (`4082d63a-...`). His bank balance was reset
+  to exactly 12 hours from the manual carryover so the test screenshot
+  shows clean numbers.
+- A `[SEED] Test Family — Schedule Demo` client and contract exists with
+  10 seeded appointments covering all status values. Tagged `[SEED]` in
+  notes/title/full_name so a cleanup script can find them later.
+
+**Owner instructions captured in code comments:**
+
+- "Audit history is sacred — nothing should ever be erasable" — driven
+  by accountability concerns and CRA tax purposes
+- "If someone cancels, no one can be forced to do appointments" — drove
+  Phase 3.5 immediate cancellation
+- "Almost every contract has 2-15 leftover hours that go to a bank" —
+  drove Phase 12
+- "Assistant is a contractor, responsible for their own hours-management
+  decisions" — drove Phase 10 (assistant freely flags Complimentary)
+- "Sessions are minimum 2 hours" — business rule; UI defaults reflect it
+- Owner wants a Live Chat widget on the marketing site eventually
+  (Intercom / Crisp / Tawk.to). Noted in §16 future polish.
+
+**Where to start when picking up next session** (priority order):
+
+1. **Push 41 commits to Netlify** when tokens reload — that gets all the
+   above LIVE for real customers.
+2. **Fix `ensure_future_contract_drafts()` to copy assistant_id** — one
+   line, real production bug.
+3. **Bank-hours spend wiring** — at appointment completion time, if
+   contract has < session_duration minutes left, spend from bank.
+   Requires new RPC + UI flow + family-side suggestion templates per
+   §16 "Bank-hours significant arc."
+4. **Update HANDOVER §3 LATEST block to "PRIOR SESSION"** when your
+   work is done so the chronology stays clean.
 
 **Code shipped (locally):**
 
@@ -880,6 +1113,16 @@ codebase. Breaking them will silently corrupt production data.
 | `assistant-appointment-status-rpcs.sql` | `assistant_mark_appointment_complete(uuid)`, `assistant_mark_appointment_no_show(uuid)` | ✅ deployed 2026-05-15 |
 | `assistant-cancel-appointment-rpc.sql` | `assistant_cancel_appointment(uuid, text)` — immediate, no admin step, no family hours forfeit | ✅ deployed 2026-05-15 |
 | `drop-stale-assistant-id-fk.sql` | Drops the stale `schedule_change_requests.assistant_id → public.users(id)` FK so `auth.uid()` works as assistant_id (matches `appointments` + `contracts` behavior) | ✅ deployed 2026-05-15 |
+| `assistant-availability.sql` | 2 tables (`assistant_availability_windows`, `assistant_availability_blackouts`) + 8 RLS policies + `is_assistant_available_at(uuid, timestamptz, int) → bool` helper | ✅ deployed 2026-05-15 |
+| `contract-freezes.sql` | `contract_freezes` table + `admin_freeze_contract(uuid, date, date, text)` + `admin_unfreeze_contract(uuid)` + `is_contract_frozen(uuid, date) → bool` | ✅ deployed 2026-05-15 |
+| `contract-token-status-helper.sql` | `get_contract_token_status(uuid) → jsonb` (Phase 7 first cut) | ✅ deployed 2026-05-15 (superseded by `token-status-authz-and-client-cancel-token.sql`) |
+| `token-status-authz-and-client-cancel-token.sql` | Adds authz check on `get_contract_token_status`; makes `cancel_own_appointment` write a `change_token_spent` audit row | ✅ deployed 2026-05-15 |
+| `auto-deduct-over-token-budget.sql` | `cancel_own_appointment` + `admin_approve_schedule_request` now auto-deduct session hours via `admin_adjustment` ledger row when family is over the 3-token budget | ✅ deployed 2026-05-15 |
+| `complimentary-sessions.sql` | `appointments.is_complimentary` column + updated `admin_approve_schedule_request` (extras branch) + updated `assistant_mark_appointment_complete` (skips ledger deduction, writes auto_generated audit row) | ✅ deployed 2026-05-15 |
+| `multi-timezone-support.sql` | `assistant_profiles.timezone` column (default Vancouver) + `is_assistant_available_at` now reads per-assistant timezone | ✅ deployed 2026-05-15 |
+| `restore-apply-hours-ledger-trigger.sql` | **CRITICAL FIX** — restored the missing `apply_hours_ledger()` trigger that keeps `clients.hours_balance` in sync with the canonical ledger. Was dropped during schema migration; 9 UI surfaces had been lying to users. Includes one-time backfill. | ✅ deployed 2026-05-15 |
+| `phase-11-history-ledger-and-plan-freezes.sql` | `sync_contract_history_ledger_row` now writes `hours_used` + `hours_remaining_display` from `v_contract_balance`. Also marks `plan_freezes` deprecated (FK to removed `client_plans`). **Backfill is in a separate DO block to avoid rollback if any row errors.** | ✅ deployed 2026-05-15 (146 rows backfilled) |
+| `phase-12-bank-hours.sql` | Bank-hours system end-to-end: `client_bank_balance` + `contract_carryover_events` tables, 5 RLS policies, trigger to keep balance synced, `apply_contract_carryover_on_expire()`, `admin_adjust_bank_balance()`, `get_client_bank_summary()`, and the extended `run_contract_lifecycle_tick()` that calls carryover at the end of each tick. **12.1 patch: only auto-carryover contracts with at least one `hours_ledger` entry** (otherwise legacy contracts bank their full plan). | ✅ deployed 2026-05-15 |
 
 ### Edge functions (Supabase Dashboard → Functions)
 
@@ -926,49 +1169,87 @@ codebase. Breaking them will silently corrupt production data.
 | 5 | Admin schedule-request inbox + atomic approval RPC | ✅ |
 | 3.5 | **Client cancellation is now immediate** (no admin step). Calls `cancel_own_appointment` RPC. No automatic hours forfeit. | ✅ (2026-05-15) |
 
-### Assistant-side scheduler (new arc, this session)
+### Assistant-side scheduler (new arc, this session) — Phases 1-13 all shipped
 | Phase | Description | Status |
 |---|---|---|
 | 1 | Read-only schedule (weekly grid + upcoming + history, color-coded) | ✅ |
 | 2 | "Mark complete" / "Mark no-show" RPCs (SECURITY DEFINER, atomic) | ✅ |
 | 3 | Multi-slot reschedule + cancel via `schedule_change_requests` engine | ✅ |
 | 3.5 | Cancellation = immediate, no admin step, no family hours forfeit | ✅ |
-| 4 | "Book new session" extra-request UI on per-family workspace | ✅ (UI shipped; uses existing engine) |
+| 4 | "Book new session" extra-request UI on per-family workspace | ✅ |
 | 5 | Assistant availability windows (recurring + blackouts) + soft check on assistant-side modals | ✅ |
 | 5.5 | Soft check on client Request Additional + Reschedule modals · admin override-confirm before approving outside availability | ✅ |
-| ⏭ later | Multi-timezone (helper hardcodes `America/Vancouver`); hard block on approval; visual week-grid UI for availability page | not blocking |
+
+### Business-layer phases (new this session, beyond scheduler)
+| Phase | Description | Status |
+|---|---|---|
+| 6 | Contract pause/freeze — admin can pause a contract for 2-3 month trips, hours preserved, end_at pushed out | ✅ |
+| 7 / 7.1 / 7.2 | Change-token (3-free per contract) counter, UI warnings, auto-deduct hours when over budget, confirm dialogs with hours math | ✅ |
+| 8 | Multi-timezone for `is_assistant_available_at` (per-assistant timezone column) | ✅ |
+| 9 | **Critical fix:** restored missing `apply_hours_ledger` trigger so `clients.hours_balance` actually stays in sync | ✅ |
+| 10 / 10.1 | Complimentary sessions (no-charge bookings) + "How billing works" explainer for new contractors | ✅ |
+| 11 | `contract_history_ledger.hours_used` / `hours_remaining_display` populated (was always NULL); `plan_freezes` deprecated | ✅ |
+| 12 / 12.1 | **Bank-hours system** — leftover hours carry forward on contract expiry; new tables, RPCs, UI, lifecycle hook. 12.1 added legacy-data filter. | ✅ |
+| 13 | Assistant help center §03 "How the System Works" — 9 FAQ items, designed as onboarding doc | ✅ |
+
+### Still queued (not blocking launch)
+- **Bank-hours spend wiring** — at completion time, spend from bank when contract is exhausted (storage built, spend logic pending)
+- **Bank-hours nudge UX** — "Suggest a make-up session" button on assistant-client.html with templated messages (longer session / extra session / outing / study / sports)
+- **Fix `ensure_future_contract_drafts` to copy assistant_id** (one-line bug — without this, every auto-renewal loses the family↔assistant link)
+- **Decide web↔app cancellation parity** — web is immediate, app still routes through approval. Business decision.
+- **Hard block on availability** (currently soft override-confirm); visual week-grid for availability page
+- **Live chat widget** on marketing site (Intercom / Crisp / Tawk.to)
+- **Stripe Connect payouts** — assistant payment side (~1 week arc)
+- **Mobile audit** for `messages.html` / `apply.html` / `hiring.html` / `the-assistant.html`
 
 ---
 
 ## §16. Open queue / pending tasks
 
-### Phase 5 — Assistant availability windows (✅ shipped 2026-05-15 late session)
+### Phase 5 — Assistant availability windows ✅ DONE 2026-05-15
+### Phase 6 — Contract pause/freeze ✅ DONE 2026-05-15
+### Phase 7 — Change-token enforcement ✅ DONE 2026-05-15
+### Phase 8 — Multi-timezone ✅ DONE 2026-05-15
+### Phase 9 — apply_hours_ledger trigger restored ✅ DONE 2026-05-15
+### Phase 10 — Complimentary sessions ✅ DONE 2026-05-15
+### Phase 11 — contract_history_ledger usage columns ✅ DONE 2026-05-15
+### Phase 12 — Bank-hours system ✅ DONE 2026-05-15 (storage + carryover; spend wiring still queued)
+### Phase 13 — Assistant help center §03 ✅ DONE 2026-05-15
 
-Closed out the scheduler arc.
+### 🟡 Active next-priority items (each is its own session)
 
-What shipped:
-- 2 new tables: `assistant_availability_windows` (weekly recurring) +
-  `assistant_availability_blackouts` (date-range exceptions). 8 RLS
-  policies. SQL file: `supabase-functions/assistant-availability.sql`.
-- SECURITY DEFINER helper `is_assistant_available_at(uuid, timestamptz, int)`.
-  Hardcodes `America/Vancouver` (multi-tz deferred). Returns TRUE if no
-  windows published (soft-launch).
-- Service layer: 7 new fns (`fetchMyAvailabilityWindows`,
-  `addAvailabilityWindow`, `removeAvailabilityWindow`, blackouts mirror,
-  `checkAssistantAvailable`).
-- `assistant-availability.html` page with two cards (Weekly + Blackouts),
-  multi-day add modal, blackout add modal, delete confirm.
-- Sidebar entry under Work: "Availability" (below My Schedule).
-- Soft availability checks added to: assistant reschedule modal, assistant
-  book-new-session modal, client Request Additional, client Reschedule.
-- Admin approve handler: pre-approval confirm dialog if the chosen slot
-  is outside the assistant's published availability. Admin can override.
+**1. Push the 41 unpushed commits** when Netlify tokens reload. Single
+push deploys the entire marathon arc. After push, validate on
+production: sign in as assistant + client + admin, walk through
+schedule, cancel, book-extra, comp session, bank-hours tile.
 
-### 🟠 Significant future arc — "Bank Hours" / Stored-balance system
+**2. `ensure_future_contract_drafts()` one-line fix.** Function copies
+`assistant_name` but not `assistant_id` when creating the next draft.
+Real customer auto-renewals will lose the assistant link and the
+assistant's My Clients page will go empty for that family. Critical
+to fix before any real customer renews. One INSERT line addition.
 
-**Captured 2026-05-15 from a direct owner conversation.** This is a real
-business reality that the current schema doesn't model. ~6–10 hours
-focused work; treat as its own arc.
+**3. Bank-hours spend wiring + nudge UX (~3–4 hr).** Phase 12 set up
+the STORAGE side. Still needed:
+- When an appointment completion would deduct more minutes than the
+  contract has remaining, automatically spend from the bank.
+- "Suggest using bank hours" button on assistant-client.html that
+  sends a templated message to the family. Multiple template
+  variants per the owner's framing: extend a session / extra session
+  / special outing / study intensive / sports time.
+- Family-side notification + "Book session" CTA.
+
+**4. Web↔app cancellation parity.** Business decision: web is
+immediate (Phase 3.5), app still uses approval queue per the manual.
+Decide whether to update the app to match. Owner has not chosen.
+
+### 🟠 Significant future arc — kept here for context
+
+The bank-hours storage was originally captured here as a future arc
+on the morning of 2026-05-15. **It shipped that same evening (Phase 12).**
+The remaining unbuilt piece is the **spend + nudge UX** described in
+item 3 above. The product reasoning below is preserved for reference
+because the nudge templates and family-side UX still need building:
 
 **The reality:**
 - Almost every contract finishes with 2–15 leftover hours
