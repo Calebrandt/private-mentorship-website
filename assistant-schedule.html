@@ -903,13 +903,14 @@ function openReschedule(apptId){
       const ts = await window.pmHiring.fetchContractTokenStatus(appt.contract_id);
       if (!ts) return;
       const left = ts.tokens_remaining;
+      const total = ts.tokens_total;
       const dur = durationOf(appt);
       const hrs = dur ? Math.round((dur/60)*10)/10 : null;
       const line = left > 0
-        ? `Family has ${left} free schedule change${left===1?'':'s'} left this period.`
+        ? `${left} of ${total} reschedule/cancel token${left===1?'':'s'} remaining.`
         : (hrs
-            ? `Family is at free-change limit — this would deduct ${hrs} hr${hrs===1?'':'s'} from their contract.`
-            : `Family is at free-change limit — hours may be deducted.`);
+            ? `Tokens used up — this would deduct ${hrs} hr${hrs===1?'':'s'} from the family's contract.`
+            : `Tokens used up — hours may be deducted.`);
       const slot = document.querySelector('#asReschedContext [data-token-line]');
       if (slot) slot.innerHTML = `<b>Tokens:</b> ${escapeHtml(line)}`;
     } catch (_) {}
