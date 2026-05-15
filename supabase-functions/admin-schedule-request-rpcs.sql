@@ -21,12 +21,12 @@ DECLARE
   v_req public.schedule_change_requests%ROWTYPE;
   v_apt public.appointments%ROWTYPE;
   v_late boolean := false;
-  v_new_status text := NULL;
+  v_new_status public.appointment_status := NULL;
   v_proposed_starts timestamptz;
   v_proposed_duration int;
   v_new_apt_id uuid := NULL;
   v_contract_id uuid := NULL;
-  v_charge_hours numeric := 0;
+  v_charge_minutes int := 0;
 BEGIN
   -- 1. Verify caller is admin/owner.
   IF v_caller_id IS NULL THEN
@@ -58,24 +58,35 @@ BEGIN
 
     -- Late cancel = within 24 hours from now (mirrors isLateCancellationFromStartsAt).
     v_late := (v_apt.starts_at - NOW()) < INTERVAL '24 hours';
-    v_new_status := CASE WHEN v_late THEN 'late_cancelled' ELSE 'cancelled' END;
+    v_new_status := (CASE WHEN v_late THEN 'late_cancelled' ELSE 'cancelled' END)::public.appointment_status;
 
     UPDATE public.appointments
        SET status = v_new_status,
            cancelled_at = NOW(),
+           cancelled_by = v_caller_id,
            cancel_reason = COALESCE(v_req.reason, cancel_reason)
      WHERE id = v_apt.id;
 
-    -- Hours ledger entry. trigger apply_hours_ledger() updates clients.hours_balance.
+    -- Hours ledger entry. New schema: minutes_delta (int) + reason_code (enum) + contract_id required.
     IF v_late THEN
-      -- Charge hours equal to the appointment duration (per app's chargeAppointmentHours).
-      v_charge_hours := -1 * COALESCE(v_apt.duration_minutes, 60) / 60.0;
-      INSERT INTO public.hours_ledger (client_id, delta_hours, reason, appointment_id)
-      VALUES (v_apt.client_id, v_charge_hours, 'late_cancel', v_apt.id);
+      -- Forfeit hours equal to the appointment duration in MINUTES (negative).
+      v_charge_minutes := -1 * COALESCE(v_apt.duration_minutes, 60);
+      INSERT INTO public.hours_ledger
+        (client_id, contract_id, appointment_id, minutes_delta, reason_code, meta, created_by)
+      VALUES
+        (v_apt.client_id, v_apt.contract_id, v_apt.id,
+         v_charge_minutes, 'late_cancel_forfeit'::public.ledger_reason_code,
+         jsonb_build_object('source','admin_approve_schedule_request','request_id',p_request_id,'kind','cancel'),
+         v_caller_id);
     ELSE
-      -- Spend a change token (logged at delta_hours=0 for audit).
-      INSERT INTO public.hours_ledger (client_id, delta_hours, reason, appointment_id)
-      VALUES (v_apt.client_id, 0, 'change_token:cancel', v_apt.id);
+      -- Spend a change token (audit-only row, minutes_delta=0).
+      INSERT INTO public.hours_ledger
+        (client_id, contract_id, appointment_id, minutes_delta, reason_code, meta, created_by)
+      VALUES
+        (v_apt.client_id, v_apt.contract_id, v_apt.id,
+         0, 'change_token_spent'::public.ledger_reason_code,
+         jsonb_build_object('source','admin_approve_schedule_request','request_id',p_request_id,'kind','cancel'),
+         v_caller_id);
     END IF;
 
   ELSIF v_req.request_type = 'reschedule' THEN
@@ -116,14 +127,19 @@ BEGIN
        SET starts_at = v_proposed_starts,
            ends_at = v_proposed_starts + (v_proposed_duration || ' minutes')::interval,
            duration_minutes = v_proposed_duration,
-           status = 'scheduled',
+           status = 'scheduled'::public.appointment_status,
            rescheduled_from_id = COALESCE(rescheduled_from_id, v_apt.id),
            reschedule_request_created_at = COALESCE(reschedule_request_created_at, v_req.created_at)
      WHERE id = v_apt.id;
 
-    -- Spend change token.
-    INSERT INTO public.hours_ledger (client_id, delta_hours, reason, appointment_id)
-    VALUES (v_apt.client_id, 0, 'change_token:reschedule', v_apt.id);
+    -- Spend change token (audit-only row).
+    INSERT INTO public.hours_ledger
+      (client_id, contract_id, appointment_id, minutes_delta, reason_code, meta, created_by)
+    VALUES
+      (v_apt.client_id, v_apt.contract_id, v_apt.id,
+       0, 'change_token_spent'::public.ledger_reason_code,
+       jsonb_build_object('source','admin_approve_schedule_request','request_id',p_request_id,'kind','reschedule'),
+       v_caller_id);
 
   ELSIF v_req.request_type = 'extra' THEN
     -- Resolve client's active contract at the proposed time.
@@ -157,6 +173,11 @@ BEGIN
      ORDER BY start_at DESC
      LIMIT 1;
 
+    -- Required by appt_extra_billable_no_contract / appt_kind_reserved_requires_contract.
+    IF v_contract_id IS NULL THEN
+      RAISE EXCEPTION 'No active contract found for client at proposed time — cannot create extra session';
+    END IF;
+
     INSERT INTO public.appointments (
       client_id, contract_id, assistant_id,
       starts_at, ends_at, duration_minutes,
@@ -167,7 +188,8 @@ BEGIN
       v_proposed_starts,
       v_proposed_starts + (v_proposed_duration || ' minutes')::interval,
       v_proposed_duration,
-      'scheduled', 'Session',
+      'scheduled'::public.appointment_status,
+      'extra_billable'::public.appointment_kind,
       COALESCE(LEFT(v_req.reason, 80), 'Additional session'),
       v_caller_id
     )
@@ -201,7 +223,7 @@ BEGIN
     'new_appointment_status', v_new_status,
     'new_appointment_id', v_new_apt_id,
     'contract_id', v_contract_id,
-    'charge_hours', v_charge_hours
+    'charge_minutes', v_charge_minutes
   );
 END;
 $$;
