@@ -202,6 +202,46 @@
   .wc-kpi--bank .wc-kpi__label{color:#92400E;}
   .wc-kpi--bank .wc-kpi__value{color:#78350F;}
   .wc-kpi--bank .wc-kpi__sub{color:#92400E;}
+  .wc-kpi__bank-cta{
+    margin-top:10px;background:transparent;border:none;cursor:pointer;
+    font:700 11.5px Inter,sans-serif;color:#92400E;letter-spacing:-.005em;
+    padding:0;text-align:left;display:block;
+    transition:color .15s ease;
+  }
+  .wc-kpi__bank-cta:hover{color:#78350F;text-decoration:underline;}
+
+  /* Bank nudge modal — template picker */
+  .wc-nudge-card{
+    background:#fff;border:1.5px solid #E2E8F0;border-radius:10px;
+    padding:11px 13px;margin-bottom:8px;cursor:pointer;
+    transition:all .15s ease;
+    display:flex;align-items:flex-start;gap:10px;
+  }
+  .wc-nudge-card:hover{border-color:#94A3B8;}
+  .wc-nudge-card.is-selected{border-color:#0071e3;background:#F0F7FF;box-shadow:0 0 0 2px rgba(0,113,227,0.08);}
+  .wc-nudge-card input{position:absolute;opacity:0;pointer-events:none;}
+  .wc-nudge-card__bullet{
+    width:18px;height:18px;border-radius:50%;border:2px solid #CBD5E1;flex-shrink:0;
+    margin-top:1px;transition:all .15s ease;position:relative;
+  }
+  .wc-nudge-card.is-selected .wc-nudge-card__bullet{
+    border-color:#0071e3;background:#0071e3;
+  }
+  .wc-nudge-card.is-selected .wc-nudge-card__bullet::after{
+    content:'';position:absolute;top:50%;left:50%;width:6px;height:6px;
+    background:#fff;border-radius:50%;transform:translate(-50%,-50%);
+  }
+  .wc-nudge-card__body{flex:1;min-width:0;}
+  .wc-nudge-card__title{font-size:13px;font-weight:700;color:#0F172A;margin:0 0 3px;letter-spacing:-.005em;}
+  .wc-nudge-card__preview{font-size:11.5px;color:#64748B;line-height:1.45;margin:0;}
+  .wc-nudge-preview{
+    background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;
+    padding:11px 13px;margin-top:8px;font-size:12.5px;color:#78350F;line-height:1.55;
+  }
+  .wc-nudge-preview__label{
+    font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:#92400E;margin:0 0 4px;
+  }
 
   /* Two-col layout */
   .wc-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
@@ -312,6 +352,9 @@
         <p class="wc-kpi__label">Bank hours</p>
         <span class="wc-kpi__value" id="kpiBank">—</span>
         <p class="wc-kpi__sub">carried over from past contracts</p>
+        <button type="button" class="wc-kpi__bank-cta" id="wcBankNudgeBtn">
+          Suggest using these →
+        </button>
       </div>
     </section>
 
@@ -435,11 +478,89 @@
   </div>
 </div>
 
+<!-- Bank-hours nudge modal (Phase 12.2) -->
+<div class="wc-modal-backdrop" id="wcNudgeModal" data-open="false">
+  <div class="wc-modal" role="dialog" aria-modal="true">
+    <h3 class="wc-modal__title">Suggest using banked hours</h3>
+    <p class="wc-modal__body">
+      The family has <strong id="wcNudgeHrs">—</strong> banked hours from past contracts.
+      Pick a template — or write your own — and send it as a message in their thread.
+    </p>
+
+    <div id="wcNudgeTemplates" style="margin-bottom:10px;">
+      <label class="wc-nudge-card is-selected" data-tpl="longer">
+        <input type="radio" name="wcNudgeTpl" value="longer" checked>
+        <span class="wc-nudge-card__bullet"></span>
+        <span class="wc-nudge-card__body">
+          <span class="wc-nudge-card__title">Longer session</span>
+          <span class="wc-nudge-card__preview">Suggest extending a regular session with banked hours.</span>
+        </span>
+      </label>
+      <label class="wc-nudge-card" data-tpl="extra">
+        <input type="radio" name="wcNudgeTpl" value="extra">
+        <span class="wc-nudge-card__bullet"></span>
+        <span class="wc-nudge-card__body">
+          <span class="wc-nudge-card__title">Extra session this week</span>
+          <span class="wc-nudge-card__preview">Schedule one extra session outside the recurring slot.</span>
+        </span>
+      </label>
+      <label class="wc-nudge-card" data-tpl="outing">
+        <input type="radio" name="wcNudgeTpl" value="outing">
+        <span class="wc-nudge-card__bullet"></span>
+        <span class="wc-nudge-card__body">
+          <span class="wc-nudge-card__title">Special outing / life skills</span>
+          <span class="wc-nudge-card__preview">Field trip, community errands, or longer activity-based session.</span>
+        </span>
+      </label>
+      <label class="wc-nudge-card" data-tpl="study">
+        <input type="radio" name="wcNudgeTpl" value="study">
+        <span class="wc-nudge-card__bullet"></span>
+        <span class="wc-nudge-card__body">
+          <span class="wc-nudge-card__title">Study intensive</span>
+          <span class="wc-nudge-card__preview">Extra focused study time before exams or big projects.</span>
+        </span>
+      </label>
+      <label class="wc-nudge-card" data-tpl="sports">
+        <input type="radio" name="wcNudgeTpl" value="sports">
+        <span class="wc-nudge-card__bullet"></span>
+        <span class="wc-nudge-card__body">
+          <span class="wc-nudge-card__title">Sports / outdoor time</span>
+          <span class="wc-nudge-card__preview">Active session, sports, or longer movement-based time.</span>
+        </span>
+      </label>
+      <label class="wc-nudge-card" data-tpl="custom">
+        <input type="radio" name="wcNudgeTpl" value="custom">
+        <span class="wc-nudge-card__bullet"></span>
+        <span class="wc-nudge-card__body">
+          <span class="wc-nudge-card__title">Write my own message</span>
+          <span class="wc-nudge-card__preview">Skip templates and write a custom note.</span>
+        </span>
+      </label>
+    </div>
+
+    <div class="wc-nudge-preview" id="wcNudgePreview">
+      <p class="wc-nudge-preview__label">Preview</p>
+      <p id="wcNudgePreviewBody" style="margin:0;">—</p>
+    </div>
+
+    <div class="wc-textarea-row" style="margin-top:14px;" id="wcNudgeCustomWrap" hidden>
+      <label for="wcNudgeCustom">Your message</label>
+      <textarea id="wcNudgeCustom" placeholder="Write a short note to the family…"></textarea>
+    </div>
+
+    <div class="wc-modal__actions">
+      <button type="button" class="wc-modal__cancel" id="wcNudgeCancel">Cancel</button>
+      <button type="button" class="wc-modal__confirm" id="wcNudgeSubmit">Send message</button>
+    </div>
+  </div>
+</div>
+
 <div class="wc-toast" id="wcToast" data-open="false">Done</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515c"></script>
 <script src="js/hiring-service.js?v=20260515c"></script>
+<script src="js/messages-service.js?v=20260515c"></script>
 <script src="js/sidebar.js?v=20260515c"></script>
 <script>
 function escapeHtml(s){return (s||'').toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[c]));}
@@ -517,15 +638,15 @@ function renderAppointmentRow(a){
   document.getElementById('kpiUsed').textContent = usedHours;
   document.getElementById('kpiUpcoming').textContent = (ws.upcomingAppointments || []).length;
 
-  // Phase 12: show bank-hours tile if the family has any saved-up hours
-  // (or has had carryover events). Hidden when zero AND no history, so
-  // the layout stays clean for new families.
+  // Phase 12: show bank-hours tile if the family has any saved-up hours.
+  // Phase 12.2: also wires the "Suggest using these" nudge button.
   try {
     const bank = await window.pmHiring.fetchClientBankSummary(clientId);
     const bankHrs = bank?.banked_hours || 0;
     if (bankHrs > 0) {
       document.getElementById('kpiBank').textContent = bankHrs;
       document.getElementById('kpiBankTile').hidden = false;
+      wireBankNudge({ clientId, bankHrs: Math.round(bankHrs) });
     }
   } catch (_) {}
 
@@ -751,6 +872,116 @@ function showWcToast(message, isError = false){
   el.dataset.open = 'true';
   if (wcToastTimer) clearTimeout(wcToastTimer);
   wcToastTimer = setTimeout(() => { el.dataset.open = 'false'; }, isError ? 4500 : 2800);
+}
+
+// ─── Phase 12.2: Bank-hours nudge modal ────────────────────────────────
+// Mirror previews of the template strings the service layer uses so the
+// assistant sees exactly what the family will receive before sending.
+const BANK_NUDGE_PREVIEW = {
+  longer: (hrs) =>
+    `Hey! I noticed you have ${hrs} hour${hrs===1?'':'s'} banked from previous contracts. ` +
+    `Want to use some of that for a longer session sometime soon? Even an extra 30-60 minutes ` +
+    `can make a big difference if there's something specific to dig into.`,
+  extra: (hrs) =>
+    `Quick note: you have ${hrs} hour${hrs===1?'':'s'} banked from past contracts that I want ` +
+    `to make sure don't sit unused. Would you like to schedule an extra session this week ` +
+    `or next? Even an hour outside the regular schedule helps.`,
+  outing: (hrs) =>
+    `Hi — you've got ${hrs} banked hour${hrs===1?'':'s'} from previous contracts. ` +
+    `If there's ever a chance for a special outing — life skills practice, community ` +
+    `errands together, a longer field trip somewhere — this would be a great way to put ` +
+    `those hours to use. Let me know if anything comes to mind.`,
+  study: (hrs) =>
+    `Quick check-in: you have ${hrs} hour${hrs===1?'':'s'} banked. With exams / projects ` +
+    `coming up, this could be a good time to schedule extra focused study sessions. ` +
+    `Want me to suggest some times?`,
+  sports: (hrs) =>
+    `Heads up — you've got ${hrs} hour${hrs===1?'':'s'} banked. If we want to do more ` +
+    `active time (outdoor activities, sports, longer movement-based sessions), this is ` +
+    `the perfect way to use them. Let me know!`,
+  custom: () => '',
+};
+
+function wireBankNudge({ clientId, bankHrs }){
+  const btn = document.getElementById('wcBankNudgeBtn');
+  const modal = document.getElementById('wcNudgeModal');
+  const cancelBtn = document.getElementById('wcNudgeCancel');
+  const submitBtn = document.getElementById('wcNudgeSubmit');
+  const previewBody = document.getElementById('wcNudgePreviewBody');
+  const customWrap = document.getElementById('wcNudgeCustomWrap');
+  const customField = document.getElementById('wcNudgeCustom');
+  const hrsLabel = document.getElementById('wcNudgeHrs');
+  const cards = modal.querySelectorAll('.wc-nudge-card');
+
+  let selectedTpl = 'longer';
+
+  function updatePreview() {
+    if (selectedTpl === 'custom') {
+      customWrap.hidden = false;
+      const txt = (customField.value || '').trim();
+      previewBody.textContent = txt || '(write your message below — it will appear here)';
+    } else {
+      customWrap.hidden = true;
+      const fn = BANK_NUDGE_PREVIEW[selectedTpl] || BANK_NUDGE_PREVIEW.longer;
+      previewBody.textContent = fn(bankHrs);
+    }
+  }
+
+  function selectCard(tpl){
+    selectedTpl = tpl;
+    cards.forEach(c => {
+      const matches = c.getAttribute('data-tpl') === tpl;
+      c.classList.toggle('is-selected', matches);
+      const input = c.querySelector('input');
+      if (input) input.checked = matches;
+    });
+    updatePreview();
+  }
+
+  cards.forEach(c => {
+    c.addEventListener('click', (e) => {
+      e.preventDefault();
+      selectCard(c.getAttribute('data-tpl'));
+    });
+  });
+  customField.addEventListener('input', updatePreview);
+
+  btn.addEventListener('click', () => {
+    hrsLabel.textContent = `${bankHrs} hour${bankHrs===1?'':'s'}`;
+    selectCard('longer');
+    customField.value = '';
+    modal.dataset.open = 'true';
+  });
+
+  cancelBtn.addEventListener('click', () => { modal.dataset.open = 'false'; });
+  modal.addEventListener('click', (e) => {
+    if (e.target.id === 'wcNudgeModal') modal.dataset.open = 'false';
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.dataset.open === 'true') modal.dataset.open = 'false';
+  });
+
+  submitBtn.addEventListener('click', async () => {
+    if (selectedTpl === 'custom' && !customField.value.trim()) {
+      showWcToast('Write a message first.', true);
+      return;
+    }
+    submitBtn.disabled = true;
+    try {
+      await window.pmHiring.assistantSuggestBankHoursUsage({
+        clientId,
+        template: selectedTpl === 'custom' ? null : selectedTpl,
+        customBody: selectedTpl === 'custom' ? customField.value : null,
+      });
+      modal.dataset.open = 'false';
+      submitBtn.disabled = false;
+      showWcToast('Message sent to the family.');
+    } catch (err) {
+      console.warn('Nudge failed:', err);
+      showWcToast(err?.message || 'Could not send message.', true);
+      submitBtn.disabled = false;
+    }
+  });
 }
 </script>
 </body>

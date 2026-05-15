@@ -1080,6 +1080,103 @@
     return data;
   }
 
+  // Phase 12.2: assistant nudges family to use their banked hours.
+  // Posts a templated message to the family's CLIENT_SHARED conversation
+  // thread (the same one used by messages.html). Family receives it as
+  // a regular message + notification — no new infrastructure.
+  //
+  // Templates the assistant can pick from. Owner's framing:
+  //   "not a warning (sounds rude) — more like a friendly catch-up."
+  const BANK_NUDGE_TEMPLATES = {
+    longer: (hrs) =>
+      `Hey! I noticed you have ${hrs} hour${hrs===1?'':'s'} banked from previous contracts. ` +
+      `Want to use some of that for a longer session sometime soon? Even an extra 30-60 minutes ` +
+      `can make a big difference if there's something specific to dig into.`,
+    extra: (hrs) =>
+      `Quick note: you have ${hrs} hour${hrs===1?'':'s'} banked from past contracts that I want ` +
+      `to make sure don't sit unused. Would you like to schedule an extra session this week ` +
+      `or next? Even an hour outside the regular schedule helps.`,
+    outing: (hrs) =>
+      `Hi — you've got ${hrs} banked hour${hrs===1?'':'s'} from previous contracts. ` +
+      `If there's ever a chance for a special outing — life skills practice, community ` +
+      `errands together, a longer field trip somewhere — this would be a great way to put ` +
+      `those hours to use. Let me know if anything comes to mind.`,
+    study: (hrs) =>
+      `Quick check-in: you have ${hrs} hour${hrs===1?'':'s'} banked. With exams / projects ` +
+      `coming up, this could be a good time to schedule extra focused study sessions. ` +
+      `Want me to suggest some times?`,
+    sports: (hrs) =>
+      `Heads up — you've got ${hrs} hour${hrs===1?'':'s'} banked. If we want to do more ` +
+      `active time (outdoor activities, sports, longer movement-based sessions), this is ` +
+      `the perfect way to use them. Let me know!`,
+    custom: null, // assistant writes their own body
+  };
+
+  async function assistantSuggestBankHoursUsage({
+    clientId, template = 'longer', customBody = null,
+  }) {
+    if (!clientId) throw new Error('clientId is required');
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not signed in');
+
+    // 1. How many banked hours does this family have?
+    const summary = await fetchClientBankSummary(clientId);
+    const bankedHrs = Math.round((summary?.banked_hours || 0));
+    if (bankedHrs <= 0) {
+      throw new Error('This family has no banked hours to suggest using.');
+    }
+
+    // 2. Build the message body from template (or use custom)
+    let body;
+    if (customBody && customBody.trim()) {
+      body = customBody.trim();
+    } else {
+      const fn = BANK_NUDGE_TEMPLATES[template] || BANK_NUDGE_TEMPLATES.longer;
+      body = fn(bankedHrs);
+    }
+
+    // 3. Find or create the CLIENT_SHARED conversation for this client.
+    //    Existing message infrastructure (pmMessages.createOrGetClientConversation)
+    //    does this; pass the assistant as creator + the assistant + the family
+    //    leader (the client.profile_id) as members.
+    const { data: client } = await sb()
+      .from('clients')
+      .select('id, profile_id, full_name')
+      .eq('id', clientId)
+      .maybeSingle();
+    if (!client?.id) throw new Error('Client not found');
+
+    // pmMessages is the global messaging-service exported by messages-service.js.
+    // createOrGetClientConversation resolves family members internally from
+    // family_assignments — we just pass clientId + creator.
+    const messagesService = window.pmMessages;
+    if (!messagesService?.createOrGetClientConversation || !messagesService?.sendMessage) {
+      throw new Error('Messaging service not loaded — refresh the page.');
+    }
+    const convo = await messagesService.createOrGetClientConversation({
+      clientId,
+      creatorUserId: user.id,
+    });
+    if (!convo?.id) throw new Error('Could not find/create conversation');
+
+    // 4. Send the message
+    const subject = '💛 Banked hours — suggestion';
+    const result = await messagesService.sendMessage({
+      conversationId: convo.id,
+      userId: user.id,
+      body,
+      subject,
+    });
+
+    return {
+      ok: true,
+      conversation_id: convo.id,
+      message_id: result?.id,
+      banked_hrs_at_send: bankedHrs,
+      template_used: customBody ? 'custom' : template,
+    };
+  }
+
   // ─── Phase 7: Change-token status (counter + warnings) ──────────────
   // Reads v_contract_balance + contract_policy_limits via the
   // get_contract_token_status RPC. Returns {tokens_used, tokens_total,
@@ -2453,6 +2550,8 @@
     // Phase 12 — bank-hours (leftover carryover)
     fetchClientBankSummary, fetchMyBankSummary, fetchClientBankHistory,
     adminAdjustBankBalance,
+    // Phase 12.2 — assistant nudges family to use banked hours
+    assistantSuggestBankHoursUsage,
     // assistant-side (Phase 3)
     updateMyAssistantProfile, fetchMyAssistantHoursLedger,
     // admin: clients

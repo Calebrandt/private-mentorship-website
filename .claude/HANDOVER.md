@@ -1229,19 +1229,52 @@ Real customer auto-renewals will lose the assistant link and the
 assistant's My Clients page will go empty for that family. Critical
 to fix before any real customer renews. One INSERT line addition.
 
-**3. Bank-hours spend wiring + nudge UX (~3–4 hr).** Phase 12 set up
-the STORAGE side. Still needed:
+**3. Bank-hours SPEND wiring (~2–3 hr — the still-unfinished piece).**
+Phase 12 + 12.2 are done (storage + nudge UX). The remaining piece:
 - When an appointment completion would deduct more minutes than the
-  contract has remaining, automatically spend from the bank.
-- "Suggest using bank hours" button on assistant-client.html that
-  sends a templated message to the family. Multiple template
-  variants per the owner's framing: extend a session / extra session
-  / special outing / study intensive / sports time.
-- Family-side notification + "Book session" CTA.
+  contract has remaining, automatically spend from the bank via a
+  `bank_spend` event (negative `minutes_delta`).
+- Decide policy: do we spend from bank BEFORE the contract is fully
+  exhausted (so contracts always finish at exactly 0 leftover)? Or
+  only AFTER (so bank is a strict reserve)?
+- Service-layer wiring on the appointment-complete RPCs.
 
-**4. Web↔app cancellation parity.** Business decision: web is
-immediate (Phase 3.5), app still uses approval queue per the manual.
-Decide whether to update the app to match. Owner has not chosen.
+**3b. Family-side bank-hours surfacing (~1-2 hr — also not built).**
+The assistant nudge (Phase 12.2) posts a message to the family thread,
+but there's no dedicated family-side UI for:
+- Seeing their bank balance on `client-dashboard.html`
+- A "Book a make-up session using my banked hours" CTA
+- Notification when assistant sends a nudge (the message goes to the
+  thread, but no separate notification badge yet)
+
+**4. Web↔app cancellation parity — DECISION RECORDED 2026-05-15:**
+
+Owner's rule: *"if someone cancels, an assistant can't say no. no one
+can be forced to do appointments."* The web was updated to immediate
+cancellation in Phase 3.5. The React Native app at
+`/Users/calebbrandt/private-mentorship-app/` still routes cancellations
+through `schedule_change_requests` for admin approval per its older
+design.
+
+**Action for the next session that touches the app:**
+1. In `appointmentService.js`, the `cancelAppointment()` function calls
+   `cancel_own_appointment` RPC directly — so that path is already
+   immediate at the DB level.
+2. The PATH that goes through `schedule_change_requests` is the older
+   reschedule-request UI flow (`ScheduleRequestScreen.js`, etc.). When
+   the user picks "cancel" in those screens, the request is filed
+   pending instead of executing.
+3. **The fix**: update the app's cancel screens to call
+   `cancel_own_appointment` directly (or the new
+   `assistant_cancel_appointment` for the assistant flow) instead of
+   inserting into `schedule_change_requests` with `request_type='cancel'`.
+4. **Server-side**: `cancel_own_appointment` was already updated in
+   Phase 7.1 to write the `change_token_spent` audit row, so token
+   counting stays consistent across web + app.
+
+**No code changes shipped for this from the website repo** — only the
+app codebase can fix the app. This is documented here so the next
+person who opens that repo knows the decision and the steps.
 
 ### 🟠 Significant future arc — kept here for context
 
