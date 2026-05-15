@@ -209,11 +209,33 @@
       const isAdmin = await window.pmHiring.isCurrentUserAdminOrOwner();
       if (isAdmin) return 'admin';
     } catch (_) {}
+
+    // Primary: use the existing pmHiring helper
     try {
       const profile = await window.pmHiring.fetchCurrentUserProfile();
-      if (profile && /^assistant$/i.test(String(profile.role || ''))) return 'assistant';
-      if (profile && /^client$/i.test(String(profile.role || ''))) return 'client';
+      const r1 = String(profile?.role || '').toUpperCase().trim();
+      if (r1 === 'ASSISTANT') return 'assistant';
+      if (r1 === 'CLIENT') return 'client';
     } catch (_) {}
+
+    // Defensive fallback: query profiles directly via user_id (the canonical
+    // FK column, per schema). Handles edge cases where pmHiring helper returns
+    // an unexpected shape or the row's row-level SELECT happens to be denied.
+    try {
+      const user = await window.pmHiring.getCurrentUser();
+      const sb = window.pmSupabase;
+      if (user && sb) {
+        const { data } = await sb
+          .from('profiles')
+          .select('role')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        const r2 = String(data?.role || '').toUpperCase().trim();
+        if (r2 === 'ASSISTANT') return 'assistant';
+        if (r2 === 'CLIENT') return 'client';
+      }
+    } catch (_) {}
+
     return 'client';
   }
 
