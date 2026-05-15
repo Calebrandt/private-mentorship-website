@@ -100,6 +100,35 @@
   .nx-req__field{}
   .nx-req__field-label{font-size:11px;color:var(--ink-tert);margin:0 0 5px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;}
   .nx-req__field-value{font-size:14px;color:var(--ink-2);margin:0;font-weight:600;letter-spacing:-.005em;line-height:1.4;}
+  /* Phase 3: multi-slot picker for assistant-filed reschedule requests */
+  .nx-slot-picker{
+    background:#FAFBFC;border:1px solid var(--border);border-radius:11px;
+    padding:14px 16px;margin-bottom:16px;
+  }
+  .nx-slot-picker__head{
+    display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:10px;
+  }
+  .nx-slot-picker__label{
+    font-size:11px;color:var(--ink-tert);margin:0;font-weight:700;letter-spacing:.10em;text-transform:uppercase;
+  }
+  .nx-slot-picker__hint{font-size:11.5px;color:var(--ink-mute);font-weight:500;}
+  .nx-slot-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));gap:8px;}
+  .nx-slot-pill{
+    background:#fff;border:2px solid var(--border);border-radius:10px;
+    padding:10px 12px;cursor:pointer;transition:all .15s ease;
+    text-align:left;font:inherit;display:flex;flex-direction:column;gap:2px;
+  }
+  .nx-slot-pill:hover{border-color:#94A3B8;}
+  .nx-slot-pill.is-chosen{border-color:var(--primary);background:#EEF1FB;box-shadow:0 0 0 2px rgba(87,80,241,0.12);}
+  .nx-slot-pill__day{font-size:11px;color:var(--ink-tert);font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin:0;}
+  .nx-slot-pill__time{font-size:14px;color:var(--ink-2);font-weight:700;letter-spacing:-.005em;margin:0;}
+  .nx-slot-pill__dur{font-size:11.5px;color:var(--ink-mute);font-weight:500;margin:0;}
+  .nx-slot-pill__badge{
+    font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    background:var(--primary);color:#fff;padding:2px 7px;border-radius:9999px;
+    margin-top:3px;display:inline-block;align-self:flex-start;
+  }
+
   .nx-req__reason{
     background:#FAFBFC;border-left:3px solid var(--primary);
     padding:12px 14px;border-radius:0 9px 9px 0;margin-bottom:18px;
@@ -355,6 +384,9 @@
   let allReviewed = [];
   let clientsById = {};
   let appointmentsById = {};
+  // Phase 3: which proposed slot has the admin chosen for each multi-slot request?
+  // chosenSlotByReq[reqId] = index into proposed_schedule.slots
+  let chosenSlotByReq = {};
 
   async function loadAll(){
     const pending = await window.pmHiring.adminListScheduleRequests({ statuses: ['pending'], limit: 200 });
@@ -397,18 +429,35 @@
       originalValue = `${d.toLocaleTimeString('en-CA',{hour:'numeric',minute:'2-digit'})}${apt.title ? ' · ' + esc(apt.title) : ''}`;
     }
 
+    // Determine whether this request has a multi-slot proposal (Phase 3 from
+    // the assistant side). Single-slot client requests fall through to the
+    // legacy detail rendering.
+    const proposedSlots = Array.isArray(req.proposed_schedule?.slots)
+      ? req.proposed_schedule.slots : null;
+    const isMultiSlot = !isReviewed
+                     && proposedSlots && proposedSlots.length > 1
+                     && req.request_type !== 'cancel';
+
     let proposedLabel = '—';
     let proposedValue = '—';
-    const proposedIso = req.proposed_schedule?.starts_at || (req.requested_date && req.requested_start ? `${req.requested_date}T${req.requested_start}` : null);
+    const proposedIso = req.proposed_schedule?.starts_at
+                     || proposedSlots?.[0]?.starts_at
+                     || (req.requested_date && req.requested_start ? `${req.requested_date}T${req.requested_start}` : null);
     if (proposedIso) {
       const d = new Date(proposedIso);
       proposedLabel = d.toLocaleDateString('en-CA', { weekday:'long', month:'long', day:'numeric' });
       proposedValue = d.toLocaleTimeString('en-CA',{hour:'numeric',minute:'2-digit'});
-      const dur = req.proposed_schedule?.duration_min;
+      const dur = req.proposed_schedule?.duration_min || proposedSlots?.[0]?.duration_min;
       if (dur) proposedValue += ` · ${dur} min`;
     } else if (req.request_type === 'cancel') {
       proposedLabel = 'Action';
       proposedValue = 'Cancel this session';
+    }
+
+    // For multi-slot requests: hide the "Proposed" cell and render a slot
+    // picker below. Default-select the first slot.
+    if (isMultiSlot && chosenSlotByReq[req.id] == null) {
+      chosenSlotByReq[req.id] = 0;
     }
 
     const detailsHtml = `<div class="nx-req__details">
@@ -418,11 +467,33 @@
         <p class="nx-req__field-value" style="color:var(--ink-mute);font-weight:500;margin-top:2px;">${esc(originalValue)}</p>
       </div>
       <div class="nx-req__field">
-        <p class="nx-req__field-label">${req.request_type === 'cancel' ? 'Outcome' : 'Proposed'}</p>
-        <p class="nx-req__field-value">${esc(proposedLabel)}</p>
-        <p class="nx-req__field-value" style="color:var(--ink-mute);font-weight:500;margin-top:2px;">${esc(proposedValue)}</p>
+        <p class="nx-req__field-label">${req.request_type === 'cancel' ? 'Outcome' : (isMultiSlot ? 'Source' : 'Proposed')}</p>
+        <p class="nx-req__field-value">${esc(isMultiSlot ? 'Assistant proposal' : proposedLabel)}</p>
+        <p class="nx-req__field-value" style="color:var(--ink-mute);font-weight:500;margin-top:2px;">${esc(isMultiSlot ? `${proposedSlots.length} options below` : proposedValue)}</p>
       </div>
     </div>`;
+
+    const slotPickerHtml = isMultiSlot ? `<div class="nx-slot-picker">
+      <div class="nx-slot-picker__head">
+        <p class="nx-slot-picker__label">Pick which slot to approve</p>
+        <span class="nx-slot-picker__hint">Click an option, then Approve</span>
+      </div>
+      <div class="nx-slot-grid">
+        ${proposedSlots.map((s, idx) => {
+          const d = new Date(s.starts_at);
+          const day = d.toLocaleDateString('en-CA',{weekday:'short', month:'short', day:'numeric'});
+          const time = d.toLocaleTimeString('en-CA',{hour:'numeric',minute:'2-digit'});
+          const dur = s.duration_min || 60;
+          const isChosen = chosenSlotByReq[req.id] === idx;
+          return `<button type="button" class="nx-slot-pill ${isChosen?'is-chosen':''}" data-req-id="${esc(req.id)}" data-slot-idx="${idx}">
+            <p class="nx-slot-pill__day">${esc(day)}${idx === 0 ? ' · primary' : ''}</p>
+            <p class="nx-slot-pill__time">${esc(time)}</p>
+            <p class="nx-slot-pill__dur">${dur} min · ${(dur/60).toFixed(dur%60?1:0)} hr</p>
+            ${isChosen ? '<span class="nx-slot-pill__badge">✓ Will approve</span>' : ''}
+          </button>`;
+        }).join('')}
+      </div>
+    </div>` : '';
 
     const reasonHtml = req.reason ? `<div class="nx-req__reason">
       <span class="nx-req__reason-label">Client's reason</span>
@@ -454,6 +525,7 @@
         <span class="nx-req__type nx-req__type--${typeClass(req.request_type)}">${esc(typeLabel(req.request_type))}</span>
       </div>
       ${detailsHtml}
+      ${slotPickerHtml}
       ${reasonHtml}
       ${actionsHtml}
     </div>`;
@@ -536,13 +608,56 @@
     }
   });
 
+  // Phase 3: when admin clicks a slot pill, remember it and re-render that card
+  function bindSlotPicker(){
+    document.querySelectorAll('.nx-slot-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        const reqId = pill.dataset.reqId;
+        const slotIdx = Number(pill.dataset.slotIdx);
+        chosenSlotByReq[reqId] = slotIdx;
+        render();
+      });
+    });
+  }
+
+  // For a reschedule request with multiple proposed slots, sync the chosen
+  // slot's start/end into the canonical columns BEFORE calling the
+  // existing approve RPC (which reads those columns).
+  async function applyChosenSlotIfMulti(req){
+    const slots = Array.isArray(req.proposed_schedule?.slots) ? req.proposed_schedule.slots : null;
+    if (!slots || slots.length <= 1) return; // nothing to do — already canonical
+    const chosen = slots[chosenSlotByReq[req.id] ?? 0];
+    if (!chosen) return;
+    const startDate = new Date(chosen.starts_at);
+    const endDate = new Date(startDate.getTime() + (chosen.duration_min || 60) * 60000);
+    const pad = n => String(n).padStart(2,'0');
+    const dateStr = `${startDate.getFullYear()}-${pad(startDate.getMonth()+1)}-${pad(startDate.getDate())}`;
+    const startStr = `${pad(startDate.getHours())}:${pad(startDate.getMinutes())}:00`;
+    const endStr   = `${pad(endDate.getHours())}:${pad(endDate.getMinutes())}:00`;
+
+    // Get the supabase client. The service layer doesn't expose a raw
+    // update helper for schedule_change_requests; use the global client.
+    const sb = window.pmSupabase;
+    if (!sb) return;
+    const { error } = await sb.from('schedule_change_requests')
+      .update({ requested_date: dateStr, requested_start: startStr, requested_end: endStr })
+      .eq('id', req.id);
+    if (error) throw error;
+  }
+
   // Action handlers (approve / reject)
   function bindRowActions(){
+    bindSlotPicker();
     document.querySelectorAll('[data-action="approve"]').forEach(btn => {
       btn.addEventListener('click', async () => {
         const id = btn.dataset.id, type = btn.dataset.type;
+        const req = allPending.find(r => r.id === id);
         btn.disabled = true; btn.textContent = 'Approving…';
         try {
+          if (req && type === 'reschedule') {
+            // Sync chosen slot into canonical columns first
+            await applyChosenSlotIfMulti(req);
+          }
           if (type === 'cancel') await window.pmHiring.adminApproveCancelRequest(id);
           else if (type === 'reschedule') await window.pmHiring.adminApproveRescheduleRequest(id);
           else if (type === 'extra') await window.pmHiring.adminApproveExtraRequest(id);

@@ -819,6 +819,169 @@
     return data;
   }
 
+  // ─── Phase 3: Assistant-side schedule change requests ───────────────────
+  // These mirror the client-side submit* functions but resolve client_id
+  // from the appointment (assistants don't have a clients row of their own)
+  // and set assistant_id = auth.uid() as required by the
+  // schedule_change_requests_assistant_insert RLS policy.
+  //
+  // All three insert into schedule_change_requests. The existing admin queue
+  // at admin-schedule-requests.html handles approval via the existing
+  // admin_approve_schedule_request RPC.
+  //
+  // Reschedule + Extra accept an array of 1-3 alternate slots, persisted in
+  // proposed_schedule.slots. The first slot also fills the canonical
+  // requested_date / requested_start / requested_end so existing admin code
+  // keeps working; the admin UI's slot picker reads proposed_schedule.slots
+  // to let the admin choose which one to approve.
+
+  // Helper: resolve a slot {startsAtIso, durationMin} into a normalized shape.
+  function _normalizeSlot(s, idx) {
+    if (!s || !s.startsAtIso) throw new Error(`Slot ${idx+1}: start time is required`);
+    const start = new Date(s.startsAtIso);
+    if (Number.isNaN(start.getTime())) throw new Error(`Slot ${idx+1}: invalid start time`);
+    const dur = Number(s.durationMin);
+    if (!dur || dur <= 0) throw new Error(`Slot ${idx+1}: invalid duration`);
+    return { starts_at: start.toISOString(), duration_min: dur };
+  }
+  // Helper: derive canonical SQL date/time strings from a normalized slot.
+  function _slotCanonicalFields(slot) {
+    const start = new Date(slot.starts_at);
+    const end   = new Date(start.getTime() + slot.duration_min * 60000);
+    return {
+      requested_date:  start.toISOString().slice(0, 10),
+      requested_start: start.toTimeString().slice(0, 8),
+      requested_end:   end.toTimeString().slice(0, 8),
+    };
+  }
+  // Helper: resolve client_id from the appointment if not supplied.
+  async function _resolveClientIdFromAppt({ appointmentId, appointment }) {
+    if (appointment?.client_id) return appointment.client_id;
+    if (!appointmentId) return null;
+    const { data } = await sb()
+      .from('appointments')
+      .select('client_id')
+      .eq('id', appointmentId)
+      .maybeSingle();
+    return data?.client_id || null;
+  }
+
+  async function assistantSubmitCancelRequest({ appointmentId, appointment, reason = '' }) {
+    if (!appointmentId && !appointment?.id) throw new Error('appointmentId is required');
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not signed in');
+    const clientId = await _resolveClientIdFromAppt({ appointmentId, appointment });
+    if (!clientId) throw new Error('Could not resolve client for this appointment');
+
+    const payload = {
+      client_id: clientId,
+      assistant_id: user.id,
+      appointment_id: appointmentId || appointment.id,
+      requested_date: null,
+      requested_start: null,
+      requested_end: null,
+      reason: String(reason || '').trim() || null,
+      status: 'pending',
+      request_type: 'cancel',
+      proposed_schedule: null,
+    };
+    const { data, error } = await sb()
+      .from('schedule_change_requests')
+      .insert([payload])
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  }
+
+  async function assistantSubmitRescheduleRequest({
+    appointmentId, appointment, slots = [], reason = '',
+  }) {
+    if (!appointmentId && !appointment?.id) throw new Error('appointmentId is required');
+    if (!Array.isArray(slots) || slots.length === 0) {
+      throw new Error('At least one proposed slot is required');
+    }
+    if (slots.length > 3) throw new Error('At most 3 proposed slots');
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not signed in');
+
+    const normalized = slots.map((s, i) => _normalizeSlot(s, i));
+    const clientId = await _resolveClientIdFromAppt({ appointmentId, appointment });
+    if (!clientId) throw new Error('Could not resolve client for this appointment');
+    const primary = _slotCanonicalFields(normalized[0]);
+
+    const payload = {
+      client_id: clientId,
+      assistant_id: user.id,
+      appointment_id: appointmentId || appointment.id,
+      requested_date: primary.requested_date,
+      requested_start: primary.requested_start,
+      requested_end: primary.requested_end,
+      reason: String(reason || '').trim() || null,
+      status: 'pending',
+      request_type: 'reschedule',
+      proposed_schedule: { slots: normalized, source: 'assistant_web_phase3' },
+    };
+    const { data, error } = await sb()
+      .from('schedule_change_requests')
+      .insert([payload])
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  }
+
+  async function assistantSubmitExtraAppointmentRequest({
+    clientId, slots = [], reason = '',
+  }) {
+    if (!clientId) throw new Error('clientId is required');
+    if (!Array.isArray(slots) || slots.length === 0) {
+      throw new Error('At least one proposed slot is required');
+    }
+    if (slots.length > 3) throw new Error('At most 3 proposed slots');
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not signed in');
+
+    const normalized = slots.map((s, i) => _normalizeSlot(s, i));
+    const primary = _slotCanonicalFields(normalized[0]);
+
+    const payload = {
+      client_id: clientId,
+      assistant_id: user.id,
+      appointment_id: null,
+      requested_date: primary.requested_date,
+      requested_start: primary.requested_start,
+      requested_end: primary.requested_end,
+      reason: String(reason || '').trim() || null,
+      status: 'pending',
+      request_type: 'extra',
+      proposed_schedule: { slots: normalized, source: 'assistant_web_phase3' },
+    };
+    const { data, error } = await sb()
+      .from('schedule_change_requests')
+      .insert([payload])
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  }
+
+  // Pending requests filed BY this assistant (so we can badge appointments).
+  async function fetchAssistantPendingScheduleRequests() {
+    const user = await getCurrentUser();
+    if (!user) return [];
+    try {
+      const { data, error } = await sb()
+        .from('schedule_change_requests')
+        .select('id, appointment_id, client_id, request_type, status, requested_date, requested_start, proposed_schedule, reason, created_at')
+        .eq('assistant_id', user.id)
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false });
+      if (error) return [];
+      return data || [];
+    } catch (_) { return []; }
+  }
+
   // List the families this assistant is engaged with — based on contracts.
   // Returns one row per contract with a `client` shape attached.
   // Statuses included: active, paused, pending, draft. Closed contracts
@@ -1865,6 +2028,9 @@
     fetchAssistantAppointmentsRange,
     // scheduler Phase 2 — appointment status writes
     assistantMarkAppointmentComplete, assistantMarkAppointmentNoShow,
+    // scheduler Phase 3 — schedule change requests (assistant)
+    assistantSubmitCancelRequest, assistantSubmitRescheduleRequest,
+    assistantSubmitExtraAppointmentRequest, fetchAssistantPendingScheduleRequests,
     // assistant-side (Phase 3)
     updateMyAssistantProfile, fetchMyAssistantHoursLedger,
     // admin: clients

@@ -204,6 +204,96 @@
   .as-toast[data-open="true"]{display:block;}
   .as-toast--error{background:#991B1B;}
   @keyframes as-slide-up{from{transform:translate(-50%,12px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+
+  /* Phase 3: upcoming-row action buttons */
+  .as-upcoming-row{
+    display:grid;grid-template-columns:90px 1fr auto auto;gap:14px;align-items:center;
+    padding:14px 4px;border-bottom:1px solid #EEF2F7;
+  }
+  .as-upcoming-row:last-child{border-bottom:0;}
+  .as-upcoming-row__btns{display:flex;gap:6px;}
+  .as-btn--ghost{
+    background:#fff;color:#475569;border:1px solid #E2E8F0;
+    font-size:11.5px;font-weight:700;padding:6px 12px;border-radius:9999px;
+    cursor:pointer;font-family:inherit;transition:all .15s ease;
+    display:inline-flex;align-items:center;gap:5px;
+  }
+  .as-btn--ghost:hover{background:#F8FAFC;border-color:#94A3B8;color:#0F172A;}
+  .as-btn--ghost.is-danger:hover{border-color:#FCA5A5;color:#B91C1C;background:#FEF2F2;}
+
+  /* Pending review badge */
+  .as-pending-pill{
+    font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    padding:4px 10px;border-radius:9999px;white-space:nowrap;
+    background:#FEF3C7;color:#92400E;
+    display:inline-flex;align-items:center;gap:5px;
+  }
+  .as-pending-pill::before{
+    content:'';width:6px;height:6px;border-radius:50%;background:#D97706;
+    animation:as-pulse 1.8s ease infinite;
+  }
+  @keyframes as-pulse{0%,100%{opacity:1}50%{opacity:.45}}
+
+  /* Reschedule modal — slot picker */
+  .as-modal--wide{max-width:540px;}
+  .as-slot-group{
+    background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;
+    padding:12px;margin-bottom:10px;display:grid;grid-template-columns:1fr 1fr auto auto;gap:8px;align-items:end;
+  }
+  .as-slot-group__label{
+    grid-column:1 / -1;font-size:10.5px;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;color:#64748B;margin:0 0 2px;
+  }
+  .as-input-field{display:flex;flex-direction:column;gap:4px;}
+  .as-input-field label{font-size:10.5px;font-weight:600;color:#64748B;letter-spacing:.02em;}
+  .as-input-field input, .as-input-field select{
+    border:1px solid #CBD5E1;border-radius:8px;padding:7px 10px;font:500 13px Inter,sans-serif;
+    color:#0F172A;background:#fff;
+  }
+  .as-input-field input:focus, .as-input-field select:focus{
+    outline:none;border-color:#0071e3;box-shadow:0 0 0 2px #DCEBFC;
+  }
+  .as-slot-remove{
+    background:#fff;border:1px solid #E2E8F0;color:#94A3B8;
+    width:32px;height:32px;border-radius:9px;cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:700;line-height:1;align-self:end;
+  }
+  .as-slot-remove:hover{border-color:#FCA5A5;color:#B91C1C;background:#FEF2F2;}
+  .as-add-slot{
+    background:#fff;border:1px dashed #CBD5E1;border-radius:10px;
+    padding:10px 16px;font:600 12.5px Inter,sans-serif;color:#475569;
+    cursor:pointer;width:100%;transition:all .15s ease;
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  }
+  .as-add-slot:hover{border-color:#0071e3;color:#0071e3;background:#F0F7FF;}
+  .as-add-slot:disabled{opacity:.45;cursor:not-allowed;}
+
+  .as-textarea-row{margin-top:6px;}
+  .as-textarea-row label{
+    display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;color:#64748B;margin:0 0 5px;
+  }
+  .as-textarea-row textarea{
+    width:100%;border:1px solid #CBD5E1;border-radius:8px;
+    padding:9px 11px;font:500 13px Inter,sans-serif;color:#0F172A;
+    resize:vertical;min-height:64px;
+  }
+  .as-textarea-row textarea:focus{
+    outline:none;border-color:#0071e3;box-shadow:0 0 0 2px #DCEBFC;
+  }
+
+  /* 24-hour warning banner inside cancel modal */
+  .as-warn-banner{
+    background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;
+    padding:11px 14px;display:flex;gap:10px;align-items:flex-start;
+    font-size:12.5px;color:#92400E;line-height:1.5;margin-bottom:14px;
+  }
+  .as-warn-banner__icon{flex-shrink:0;color:#D97706;font-size:14px;line-height:1;margin-top:1px;}
+
+  /* Modal confirm variants */
+  .as-modal__confirm--primary{background:#0071e3;}
+  .as-modal__confirm--primary:hover{background:#005CBE;}
 </style>
 </head>
 <body class="pm-has-sidebar">
@@ -293,6 +383,49 @@
   </div>
 </div>
 
+<!-- Reschedule modal (Phase 3 — multi-slot proposals) -->
+<div class="as-modal-backdrop" id="asReschedModal" data-open="false">
+  <div class="as-modal as-modal--wide" role="dialog" aria-modal="true">
+    <h3 class="as-modal__title">Request reschedule</h3>
+    <p class="as-modal__body">Propose one to three alternate times. The admin will choose which slot to confirm and notify the family.</p>
+    <div class="as-modal__row" id="asReschedContext"></div>
+
+    <div id="asReschedSlots"></div>
+    <button type="button" class="as-add-slot" id="asReschedAddSlot">+ Add another option</button>
+
+    <div class="as-textarea-row" style="margin-top:14px;">
+      <label for="asReschedReason">Reason (optional, visible to admin)</label>
+      <textarea id="asReschedReason" placeholder="Why this change is needed…"></textarea>
+    </div>
+
+    <div class="as-modal__actions" style="margin-top:18px;">
+      <button type="button" class="as-modal__cancel" id="asReschedCancel">Cancel</button>
+      <button type="button" class="as-modal__confirm as-modal__confirm--primary" id="asReschedSubmit">Submit request</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cancel-request modal (Phase 3) -->
+<div class="as-modal-backdrop" id="asCancelModal" data-open="false">
+  <div class="as-modal" role="dialog" aria-modal="true">
+    <h3 class="as-modal__title">Request cancellation</h3>
+    <p class="as-modal__body">This will file a cancellation request for admin review. The session stays scheduled until approved.</p>
+    <div class="as-modal__row" id="asCancelContext"></div>
+
+    <div id="asCancelWarnSlot"></div>
+
+    <div class="as-textarea-row">
+      <label for="asCancelReason">Reason (required)</label>
+      <textarea id="asCancelReason" placeholder="Why this session needs to be cancelled…"></textarea>
+    </div>
+
+    <div class="as-modal__actions" style="margin-top:18px;">
+      <button type="button" class="as-modal__cancel" id="asCancelBack">Back</button>
+      <button type="button" class="as-modal__confirm as-modal__confirm--no-show" id="asCancelSubmit">Submit cancellation</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast (success / error) -->
 <div class="as-toast" id="asToast" data-open="false">Done</div>
 
@@ -359,6 +492,7 @@ const state = {
   upcoming: [],
   needsAttention: [], // past starts_at && status='scheduled'
   history: [],
+  pendingByAppt: {}, // appointment_id → pending schedule_change_request
 };
 
 async function loadAll(){
@@ -374,6 +508,16 @@ async function loadAll(){
       toDate:   to.toISOString(),
     });
   } catch (_) { state.appointments = []; }
+
+  // Fetch any pending schedule_change_requests this assistant has filed,
+  // so we can badge the affected appointments.
+  try {
+    const reqs = await window.pmHiring.fetchAssistantPendingScheduleRequests();
+    state.pendingByAppt = {};
+    (reqs || []).forEach(r => {
+      if (r.appointment_id) state.pendingByAppt[r.appointment_id] = r;
+    });
+  } catch (_) { state.pendingByAppt = {}; }
 
   // Upcoming: next 14 days, status=scheduled, future.
   const upFrom = now, upTo = addDays(now, 14);
@@ -454,7 +598,44 @@ function renderUpcoming(){
     wrap.innerHTML = `<div class="as-mini-empty">No sessions scheduled in the next two weeks.</div>`;
     return;
   }
-  wrap.innerHTML = `<div class="as-list">` + state.upcoming.map(a => rowHtml(a)).join('') + `</div>`;
+  wrap.innerHTML = `<div class="as-list">` + state.upcoming.map(a => upcomingRowHtml(a)).join('') + `</div>`;
+
+  // Wire up the action buttons on each row
+  wrap.querySelectorAll('button[data-action="reschedule"]').forEach(btn => {
+    btn.addEventListener('click', () => openReschedule(btn.dataset.apptId));
+  });
+  wrap.querySelectorAll('button[data-action="cancel-request"]').forEach(btn => {
+    btn.addEventListener('click', () => openCancelRequest(btn.dataset.apptId));
+  });
+}
+
+function upcomingRowHtml(a){
+  const d = new Date(a.starts_at);
+  const dateMain = d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  const dateYear = d.getFullYear();
+  const time = fmtTime(d);
+  const clientName = a.client?.full_name || (a.client_id ? 'Client ' + a.client_id.slice(0,6) : '—');
+  const min = durationOf(a);
+  const pending = state.pendingByAppt[a.id];
+
+  // If there's already a pending request for this appointment, hide the
+  // action buttons and show a "Pending review" badge instead. Prevents
+  // double-filing and gives the assistant visible status.
+  const rightSide = pending
+    ? `<span class="as-pending-pill">${escapeHtml(pending.request_type === 'cancel' ? 'Cancel pending' : 'Reschedule pending')}</span>`
+    : `<div class="as-upcoming-row__btns">
+         <button type="button" class="as-btn--ghost" data-action="reschedule" data-appt-id="${escapeHtml(a.id)}">⤴ Reschedule</button>
+         <button type="button" class="as-btn--ghost is-danger" data-action="cancel-request" data-appt-id="${escapeHtml(a.id)}">✕ Cancel</button>
+       </div>`;
+
+  return `<div class="as-upcoming-row" data-appt-id="${escapeHtml(a.id)}">
+    <div class="as-row__date">${escapeHtml(dateMain)}<small>${escapeHtml(String(dateYear))} · ${escapeHtml(time)}</small></div>
+    <div class="as-row__body">
+      <div class="as-row__client">${escapeHtml(clientName)}</div>
+      <div class="as-row__meta">${escapeHtml(a.title || a.notes || 'Session')} · ${escapeHtml(hoursLabel(min))}</div>
+    </div>
+    ${rightSide}
+  </div>`;
 }
 
 function renderHistory(){
@@ -619,6 +800,229 @@ function toast(message, isError = false){
   if (toastTimer) clearTimeout(toastTimer);
   toastTimer = setTimeout(() => { el.dataset.open = 'false'; }, isError ? 4500 : 2200);
 }
+
+// ─── Phase 3: Reschedule modal (multi-slot proposal) ───────────────────
+// Slot template: {date: 'YYYY-MM-DD', time: 'HH:MM', durationMin: number}
+// The first slot defaults to "tomorrow same time" as a sensible starting point.
+
+let reschedTarget = null; // the appointment we're rescheduling
+let reschedSlots = [];    // pending slot inputs
+
+function defaultSlotFromAppt(a){
+  const d = new Date(a.starts_at);
+  d.setDate(d.getDate() + 1); // suggest one day later
+  const pad = (n) => String(n).padStart(2, '0');
+  return {
+    date: `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`,
+    time: `${pad(d.getHours())}:${pad(d.getMinutes())}`,
+    durationMin: Number(a.duration_minutes) || 120,
+  };
+}
+
+function renderReschedSlots(){
+  const wrap = document.getElementById('asReschedSlots');
+  wrap.innerHTML = reschedSlots.map((s, idx) => `
+    <div class="as-slot-group" data-slot-idx="${idx}">
+      <div class="as-slot-group__label">Option ${idx + 1}${idx === 0 ? ' · primary' : ''}</div>
+      <div class="as-input-field">
+        <label>Date</label>
+        <input type="date" data-field="date" data-idx="${idx}" value="${escapeHtml(s.date)}"/>
+      </div>
+      <div class="as-input-field">
+        <label>Start time</label>
+        <input type="time" data-field="time" data-idx="${idx}" value="${escapeHtml(s.time)}"/>
+      </div>
+      <div class="as-input-field">
+        <label>Hours</label>
+        <select data-field="durationMin" data-idx="${idx}">
+          <option value="60" ${s.durationMin==60?'selected':''}>1 hr</option>
+          <option value="90" ${s.durationMin==90?'selected':''}>1.5 hr</option>
+          <option value="120" ${s.durationMin==120?'selected':''}>2 hr</option>
+          <option value="150" ${s.durationMin==150?'selected':''}>2.5 hr</option>
+          <option value="180" ${s.durationMin==180?'selected':''}>3 hr</option>
+          <option value="240" ${s.durationMin==240?'selected':''}>4 hr</option>
+        </select>
+      </div>
+      ${reschedSlots.length > 1
+        ? `<button type="button" class="as-slot-remove" data-action="remove-slot" data-idx="${idx}" aria-label="Remove option ${idx+1}">×</button>`
+        : `<span style="width:32px;"></span>`}
+    </div>
+  `).join('');
+
+  // Wire field updates
+  wrap.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('input', () => {
+      const idx = Number(el.dataset.idx);
+      const field = el.dataset.field;
+      reschedSlots[idx][field] = field === 'durationMin' ? Number(el.value) : el.value;
+    });
+  });
+  wrap.querySelectorAll('button[data-action="remove-slot"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = Number(btn.dataset.idx);
+      reschedSlots.splice(idx, 1);
+      renderReschedSlots();
+      updateAddSlotButton();
+    });
+  });
+}
+
+function updateAddSlotButton(){
+  const btn = document.getElementById('asReschedAddSlot');
+  btn.disabled = reschedSlots.length >= 3;
+  btn.textContent = btn.disabled ? '· Maximum 3 options ·' : '+ Add another option';
+}
+
+function openReschedule(apptId){
+  const appt = state.upcoming.find(a => a.id === apptId);
+  if (!appt) return;
+  reschedTarget = appt;
+  reschedSlots = [defaultSlotFromAppt(appt)];
+
+  // Context block
+  const d = new Date(appt.starts_at);
+  const dateStr = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+  const time = fmtTime(d);
+  const clientName = appt.client?.full_name || '—';
+  document.getElementById('asReschedContext').innerHTML = `
+    <span><b>Current:</b> ${escapeHtml(dateStr)} at ${escapeHtml(time)}</span>
+    <span><b>Family:</b> ${escapeHtml(clientName)}</span>
+    <span><b>Duration:</b> ${escapeHtml(hoursLabel(durationOf(appt)))}</span>
+  `;
+
+  document.getElementById('asReschedReason').value = '';
+  renderReschedSlots();
+  updateAddSlotButton();
+  document.getElementById('asReschedModal').dataset.open = 'true';
+}
+
+function closeReschedule(){
+  reschedTarget = null;
+  reschedSlots = [];
+  document.getElementById('asReschedModal').dataset.open = 'false';
+  document.getElementById('asReschedSubmit').disabled = false;
+}
+
+async function submitReschedule(){
+  if (!reschedTarget) return;
+  const btn = document.getElementById('asReschedSubmit');
+  btn.disabled = true;
+  try {
+    // Convert each slot into the service-layer's startsAtIso shape (Vancouver-local)
+    const slots = reschedSlots.map(s => {
+      if (!s.date || !s.time) throw new Error('Every option needs a date and time.');
+      // Build an ISO string in local time, then JS handles tz conversion
+      const [hh, mm] = s.time.split(':').map(Number);
+      const [y, m, d] = s.date.split('-').map(Number);
+      const localDate = new Date(y, m - 1, d, hh, mm);
+      return {
+        startsAtIso: localDate.toISOString(),
+        durationMin: Number(s.durationMin) || 120,
+      };
+    });
+    await window.pmHiring.assistantSubmitRescheduleRequest({
+      appointmentId: reschedTarget.id,
+      appointment: reschedTarget,
+      slots,
+      reason: document.getElementById('asReschedReason').value,
+    });
+    toast(`Reschedule request submitted (${slots.length} option${slots.length>1?'s':''}).`);
+    closeReschedule();
+    await loadAll();
+  } catch (err) {
+    console.warn('Reschedule request failed:', err);
+    toast(err?.message || 'Could not submit request.', true);
+    btn.disabled = false;
+  }
+}
+
+// ─── Phase 3: Cancel-request modal ─────────────────────────────────────
+let cancelTarget = null;
+
+function openCancelRequest(apptId){
+  const appt = state.upcoming.find(a => a.id === apptId);
+  if (!appt) return;
+  cancelTarget = appt;
+
+  const d = new Date(appt.starts_at);
+  const dateStr = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+  const time = fmtTime(d);
+  const clientName = appt.client?.full_name || '—';
+  document.getElementById('asCancelContext').innerHTML = `
+    <span><b>Session:</b> ${escapeHtml(dateStr)} at ${escapeHtml(time)}</span>
+    <span><b>Family:</b> ${escapeHtml(clientName)}</span>
+    <span><b>Duration:</b> ${escapeHtml(hoursLabel(durationOf(appt)))}</span>
+  `;
+
+  // 24-hour warning if applicable
+  const hoursAway = (d - Date.now()) / 36e5;
+  const warnSlot = document.getElementById('asCancelWarnSlot');
+  if (hoursAway < 24 && hoursAway > 0) {
+    warnSlot.innerHTML = `<div class="as-warn-banner">
+      <span class="as-warn-banner__icon">⚠</span>
+      <span>This session is less than 24 hours away. Late-cancellation policy may apply — the admin will determine whether hours are forfeited.</span>
+    </div>`;
+  } else {
+    warnSlot.innerHTML = '';
+  }
+
+  document.getElementById('asCancelReason').value = '';
+  document.getElementById('asCancelModal').dataset.open = 'true';
+}
+
+function closeCancelRequest(){
+  cancelTarget = null;
+  document.getElementById('asCancelModal').dataset.open = 'false';
+  document.getElementById('asCancelSubmit').disabled = false;
+}
+
+async function submitCancelRequest(){
+  if (!cancelTarget) return;
+  const reason = document.getElementById('asCancelReason').value.trim();
+  if (!reason) {
+    toast('Please add a reason.', true);
+    return;
+  }
+  const btn = document.getElementById('asCancelSubmit');
+  btn.disabled = true;
+  try {
+    await window.pmHiring.assistantSubmitCancelRequest({
+      appointmentId: cancelTarget.id,
+      appointment: cancelTarget,
+      reason,
+    });
+    toast('Cancellation request submitted.');
+    closeCancelRequest();
+    await loadAll();
+  } catch (err) {
+    console.warn('Cancel request failed:', err);
+    toast(err?.message || 'Could not submit request.', true);
+    btn.disabled = false;
+  }
+}
+
+// Wire reschedule + cancel modal controls
+document.getElementById('asReschedCancel').addEventListener('click', closeReschedule);
+document.getElementById('asReschedSubmit').addEventListener('click', submitReschedule);
+document.getElementById('asReschedAddSlot').addEventListener('click', () => {
+  if (reschedSlots.length >= 3) return;
+  reschedSlots.push(defaultSlotFromAppt(reschedTarget));
+  renderReschedSlots();
+  updateAddSlotButton();
+});
+document.getElementById('asReschedModal').addEventListener('click', (e) => {
+  if (e.target.id === 'asReschedModal') closeReschedule();
+});
+document.getElementById('asCancelBack').addEventListener('click', closeCancelRequest);
+document.getElementById('asCancelSubmit').addEventListener('click', submitCancelRequest);
+document.getElementById('asCancelModal').addEventListener('click', (e) => {
+  if (e.target.id === 'asCancelModal') closeCancelRequest();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  if (document.getElementById('asReschedModal').dataset.open === 'true') closeReschedule();
+  else if (document.getElementById('asCancelModal').dataset.open === 'true') closeCancelRequest();
+});
 
 // Wire week nav
 document.getElementById('asPrev').addEventListener('click', () => {
