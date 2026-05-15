@@ -1479,6 +1479,9 @@
       certifications: Array.isArray(patch.certifications) ? patch.certifications : [],
       education_summary: patch.education_summary ?? null,
       experience_summary: patch.experience_summary ?? null,
+      // Phase 8: per-assistant timezone for availability calculations.
+      // Defaults to America/Vancouver if not provided.
+      timezone: patch.timezone || 'America/Vancouver',
       updated_at: new Date().toISOString(),
       // is_published is intentionally NOT touched here — only admin controls visibility.
     };

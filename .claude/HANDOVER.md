@@ -965,9 +965,9 @@ What shipped:
   is outside the assistant's published availability. Admin can override.
 
 ### Future polish (not blocking launch)
-- Multi-timezone support — `is_assistant_available_at` hardcodes
-  Vancouver. To go national, store timezone on `assistant_profiles` or
-  `profiles` and pass it to the helper.
+- ~~Multi-timezone support~~ — **DONE 2026-05-15 (Phase 8).** `assistant_profiles.timezone`
+  column (default `America/Vancouver`), 7-option dropdown on profile editor,
+  `is_assistant_available_at` reads the assistant's own timezone.
 - Hard block on admin approval (vs current override-confirm).
 - Family-facing slot picker (a true calendar grid showing only available
   slots, not just a free-form time input with a warning).

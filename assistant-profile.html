@@ -137,6 +137,20 @@
       </div>
 
       <div class="ap-field">
+        <label class="ap-field__label" for="apTimezone">Timezone</label>
+        <select class="ap-field__input" id="apTimezone">
+          <option value="America/Vancouver">Pacific — Vancouver / Seattle</option>
+          <option value="America/Edmonton">Mountain — Calgary / Edmonton</option>
+          <option value="America/Regina">Central (no DST) — Saskatchewan</option>
+          <option value="America/Winnipeg">Central — Winnipeg</option>
+          <option value="America/Toronto">Eastern — Toronto / Montreal / Ottawa</option>
+          <option value="America/Halifax">Atlantic — Halifax</option>
+          <option value="America/St_Johns">Newfoundland — St. John's</option>
+        </select>
+        <p class="ap-field__hint">Used when families propose session times. Your published availability is read in this zone.</p>
+      </div>
+
+      <div class="ap-field">
         <label class="ap-field__label" for="apBio">Bio</label>
         <textarea class="ap-field__textarea" id="apBio" placeholder="A few sentences in your own voice — what you bring to a family, the kind of support you provide best."></textarea>
       </div>
@@ -202,6 +216,8 @@ function applyProfileToForm(p){
   $('apCertifications').value = csvIn(p.certifications);
   $('apEducation').value = p.education_summary || '';
   $('apExperience').value = p.experience_summary || '';
+  // Phase 8: timezone for availability calculations
+  $('apTimezone').value = p.timezone || 'America/Vancouver';
 
   // Public status pill
   const pillEl = $('pubStatusPill');
@@ -255,6 +271,7 @@ $('apSave').addEventListener('click', async () => {
     certifications: csvOut($('apCertifications').value),
     education_summary: $('apEducation').value.trim() || null,
     experience_summary: $('apExperience').value.trim() || null,
+    timezone: $('apTimezone').value || 'America/Vancouver',
   };
   const btn = $('apSave');
   btn.disabled = true; btn.textContent = 'Saving…';
