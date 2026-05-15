@@ -442,6 +442,143 @@
     }
   }
 
+  // ─── Client picks (logged-in families) ─────────────────────────────────
+  // Wraps the client_assistant_picks table. RLS enforces ownership via
+  // clients.profile_id = auth.uid(), so these queries return / write only
+  // the current family's rows.
+
+  // Helper — resolve the logged-in user's client_id (service recipient).
+  async function getCurrentClientId() {
+    const user = await getCurrentUser();
+    if (!user) return null;
+    const { data, error } = await sb()
+      .from('clients')
+      .select('id')
+      .eq('profile_id', user.id)
+      .maybeSingle();
+    if (error) {
+      console.warn('getCurrentClientId failed:', error);
+      return null;
+    }
+    return data?.id || null;
+  }
+
+  // List the current family's picks (joined with assistant profile fields
+  // for display). Returns an array sorted by rank (nulls last), then created_at.
+  async function fetchMyPicks() {
+    const { data, error } = await sb()
+      .from('client_assistant_picks')
+      .select(`
+        id, assistant_id, rank, status, notes, submitted_at, created_at, updated_at,
+        assistant_profiles!inner ( assistant_id, display_name, city, languages, certifications, bio, is_published )
+      `)
+      .order('rank', { ascending: true, nullsFirst: false })
+      .order('created_at', { ascending: true });
+    if (error) {
+      console.warn('fetchMyPicks failed:', error);
+      return [];
+    }
+    return data || [];
+  }
+
+  // Add an Assistant to the current family's pick list. If rank is null,
+  // it's added at the end. Returns the inserted row.
+  async function addPick({ assistantId, rank = null, notes = null }) {
+    const clientId = await getCurrentClientId();
+    if (!clientId) throw new Error('No client record for current user');
+    const row = {
+      client_id: clientId,
+      assistant_id: assistantId,
+      rank: rank,
+      status: 'shortlisted',
+      notes: notes,
+      updated_at: new Date().toISOString(),
+    };
+    const { data, error } = await sb()
+      .from('client_assistant_picks')
+      .insert(row)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  }
+
+  // Remove an Assistant from the current family's pick list.
+  async function removePick({ pickId = null, assistantId = null }) {
+    let q = sb().from('client_assistant_picks').delete();
+    if (pickId) q = q.eq('id', pickId);
+    else if (assistantId) q = q.eq('assistant_id', assistantId);
+    else throw new Error('Either pickId or assistantId is required');
+    const { error } = await q;
+    if (error) throw error;
+    return { ok: true };
+  }
+
+  // Update an existing pick (rank, notes). Status transitions go through
+  // the dedicated submit/admin RPCs to keep the lifecycle clean.
+  async function updatePick({ pickId, rank = undefined, notes = undefined }) {
+    if (!pickId) throw new Error('pickId is required');
+    const patch = { updated_at: new Date().toISOString() };
+    if (rank !== undefined) patch.rank = rank;
+    if (notes !== undefined) patch.notes = notes;
+    const { data, error } = await sb()
+      .from('client_assistant_picks')
+      .update(patch)
+      .eq('id', pickId)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  }
+
+  // Submit all shortlisted picks → status becomes 'introduction_requested'.
+  // Returns { ok, submitted_count, submitted_at }.
+  async function submitPicks() {
+    const { data, error } = await sb().rpc('client_submit_picks');
+    if (error) throw error;
+    return data;
+  }
+
+  // ─── Admin: pick queue management ──────────────────────────────────────
+
+  // List incoming picks for the admin queue. Defaults to all non-terminal
+  // states (excludes 'engaged' and 'declined'). Optionally filter by status.
+  async function adminListPicks({ statuses = null } = {}) {
+    let q = sb()
+      .from('client_assistant_picks')
+      .select(`
+        id, client_id, assistant_id, rank, status, notes, submitted_at, created_at, updated_at,
+        assistant_profiles!inner ( assistant_id, display_name, city, languages ),
+        clients!inner ( id, profile_id, full_name )
+      `)
+      .order('submitted_at', { ascending: false, nullsFirst: false })
+      .order('created_at', { ascending: false });
+    if (Array.isArray(statuses) && statuses.length) {
+      q = q.in('status', statuses);
+    } else {
+      // Default: show actionable items, hide closed states
+      q = q.not('status', 'in', '(engaged,declined)');
+    }
+    const { data, error } = await q;
+    if (error) {
+      console.warn('adminListPicks failed:', error);
+      return [];
+    }
+    return data || [];
+  }
+
+  // Admin transitions a pick's status (e.g., introduction_requested →
+  // meeting_scheduled). Uses the server-side RPC for auth + validation.
+  async function adminUpdatePickStatus({ pickId, newStatus, notes = null }) {
+    const { data, error } = await sb().rpc('admin_update_pick_status', {
+      p_pick_id: pickId,
+      p_new_status: newStatus,
+      p_notes: notes,
+    });
+    if (error) throw error;
+    return data;
+  }
+
   // ─── Admin: create a client account ──────────────────────────────────────
   // Calls the admin-create-client edge function. Server-side it verifies the caller
   // is OWNER/ADMIN/SUPERADMIN, creates the auth user, lets the trigger create the
@@ -1233,6 +1370,10 @@
     adminDeleteAssistantProfile, adminListAssistantUsers,
     // public: anonymous-readable roster
     listPublishedAssistantProfiles,
+    // client picks (Phase C)
+    getCurrentClientId, fetchMyPicks, addPick, removePick, updatePick, submitPicks,
+    // admin pick queue
+    adminListPicks, adminUpdatePickStatus,
     // admin: clients
     adminCreateClientAccount, adminListClients, adminFetchHomeKpis, adminFetchMonthlyStats,
     // client (self)
