@@ -973,20 +973,23 @@
     const reason = $('cancelReason').value;
 
     // Phase 7.2: if family is at/over their token budget, require explicit
-    // confirmation since hours will be deducted. (Soft pre-check; the RPC
-    // does the actual deduction atomically.)
+    // confirmation since hours will be deducted. Show current → deduction →
+    // after math so they can make an informed decision.
     if (tokenStatus && tokenStatus.over_budget) {
       const dur = apt.ends_at
         ? Math.round((new Date(apt.ends_at).getTime() - new Date(apt.starts_at).getTime()) / 60000)
         : null;
-      const hrs = dur ? Math.round((dur/60)*10)/10 : null;
+      const hrs = dur ? Math.round((dur/60)*10)/10 : 0;
+      const currentHrs = Number(client?.hours_balance || 0);
+      const afterHrs = Math.round((currentHrs - hrs) * 10) / 10;
       const proceed = confirm(
         `You're out of reschedule/cancel tokens for this contract.\n\n` +
-        `If you cancel this session, ${hrs ? hrs + ' hr' + (hrs===1?'':'s') : 'the full session length'} ` +
-        `will be deducted from your contract.\n\n` +
+        `Current hours:       ${currentHrs} hr\n` +
+        `This cancel deducts: ${hrs} hr\n` +
+        `After cancel:        ${afterHrs} hr remaining\n\n` +
         `Continue?`
       );
-      if (!proceed) return; // button stays enabled, nothing changes
+      if (!proceed) return;
     }
 
     const btn = $('cancelSubmit');
@@ -1003,20 +1006,24 @@
       bindActionButtons();
       closeCancelModal();
 
-      // Phase 7.1: refresh token status so the next modal shows the right
-      // counter, and surface the remaining count in the success toast.
+      // Phase 7.1/7.2: refresh token status AND client.hours_balance so
+      // the next modal + the right-column "remaining" number reflect the
+      // deduction if one happened.
       let toastMsg = isLate
         ? 'Session cancelled (within 24 hours — logged for your admin).'
         : 'Session cancelled.';
       try {
-        if (contract?.id) {
-          tokenStatus = await window.pmHiring.fetchContractTokenStatus(contract.id);
-          if (tokenStatus) {
-            const left = tokenStatus.tokens_remaining;
-            toastMsg += left > 0
-              ? ` ${left} reschedule/cancel token${left===1?'':'s'} remaining.`
-              : ` Tokens used up — next change deducts hours.`;
-          }
+        const [freshClient, freshTokens] = await Promise.all([
+          window.pmHiring.fetchMyClientRecord().catch(()=>null),
+          contract?.id ? window.pmHiring.fetchContractTokenStatus(contract.id).catch(()=>null) : Promise.resolve(null),
+        ]);
+        if (freshClient) client = freshClient;
+        if (freshTokens) tokenStatus = freshTokens;
+        if (tokenStatus) {
+          const left = tokenStatus.tokens_remaining;
+          toastMsg += left > 0
+            ? ` ${left} reschedule/cancel token${left===1?'':'s'} remaining.`
+            : ` Tokens used up — next change deducts hours.`;
         }
       } catch (_) {}
       showToast(toastMsg);
@@ -1047,10 +1054,13 @@
     // time, not at submit, so the warning is about the eventual outcome.)
     if (tokenStatus && tokenStatus.over_budget) {
       const hrs = Math.round((durationMin/60)*10)/10;
+      const currentHrs = Number(client?.hours_balance || 0);
+      const afterHrs = Math.round((currentHrs - hrs) * 10) / 10;
       const proceed = confirm(
         `You're out of reschedule/cancel tokens for this contract.\n\n` +
-        `If your admin approves this reschedule, ${hrs} hr${hrs===1?'':'s'} ` +
-        `will be deducted from your contract.\n\n` +
+        `Current hours:        ${currentHrs} hr\n` +
+        `If admin approves:    -${hrs} hr\n` +
+        `After approval:       ${afterHrs} hr remaining\n\n` +
         `Send the request anyway?`
       );
       if (!proceed) return;
