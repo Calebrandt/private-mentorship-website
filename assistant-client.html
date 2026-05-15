@@ -573,6 +573,28 @@ async function submitBookModal(){
         durationMin: Number(s.durationMin) || 120,
       };
     });
+
+    // Phase 5: soft availability check (same pattern as the reschedule modal).
+    try {
+      const me = (await window.pmSupabase.auth.getUser()).data?.user;
+      if (me?.id) {
+        const checks = await Promise.all(slots.map(s =>
+          window.pmHiring.checkAssistantAvailable({
+            assistantId: me.id, startsAtIso: s.startsAtIso, durationMin: s.durationMin,
+          })
+        ));
+        const outsideCount = checks.filter(ok => !ok).length;
+        if (outsideCount > 0) {
+          const proceed = confirm(
+            `${outsideCount} of your proposed slot${outsideCount>1?'s':''} ` +
+            `${outsideCount>1?'fall':'falls'} outside the availability you've published. ` +
+            `\n\nSubmit the request anyway?`
+          );
+          if (!proceed) { btn.disabled = false; return; }
+        }
+      }
+    } catch (_) { /* informational only */ }
+
     await window.pmHiring.assistantSubmitExtraAppointmentRequest({
       clientId: bookCtx.clientId,
       slots,

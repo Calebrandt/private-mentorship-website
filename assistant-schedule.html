@@ -911,7 +911,6 @@ async function submitReschedule(){
     // Convert each slot into the service-layer's startsAtIso shape (Vancouver-local)
     const slots = reschedSlots.map(s => {
       if (!s.date || !s.time) throw new Error('Every option needs a date and time.');
-      // Build an ISO string in local time, then JS handles tz conversion
       const [hh, mm] = s.time.split(':').map(Number);
       const [y, m, d] = s.date.split('-').map(Number);
       const localDate = new Date(y, m - 1, d, hh, mm);
@@ -920,6 +919,30 @@ async function submitReschedule(){
         durationMin: Number(s.durationMin) || 120,
       };
     });
+
+    // Phase 5: soft availability check — warn the assistant if any proposed
+    // slot falls outside their own published windows or in a blackout.
+    // Doesn't block submission (they may have a legitimate exception in mind).
+    try {
+      const me = (await window.pmSupabase.auth.getUser()).data?.user;
+      if (me?.id) {
+        const checks = await Promise.all(slots.map(s =>
+          window.pmHiring.checkAssistantAvailable({
+            assistantId: me.id, startsAtIso: s.startsAtIso, durationMin: s.durationMin,
+          })
+        ));
+        const outsideCount = checks.filter(ok => !ok).length;
+        if (outsideCount > 0) {
+          const proceed = confirm(
+            `${outsideCount} of your proposed slot${outsideCount>1?'s':''} ` +
+            `${outsideCount>1?'fall':'falls'} outside the availability you've published. ` +
+            `\n\nFile the request anyway?`
+          );
+          if (!proceed) { btn.disabled = false; return; }
+        }
+      }
+    } catch (_) { /* check is informational only — never blocks */ }
+
     await window.pmHiring.assistantSubmitRescheduleRequest({
       appointmentId: reschedTarget.id,
       appointment: reschedTarget,

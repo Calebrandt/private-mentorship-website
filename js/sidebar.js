@@ -51,6 +51,7 @@
       { type: 'section', label: 'Work' },
       { type: 'link', href: 'assistant-clients.html', label: 'My Clients', icon: 'users' },
       { type: 'link', href: 'assistant-schedule.html', label: 'My Schedule', icon: 'calendar', dynamicBadge: 'assistant-needs-attention' },
+      { type: 'link', href: 'assistant-availability.html', label: 'Availability', icon: 'clock' },
       { type: 'section', label: 'Earnings' },
       { type: 'link', href: 'assistant-hours.html', label: 'Hours & Payouts', icon: 'clock' },
       { type: 'section', label: 'Profile' },

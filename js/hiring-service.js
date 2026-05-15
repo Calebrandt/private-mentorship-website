@@ -1023,6 +1023,121 @@
     } catch (_) { return 0; }
   }
 
+  // ─── Phase 5: Assistant availability windows ─────────────────────────
+  // Two tables, mirrored 1:1 in this service layer:
+  //   assistant_availability_windows  — recurring weekly time blocks
+  //   assistant_availability_blackouts — date-range exceptions
+  // Plus a soft-check `checkAssistantAvailable` that calls the RPC for use
+  // in the booking modals (informational only — doesn't block submission).
+
+  async function fetchMyAvailabilityWindows() {
+    const user = await getCurrentUser();
+    if (!user) return [];
+    try {
+      const { data, error } = await sb()
+        .from('assistant_availability_windows')
+        .select('id, weekday, start_time, end_time, active_from, active_until, notes, created_at')
+        .eq('assistant_id', user.id)
+        .order('weekday', { ascending: true })
+        .order('start_time', { ascending: true });
+      if (error) { console.warn('fetchMyAvailabilityWindows', error); return []; }
+      return data || [];
+    } catch (_) { return []; }
+  }
+
+  async function addAvailabilityWindow({ weekday, startTime, endTime, activeFrom = null, activeUntil = null, notes = null }) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not signed in');
+    if (weekday == null || weekday < 0 || weekday > 6) throw new Error('Invalid weekday');
+    if (!startTime || !endTime) throw new Error('Start and end times are required');
+    if (startTime >= endTime) throw new Error('End time must be after start time');
+    const { data, error } = await sb()
+      .from('assistant_availability_windows')
+      .insert([{
+        assistant_id: user.id,
+        weekday: Number(weekday),
+        start_time: startTime,
+        end_time: endTime,
+        active_from: activeFrom,
+        active_until: activeUntil,
+        notes: notes || null,
+      }])
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  }
+
+  async function removeAvailabilityWindow(id) {
+    if (!id) throw new Error('id is required');
+    const { error } = await sb()
+      .from('assistant_availability_windows')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+    return true;
+  }
+
+  async function fetchMyAvailabilityBlackouts() {
+    const user = await getCurrentUser();
+    if (!user) return [];
+    try {
+      const { data, error } = await sb()
+        .from('assistant_availability_blackouts')
+        .select('id, starts_on, ends_on, reason, created_at')
+        .eq('assistant_id', user.id)
+        .order('starts_on', { ascending: true });
+      if (error) { console.warn('fetchMyAvailabilityBlackouts', error); return []; }
+      return data || [];
+    } catch (_) { return []; }
+  }
+
+  async function addAvailabilityBlackout({ startsOn, endsOn, reason = null }) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not signed in');
+    if (!startsOn || !endsOn) throw new Error('Both start and end dates are required');
+    if (endsOn < startsOn) throw new Error('End date must be on or after start date');
+    const { data, error } = await sb()
+      .from('assistant_availability_blackouts')
+      .insert([{
+        assistant_id: user.id,
+        starts_on: startsOn,
+        ends_on: endsOn,
+        reason: reason || null,
+      }])
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  }
+
+  async function removeAvailabilityBlackout(id) {
+    if (!id) throw new Error('id is required');
+    const { error } = await sb()
+      .from('assistant_availability_blackouts')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+    return true;
+  }
+
+  // Soft check — returns true if the assistant is available at this time
+  // per their published windows + blackouts. Defaults to TRUE if they
+  // haven't published anything (so the rest of the system still works
+  // before availability data exists).
+  async function checkAssistantAvailable({ assistantId, startsAtIso, durationMin }) {
+    if (!assistantId || !startsAtIso || !durationMin) return true;
+    try {
+      const { data, error } = await sb().rpc('is_assistant_available_at', {
+        p_assistant_id: assistantId,
+        p_starts_at: startsAtIso,
+        p_duration_minutes: Number(durationMin),
+      });
+      if (error) { console.warn('checkAssistantAvailable', error); return true; }
+      return Boolean(data);
+    } catch (_) { return true; }
+  }
+
   // Assistant: count of past-but-still-scheduled appointments that need the
   // assistant to mark complete or no-show. Drives the My Schedule sidebar
   // badge so the assistant sees it without needing to open the page.
@@ -2176,6 +2291,10 @@
     fetchMyUnreadMessagesCount,
     // sidebar badge — assistant My Schedule
     fetchAssistantNeedsAttentionCount,
+    // scheduler Phase 5 — availability windows + blackouts
+    fetchMyAvailabilityWindows, addAvailabilityWindow, removeAvailabilityWindow,
+    fetchMyAvailabilityBlackouts, addAvailabilityBlackout, removeAvailabilityBlackout,
+    checkAssistantAvailable,
     // assistant-side (Phase 3)
     updateMyAssistantProfile, fetchMyAssistantHoursLedger,
     // admin: clients

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My Availability — Private Mentorship Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&display=swap" />
+<link rel="stylesheet" href="js/sidebar.css?v=20260515c" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#F4F5F7;color:#0F172A;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+  .av-shell{padding:36px 32px 80px;max-width:1100px;margin:0 auto;}
+
+  /* Head */
+  .av-head{margin-bottom:24px;}
+  .av-eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#0071e3;margin:0 0 8px;}
+  .av-h1{font-family:"Archivo","Inter",sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0 0 6px;color:#0F172A;}
+  .av-sub{font-size:14px;color:#64748B;margin:0;line-height:1.55;max-width:680px;}
+
+  /* Cards */
+  .av-card{
+    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    padding:24px 26px;margin-bottom:18px;
+  }
+  .av-card__head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px;flex-wrap:wrap;}
+  .av-card__title{font-family:"Archivo","Inter",sans-serif;font-size:18px;font-weight:800;letter-spacing:-.01em;color:#0F172A;margin:0 0 4px;}
+  .av-card__sub{font-size:13px;color:#64748B;margin:0;line-height:1.5;max-width:520px;}
+  .av-add-btn{
+    background:#0071e3;color:#fff;border:1px solid #0071e3;
+    font-family:inherit;font-size:13px;font-weight:700;letter-spacing:-.005em;
+    padding:9px 16px;border-radius:9999px;cursor:pointer;
+    transition:background .15s ease;
+    display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
+  }
+  .av-add-btn:hover{background:#005CBE;border-color:#005CBE;}
+
+  /* Row table */
+  .av-row{
+    display:grid;gap:14px;align-items:center;
+    padding:13px 4px;border-bottom:1px solid #EEF2F7;
+  }
+  .av-row:last-child{border-bottom:0;}
+  .av-row--windows{grid-template-columns:110px 1fr 1fr auto;}
+  .av-row--blackouts{grid-template-columns:1fr 1fr auto;}
+  .av-row__day{font-family:"Archivo","Inter",sans-serif;font-weight:800;font-size:14px;color:#0F172A;letter-spacing:-.005em;}
+  .av-row__times{font-size:13.5px;color:#475569;font-weight:600;font-variant-numeric:tabular-nums;}
+  .av-row__range{font-size:13px;color:#64748B;}
+  .av-row__range strong{color:#0F172A;font-weight:700;}
+  .av-row__reason{font-size:12.5px;color:#94A3B8;font-style:italic;}
+  .av-del-btn{
+    background:#fff;border:1px solid #E2E8F0;color:#94A3B8;
+    width:32px;height:32px;border-radius:9px;cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:700;
+  }
+  .av-del-btn:hover{border-color:#FCA5A5;color:#B91C1C;background:#FEF2F2;}
+
+  /* Empty / loading */
+  .av-empty,.av-loading{
+    text-align:center;padding:36px 16px;color:#64748B;
+    border:1px dashed #CBD5E1;border-radius:12px;
+  }
+  .av-empty__title,.av-loading__title{font-family:"Archivo","Inter",sans-serif;font-size:15px;font-weight:700;color:#0F172A;margin:0 0 4px;letter-spacing:-.005em;}
+  .av-empty__sub,.av-loading__sub{font-size:12.5px;margin:0;line-height:1.55;max-width:440px;margin-left:auto;margin-right:auto;}
+  .av-spinner{
+    width:16px;height:16px;border-radius:50%;
+    border:2px solid #E2E8F0;border-top-color:#0071e3;
+    animation:av-spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px;
+  }
+  @keyframes av-spin{to{transform:rotate(360deg);}}
+
+  /* Modal */
+  .av-modal-backdrop{
+    position:fixed;inset:0;background:rgba(15,23,42,0.5);
+    display:none;align-items:center;justify-content:center;z-index:1000;
+    animation:av-fade .15s ease;
+  }
+  .av-modal-backdrop[data-open="true"]{display:flex;}
+  @keyframes av-fade{from{opacity:0}to{opacity:1}}
+  .av-modal{
+    background:#fff;border-radius:14px;padding:26px;max-width:520px;width:calc(100% - 32px);
+    box-shadow:0 24px 60px -12px rgba(15,23,42,0.35);
+  }
+  .av-modal__title{font-family:"Archivo","Inter",sans-serif;font-size:17px;font-weight:800;letter-spacing:-.01em;color:#0F172A;margin:0 0 6px;}
+  .av-modal__body{font-size:13px;color:#475569;margin:0 0 18px;line-height:1.55;}
+
+  .av-field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+  .av-field label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#64748B;}
+  .av-field input, .av-field select, .av-field textarea{
+    border:1px solid #CBD5E1;border-radius:8px;padding:9px 11px;
+    font:500 13.5px Inter,sans-serif;color:#0F172A;background:#fff;
+  }
+  .av-field input:focus, .av-field select:focus, .av-field textarea:focus{
+    outline:none;border-color:#0071e3;box-shadow:0 0 0 2px #DCEBFC;
+  }
+  .av-field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .av-weekdays{display:flex;gap:6px;flex-wrap:wrap;}
+  .av-weekdays input{display:none;}
+  .av-weekdays label{
+    border:1.5px solid #E2E8F0;background:#fff;padding:7px 12px;border-radius:9px;
+    cursor:pointer;font-size:12px;font-weight:700;color:#475569;
+    transition:all .15s ease;letter-spacing:.02em;
+    user-select:none;
+  }
+  .av-weekdays input:checked + label{
+    background:#EEF6FF;border-color:#0071e3;color:#0071e3;
+  }
+  .av-weekdays label:hover{border-color:#94A3B8;}
+
+  .av-modal__actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;}
+  .av-btn-cancel{
+    background:#fff;color:#475569;border:1px solid #E2E8F0;
+    padding:9px 16px;border-radius:9999px;font:600 13px Inter,sans-serif;cursor:pointer;
+  }
+  .av-btn-cancel:hover{background:#F8FAFC;}
+  .av-btn-confirm{
+    background:#0071e3;color:#fff;border:none;padding:9px 18px;border-radius:9999px;
+    font:700 13px Inter,sans-serif;cursor:pointer;
+  }
+  .av-btn-confirm:hover{background:#005CBE;}
+  .av-btn-confirm:disabled{opacity:.6;cursor:wait;}
+
+  /* Toast */
+  .av-toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:#0F172A;color:#fff;padding:11px 18px;border-radius:9999px;
+    font-size:13px;font-weight:600;
+    box-shadow:0 10px 30px -6px rgba(15,23,42,0.4);
+    display:none;z-index:1100;
+  }
+  .av-toast[data-open="true"]{display:block;}
+  .av-toast--error{background:#991B1B;}
+</style>
+</head>
+<body class="pm-has-sidebar">
+<div id="pmSidebar"></div>
+
+<main class="av-shell">
+  <div class="av-head">
+    <p class="av-eyebrow">Work · Availability</p>
+    <h1 class="av-h1">My Availability</h1>
+    <p class="av-sub">Publish the days and times you're generally available to work, plus any blackouts for vacations or time off. Families and admin see this when scheduling new sessions.</p>
+  </div>
+
+  <!-- Weekly availability -->
+  <div class="av-card">
+    <div class="av-card__head">
+      <div>
+        <h2 class="av-card__title">Weekly availability</h2>
+        <p class="av-card__sub">Recurring time blocks. Pick the days you work and the hours you're open for sessions. These repeat every week.</p>
+      </div>
+      <button type="button" class="av-add-btn" id="avAddWindowBtn">+ Add window</button>
+    </div>
+    <div id="avWindowsWrap">
+      <div class="av-loading"><span class="av-spinner"></span> Loading…</div>
+    </div>
+  </div>
+
+  <!-- Blackouts -->
+  <div class="av-card">
+    <div class="av-card__head">
+      <div>
+        <h2 class="av-card__title">Blackouts</h2>
+        <p class="av-card__sub">Date ranges when you're not available — vacations, conferences, sick days. Overrides your weekly availability for those dates.</p>
+      </div>
+      <button type="button" class="av-add-btn" id="avAddBlackoutBtn">+ Add blackout</button>
+    </div>
+    <div id="avBlackoutsWrap">
+      <div class="av-loading"><span class="av-spinner"></span> Loading…</div>
+    </div>
+  </div>
+</main>
+
+<!-- Add window modal -->
+<div class="av-modal-backdrop" id="avWindowModal" data-open="false">
+  <div class="av-modal" role="dialog" aria-modal="true">
+    <h3 class="av-modal__title">Add weekly availability</h3>
+    <p class="av-modal__body">Pick one or more days, then the time range you're available that day. Tap multiple days to add the same window to each.</p>
+
+    <div class="av-field">
+      <label>Days of week</label>
+      <div class="av-weekdays" id="avWeekdays">
+        <input type="checkbox" id="avDay0" value="0"><label for="avDay0">Sun</label>
+        <input type="checkbox" id="avDay1" value="1"><label for="avDay1">Mon</label>
+        <input type="checkbox" id="avDay2" value="2"><label for="avDay2">Tue</label>
+        <input type="checkbox" id="avDay3" value="3"><label for="avDay3">Wed</label>
+        <input type="checkbox" id="avDay4" value="4"><label for="avDay4">Thu</label>
+        <input type="checkbox" id="avDay5" value="5"><label for="avDay5">Fri</label>
+        <input type="checkbox" id="avDay6" value="6"><label for="avDay6">Sat</label>
+      </div>
+    </div>
+
+    <div class="av-field-row">
+      <div class="av-field">
+        <label>Start time</label>
+        <input type="time" id="avStartTime" value="09:00"/>
+      </div>
+      <div class="av-field">
+        <label>End time</label>
+        <input type="time" id="avEndTime" value="17:00"/>
+      </div>
+    </div>
+
+    <div class="av-modal__actions">
+      <button type="button" class="av-btn-cancel" id="avWindowCancel">Cancel</button>
+      <button type="button" class="av-btn-confirm" id="avWindowSubmit">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add blackout modal -->
+<div class="av-modal-backdrop" id="avBlackoutModal" data-open="false">
+  <div class="av-modal" role="dialog" aria-modal="true">
+    <h3 class="av-modal__title">Add blackout</h3>
+    <p class="av-modal__body">When you'll be unavailable. Inclusive on both ends (e.g. Jun 1 to Jun 7 = 7 full days off).</p>
+
+    <div class="av-field-row">
+      <div class="av-field">
+        <label>From</label>
+        <input type="date" id="avBlackoutFrom"/>
+      </div>
+      <div class="av-field">
+        <label>To</label>
+        <input type="date" id="avBlackoutTo"/>
+      </div>
+    </div>
+
+    <div class="av-field">
+      <label>Reason (optional)</label>
+      <input type="text" id="avBlackoutReason" placeholder="e.g. Family vacation"/>
+    </div>
+
+    <div class="av-modal__actions">
+      <button type="button" class="av-btn-cancel" id="avBlackoutCancel">Cancel</button>
+      <button type="button" class="av-btn-confirm" id="avBlackoutSubmit">Add</button>
+    </div>
+  </div>
+</div>
+
+<div class="av-toast" id="avToast" data-open="false">Done</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260515c"></script>
+<script src="js/hiring-service.js?v=20260515c"></script>
+<script src="js/sidebar.js?v=20260515c"></script>
+<script>
+function escapeHtml(s){return (s||'').toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[c]));}
+
+const DAY_LABELS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+function fmtTime12(t){
+  if (!t) return '—';
+  const [hStr, m] = t.split(':');
+  const h = Number(hStr);
+  const ampm = h >= 12 ? 'pm' : 'am';
+  const h12 = h === 0 ? 12 : (h > 12 ? h - 12 : h);
+  return `${h12}:${m}${ampm}`;
+}
+function fmtDate(iso){
+  if (!iso) return '—';
+  return new Date(iso + 'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+// ─── Load + render ──────────────────────────────────────────────────
+async function loadWindows(){
+  const wrap = document.getElementById('avWindowsWrap');
+  let rows = [];
+  try { rows = await window.pmHiring.fetchMyAvailabilityWindows(); } catch (_) {}
+
+  if (!rows.length) {
+    wrap.innerHTML = `<div class="av-empty">
+      <p class="av-empty__title">No weekly availability published yet</p>
+      <p class="av-empty__sub">Click <strong>+ Add window</strong> above to publish the days and times you're available to work each week.</p>
+    </div>`;
+    return;
+  }
+  wrap.innerHTML = rows.map(w => `<div class="av-row av-row--windows">
+    <div class="av-row__day">${escapeHtml(DAY_LABELS[w.weekday] || '—')}</div>
+    <div class="av-row__times">${escapeHtml(fmtTime12(w.start_time))} – ${escapeHtml(fmtTime12(w.end_time))}</div>
+    <div class="av-row__range">${
+      w.active_from || w.active_until
+        ? `${w.active_from ? 'from ' + escapeHtml(fmtDate(w.active_from)) : ''}${w.active_from && w.active_until ? ' ' : ''}${w.active_until ? 'until ' + escapeHtml(fmtDate(w.active_until)) : ''}`
+        : '<span style="color:#94A3B8;">always</span>'
+    }</div>
+    <button type="button" class="av-del-btn" data-del-window="${escapeHtml(w.id)}" aria-label="Remove">×</button>
+  </div>`).join('');
+
+  wrap.querySelectorAll('button[data-del-window]').forEach(btn => {
+    btn.addEventListener('click', () => confirmDeleteWindow(btn.dataset.delWindow));
+  });
+}
+
+async function loadBlackouts(){
+  const wrap = document.getElementById('avBlackoutsWrap');
+  let rows = [];
+  try { rows = await window.pmHiring.fetchMyAvailabilityBlackouts(); } catch (_) {}
+
+  if (!rows.length) {
+    wrap.innerHTML = `<div class="av-empty">
+      <p class="av-empty__title">No blackouts set</p>
+      <p class="av-empty__sub">Add a blackout for vacations, conferences, or sick days. They override your weekly availability for those dates.</p>
+    </div>`;
+    return;
+  }
+  wrap.innerHTML = rows.map(b => `<div class="av-row av-row--blackouts">
+    <div class="av-row__range"><strong>${escapeHtml(fmtDate(b.starts_on))}</strong> → <strong>${escapeHtml(fmtDate(b.ends_on))}</strong></div>
+    <div class="av-row__reason">${b.reason ? escapeHtml(b.reason) : '—'}</div>
+    <button type="button" class="av-del-btn" data-del-blackout="${escapeHtml(b.id)}" aria-label="Remove">×</button>
+  </div>`).join('');
+
+  wrap.querySelectorAll('button[data-del-blackout]').forEach(btn => {
+    btn.addEventListener('click', () => confirmDeleteBlackout(btn.dataset.delBlackout));
+  });
+}
+
+async function confirmDeleteWindow(id){
+  if (!confirm('Remove this availability window?')) return;
+  try {
+    await window.pmHiring.removeAvailabilityWindow(id);
+    toast('Window removed.');
+    await loadWindows();
+  } catch (e) { toast(e?.message || 'Could not remove window.', true); }
+}
+async function confirmDeleteBlackout(id){
+  if (!confirm('Remove this blackout?')) return;
+  try {
+    await window.pmHiring.removeAvailabilityBlackout(id);
+    toast('Blackout removed.');
+    await loadBlackouts();
+  } catch (e) { toast(e?.message || 'Could not remove blackout.', true); }
+}
+
+// ─── Modal: add window ─────────────────────────────────────────────
+function openWindowModal(){
+  document.querySelectorAll('#avWeekdays input').forEach(el => el.checked = false);
+  document.getElementById('avStartTime').value = '09:00';
+  document.getElementById('avEndTime').value = '17:00';
+  document.getElementById('avWindowModal').dataset.open = 'true';
+}
+function closeWindowModal(){
+  document.getElementById('avWindowModal').dataset.open = 'false';
+  document.getElementById('avWindowSubmit').disabled = false;
+}
+async function submitWindow(){
+  const days = Array.from(document.querySelectorAll('#avWeekdays input:checked')).map(el => Number(el.value));
+  const startTime = document.getElementById('avStartTime').value;
+  const endTime = document.getElementById('avEndTime').value;
+  if (!days.length) { toast('Pick at least one day.', true); return; }
+  if (!startTime || !endTime) { toast('Pick start and end times.', true); return; }
+  if (startTime >= endTime) { toast('End time must be after start time.', true); return; }
+  const btn = document.getElementById('avWindowSubmit');
+  btn.disabled = true;
+  try {
+    // Insert one row per checked day.
+    for (const weekday of days) {
+      await window.pmHiring.addAvailabilityWindow({
+        weekday, startTime, endTime,
+      });
+    }
+    toast(`Added ${days.length} window${days.length>1?'s':''}.`);
+    closeWindowModal();
+    await loadWindows();
+  } catch (e) {
+    toast(e?.message || 'Could not add window.', true);
+    btn.disabled = false;
+  }
+}
+
+// ─── Modal: add blackout ───────────────────────────────────────────
+function openBlackoutModal(){
+  const today = new Date();
+  const iso = (d) => {
+    const pad = (n) => String(n).padStart(2,'0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  };
+  document.getElementById('avBlackoutFrom').value = iso(today);
+  document.getElementById('avBlackoutTo').value = iso(today);
+  document.getElementById('avBlackoutReason').value = '';
+  document.getElementById('avBlackoutModal').dataset.open = 'true';
+}
+function closeBlackoutModal(){
+  document.getElementById('avBlackoutModal').dataset.open = 'false';
+  document.getElementById('avBlackoutSubmit').disabled = false;
+}
+async function submitBlackout(){
+  const startsOn = document.getElementById('avBlackoutFrom').value;
+  const endsOn = document.getElementById('avBlackoutTo').value;
+  const reason = document.getElementById('avBlackoutReason').value.trim() || null;
+  if (!startsOn || !endsOn) { toast('Pick both dates.', true); return; }
+  if (endsOn < startsOn) { toast('End date must be on or after the start date.', true); return; }
+  const btn = document.getElementById('avBlackoutSubmit');
+  btn.disabled = true;
+  try {
+    await window.pmHiring.addAvailabilityBlackout({ startsOn, endsOn, reason });
+    toast('Blackout added.');
+    closeBlackoutModal();
+    await loadBlackouts();
+  } catch (e) {
+    toast(e?.message || 'Could not add blackout.', true);
+    btn.disabled = false;
+  }
+}
+
+let toastTimer = null;
+function toast(msg, isError = false){
+  const el = document.getElementById('avToast');
+  el.textContent = msg;
+  el.classList.toggle('av-toast--error', !!isError);
+  el.dataset.open = 'true';
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.dataset.open = 'false'; }, isError ? 4500 : 2400);
+}
+
+// Wire
+document.getElementById('avAddWindowBtn').addEventListener('click', openWindowModal);
+document.getElementById('avWindowCancel').addEventListener('click', closeWindowModal);
+document.getElementById('avWindowSubmit').addEventListener('click', submitWindow);
+document.getElementById('avWindowModal').addEventListener('click', (e) => {
+  if (e.target.id === 'avWindowModal') closeWindowModal();
+});
+
+document.getElementById('avAddBlackoutBtn').addEventListener('click', openBlackoutModal);
+document.getElementById('avBlackoutCancel').addEventListener('click', closeBlackoutModal);
+document.getElementById('avBlackoutSubmit').addEventListener('click', submitBlackout);
+document.getElementById('avBlackoutModal').addEventListener('click', (e) => {
+  if (e.target.id === 'avBlackoutModal') closeBlackoutModal();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  if (document.getElementById('avWindowModal').dataset.open === 'true') closeWindowModal();
+  if (document.getElementById('avBlackoutModal').dataset.open === 'true') closeBlackoutModal();
+});
+
+// Init
+(async function init(){
+  await new Promise(r => setTimeout(r, 250));
+  await Promise.all([loadWindows(), loadBlackouts()]);
+})();
+</script>
+</body>
+</html>
