@@ -108,6 +108,14 @@
   .as-status--cancelled{background:#F1F5F9;color:#64748B;}
   .as-status--late_cancelled{background:#FEF3C7;color:#92400E;}
   .as-status--no_show{background:#FEE2E2;color:#B91C1C;}
+  /* Phase 10: complimentary badge — small gold pill next to status */
+  .as-comp-badge{
+    font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    padding:3px 8px;border-radius:9999px;white-space:nowrap;margin-left:6px;
+    background:linear-gradient(135deg,#FEF3C7,#FDE68A);
+    color:#92400E;border:1px solid #FCD34D;
+  }
+  .as-slot--comp{background:#FFFBEB !important;border-color:#FDE68A !important;}
 
   /* Empty / loading */
   .as-empty,.as-loading{
@@ -570,8 +578,10 @@ function renderWeek(){
       const t = fmtTime(new Date(a.starts_at));
       const clientName = a.client?.full_name || (a.client_id ? 'Client ' + a.client_id.slice(0,6) : '—');
       const cls = ['scheduled','completed','cancelled','late_cancelled','no_show'].includes(a.status) ? a.status : 'scheduled';
-      return `<div class="as-slot as-slot--${cls}" title="${escapeHtml(statusLabel(a.status))}">
-        <span class="as-slot__time">${escapeHtml(t)}</span>
+      const compCls = a.is_complimentary ? ' as-slot--comp' : '';
+      const compMark = a.is_complimentary ? ' ★' : '';
+      return `<div class="as-slot as-slot--${cls}${compCls}" title="${escapeHtml(statusLabel(a.status))}${a.is_complimentary?' · Complimentary':''}">
+        <span class="as-slot__time">${escapeHtml(t)}${compMark}</span>
         <span class="as-slot__client">${escapeHtml(clientName)}</span>
       </div>`;
     }).join('');
@@ -655,6 +665,7 @@ function rowHtml(a){
   const clientName = a.client?.full_name || (a.client_id ? 'Client ' + a.client_id.slice(0,6) : '—');
   const min = durationOf(a);
   const status = a.status || 'scheduled';
+  const compBadge = a.is_complimentary ? `<span class="as-comp-badge" title="No hours deducted">COMP</span>` : '';
   return `<div class="as-row">
     <div class="as-row__date">${escapeHtml(dateMain)}<small>${escapeHtml(String(dateYear))} · ${escapeHtml(time)}</small></div>
     <div class="as-row__body">
@@ -663,6 +674,7 @@ function rowHtml(a){
     </div>
     <span class="as-row__hours">${escapeHtml(hoursLabel(min))}</span>
     <span class="as-status as-status--${escapeHtml(status)}">${escapeHtml(statusLabel(status))}</span>
+    ${compBadge}
   </div>`;
 }
 

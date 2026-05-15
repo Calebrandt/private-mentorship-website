@@ -616,6 +616,12 @@
       </div>`;
     }
 
+    // Phase 10: complimentary badge on the request top row if the assistant
+    // flagged this booking as no-charge. Admin sees it at a glance.
+    const isComp = !!req.proposed_schedule?.is_complimentary;
+    const compChip = isComp
+      ? `<span style="font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:linear-gradient(135deg,#FEF3C7,#FDE68A);color:#92400E;border:1px solid #FCD34D;padding:3px 8px;border-radius:9999px;margin-left:6px;">Complimentary</span>`
+      : '';
     return `<div class="nx-req${isReviewed ? ' nx-req--reviewed' : ''}" data-req-id="${esc(req.id)}">
       <div class="nx-req__top">
         <div class="nx-req__avatar">${esc(initials(client.full_name))}</div>
@@ -624,6 +630,7 @@
           <p class="nx-req__meta">${esc(client.email || '')} · submitted ${esc(timeAgo(req.created_at))}</p>
         </div>
         <span class="nx-req__type nx-req__type--${typeClass(req.request_type)}">${esc(typeLabel(req.request_type))}</span>
+        ${compChip}
       </div>
       ${detailsHtml}
       ${slotPickerHtml}

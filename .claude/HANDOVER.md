@@ -964,6 +964,77 @@ What shipped:
 - Admin approve handler: pre-approval confirm dialog if the chosen slot
   is outside the assistant's published availability. Admin can override.
 
+### 🟠 Significant future arc — "Bank Hours" / Stored-balance system
+
+**Captured 2026-05-15 from a direct owner conversation.** This is a real
+business reality that the current schema doesn't model. ~6–10 hours
+focused work; treat as its own arc.
+
+**The reality:**
+- Almost every contract finishes with 2–15 leftover hours
+- These hours need to move to a separate "bank" / "stored" balance
+  when the contract period ends — they're in a gray zone: technically
+  past the contract, but still owed to the family
+- Used for: longer-than-usual sessions, special events, study
+  intensives, life-skills outings, sports time, one-off extras outside
+  the recurring pattern
+- Owner has had clients with 10–15 banked hours sitting unused
+- Real risk: client lets hours pile up → eventually demands refund →
+  assistant owes money back. Owner has been burned by this.
+
+**What needs to be built:**
+
+1. **Schema:**
+   - `client_bank_hours` table (or column on `clients`) tracking the
+     stored balance per family, with audit trail of how it got there
+     (contract end carryover, manual admin adjustment, etc.)
+   - Ledger rows when bank balance changes (the audit trail is sacred —
+     never erase, only append)
+   - Lifecycle hook: when a contract reaches `end_at` with unused
+     hours, automatically migrate them to the bank
+
+2. **Assistant-facing UI** (probably a new section on the per-family
+   workspace or a dedicated page):
+   - See the family's current bank balance
+   - "Suggest a make-up session" button — sends a gentle nudge to the
+     family with templated language. NOT a warning (rude) — more like
+     a friendly catch-up. Multiple suggestion types:
+     - "Want to extend a regular session?"
+     - "Schedule an extra session this week?"
+     - "Special outing for life skills?"
+     - "Extra study time before exam?"
+     - "Sports / outdoor time?"
+   - Each suggestion is a different tone/use-case. Assistant picks the
+     right framing for that family.
+   - "Hard request" option — more direct ("you have 15 hr saved, let's
+     get one on the calendar") for families who've been ignoring
+     gentler nudges.
+
+3. **Client-facing:**
+   - Visible bank balance on their dashboard
+   - When the assistant sends a make-up suggestion, the family sees it
+     as a notification (or message thread) with a "Book a session"
+     button
+   - Family can also self-initiate "I want to use my banked hours" if
+     they want a longer session or extra time
+
+4. **Admin oversight:**
+   - See every family's bank balance + age of those hours
+   - Reports: "families with > X banked hours and no recent activity"
+     so owner can intervene before disputes
+   - Manual adjustment ability with audit trail
+
+**Owner's words for why this matters:**
+> "All those hours equal a lot of money and if there's ever a problem
+> in the future like 'we still got all these hours left over we never
+> used it, give me back my money,' that kind of puts the assistant in
+> a little bit of debt if they do have to pay them back."
+
+This is essentially anti-shrinkage infrastructure. Build it before
+scaling beyond 10–15 active families.
+
+---
+
 ### Future polish (not blocking launch)
 - ~~Multi-timezone support~~ — **DONE 2026-05-15 (Phase 8).** `assistant_profiles.timezone`
   column (default `America/Vancouver`), 7-option dropdown on profile editor,

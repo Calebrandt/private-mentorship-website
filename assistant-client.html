@@ -127,6 +127,32 @@
   }
   .wc-textarea-row textarea:focus{outline:none;border-color:#0071e3;box-shadow:0 0 0 2px #DCEBFC;}
 
+  /* Phase 10: complimentary billing toggle */
+  .wc-billing-row{display:flex;flex-direction:column;gap:8px;}
+  .wc-billing-row__label{
+    font-size:10.5px;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;color:#64748B;
+  }
+  .wc-billing-row__opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media (max-width:560px){.wc-billing-row__opts{grid-template-columns:1fr;}}
+  .wc-billing-opt{
+    position:relative;cursor:pointer;
+    border:1.5px solid #E2E8F0;border-radius:10px;
+    padding:11px 14px;display:flex;flex-direction:column;gap:3px;
+    background:#fff;transition:all .15s ease;
+  }
+  .wc-billing-opt:hover{border-color:#94A3B8;}
+  .wc-billing-opt input[type="radio"]{
+    position:absolute;opacity:0;pointer-events:none;
+  }
+  .wc-billing-opt input:checked ~ .wc-billing-opt__title{color:#0071e3;}
+  .wc-billing-opt:has(input:checked){
+    border-color:#0071e3;background:#F0F7FF;
+    box-shadow:0 0 0 2px rgba(0,113,227,0.08);
+  }
+  .wc-billing-opt__title{font-size:13.5px;font-weight:700;color:#0F172A;letter-spacing:-.005em;}
+  .wc-billing-opt__sub{font-size:11.5px;color:#64748B;line-height:1.4;}
+
   /* Toast */
   .wc-toast{
     position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
@@ -324,9 +350,25 @@
     <div id="wcBookSlots"></div>
     <button type="button" class="wc-add-slot" id="wcBookAddSlot">+ Add another option</button>
 
+    <div class="wc-billing-row" style="margin-top:16px;">
+      <div class="wc-billing-row__label">Billing</div>
+      <div class="wc-billing-row__opts">
+        <label class="wc-billing-opt">
+          <input type="radio" name="wcBookBilling" value="standard" checked>
+          <span class="wc-billing-opt__title">Standard</span>
+          <span class="wc-billing-opt__sub">Hours deduct from contract when complete</span>
+        </label>
+        <label class="wc-billing-opt">
+          <input type="radio" name="wcBookBilling" value="complimentary">
+          <span class="wc-billing-opt__title">Complimentary</span>
+          <span class="wc-billing-opt__sub">No deduction — make-up, courtesy, follow-up</span>
+        </label>
+      </div>
+    </div>
+
     <div class="wc-textarea-row" style="margin-top:14px;">
-      <label for="wcBookReason">Why this session is needed (optional)</label>
-      <textarea id="wcBookReason" placeholder="Context for the admin…"></textarea>
+      <label for="wcBookReason">Reason / context (optional)</label>
+      <textarea id="wcBookReason" placeholder="Helpful for admin + audit trail…"></textarea>
     </div>
 
     <div class="wc-modal__actions">
@@ -549,6 +591,9 @@ function openBookModal(){
     <span><b>Admin step:</b> Required — admin picks one of your proposed slots</span>
   `;
   document.getElementById('wcBookReason').value = '';
+  // Reset billing choice to "Standard" each open
+  const standardRadio = document.querySelector('input[name="wcBookBilling"][value="standard"]');
+  if (standardRadio) standardRadio.checked = true;
   renderBookSlots();
   updateAddSlotState();
   document.getElementById('wcBookModal').dataset.open = 'true';
@@ -595,12 +640,16 @@ async function submitBookModal(){
       }
     } catch (_) { /* informational only */ }
 
+    const billingChoice = document.querySelector('input[name="wcBookBilling"]:checked')?.value || 'standard';
+    const isComplimentary = billingChoice === 'complimentary';
     await window.pmHiring.assistantSubmitExtraAppointmentRequest({
       clientId: bookCtx.clientId,
       slots,
       reason: document.getElementById('wcBookReason').value,
+      isComplimentary,
     });
-    showWcToast(`Booking request submitted (${slots.length} option${slots.length>1?'s':''}). Admin will confirm.`);
+    const compTag = isComplimentary ? ' (complimentary)' : '';
+    showWcToast(`Booking request submitted${compTag} — ${slots.length} option${slots.length>1?'s':''}. Admin will confirm.`);
     closeBookModal();
   } catch (err) {
     console.warn('Booking failed:', err);

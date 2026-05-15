@@ -762,7 +762,7 @@
 
       let q = sb()
         .from('appointments')
-        .select('id, contract_id, client_id, starts_at, ends_at, duration_minutes, status, kind, title, notes, cancelled_at, cancel_reason')
+        .select('id, contract_id, client_id, starts_at, ends_at, duration_minutes, status, kind, title, notes, cancelled_at, cancel_reason, is_complimentary')
         .in('contract_id', contractIds)
         .in('status', statuses)
         .order('starts_at', { ascending: true })
@@ -929,7 +929,7 @@
   }
 
   async function assistantSubmitExtraAppointmentRequest({
-    clientId, slots = [], reason = '',
+    clientId, slots = [], reason = '', isComplimentary = false,
   }) {
     if (!clientId) throw new Error('clientId is required');
     if (!Array.isArray(slots) || slots.length === 0) {
@@ -952,7 +952,14 @@
       reason: String(reason || '').trim() || null,
       status: 'pending',
       request_type: 'extra',
-      proposed_schedule: { slots: normalized, source: 'assistant_web_phase3' },
+      // Phase 10: is_complimentary flag carried through to admin approval,
+      // which sets it on the created appointment. UI displays a "Comp"
+      // badge on flagged appointments + skips hours deduction at completion.
+      proposed_schedule: {
+        slots: normalized,
+        source: 'assistant_web_phase3',
+        is_complimentary: !!isComplimentary,
+      },
     };
     const { data, error } = await sb()
       .from('schedule_change_requests')
