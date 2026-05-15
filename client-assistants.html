@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My Assistant — Private Mentorship</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,500&display=swap" />
+<link rel="stylesheet" href="js/sidebar.css?v=20260514a" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#F4F5F7;color:#0F172A;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+
+  .ca-shell{padding:36px 32px 80px;max-width:1240px;margin:0 auto;}
+  .ca-head{margin-bottom:20px;display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;}
+  .ca-head__body{flex:1;min-width:260px;}
+  .ca-eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#0071e3;margin:0 0 8px;}
+  .ca-h1{font-family:"Archivo","Inter",sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0 0 6px;color:#0F172A;}
+  .ca-sub{font-size:14px;color:#64748B;margin:0;line-height:1.55;max-width:620px;}
+
+  /* Tabs */
+  .ca-tabs{
+    display:flex;gap:4px;
+    border-bottom:1px solid #E2E8F0;
+    margin-bottom:24px;
+    overflow-x:auto;
+  }
+  .ca-tab{
+    position:relative;padding:14px 18px;
+    background:transparent;border:none;cursor:pointer;
+    font-family:inherit;font-size:13.5px;font-weight:600;
+    color:#64748B;display:inline-flex;align-items:center;gap:8px;
+    border-radius:8px 8px 0 0;
+    transition:color .15s ease;white-space:nowrap;
+  }
+  .ca-tab:hover{color:#0F172A;}
+  .ca-tab.is-active{color:#0F172A;}
+  .ca-tab.is-active::after{
+    content:"";position:absolute;left:14px;right:14px;bottom:-1px;height:2px;background:#0071e3;
+  }
+  .ca-tab__count{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:20px;height:20px;padding:0 6px;
+    background:#0071e3;color:#fff;border-radius:10px;
+    font-size:11px;font-weight:700;letter-spacing:.02em;
+  }
+  .ca-tab__count[data-count="0"]{background:#CBD5E1;color:#fff;}
+
+  /* Panels */
+  .ca-panel{display:none;}
+  .ca-panel.is-active{display:block;}
+
+  /* Filter row */
+  .ca-filterbar{
+    background:#fff;border:1px solid #E2E8F0;border-radius:12px;
+    padding:14px 18px;margin-bottom:20px;
+    display:flex;flex-wrap:wrap;gap:16px;align-items:center;
+  }
+  .ca-filter{display:flex;flex-direction:column;gap:4px;min-width:160px;flex:1;}
+  .ca-filter__label{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8;}
+  .ca-filter__select{
+    padding:8px 12px;border:1px solid #CBD5E1;border-radius:8px;
+    font-family:inherit;font-size:13px;color:#0F172A;background:#fff;
+  }
+  .ca-filter__count{
+    font-size:11.5px;color:#64748B;font-weight:600;
+    margin-left:auto;align-self:flex-end;padding-bottom:8px;letter-spacing:.04em;
+  }
+  .ca-filter__count strong{color:#0F172A;}
+
+  /* Roster grid */
+  .ca-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  @media(max-width:1100px){.ca-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:640px){.ca-grid{grid-template-columns:1fr;}}
+
+  .ca-card{
+    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    padding:20px;display:flex;flex-direction:column;gap:12px;
+    transition:border-color .18s ease, box-shadow .18s ease;
+  }
+  .ca-card:hover{border-color:#B3D0F5;box-shadow:0 4px 14px -4px rgba(15,23,42,0.08);}
+  .ca-card[hidden]{display:none;}
+
+  .ca-card__head{display:flex;align-items:flex-start;gap:14px;}
+  .ca-card__avatar{
+    flex:0 0 52px;width:52px;height:52px;border-radius:50%;
+    background:linear-gradient(135deg, var(--av-from, #3B82F6), var(--av-to, #1E40AF));
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:800;font-size:16px;
+  }
+  .ca-card__id{flex:1;min-width:0;}
+  .ca-card__name{font-size:15px;font-weight:700;color:#0F172A;margin:0 0 2px;}
+  .ca-card__city{font-size:12.5px;color:#64748B;margin:0;}
+
+  .ca-card__bio{font-size:13px;color:#475569;line-height:1.55;margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+  .ca-card__tags{display:flex;flex-wrap:wrap;gap:5px;}
+  .ca-tag{
+    font-size:10.5px;font-weight:600;letter-spacing:.02em;
+    padding:3px 8px;border-radius:6px;
+    background:#F1F5F9;color:#475569;
+  }
+  .ca-card__actions{display:flex;gap:8px;margin-top:auto;padding-top:8px;}
+  .ca-btn{
+    padding:8px 14px;border-radius:8px;font-family:inherit;font-size:12.5px;font-weight:600;
+    cursor:pointer;transition:all .15s ease;border:1px solid transparent;
+    display:inline-flex;align-items:center;justify-content:center;gap:5px;
+    text-decoration:none;
+  }
+  .ca-btn--ghost{background:transparent;border-color:#CBD5E1;color:#0F172A;}
+  .ca-btn--ghost:hover{background:#F8FAFC;border-color:#94A3B8;}
+  .ca-btn--primary{background:#0071e3;color:#fff;}
+  .ca-btn--primary:hover{background:#005ec2;}
+  .ca-btn--gold{background:#a07c3c;color:#fff;}
+  .ca-btn--gold:hover{background:#8a6a30;}
+  .ca-btn--ghost-danger{background:transparent;border-color:#FCA5A5;color:#DC2626;}
+  .ca-btn--ghost-danger:hover{background:#FEF2F2;}
+  .ca-btn:disabled{opacity:0.5;cursor:not-allowed;}
+  .ca-btn--full{flex:1;}
+
+  /* Empty / loading */
+  .ca-empty,.ca-loading{
+    background:#fff;border:1px dashed #CBD5E1;border-radius:14px;
+    padding:48px 32px;text-align:center;color:#64748B;
+  }
+  .ca-empty__title,.ca-loading__title{font-family:"Archivo","Inter",sans-serif;font-size:17px;font-weight:700;color:#0F172A;margin:0 0 6px;}
+  .ca-empty__sub,.ca-loading__sub{font-size:13px;margin:0 0 16px;line-height:1.55;}
+  .ca-spinner{
+    width:18px;height:18px;border-radius:50%;
+    border:2px solid #E2E8F0;border-top-color:#0071e3;
+    animation:ca-spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px;
+  }
+  @keyframes ca-spin{to{transform:rotate(360deg);}}
+
+  /* Picks panel — list of selected assistants */
+  .ca-picklist{display:flex;flex-direction:column;gap:10px;}
+  .ca-pickrow{
+    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    padding:16px 20px;display:grid;grid-template-columns:48px 1fr auto;gap:16px;align-items:center;
+  }
+  .ca-pickrow__avatar{
+    width:48px;height:48px;border-radius:50%;
+    background:linear-gradient(135deg, var(--av-from, #3B82F6), var(--av-to, #1E40AF));
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:800;font-size:14px;
+  }
+  .ca-pickrow__body{min-width:0;}
+  .ca-pickrow__rank{font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#a07c3c;margin:0 0 4px;}
+  .ca-pickrow__name{font-size:15px;font-weight:700;color:#0F172A;margin:0 0 2px;}
+  .ca-pickrow__meta{font-size:12.5px;color:#64748B;margin:0;}
+  .ca-pickrow__actions{display:flex;align-items:center;gap:8px;}
+  .ca-status{
+    display:inline-flex;align-items:center;padding:4px 10px;border-radius:9999px;
+    font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  }
+  .ca-status--shortlisted{background:#F1F5F9;color:#64748B;}
+  .ca-status--introduction_requested{background:#FEF3C7;color:#92400E;}
+  .ca-status--meeting_scheduled{background:#DBEAFE;color:#1E3A8A;}
+  .ca-status--meeting_complete{background:#FAE8FF;color:#6B21A8;}
+  .ca-status--engaged{background:#D1FAE5;color:#047857;}
+  .ca-status--declined{background:#FEE2E2;color:#991B1B;}
+
+  /* Submit bar */
+  .ca-submitbar{
+    background:#0F172A;color:#fff;
+    border-radius:14px;padding:22px 24px;
+    margin-top:18px;
+    display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
+  }
+  .ca-submitbar__text{flex:1;min-width:240px;}
+  .ca-submitbar__title{font-family:"Archivo","Inter",sans-serif;font-size:18px;font-weight:800;letter-spacing:-.01em;margin:0 0 4px;color:#fff;}
+  .ca-submitbar__sub{font-size:13px;color:rgba(255,255,255,0.72);margin:0;line-height:1.55;}
+  .ca-submitbar__btn{
+    padding:12px 22px;border-radius:9999px;
+    background:#fff;color:#0F172A;font-family:inherit;font-size:13px;font-weight:700;letter-spacing:.02em;
+    border:none;cursor:pointer;transition:opacity .15s ease;
+  }
+  .ca-submitbar__btn:hover{opacity:0.9;}
+  .ca-submitbar__btn:disabled{opacity:0.5;cursor:not-allowed;}
+
+  /* Pre-engagement banner */
+  .ca-preengage{
+    background:linear-gradient(135deg, #ECFDF5, #F0F9FF);
+    border:1px solid #BAE6FD;border-radius:12px;
+    padding:14px 18px;margin-bottom:18px;
+    font-size:13px;color:#0F172A;line-height:1.55;
+  }
+  .ca-preengage strong{color:#0F172A;}
+
+  /* Modal (assistant detail) */
+  .ca-modal{
+    display:none;position:fixed;inset:0;z-index:80;
+    background:rgba(15,23,42,0.55);
+    align-items:center;justify-content:center;padding:24px;
+  }
+  .ca-modal.is-shown{display:flex;}
+  .ca-modal__panel{
+    background:#fff;border-radius:18px;
+    width:100%;max-width:680px;max-height:90vh;overflow-y:auto;
+    box-shadow:0 30px 70px -20px rgba(15,23,42,0.5);
+  }
+  .ca-modal__head{padding:24px 30px 18px;border-bottom:1px solid #E2E8F0;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
+  .ca-modal__title{font-family:"Archivo","Inter",sans-serif;font-size:22px;font-weight:800;letter-spacing:-.015em;margin:0 0 4px;}
+  .ca-modal__sub{font-size:13px;color:#64748B;margin:0;}
+  .ca-modal__close{background:transparent;border:none;font-size:24px;color:#94A3B8;cursor:pointer;line-height:1;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;}
+  .ca-modal__body{padding:24px 30px;display:flex;flex-direction:column;gap:18px;}
+  .ca-modal__section h4{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A3B8;margin:0 0 8px;}
+  .ca-modal__section p{font-size:14px;color:#334155;line-height:1.6;margin:0;}
+  .ca-modal__foot{padding:18px 30px;border-top:1px solid #E2E8F0;display:flex;justify-content:flex-end;gap:10px;}
+</style>
+</head>
+<body class="pm-has-sidebar">
+
+<div id="pmSidebar"></div>
+
+<main class="ca-shell">
+
+  <div class="ca-head">
+    <div class="ca-head__body">
+      <p class="ca-eyebrow">People · Roster</p>
+      <h1 class="ca-h1">Your Assistant</h1>
+      <p class="ca-sub">Private Mentorship works with a small, hand-vetted group of Private Family Assistants. Browse the roster and add up to three Assistants to your pick list. Once you submit, we will schedule a 30-minute introduction with each.</p>
+    </div>
+  </div>
+
+  <div class="ca-preengage" id="caPreEngageBanner">
+    <strong>Pre-engagement.</strong> When your match is finalized, this page will show your active Assistant. Until then, use it to browse the roster and build your pick list.
+  </div>
+
+  <div class="ca-tabs" role="tablist">
+    <button class="ca-tab is-active" data-tab="browse" type="button">
+      Browse the Roster
+    </button>
+    <button class="ca-tab" data-tab="picks" type="button">
+      My Picks <span class="ca-tab__count" id="picksTabCount" data-count="0">0</span>
+    </button>
+  </div>
+
+  <!-- ─── BROWSE PANEL ─── -->
+  <section class="ca-panel is-active" data-panel="browse">
+
+    <div class="ca-filterbar">
+      <div class="ca-filter">
+        <label class="ca-filter__label" for="fLocation">Location</label>
+        <select class="ca-filter__select" id="fLocation">
+          <option value="all">All locations</option>
+          <option value="vancouver">Vancouver</option>
+          <option value="north-shore">North Shore</option>
+          <option value="burnaby">Burnaby</option>
+          <option value="richmond">Richmond</option>
+        </select>
+      </div>
+      <div class="ca-filter">
+        <label class="ca-filter__label" for="fLanguage">Language</label>
+        <select class="ca-filter__select" id="fLanguage">
+          <option value="all">Any language</option>
+          <option value="en">English</option>
+          <option value="fr">French</option>
+          <option value="cantonese">Cantonese</option>
+          <option value="mandarin">Mandarin</option>
+          <option value="hindi">Hindi</option>
+          <option value="asl">ASL</option>
+        </select>
+      </div>
+      <div class="ca-filter__count"><strong id="resultCount">0</strong> Assistants showing</div>
+    </div>
+
+    <div class="ca-loading" id="rosterLoading"><span class="ca-spinner"></span> Loading the roster…</div>
+    <div class="ca-empty" id="rosterEmpty" hidden>
+      <p class="ca-empty__title">No Assistants on the roster yet</p>
+      <p class="ca-empty__sub">Private Mentorship is in the middle of vetting and publishing the first group of Assistants. Check back soon — we will reach out as soon as profiles are available.</p>
+    </div>
+    <div class="ca-grid" id="rosterGrid" hidden></div>
+  </section>
+
+  <!-- ─── PICKS PANEL ─── -->
+  <section class="ca-panel" data-panel="picks">
+
+    <div class="ca-loading" id="picksLoading"><span class="ca-spinner"></span> Loading your picks…</div>
+
+    <div class="ca-empty" id="picksEmpty" hidden>
+      <p class="ca-empty__title">You haven't picked anyone yet</p>
+      <p class="ca-empty__sub">Add up to three Assistants from the roster. Once you submit your list, Private Mentorship will schedule a 30-minute introduction with each.</p>
+      <button class="ca-btn ca-btn--primary" type="button" id="emptyBrowseBtn">Browse the Roster →</button>
+    </div>
+
+    <div class="ca-picklist" id="picksList" hidden></div>
+
+    <div class="ca-submitbar" id="picksSubmitBar" hidden>
+      <div class="ca-submitbar__text">
+        <h3 class="ca-submitbar__title">Ready to meet your picks?</h3>
+        <p class="ca-submitbar__sub">Submit your list and Private Mentorship will schedule a 30-minute introduction with each Assistant within one business day.</p>
+      </div>
+      <button class="ca-submitbar__btn" type="button" id="submitPicksBtn">Submit Picks</button>
+    </div>
+
+    <div class="ca-empty" id="picksSubmitted" hidden style="background:#ECFDF5;border-style:solid;border-color:#86EFAC;">
+      <p class="ca-empty__title" style="color:#047857;">Your picks are in.</p>
+      <p class="ca-empty__sub">Private Mentorship has received your list and will reach out within one business day to schedule the introduction meetings. You can check the status of each pick below.</p>
+    </div>
+
+  </section>
+
+</main>
+
+<!-- ─── Modal: assistant detail ─── -->
+<div class="ca-modal" id="caModal" aria-hidden="true">
+  <div class="ca-modal__panel">
+    <div class="ca-modal__head">
+      <div>
+        <h2 class="ca-modal__title" id="caModalName"></h2>
+        <p class="ca-modal__sub" id="caModalCity"></p>
+      </div>
+      <button type="button" class="ca-modal__close" id="caModalClose" aria-label="Close">×</button>
+    </div>
+    <div class="ca-modal__body" id="caModalBody">
+      <!-- Filled by JS -->
+    </div>
+    <div class="ca-modal__foot">
+      <button type="button" class="ca-btn ca-btn--ghost" id="caModalCloseBtn">Close</button>
+      <button type="button" class="ca-btn ca-btn--primary" id="caModalAddBtn">Add to my picks</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260514a"></script>
+<script src="js/hiring-service.js?v=20260514a"></script>
+<script src="js/sidebar.js?v=20260514a"></script>
+<script>
+/* ============================================================================
+ * client-assistants.html — Browse roster + manage pick list
+ * ============================================================================ */
+let allProfiles = [];     // full roster (assistant_profiles WHERE is_published)
+let myPicks = [];         // current family's picks (joined with profile fields)
+let currentModalProfile = null;
+
+const PICK_LIMIT = 3;
+const RANK_LABELS = ['1st Choice', '2nd Choice', '3rd Choice'];
+
+const palettes = [
+  ['#3B82F6','#1E40AF'], ['#10B981','#047857'], ['#F59E0B','#B45309'],
+  ['#A855F7','#6B21A8'], ['#EC4899','#9D174D'], ['#0EA5E9','#075985'],
+];
+
+function escapeHtml(s){ return (s || '').toString().replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[c])); }
+
+function initialsFor(name){
+  return (name || 'A').split(/\s+/).map(s => s[0] || '').slice(0,2).join('').toUpperCase() || 'A';
+}
+function paletteFor(id){
+  const hash = (id || '').split('').reduce((a,c) => a + c.charCodeAt(0), 0);
+  return palettes[hash % palettes.length];
+}
+function cityKey(city){
+  const c = (city || '').toLowerCase();
+  if (/north\s*shore|north\s*van|west\s*van/.test(c)) return 'north-shore';
+  if (/burnaby/.test(c)) return 'burnaby';
+  if (/richmond/.test(c)) return 'richmond';
+  if (/vancouver|west\s*end|kits|downtown/.test(c)) return 'vancouver';
+  return c.replace(/\s+/g,'-');
+}
+function langKeys(languages){
+  return (languages || []).map(l => {
+    const s = String(l).toLowerCase();
+    if (/english/.test(s)) return 'en';
+    if (/french|fran/.test(s)) return 'fr';
+    if (/cantonese/.test(s)) return 'cantonese';
+    if (/mandarin|chinese/.test(s)) return 'mandarin';
+    if (/hindi/.test(s)) return 'hindi';
+    if (/asl|sign/.test(s)) return 'asl';
+    return s.replace(/\s+/g,'-');
+  });
+}
+
+/* ─── Tabs ─── */
+document.querySelectorAll('.ca-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.ca-tab').forEach(b => b.classList.remove('is-active'));
+    btn.classList.add('is-active');
+    const target = btn.dataset.tab;
+    document.querySelectorAll('.ca-panel').forEach(p => p.classList.toggle('is-active', p.dataset.panel === target));
+    if (target === 'picks') refreshPicks();
+  });
+});
+document.getElementById('emptyBrowseBtn')?.addEventListener('click', () => {
+  document.querySelector('.ca-tab[data-tab="browse"]').click();
+});
+
+/* ─── Render roster grid ─── */
+function renderRoster(){
+  const grid = document.getElementById('rosterGrid');
+  const loading = document.getElementById('rosterLoading');
+  const empty = document.getElementById('rosterEmpty');
+  loading.hidden = true;
+  if (!allProfiles.length) {
+    empty.hidden = false;
+    grid.hidden = true;
+    document.getElementById('resultCount').textContent = '0';
+    return;
+  }
+  empty.hidden = true;
+  grid.hidden = false;
+  grid.innerHTML = allProfiles.map(p => {
+    const name = p.display_name || 'Private Family Assistant';
+    const pal = paletteFor(p.assistant_id);
+    const langs = (p.languages || []).slice(0,3).join(' · ') || '';
+    const certs = (p.certifications || []).slice(0,3);
+    const picked = myPicks.some(x => x.assistant_id === p.assistant_id);
+    const reachedLimit = myPicks.length >= PICK_LIMIT;
+    return `<article class="ca-card" data-id="${escapeHtml(p.assistant_id)}" data-location="${escapeHtml(cityKey(p.city))}" data-lang="${escapeHtml(langKeys(p.languages).join(' '))}">
+      <div class="ca-card__head">
+        <div class="ca-card__avatar" style="--av-from:${pal[0]};--av-to:${pal[1]};">${escapeHtml(initialsFor(name))}</div>
+        <div class="ca-card__id">
+          <h3 class="ca-card__name">${escapeHtml(name)}</h3>
+          <p class="ca-card__city">${escapeHtml(p.city || 'Greater Vancouver')}${langs ? ' · ' + escapeHtml(langs) : ''}</p>
+        </div>
+      </div>
+      ${p.bio ? `<p class="ca-card__bio">${escapeHtml(p.bio)}</p>` : ''}
+      ${certs.length ? `<div class="ca-card__tags">${certs.map(c => `<span class="ca-tag">${escapeHtml(c)}</span>`).join('')}</div>` : ''}
+      <div class="ca-card__actions">
+        <button class="ca-btn ca-btn--ghost ca-btn--full" type="button" data-action="view" data-id="${escapeHtml(p.assistant_id)}">View profile</button>
+        ${picked
+          ? `<button class="ca-btn ca-btn--ghost-danger" type="button" data-action="remove" data-id="${escapeHtml(p.assistant_id)}">✓ In picks · remove</button>`
+          : `<button class="ca-btn ca-btn--primary" type="button" data-action="add" data-id="${escapeHtml(p.assistant_id)}" ${reachedLimit ? 'disabled title="You have already added 3 picks"' : ''}>+ Add to picks</button>`
+        }
+      </div>
+    </article>`;
+  }).join('');
+  applyFilters();
+
+  grid.querySelectorAll('[data-action]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      const action = btn.dataset.action;
+      if (action === 'add') addToPicks(id);
+      else if (action === 'remove') removeFromPicks(id);
+      else if (action === 'view') openModal(id);
+    });
+  });
+}
+
+/* ─── Filter ─── */
+function applyFilters(){
+  const loc = document.getElementById('fLocation').value;
+  const lang = document.getElementById('fLanguage').value;
+  let visible = 0;
+  document.querySelectorAll('#rosterGrid .ca-card').forEach(card => {
+    const locs = (card.dataset.location || '').split(/\s+/);
+    const langs = (card.dataset.lang || '').split(/\s+/);
+    const locMatch = loc === 'all' || locs.includes(loc);
+    const langMatch = lang === 'all' || langs.includes(lang);
+    const show = locMatch && langMatch;
+    card.hidden = !show;
+    if (show) visible++;
+  });
+  document.getElementById('resultCount').textContent = visible;
+}
+document.getElementById('fLocation').addEventListener('change', applyFilters);
+document.getElementById('fLanguage').addEventListener('change', applyFilters);
+
+/* ─── Picks ─── */
+async function addToPicks(assistantId){
+  if (myPicks.length >= PICK_LIMIT) { alert(`You can pick up to ${PICK_LIMIT} Assistants. Remove one to add another.`); return; }
+  try {
+    const rank = myPicks.length + 1;
+    await window.pmHiring.addPick({ assistantId, rank });
+    await refreshPicks();
+    renderRoster();
+  } catch (e) {
+    console.error(e);
+    alert(e?.message || 'Could not add to picks.');
+  }
+}
+async function removeFromPicks(assistantId){
+  try {
+    await window.pmHiring.removePick({ assistantId });
+    await refreshPicks();
+    renderRoster();
+  } catch (e) {
+    console.error(e);
+    alert(e?.message || 'Could not remove pick.');
+  }
+}
+
+async function refreshPicks(){
+  const loading = document.getElementById('picksLoading');
+  const list = document.getElementById('picksList');
+  const empty = document.getElementById('picksEmpty');
+  const submitBar = document.getElementById('picksSubmitBar');
+  const submitted = document.getElementById('picksSubmitted');
+  loading.hidden = false;
+  list.hidden = true; empty.hidden = true; submitBar.hidden = true; submitted.hidden = true;
+
+  try {
+    myPicks = await window.pmHiring.fetchMyPicks();
+  } catch (e) {
+    myPicks = [];
+    console.warn('fetchMyPicks failed:', e);
+  }
+
+  const tabCount = document.getElementById('picksTabCount');
+  tabCount.textContent = myPicks.length;
+  tabCount.dataset.count = myPicks.length;
+
+  loading.hidden = true;
+
+  if (!myPicks.length) {
+    empty.hidden = false;
+    return;
+  }
+
+  const allShortlisted = myPicks.every(p => p.status === 'shortlisted');
+  const hasSubmitted = myPicks.some(p => p.status !== 'shortlisted');
+
+  list.innerHTML = myPicks.map((p, i) => {
+    const profile = p.assistant_profiles || {};
+    const name = profile.display_name || 'Private Family Assistant';
+    const pal = paletteFor(p.assistant_id);
+    const rank = p.rank || (i + 1);
+    return `<div class="ca-pickrow">
+      <div class="ca-pickrow__avatar" style="--av-from:${pal[0]};--av-to:${pal[1]};">${escapeHtml(initialsFor(name))}</div>
+      <div class="ca-pickrow__body">
+        <p class="ca-pickrow__rank">${escapeHtml(RANK_LABELS[rank-1] || (rank+'th Choice'))}</p>
+        <h3 class="ca-pickrow__name">${escapeHtml(name)}</h3>
+        <p class="ca-pickrow__meta">${escapeHtml(profile.city || 'Greater Vancouver')}${(profile.languages || []).length ? ' · ' + escapeHtml((profile.languages || []).join(' · ')) : ''}</p>
+      </div>
+      <div class="ca-pickrow__actions">
+        <span class="ca-status ca-status--${p.status}">${p.status.replace(/_/g,' ')}</span>
+        ${p.status === 'shortlisted'
+          ? `<button class="ca-btn ca-btn--ghost-danger" type="button" data-remove="${escapeHtml(p.assistant_id)}">Remove</button>`
+          : ''}
+      </div>
+    </div>`;
+  }).join('');
+  list.hidden = false;
+
+  // Wire remove buttons
+  list.querySelectorAll('[data-remove]').forEach(btn => {
+    btn.addEventListener('click', () => removeFromPicks(btn.dataset.remove));
+  });
+
+  if (allShortlisted) {
+    submitBar.hidden = false;
+  } else if (hasSubmitted) {
+    submitted.hidden = false;
+  }
+}
+
+document.getElementById('submitPicksBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('submitPicksBtn');
+  btn.disabled = true; btn.textContent = 'Submitting…';
+  try {
+    const result = await window.pmHiring.submitPicks();
+    console.log('Picks submitted:', result);
+    await refreshPicks();
+  } catch (e) {
+    console.error(e);
+    alert(e?.message || 'Could not submit picks.');
+    btn.disabled = false; btn.textContent = 'Submit Picks';
+  }
+});
+
+/* ─── Modal ─── */
+function openModal(assistantId){
+  const p = allProfiles.find(x => x.assistant_id === assistantId);
+  if (!p) return;
+  currentModalProfile = p;
+  const name = p.display_name || 'Private Family Assistant';
+  document.getElementById('caModalName').textContent = name;
+  document.getElementById('caModalCity').textContent = p.city || 'Greater Vancouver';
+  const langs = (p.languages || []).join(' · ') || '—';
+  const certs = (p.certifications || []).join(' · ') || '—';
+  document.getElementById('caModalBody').innerHTML = `
+    ${p.bio ? `<div class="ca-modal__section"><h4>About</h4><p>${escapeHtml(p.bio)}</p></div>` : ''}
+    <div class="ca-modal__section"><h4>Languages</h4><p>${escapeHtml(langs)}</p></div>
+    <div class="ca-modal__section"><h4>Certifications</h4><p>${escapeHtml(certs)}</p></div>
+    ${p.education_summary ? `<div class="ca-modal__section"><h4>Education</h4><p>${escapeHtml(p.education_summary)}</p></div>` : ''}
+    ${p.experience_summary ? `<div class="ca-modal__section"><h4>Experience</h4><p>${escapeHtml(p.experience_summary)}</p></div>` : ''}
+  `;
+  const picked = myPicks.some(x => x.assistant_id === assistantId);
+  const addBtn = document.getElementById('caModalAddBtn');
+  if (picked) {
+    addBtn.textContent = '✓ In your picks';
+    addBtn.disabled = true;
+    addBtn.classList.remove('ca-btn--primary');
+    addBtn.classList.add('ca-btn--ghost');
+  } else if (myPicks.length >= PICK_LIMIT) {
+    addBtn.textContent = 'Pick list is full';
+    addBtn.disabled = true;
+  } else {
+    addBtn.textContent = '+ Add to my picks';
+    addBtn.disabled = false;
+    addBtn.classList.remove('ca-btn--ghost');
+    addBtn.classList.add('ca-btn--primary');
+  }
+  document.getElementById('caModal').classList.add('is-shown');
+}
+function closeModal(){ document.getElementById('caModal').classList.remove('is-shown'); currentModalProfile = null; }
+document.getElementById('caModalClose').addEventListener('click', closeModal);
+document.getElementById('caModalCloseBtn').addEventListener('click', closeModal);
+document.getElementById('caModal').addEventListener('click', e => { if (e.target === document.getElementById('caModal')) closeModal(); });
+document.getElementById('caModalAddBtn').addEventListener('click', async () => {
+  if (!currentModalProfile) return;
+  await addToPicks(currentModalProfile.assistant_id);
+  closeModal();
+});
+
+/* ─── Init ─── */
+(async function init(){
+  await new Promise(r => setTimeout(r, 300));  // wait for sidebar.js auth
+  try {
+    [allProfiles] = await Promise.all([
+      window.pmHiring.listPublishedAssistantProfiles(),
+    ]);
+  } catch (e) {
+    allProfiles = [];
+    console.warn('Roster load failed:', e);
+  }
+  await refreshPicks();
+  renderRoster();
+})();
+</script>
+
+</body>
+</html>
