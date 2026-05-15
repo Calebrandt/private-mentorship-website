@@ -754,6 +754,42 @@
     if (error) throw error;
   }
 
+  // Phase 5.5: determine the slot (start time + duration) and assistant_id
+  // that an approval will execute against, so we can pre-check the
+  // assistant's availability and warn the admin if outside.
+  function approvalSlotForReq(req){
+    if (!req) return null;
+    const slots = Array.isArray(req.proposed_schedule?.slots) ? req.proposed_schedule.slots : null;
+    let startsAtIso = null, durationMin = null;
+    if (slots && slots.length) {
+      const chosen = slots[chosenSlotByReq[req.id] ?? 0];
+      if (chosen) { startsAtIso = chosen.starts_at; durationMin = chosen.duration_min; }
+    }
+    if (!startsAtIso && req.requested_date && req.requested_start) {
+      try {
+        startsAtIso = new Date(`${req.requested_date}T${req.requested_start}`).toISOString();
+      } catch (_) {}
+    }
+    if (!durationMin && req.requested_date && req.requested_start && req.requested_end) {
+      try {
+        const s = new Date(`${req.requested_date}T${req.requested_start}`);
+        const e = new Date(`${req.requested_date}T${req.requested_end}`);
+        durationMin = Math.max(0, Math.round((e.getTime() - s.getTime()) / 60000));
+      } catch (_) {}
+    }
+    if (!durationMin && req.appointment_id) {
+      const apt = appointmentsById[req.appointment_id];
+      if (apt?.duration_minutes) durationMin = apt.duration_minutes;
+    }
+    // Resolve assistant_id from request OR from the linked appointment
+    let assistantId = req.assistant_id || null;
+    if (!assistantId && req.appointment_id) {
+      const apt = appointmentsById[req.appointment_id];
+      if (apt?.assistant_id) assistantId = apt.assistant_id;
+    }
+    return { startsAtIso, durationMin, assistantId };
+  }
+
   // Action handlers (approve / reject)
   function bindRowActions(){
     bindSlotPicker();
@@ -761,6 +797,36 @@
       btn.addEventListener('click', async () => {
         const id = btn.dataset.id, type = btn.dataset.type;
         const req = allPending.find(r => r.id === id);
+
+        // Phase 5.5: pre-approval availability check for reschedule + extra
+        // (cancellations don't have a target time to check). Admin sees a
+        // confirm dialog with the conflict and can choose to override.
+        if (req && (type === 'reschedule' || type === 'extra')) {
+          const target = approvalSlotForReq(req);
+          if (target?.assistantId && target?.startsAtIso && target?.durationMin) {
+            try {
+              const ok = await window.pmHiring.checkAssistantAvailable({
+                assistantId: target.assistantId,
+                startsAtIso: target.startsAtIso,
+                durationMin: target.durationMin,
+              });
+              if (!ok) {
+                const slotStr = new Date(target.startsAtIso).toLocaleString('en-CA',
+                  {weekday:'short', month:'short', day:'numeric', hour:'numeric', minute:'2-digit'});
+                const proceed = confirm(
+                  `⚠ This slot is OUTSIDE the assistant's published availability.\n\n` +
+                  `Slot: ${slotStr}\nDuration: ${target.durationMin} min\n\n` +
+                  `Reasons this might be ok:\n` +
+                  ` • Assistant hasn't published windows yet\n` +
+                  ` • One-off exception you've cleared with the assistant\n\n` +
+                  `Approve anyway?`
+                );
+                if (!proceed) return; // button stays enabled, no state change
+              }
+            } catch (_) { /* check failed — fall through and let approval proceed */ }
+          }
+        }
+
         btn.disabled = true; btn.textContent = 'Approving…';
         try {
           if (req && type === 'reschedule') {

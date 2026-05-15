@@ -955,12 +955,34 @@
     if (newStart.getTime() < Date.now()) { showToast('New time must be in the future', 'error'); return; }
     const btn = $('reschedSubmit');
     btn.disabled = true; btn.textContent = 'Submitting…';
+
+    // Compute duration from current appointment if available
+    let durationMin = 60;
+    if (apt.ends_at) {
+      durationMin = Math.round((new Date(apt.ends_at).getTime() - new Date(apt.starts_at).getTime()) / 60000);
+    }
+
+    // Phase 5.5: soft availability check against the assigned assistant.
     try {
-      // Compute duration from current appointment if available
-      let durationMin = 60;
-      if (apt.ends_at) {
-        durationMin = Math.round((new Date(apt.ends_at).getTime() - new Date(apt.starts_at).getTime()) / 60000);
+      const assistantId = apt?.assistant_id || contract?.assistant_id;
+      if (assistantId) {
+        const ok = await window.pmHiring.checkAssistantAvailable({
+          assistantId, startsAtIso: newStart.toISOString(), durationMin,
+        });
+        if (!ok) {
+          const proceed = confirm(
+            "The time you picked is outside your assistant's published availability.\n\n" +
+            "Send the reschedule request anyway? Your admin will review and may suggest a different time."
+          );
+          if (!proceed) {
+            btn.disabled = false; btn.textContent = 'Submit reschedule';
+            return;
+          }
+        }
       }
+    } catch (_) { /* informational only */ }
+
+    try {
       const created = await window.pmHiring.submitRescheduleRequest({
         appointmentId: apt.id, appointment: apt,
         newStartIso: newStart.toISOString(),
@@ -1068,6 +1090,29 @@
     if (newStart.getTime() < Date.now()) { showToast('Time must be in the future', 'error'); return; }
     const btn = $('extraSubmit');
     btn.disabled = true; btn.textContent = 'Submitting…';
+
+    // Phase 5.5: soft availability check — if the contract has an
+    // assigned assistant, warn the family if their proposed time falls
+    // outside the assistant's published availability. Informational only.
+    try {
+      const assistantId = contract?.assistant_id;
+      if (assistantId) {
+        const ok = await window.pmHiring.checkAssistantAvailable({
+          assistantId, startsAtIso: newStart.toISOString(), durationMin: dur,
+        });
+        if (!ok) {
+          const proceed = confirm(
+            "This time is outside your assistant's published availability.\n\n" +
+            "Send the request anyway? Your admin will review and may suggest a different time."
+          );
+          if (!proceed) {
+            btn.disabled = false; btn.textContent = 'Submit request';
+            return;
+          }
+        }
+      }
+    } catch (_) { /* check is informational, never blocks */ }
+
     try {
       await window.pmHiring.submitExtraAppointmentRequest({
         newStartIso: newStart.toISOString(), durationMin: dur, reason,

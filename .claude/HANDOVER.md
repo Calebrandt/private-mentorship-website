@@ -934,35 +934,45 @@ codebase. Breaking them will silently corrupt production data.
 | 3 | Multi-slot reschedule + cancel via `schedule_change_requests` engine | ✅ |
 | 3.5 | Cancellation = immediate, no admin step, no family hours forfeit | ✅ |
 | 4 | "Book new session" extra-request UI on per-family workspace | ✅ (UI shipped; uses existing engine) |
-| **5** | **Assistant availability windows (new schema + booking constraints)** | ⏭ **PENDING — biggest remaining piece. Own session.** |
+| 5 | Assistant availability windows (recurring + blackouts) + soft check on assistant-side modals | ✅ |
+| 5.5 | Soft check on client Request Additional + Reschedule modals · admin override-confirm before approving outside availability | ✅ |
+| ⏭ later | Multi-timezone (helper hardcodes `America/Vancouver`); hard block on approval; visual week-grid UI for availability page | not blocking |
 
 ---
 
 ## §16. Open queue / pending tasks
 
-### TOP PRIORITY — Assistant scheduler Phase 5 (availability windows)
+### Phase 5 — Assistant availability windows (✅ shipped 2026-05-15 late session)
 
-The only remaining piece of the assistant scheduler arc. Estimated
-~6–8 hr; treat as **its own session**.
+Closed out the scheduler arc.
 
-Scope:
-1. **New table:** `assistant_availability_windows` (id, assistant_id,
-   weekday 0–6, start_time, end_time, kind: recurring | one_off | blackout,
-   active_from, active_until, created_at). RLS: assistant manages own
-   rows; admin sees all.
-2. **Service layer:** list / create / update / delete + a helper
-   `isWithinAvailability(assistantId, startsAtIso, durationMin)` for
-   constraint checks.
-3. **Assistant UI:** a new page (or section on `assistant-profile.html`)
-   where the assistant publishes weekly recurring availability + blackouts.
-4. **Booking constraint:** when an `extra` request is filed or when admin
-   approves a reschedule, validate the proposed slot falls within the
-   assistant's published availability. Surface a clean error if not.
-5. **Family-facing slot picker** (when families book): only shows slots
-   that fall within the assigned assistant's availability windows.
+What shipped:
+- 2 new tables: `assistant_availability_windows` (weekly recurring) +
+  `assistant_availability_blackouts` (date-range exceptions). 8 RLS
+  policies. SQL file: `supabase-functions/assistant-availability.sql`.
+- SECURITY DEFINER helper `is_assistant_available_at(uuid, timestamptz, int)`.
+  Hardcodes `America/Vancouver` (multi-tz deferred). Returns TRUE if no
+  windows published (soft-launch).
+- Service layer: 7 new fns (`fetchMyAvailabilityWindows`,
+  `addAvailabilityWindow`, `removeAvailabilityWindow`, blackouts mirror,
+  `checkAssistantAvailable`).
+- `assistant-availability.html` page with two cards (Weekly + Blackouts),
+  multi-day add modal, blackout add modal, delete confirm.
+- Sidebar entry under Work: "Availability" (below My Schedule).
+- Soft availability checks added to: assistant reschedule modal, assistant
+  book-new-session modal, client Request Additional, client Reschedule.
+- Admin approve handler: pre-approval confirm dialog if the chosen slot
+  is outside the assistant's published availability. Admin can override.
 
-This is the only **genuinely new** schema work in the scheduler arc.
-Phases 1–4 were ports of patterns the app already had.
+### Future polish (not blocking launch)
+- Multi-timezone support — `is_assistant_available_at` hardcodes
+  Vancouver. To go national, store timezone on `assistant_profiles` or
+  `profiles` and pass it to the helper.
+- Hard block on admin approval (vs current override-confirm).
+- Family-facing slot picker (a true calendar grid showing only available
+  slots, not just a free-form time input with a warning).
+- Visual week grid on `assistant-availability.html` (currently a table).
+- One-off availability (one-time extra windows outside recurring).
 
 ### Pending owner tasks (Supabase dashboard, ~5 min each)
 
