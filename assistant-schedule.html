@@ -405,23 +405,23 @@
   </div>
 </div>
 
-<!-- Cancel-request modal (Phase 3) -->
+<!-- Cancel modal (Phase 3.5 — immediate, no admin step) -->
 <div class="as-modal-backdrop" id="asCancelModal" data-open="false">
   <div class="as-modal" role="dialog" aria-modal="true">
-    <h3 class="as-modal__title">Request cancellation</h3>
-    <p class="as-modal__body">This will file a cancellation request for admin review. The session stays scheduled until approved.</p>
+    <h3 class="as-modal__title">Cancel this session</h3>
+    <p class="as-modal__body">The session will be cancelled immediately. The family is not charged any hours — you initiated the cancellation.</p>
     <div class="as-modal__row" id="asCancelContext"></div>
 
     <div id="asCancelWarnSlot"></div>
 
     <div class="as-textarea-row">
-      <label for="asCancelReason">Reason (required)</label>
-      <textarea id="asCancelReason" placeholder="Why this session needs to be cancelled…"></textarea>
+      <label for="asCancelReason">Reason (required, visible to admin)</label>
+      <textarea id="asCancelReason" placeholder="Why you can't make this session…"></textarea>
     </div>
 
     <div class="as-modal__actions" style="margin-top:18px;">
       <button type="button" class="as-modal__cancel" id="asCancelBack">Back</button>
-      <button type="button" class="as-modal__confirm as-modal__confirm--no-show" id="asCancelSubmit">Submit cancellation</button>
+      <button type="button" class="as-modal__confirm as-modal__confirm--no-show" id="asCancelSubmit">Cancel session</button>
     </div>
   </div>
 </div>
@@ -954,13 +954,14 @@ function openCancelRequest(apptId){
     <span><b>Duration:</b> ${escapeHtml(hoursLabel(durationOf(appt)))}</span>
   `;
 
-  // 24-hour warning if applicable
+  // 24-hour notice — recorded as a "late cancellation" for the audit log.
+  // Family still isn't charged (you're the one cancelling).
   const hoursAway = (d - Date.now()) / 36e5;
   const warnSlot = document.getElementById('asCancelWarnSlot');
   if (hoursAway < 24 && hoursAway > 0) {
     warnSlot.innerHTML = `<div class="as-warn-banner">
       <span class="as-warn-banner__icon">⚠</span>
-      <span>This session is less than 24 hours away. Late-cancellation policy may apply — the admin will determine whether hours are forfeited.</span>
+      <span>This session is less than 24 hours away. It will be recorded as a <strong>late cancellation</strong> in the admin log. The family is still not charged.</span>
     </div>`;
   } else {
     warnSlot.innerHTML = '';
@@ -986,12 +987,13 @@ async function submitCancelRequest(){
   const btn = document.getElementById('asCancelSubmit');
   btn.disabled = true;
   try {
-    await window.pmHiring.assistantSubmitCancelRequest({
+    const result = await window.pmHiring.assistantSubmitCancelRequest({
       appointmentId: cancelTarget.id,
       appointment: cancelTarget,
       reason,
     });
-    toast('Cancellation request submitted.');
+    const isLate = result?.status === 'late_cancelled';
+    toast(isLate ? 'Session cancelled (late — logged for admin).' : 'Session cancelled.');
     closeCancelRequest();
     await loadAll();
   } catch (err) {

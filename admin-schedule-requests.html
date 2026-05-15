@@ -100,6 +100,31 @@
   .nx-req__field{}
   .nx-req__field-label{font-size:11px;color:var(--ink-tert);margin:0 0 5px;font-weight:700;letter-spacing:.10em;text-transform:uppercase;}
   .nx-req__field-value{font-size:14px;color:var(--ink-2);margin:0;font-weight:600;letter-spacing:-.005em;line-height:1.4;}
+  /* Phase 3.5: Cancellations audit table */
+  .nx-cx-table{
+    background:#fff;border:1px solid var(--border);border-radius:14px;
+    overflow:hidden;box-shadow:0 1px 2px rgba(15,23,42,0.04);
+  }
+  .nx-cx-row{
+    display:grid;grid-template-columns:110px 1fr 1fr auto;gap:14px;align-items:center;
+    padding:14px 18px;border-bottom:1px solid var(--border-soft);
+    font-size:13px;
+  }
+  .nx-cx-row:last-child{border-bottom:0;}
+  .nx-cx-row:hover{background:#FAFBFC;}
+  .nx-cx-row__date{font-weight:700;color:var(--ink-2);letter-spacing:-.005em;}
+  .nx-cx-row__date small{display:block;font-size:11px;font-weight:500;color:var(--ink-tert);margin-top:2px;}
+  .nx-cx-row__who{color:var(--ink);}
+  .nx-cx-row__who strong{color:var(--ink-2);font-weight:700;}
+  .nx-cx-row__who-meta{font-size:11.5px;color:var(--ink-mute);margin-top:2px;}
+  .nx-cx-row__reason{color:var(--ink-mute);font-style:italic;font-size:12.5px;}
+  .nx-cx-pill{
+    font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+    padding:4px 10px;border-radius:9999px;white-space:nowrap;
+  }
+  .nx-cx-pill--late{background:#FEF3C7;color:#92400E;}
+  .nx-cx-pill--normal{background:#F1F5F9;color:#64748B;}
+
   /* Phase 3: multi-slot picker for assistant-filed reschedule requests */
   .nx-slot-picker{
     background:#FAFBFC;border:1px solid var(--border);border-radius:11px;
@@ -240,6 +265,26 @@
   </div>
 
   <div id="reqList"><div class="nx-empty">Loading…</div></div>
+
+  <!-- Phase 3.5: Recent cancellations audit log -->
+  <!-- Cancellations no longer queue for approval — they're immediate.
+       This section gives the admin visibility into what's been cancelled. -->
+  <section class="nx-cancellations" style="margin-top:36px;">
+    <header style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:16px;padding:0 4px;">
+      <div>
+        <h2 style="margin:0;font-size:20px;font-weight:800;color:var(--ink-2);letter-spacing:-.015em;">Recent cancellations</h2>
+        <p style="margin:4px 0 0;font-size:13px;color:var(--ink-mute);letter-spacing:-.005em;">
+          Cancellations are immediate — no approval needed. This is a read-only audit log.
+        </p>
+      </div>
+      <span id="nxCxCount" style="font-size:11.5px;font-weight:700;color:var(--ink-mute);background:#fff;border:1px solid var(--border);border-radius:9999px;padding:6px 12px;letter-spacing:.04em;">— recent</span>
+    </header>
+    <div id="nxCxList">
+      <div class="nx-empty" style="padding:32px;">
+        <p style="margin:0;font-size:13px;color:var(--ink-mute);">Loading…</p>
+      </div>
+    </div>
+  </section>
 
 </main>
 
@@ -397,6 +442,48 @@
     appointmentsById = { ...pending.appointmentsById, ...reviewed.appointmentsById };
     refreshTabCounts();
     render();
+    // Phase 3.5: refresh the cancellations audit log alongside the inbox.
+    loadCancellations().catch(()=>{});
+  }
+
+  // Phase 3.5: read-only cancellations audit log (immediate cancels by
+  // assistants or clients no longer flow through the approval queue).
+  async function loadCancellations(){
+    const wrap = document.getElementById('nxCxList');
+    const counter = document.getElementById('nxCxCount');
+    let data = { rows: [] };
+    try { data = await window.pmHiring.adminFetchRecentCancellations({ limit: 50 }); } catch (_) {}
+    const rows = data.rows || [];
+    counter.textContent = `${rows.length} recent`;
+    if (!rows.length) {
+      wrap.innerHTML = `<div class="nx-empty" style="padding:36px 16px;">
+        <p style="margin:0;font-size:13px;color:var(--ink-mute);">No cancellations in recent history.</p>
+      </div>`;
+      return;
+    }
+    wrap.innerHTML = `<div class="nx-cx-table">` + rows.map(r => {
+      const d = new Date(r.starts_at);
+      const dateMain = d.toLocaleDateString('en-CA',{month:'short',day:'numeric'});
+      const dateTime = d.toLocaleTimeString('en-CA',{hour:'numeric',minute:'2-digit'});
+      const dateYear = d.getFullYear();
+      const cxAt = r.cancelled_at ? new Date(r.cancelled_at) : null;
+      const cxAgo = cxAt ? timeAgo(r.cancelled_at) : '—';
+      const clientName = r.client?.full_name || (r.client_id ? `Client ${r.client_id.slice(0,6)}` : '—');
+      const cancellerName = r.canceller?.full_name || 'Unknown';
+      const cancellerRole = r.canceller?.role || '';
+      const isLate = r.status === 'late_cancelled';
+      return `<div class="nx-cx-row">
+        <div class="nx-cx-row__date">
+          ${esc(dateMain)}<small>${esc(String(dateYear))} · ${esc(dateTime)}</small>
+        </div>
+        <div class="nx-cx-row__who">
+          <strong>${esc(clientName)}</strong>
+          <div class="nx-cx-row__who-meta">Cancelled by ${esc(cancellerName)}${cancellerRole ? ` (${esc(cancellerRole)})` : ''} · ${esc(cxAgo)}</div>
+        </div>
+        <div class="nx-cx-row__reason">${esc(r.cancel_reason || r.title || 'No reason provided')}</div>
+        <span class="nx-cx-pill ${isLate ? 'nx-cx-pill--late' : 'nx-cx-pill--normal'}">${isLate ? 'Late cancel' : 'Cancelled'}</span>
+      </div>`;
+    }).join('') + `</div>`;
   }
 
   function refreshTabCounts(){

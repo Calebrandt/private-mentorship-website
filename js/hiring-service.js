@@ -866,32 +866,23 @@
     return data?.client_id || null;
   }
 
+  // Phase 3.5: assistant cancellation goes through the SECURITY DEFINER RPC,
+  // not the approval queue. Cancellations don't need admin approval — no one
+  // can force an appointment. Family is not charged hours even on late
+  // cancels (the assistant initiated, the family is held harmless).
+  //
+  // Function name preserved for backward compatibility with existing UI
+  // callers, but behavior is now: immediate cancel, no schedule_change_request
+  // row written.
   async function assistantSubmitCancelRequest({ appointmentId, appointment, reason = '' }) {
     if (!appointmentId && !appointment?.id) throw new Error('appointmentId is required');
-    const user = await getCurrentUser();
-    if (!user) throw new Error('Not signed in');
-    const clientId = await _resolveClientIdFromAppt({ appointmentId, appointment });
-    if (!clientId) throw new Error('Could not resolve client for this appointment');
-
-    const payload = {
-      client_id: clientId,
-      assistant_id: user.id,
-      appointment_id: appointmentId || appointment.id,
-      requested_date: null,
-      requested_start: null,
-      requested_end: null,
-      reason: String(reason || '').trim() || null,
-      status: 'pending',
-      request_type: 'cancel',
-      proposed_schedule: null,
-    };
-    const { data, error } = await sb()
-      .from('schedule_change_requests')
-      .insert([payload])
-      .select()
-      .single();
+    const id = appointmentId || appointment.id;
+    const { data, error } = await sb().rpc('assistant_cancel_appointment', {
+      p_appointment_id: id,
+      p_reason: String(reason || '').trim() || null,
+    });
     if (error) throw error;
-    return data;
+    return data; // returns the updated appointment row
   }
 
   async function assistantSubmitRescheduleRequest({
@@ -980,6 +971,65 @@
       if (error) return [];
       return data || [];
     } catch (_) { return []; }
+  }
+
+  // Phase 3.5: admin badge count for the "Schedule Requests" sidebar entry.
+  // Counts only PENDING requests of types that still need approval —
+  // reschedule + extra. Cancellations are immediate now and don't queue.
+  async function adminFetchPendingScheduleRequestsCount() {
+    try {
+      const { count, error } = await sb()
+        .from('schedule_change_requests')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'pending')
+        .in('request_type', ['reschedule', 'extra']);
+      if (error) return 0;
+      return Number(count) || 0;
+    } catch (_) { return 0; }
+  }
+
+  // Phase 3.5: read-only audit log of recent cancellations (assistant- or
+  // client-initiated). Surfaced on admin-schedule-requests.html as a separate
+  // section below the approval inbox since they no longer flow through it.
+  async function adminFetchRecentCancellations({ limit = 50 } = {}) {
+    try {
+      const { data: appts, error } = await sb()
+        .from('appointments')
+        .select('id, client_id, assistant_id, contract_id, starts_at, ends_at, duration_minutes, status, title, notes, cancelled_at, cancelled_by, cancel_reason')
+        .in('status', ['cancelled', 'late_cancelled'])
+        .not('cancelled_at', 'is', null)
+        .order('cancelled_at', { ascending: false })
+        .limit(limit);
+      if (error) return { rows: [] };
+      const rows = appts || [];
+      if (!rows.length) return { rows: [] };
+
+      // Resolve client names
+      const clientIds = [...new Set(rows.map(r => r.client_id))].filter(Boolean);
+      const { data: clients } = clientIds.length
+        ? await sb().from('clients').select('id, full_name').in('id', clientIds)
+        : { data: [] };
+      const clientsById = {};
+      (clients || []).forEach(c => { clientsById[c.id] = c; });
+
+      // Resolve canceller display name via profiles
+      const cancellerIds = [...new Set(rows.map(r => r.cancelled_by))].filter(Boolean);
+      const { data: profs } = cancellerIds.length
+        ? await sb().from('profiles').select('user_id, full_name, role').in('user_id', cancellerIds)
+        : { data: [] };
+      const profsByUserId = {};
+      (profs || []).forEach(p => { profsByUserId[p.user_id] = p; });
+
+      return {
+        rows: rows.map(r => ({
+          ...r,
+          client: clientsById[r.client_id] || null,
+          canceller: r.cancelled_by ? (profsByUserId[r.cancelled_by] || null) : null,
+        })),
+      };
+    } catch (_) {
+      return { rows: [] };
+    }
   }
 
   // List the families this assistant is engaged with — based on contracts.
@@ -2031,6 +2081,8 @@
     // scheduler Phase 3 — schedule change requests (assistant)
     assistantSubmitCancelRequest, assistantSubmitRescheduleRequest,
     assistantSubmitExtraAppointmentRequest, fetchAssistantPendingScheduleRequests,
+    // scheduler Phase 3.5 — admin badges + cancellations audit
+    adminFetchPendingScheduleRequestsCount, adminFetchRecentCancellations,
     // assistant-side (Phase 3)
     updateMyAssistantProfile, fetchMyAssistantHoursLedger,
     // admin: clients

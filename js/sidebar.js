@@ -15,7 +15,7 @@
       {
         type: 'group', label: 'Tools', icon: 'tools',
         items: [
-          { href: 'admin-schedule-requests.html', label: 'Schedule Requests', icon: 'inbox' },
+          { href: 'admin-schedule-requests.html', label: 'Schedule Requests', icon: 'inbox', dynamicBadge: 'admin-schedule-requests' },
           { href: 'admin-membership-requests.html', label: 'Membership Requests', icon: 'inbox' },
           { href: 'admin-intro-requests.html', label: 'Intro Requests', icon: 'inbox', dynamicBadge: 'admin-intro-requests' },
           { href: 'admin-create-client.html', label: 'Create Client', icon: 'user-plus' },
@@ -357,6 +357,13 @@
           'introduction_requested','meeting_scheduled','meeting_complete'
         ]});
         return (picks || []).length;
+      } catch (_) { return 0; }
+    }
+    if (kind === 'admin-schedule-requests' && role === 'admin') {
+      // Pending reschedule + extra requests still need admin approval.
+      // Cancels are immediate as of Phase 3.5 — they don't queue here.
+      try {
+        return await window.pmHiring.adminFetchPendingScheduleRequestsCount();
       } catch (_) { return 0; }
     }
     if (kind === 'client-picks' && role === 'client') {
