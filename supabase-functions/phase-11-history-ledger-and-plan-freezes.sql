@@ -115,11 +115,16 @@ $$;
 
 
 -- (1b) Backfill: re-sync every existing row so the audit history is complete
--- right now, not just from this point forward.
+-- right now, not just from this point forward. JOIN to contracts filters
+-- out both NULL contract_ids AND orphaned history rows whose contract
+-- no longer exists (caught in deploy: legacy data had at least one such row).
 DO $$
 DECLARE r record;
 BEGIN
-  FOR r IN SELECT contract_id FROM public.contract_history_ledger
+  FOR r IN
+    SELECT chl.contract_id
+    FROM public.contract_history_ledger chl
+    JOIN public.contracts c ON c.id = chl.contract_id
   LOOP
     PERFORM public.sync_contract_history_ledger_row(r.contract_id);
   END LOOP;
