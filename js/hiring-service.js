@@ -724,21 +724,59 @@
       out.hoursThisMonth = Math.round((totalMinutes / 60) * 10) / 10;
     } catch (_) {}
 
-    // Money this month — sum of invoice payments collected in this
-    // calendar month (status != void). Reflects cash collected: best
-    // single-number answer to "what did I earn so far this month".
-    // Falls back to total_cents when amount_paid_cents is missing.
+    // Money this month — per-session earnings, NOT invoice payments.
+    //
+    // Caleb's business model:
+    //   • 1-month / 40h contracts (e.g. Michael Yang)  → $30/hr gross
+    //   • 2-month / 24h contracts (e.g. Daniel, Ryan)  → $45/hr gross
+    //   Assistant takes 70% of gross per session worked.
+    //
+    // Formula per session:  session_hours × gross_rate × 0.70
+    // Rate is derived from the contract's calendar span:
+    //   span ≤ 45 days  → 1-month plan  ($30/hr)
+    //   span >  45 days → 2-month plan  ($45/hr)
+    // Defaults to 30 days / $30 rate when contract dates are missing.
+    //
+    // Counts every non-cancelled session whose starts_at falls in this
+    // calendar month — matches the same window as Hours This Month so
+    // the two numbers are always consistent ("X hours, $Y earned").
     try {
-      const { data: invoices } = await sb()
-        .from('invoices')
-        .select('status, amount_paid_cents, total_cents, paid_at')
-        .gte('paid_at', firstOfMonth.toISOString())
-        .lt('paid_at', firstOfNextMonth.toISOString())
-        .neq('status', 'void');
-      const totalCents = (invoices || []).reduce(
-        (s, i) => s + (Number(i.amount_paid_cents) || Number(i.total_cents) || 0), 0
-      );
-      out.moneyThisMonth = Math.round(totalCents / 100);
+      const { data: monthAppts } = await sb()
+        .from('appointments')
+        .select('contract_id, duration_minutes, starts_at, ends_at, status')
+        .in('status', ['completed', 'scheduled'])
+        .gte('starts_at', firstOfMonth.toISOString())
+        .lt('starts_at', firstOfNextMonth.toISOString());
+
+      const contractIds = [...new Set(
+        (monthAppts || []).map(a => a.contract_id).filter(Boolean)
+      )];
+      const contractsById = {};
+      if (contractIds.length) {
+        const { data: contracts } = await sb()
+          .from('contracts')
+          .select('id, start_at, end_at')
+          .in('id', contractIds);
+        (contracts || []).forEach(c => { contractsById[c.id] = c; });
+      }
+
+      const ASSISTANT_SHARE = 0.70;
+      let total = 0;
+      (monthAppts || []).forEach(a => {
+        let mins = Number(a.duration_minutes) || 0;
+        if (!mins && a.starts_at && a.ends_at) {
+          mins = Math.max(0, Math.round((new Date(a.ends_at) - new Date(a.starts_at)) / 60000));
+        }
+        const hours = mins / 60;
+        if (hours <= 0) return;
+        const c = contractsById[a.contract_id];
+        const days = (c?.start_at && c?.end_at)
+          ? Math.round((new Date(c.end_at) - new Date(c.start_at)) / 86400000)
+          : 30;
+        const gross = days > 45 ? 45 : 30;
+        total += hours * gross * ASSISTANT_SHARE;
+      });
+      out.moneyThisMonth = Math.round(total);
     } catch (_) {}
 
     return out;
