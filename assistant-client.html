@@ -424,18 +424,23 @@
 
     <!-- KPI tiles -->
     <section class="wc-kpis">
+      <!-- Phase 19d v3 (2026-05-16): rolled the Carried Over tile into
+           the headline. Per Caleb: "when I have extra hours from a
+           client, I just put that on the total and we count down from
+           there." So this tile shows the FULL available pool (plan +
+           carryover baked in). Subline names the breakdown only when
+           a carryover actually exists. Math reads honestly at a glance:
+              Available − Used = Remaining
+           (e.g. Michael: 42.75 − 36 = 6.75)
+           kpiCarryTile element is kept in the DOM hidden+empty for
+           backward-compat with any JS that may still touch it. -->
       <div class="wc-kpi">
-        <p class="wc-kpi__label">Plan size</p>
+        <p class="wc-kpi__label">Hours available</p>
         <span class="wc-kpi__value" id="kpiPlan">—</span>
-        <p class="wc-kpi__sub" id="kpiPlanSub">hours included</p>
+        <p class="wc-kpi__sub" id="kpiPlanSub">hours purchased</p>
       </div>
-      <!-- Carried over tile (Phase 19d v2): only shown when prior contract
-           rolled hours forward. Without this the math reads broken
-           ("bought 40, used 38.8, somehow still have 6.75 left"). -->
-      <div class="wc-kpi wc-kpi--carry" id="kpiCarryTile" hidden>
-        <p class="wc-kpi__label">Carried over</p>
-        <span class="wc-kpi__value" id="kpiCarry">—</span>
-        <p class="wc-kpi__sub">rolled in from prior contract</p>
+      <div id="kpiCarryTile" hidden>
+        <span id="kpiCarry"></span>
       </div>
       <div class="wc-kpi wc-kpi--remaining" id="kpiRemainingTile">
         <p class="wc-kpi__label">Hours remaining</p>
@@ -673,7 +678,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515c"></script>
-<script src="js/hiring-service.js?v=20260515g"></script>
+<script src="js/hiring-service.js?v=20260515h"></script>
 <script src="js/messages-service.js?v=20260515c"></script>
 <script src="js/sidebar.js?v=20260515c"></script>
 <script>
@@ -783,22 +788,19 @@ function renderAppointmentRow(a, spend){
   const remainingHours = Number.isFinite(ws.hoursRemainingMinutes)
     ? Math.round(ws.hoursRemainingMinutes/60*100)/100
     : Math.max(0, planHours - usedHours);
-  document.getElementById('kpiPlan').textContent = planHours;
+  // "Hours available" tile = plan + any carryover IN (positive ledger
+  // top-ups from prior contract). One headline number so the assistant
+  // doesn't have to add tiles in their head. When a carry exists, the
+  // subline names the breakdown ("40 purchased + 2.75 carried over")
+  // so the math is traceable; otherwise the subline stays plain.
+  const availableHours = Math.round((planHours + toppedUpHours) * 100) / 100;
+  document.getElementById('kpiPlan').textContent = availableHours;
   document.getElementById('kpiUsed').textContent = usedHours;
   document.getElementById('kpiUpcoming').textContent = (ws.upcomingAppointments || []).length;
 
-  // Carried-over tile: only show when there's a real carry-in. Makes the
-  // math add up at a glance: plan + carried − used = remaining.
+  // Hide the legacy Carried Over tile (kept in DOM for back-compat).
   const carryTile = document.getElementById('kpiCarryTile');
-  const carryEl   = document.getElementById('kpiCarry');
-  if (carryTile && carryEl) {
-    if (toppedUpHours > 0) {
-      carryEl.textContent = toppedUpHours;
-      carryTile.hidden = false;
-    } else {
-      carryTile.hidden = true;
-    }
-  }
+  if (carryTile) carryTile.hidden = true;
 
   // Hours Remaining tile — color shifts as the runway shrinks so the
   // assistant clocks it at a glance. Bank hours are SEPARATE (gold tile
@@ -833,10 +835,17 @@ function renderAppointmentRow(a, spend){
       remSubEl.textContent = 'left on this contract';
     }
   }
-  // Plan-size subline: keep plain. No "+X carried in" stacking — that
-  // confused the relationship between Plan size and Hours remaining.
+  // Plan subline: now safely names the carryover breakdown if one
+  // exists, because the headline tile is the SUM (no risk of double-
+  // counting against a separate Carry tile — that tile is gone).
+  // Reads "40 purchased + 2.75 carried over" when relevant, plain
+  // "hours purchased" otherwise.
   const planSubEl = document.getElementById('kpiPlanSub');
-  if (planSubEl) planSubEl.textContent = 'hours included';
+  if (planSubEl) {
+    planSubEl.textContent = toppedUpHours > 0
+      ? `${planHours} purchased + ${toppedUpHours} carried over`
+      : 'hours purchased';
+  }
 
   // Phase 12: show bank-hours tile if the family has any saved-up hours.
   // Phase 12.2: also wires the "Suggest using these" nudge button.
