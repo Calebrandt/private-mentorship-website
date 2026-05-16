@@ -921,8 +921,28 @@
   } catch (_) {}
 
   // ─── KPIs ────────────────────────────────────────────────────
-  $('kpiHours').textContent = Number(client?.hours_balance || 0).toFixed(1);
-  // Sessions this month
+  // Hours remaining: use the SAME workspace fetcher the assistant view
+  // uses so the numbers match across both screens. Falls back to the
+  // stale clients.hours_balance column only if the workspace lookup
+  // fails (e.g. RLS blocks, no contract yet).
+  let _hoursRemaining = null;
+  try {
+    const ws = await window.pmHiring.fetchAssistantClientWorkspace(client.id);
+    if (ws && Number.isFinite(ws.hoursRemainingMinutes)) {
+      _hoursRemaining = Math.round((ws.hoursRemainingMinutes / 60) * 100) / 100;
+    }
+  } catch (_) {}
+  if (_hoursRemaining == null) {
+    _hoursRemaining = Number(client?.hours_balance || 0).toFixed(1);
+  }
+  $('kpiHours').textContent = _hoursRemaining;
+
+  // Sessions this month — attendance.monthly's last entry. Note: known
+  // bug — bucketing is off for clients with bulk-imported history; the
+  // unified rebuild (Phase 19m) will replace this with the same
+  // appointments query the assistant dashboard's "Hours This Month"
+  // uses, which correctly filters by starts_at in current calendar
+  // month.
   const startOfMonth = new Date(); startOfMonth.setDate(1); startOfMonth.setHours(0,0,0,0);
   const thisMonthCount = (attendance.monthly || []).slice(-1)[0]?.attended || 0;
   $('kpiSessions').textContent = thisMonthCount;
