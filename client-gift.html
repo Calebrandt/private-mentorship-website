@@ -37,6 +37,19 @@
   .nx-search input::placeholder{color:var(--ink-tert);font-weight:400;}
   .nx-search input:focus{outline:none;border-color:var(--primary);background:var(--card);}
   .nx-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--ink-tert);}
+  /* Theme toggle — same vocabulary as every other client page */
+  .dash-theme-toggle{
+    display:inline-flex;align-items:center;justify-content:center;
+    padding:7px 10px;background:var(--card);color:var(--ink-mute);
+    border:1px solid var(--border);border-radius:8px;cursor:pointer;
+    transition:background .14s ease, color .14s ease;
+  }
+  .dash-theme-toggle:hover{background:var(--border-soft);color:var(--ink-2);}
+  .dash-theme-toggle svg{width:14px;height:14px;}
+  .dash-theme-toggle__sun{display:none;}
+  .dash-theme-toggle__moon{display:block;}
+  [data-dash-theme="dark"] .dash-theme-toggle__sun{display:block;}
+  [data-dash-theme="dark"] .dash-theme-toggle__moon{display:none;}
   .nx-userpod{display:flex;align-items:center;gap:10px;padding:5px 12px 5px 5px;border:1px solid var(--border);border-radius:9999px;background:var(--card);}
   .nx-userpod__avatar{
     width:34px;height:34px;border-radius:50%;
