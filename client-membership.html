@@ -11,6 +11,47 @@
 <link rel="icon" href="assets/logos/pm-logo.png" />
 <script src="js/theme.js?v=20260512a"></script>
 <style>
+  /* Phase 19n: shared theme tokens — same vocabulary as client-dashboard
+     so the dark/light toggle persists and works on every client page. */
+  :root,[data-dash-theme="light"]{
+    --bg:#f9fafb;--card:#ffffff;--border:#e5e7eb;--border-soft:#f3f4f6;
+    --input-bg:#ffffff;--ink:#1f2937;--ink-2:#111827;--ink-mute:#6b7280;
+    --ink-tert:#9ca3af;--primary:#2563eb;--primary-hover:#1d4ed8;
+  }
+  [data-dash-theme="dark"]{
+    --bg:#0b0c10;--card:#16171c;--border:#262830;--border-soft:#1c1d23;
+    --input-bg:#22232a;--ink:#f1f5f9;--ink-2:#ffffff;--ink-mute:#94a3b8;
+    --ink-tert:#64748b;--primary:#3b82f6;--primary-hover:#2563eb;
+  }
+  .nx-topbar{
+    background:var(--card);border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 26px;gap:16px;position:sticky;top:0;z-index:20;
+  }
+  .nx-search{flex:1;max-width:520px;position:relative;}
+  .nx-search input{
+    width:100%;background:var(--input-bg);border:1px solid transparent;
+    border-radius:10px;padding:10px 14px 10px 38px;
+    font:500 13.5px Inter,sans-serif;color:var(--ink);
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .nx-search input::placeholder{color:var(--ink-tert);font-weight:400;}
+  .nx-search input:focus{outline:none;border-color:var(--primary);background:var(--card);}
+  .nx-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--ink-tert);}
+  .dash-theme-toggle{
+    display:inline-flex;align-items:center;justify-content:center;
+    padding:7px 10px;background:var(--card);color:var(--ink-mute);
+    border:1px solid var(--border);border-radius:8px;cursor:pointer;
+    transition:background .14s ease, color .14s ease;
+  }
+  .dash-theme-toggle:hover{background:var(--border-soft);color:var(--ink-2);}
+  .dash-theme-toggle svg{width:14px;height:14px;}
+  .dash-theme-toggle__sun{display:none;}
+  .dash-theme-toggle__moon{display:block;}
+  [data-dash-theme="dark"] .dash-theme-toggle__sun{display:block;}
+  [data-dash-theme="dark"] .dash-theme-toggle__moon{display:none;}
+  @media(max-width:780px){.nx-search{display:none;}.nx-topbar{padding:12px 16px;}}
+
   *,*::before,*::after{box-sizing:border-box;}
   html,body{margin:0;padding:0;background:#F1F5F9;color:#1F2937;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
   :root{
@@ -22,13 +63,13 @@
   }
 
   /* Top bar */
-  .nx-topbar{background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:14px 26px;gap:16px;position:sticky;top:0;z-index:20;}
+  .nx-topbar{background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:14px 26px;gap:16px;position:sticky;top:0;z-index:20;}
   .nx-search{flex:1;max-width:520px;position:relative;}
   .nx-search input{width:100%;background:#F1F5F9;border:1px solid transparent;border-radius:10px;padding:10px 14px 10px 38px;font:500 13.5px Inter,sans-serif;color:var(--ink);}
   .nx-search input::placeholder{color:var(--ink-tert);font-weight:400;}
-  .nx-search input:focus{outline:none;border-color:var(--primary);background:#fff;}
+  .nx-search input:focus{outline:none;border-color:var(--primary);background:var(--card);}
   .nx-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--ink-tert);}
-  .nx-userpod{display:flex;align-items:center;gap:10px;padding:5px 12px 5px 5px;border:1px solid var(--border);border-radius:9999px;background:#fff;}
+  .nx-userpod{display:flex;align-items:center;gap:10px;padding:5px 12px 5px 5px;border:1px solid var(--border);border-radius:9999px;background:var(--card);}
   .nx-userpod__avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#5750F1 0%,#0ABEF9 100%);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px -1px rgba(87,80,241,0.35);}
   .nx-userpod__name{font-size:13.5px;font-weight:700;color:var(--ink);letter-spacing:-.005em;}
 
@@ -46,7 +87,7 @@
 
   /* Pending review banner — calm slate (no orange/amber gradients) */
   .nx-pending{
-    background:#fff;border:1px solid var(--border);border-radius:12px;
+    background:var(--card);border:1px solid var(--border);border-radius:12px;
     padding:16px 20px;margin-bottom:22px;
     display:flex;align-items:center;gap:14px;
     box-shadow:0 1px 2px rgba(15,23,42,0.04);
@@ -88,7 +129,7 @@
   .pm-switch__rail.is-on{background:var(--primary);}
   .pm-switch__knob{
     position:absolute;top:2px;left:2px;width:20px;height:20px;
-    background:#fff;border-radius:50%;
+    background:var(--card);border-radius:50%;
     box-shadow:0 1px 2px rgba(0,0,0,0.15);
     transition:transform .2s ease;
   }
@@ -113,7 +154,7 @@
     transition:background .15s ease, color .15s ease;
   }
   .pm-segment__btn:hover{color:var(--ink-2);}
-  .pm-segment__btn.is-active{background:#fff;color:var(--ink-2);box-shadow:0 1px 2px rgba(15,23,42,0.06);}
+  .pm-segment__btn.is-active{background:var(--card);color:var(--ink-2);box-shadow:0 1px 2px rgba(15,23,42,0.06);}
 
   /* Pricing card grid */
   .pm-pricing__grid{
@@ -194,9 +235,9 @@
   }
   .pm-tier__cta--primary:hover{background:#4338ca;border-color:#4338ca;}
   .pm-tier__cta.is-selected{
-    background:#0f172a;color:#fff;border-color:#0f172a;
+    background:#0f172a;color:#fff;border-color:var(--ink-2);
   }
-  .pm-tier__cta.is-selected:hover{background:#1e293b;border-color:#1e293b;}
+  .pm-tier__cta.is-selected:hover{background:#1e293b;border-color:var(--ink);}
 
   /* Continue button row */
   .pm-pricing__foot{
@@ -216,7 +257,7 @@
   [data-pm-theme="dark"] .pm-switch__saving{background:rgba(96,165,250,0.16);color:#60A5FA;}
   [data-pm-theme="dark"] .pm-tier__cta--ghost{border-color:#262830;}
   [data-pm-theme="dark"] .pm-tier__cta--ghost:hover{background:#1c1d23;}
-  [data-pm-theme="dark"] .pm-tier__cta.is-selected{background:#fff;color:#0f172a;border-color:#fff;}
+  [data-pm-theme="dark"] .pm-tier__cta.is-selected{background:var(--card);color:var(--ink-2);border-color:#fff;}
   [data-pm-theme="dark"] .pm-tier__cta.is-selected:hover{background:#e5e5e5;}
   [data-pm-theme="dark"] .nx-pending{background:#16171c;border-color:#262830;}
   [data-pm-theme="dark"] .nx-pending__icon{background:rgba(96,165,250,0.16);color:#60A5FA;}
@@ -245,12 +286,12 @@
   .nx-slotcard{
     display:grid;grid-template-columns:80px 1fr 1fr 110px 36px;gap:12px;
     align-items:center;
-    padding:14px 16px;background:#FAFBFC;border:1px solid var(--border);border-radius:12px;
+    padding:14px 16px;background:var(--border-soft);border:1px solid var(--border);border-radius:12px;
   }
   .nx-slotcard__day{font-size:12.5px;font-weight:800;color:var(--ink-2);letter-spacing:.10em;text-transform:uppercase;}
-  .nx-slotcard select,.nx-slotcard input{width:100%;background:#fff;border:1px solid var(--border);border-radius:8px;padding:9px 10px;font:600 13px Inter,sans-serif;color:var(--ink-2);}
+  .nx-slotcard select,.nx-slotcard input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px 10px;font:600 13px Inter,sans-serif;color:var(--ink-2);}
   .nx-slotcard select:focus,.nx-slotcard input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(87,80,241,0.12);}
-  .nx-slot-remove{width:36px;height:36px;border-radius:8px;background:#fff;border:1px solid var(--border);color:var(--ink-mute);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .nx-slot-remove{width:36px;height:36px;border-radius:8px;background:var(--card);border:1px solid var(--border);color:var(--ink-mute);display:flex;align-items:center;justify-content:center;cursor:pointer;}
   .nx-slot-remove:hover{background:var(--red-soft);color:#991B1B;border-color:#FCA5A5;}
   .nx-slot-remove svg{width:14px;height:14px;stroke-width:2.4;}
   .nx-add-slot{
@@ -263,7 +304,7 @@
 
   /* Summary section */
   .nx-summary{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
-  .nx-summary__col{background:#FAFBFC;border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
+  .nx-summary__col{background:var(--border-soft);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
   .nx-summary__label{font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-tert);margin:0 0 8px;}
   .nx-summary__value{font-size:18px;font-weight:800;color:var(--ink-2);margin:0;letter-spacing:-.018em;}
   .nx-summary__hint{font-size:12.5px;color:var(--ink-mute);margin:5px 0 0;font-weight:500;}
@@ -274,7 +315,7 @@
   .nx-toast--success{background:linear-gradient(135deg,#16A34A,#22C55E);}
   .nx-toast--error{background:linear-gradient(135deg,#DC2626,#EF4444);}
 
-  .nx-empty{padding:48px 24px;text-align:center;background:#fff;border:1px dashed var(--border);border-radius:14px;color:var(--ink-mute);font-size:14px;font-weight:500;}
+  .nx-empty{padding:48px 24px;text-align:center;background:var(--card);border:1px dashed var(--border);border-radius:14px;color:var(--ink-mute);font-size:14px;font-weight:500;}
 
   @media (max-width:880px){
     .nx-hero{padding:28px 24px;}
@@ -295,6 +336,19 @@
 <body class="pm-has-sidebar">
 
 <div id="pmSidebar"></div>
+
+<!-- Phase 19n: topbar with search + theme toggle (consistent across client pages) -->
+<header class="nx-topbar">
+  <div class="nx-search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="search" placeholder="Search sessions, messages, documents…" />
+  </div>
+  <button class="dash-theme-toggle" type="button" data-pm-theme-toggle title="Toggle light / dark theme" aria-label="Toggle theme">
+    <svg class="dash-theme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <svg class="dash-theme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.05" y2="7.05"/><line x1="16.95" y1="16.95" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.05" y2="16.95"/><line x1="16.95" y1="7.05" x2="19.07" y2="4.93"/></svg>
+  </button>
+</header>
+
 
 <header class="nx-topbar">
   <div class="nx-search">

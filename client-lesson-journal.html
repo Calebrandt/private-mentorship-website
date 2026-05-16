@@ -23,40 +23,81 @@
   page resolves the family's client_id from the logged-in user.
 -->
 <style>
+  /* Phase 19n: shared theme tokens — same vocabulary as client-dashboard
+     so the dark/light toggle persists and works on every client page. */
+  :root,[data-dash-theme="light"]{
+    --bg:#f9fafb;--card:#ffffff;--border:#e5e7eb;--border-soft:#f3f4f6;
+    --input-bg:#ffffff;--ink:#1f2937;--ink-2:#111827;--ink-mute:#6b7280;
+    --ink-tert:#9ca3af;--primary:#2563eb;--primary-hover:#1d4ed8;
+  }
+  [data-dash-theme="dark"]{
+    --bg:#0b0c10;--card:#16171c;--border:#262830;--border-soft:#1c1d23;
+    --input-bg:#22232a;--ink:#f1f5f9;--ink-2:#ffffff;--ink-mute:#94a3b8;
+    --ink-tert:#64748b;--primary:#3b82f6;--primary-hover:#2563eb;
+  }
+  .nx-topbar{
+    background:var(--card);border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 26px;gap:16px;position:sticky;top:0;z-index:20;
+  }
+  .nx-search{flex:1;max-width:520px;position:relative;}
+  .nx-search input{
+    width:100%;background:var(--input-bg);border:1px solid transparent;
+    border-radius:10px;padding:10px 14px 10px 38px;
+    font:500 13.5px Inter,sans-serif;color:var(--ink);
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .nx-search input::placeholder{color:var(--ink-tert);font-weight:400;}
+  .nx-search input:focus{outline:none;border-color:var(--primary);background:var(--card);}
+  .nx-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--ink-tert);}
+  .dash-theme-toggle{
+    display:inline-flex;align-items:center;justify-content:center;
+    padding:7px 10px;background:var(--card);color:var(--ink-mute);
+    border:1px solid var(--border);border-radius:8px;cursor:pointer;
+    transition:background .14s ease, color .14s ease;
+  }
+  .dash-theme-toggle:hover{background:var(--border-soft);color:var(--ink-2);}
+  .dash-theme-toggle svg{width:14px;height:14px;}
+  .dash-theme-toggle__sun{display:none;}
+  .dash-theme-toggle__moon{display:block;}
+  [data-dash-theme="dark"] .dash-theme-toggle__sun{display:block;}
+  [data-dash-theme="dark"] .dash-theme-toggle__moon{display:none;}
+  @media(max-width:780px){.nx-search{display:none;}.nx-topbar{padding:12px 16px;}}
+
   *,*::before,*::after{box-sizing:border-box;}
-  html,body{margin:0;padding:0;background:#F4F5F7;color:#0F172A;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink-2);font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
 
   .lj-shell{padding:36px 32px 80px;max-width:980px;margin:0 auto;}
 
   /* Hero */
   .lj-hero{margin-bottom:28px;}
   .lj-eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#0071e3;margin:0 0 8px;}
-  .lj-h1{font-family:"Archivo","Inter",sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0 0 6px;color:#0F172A;}
-  .lj-sub{font-size:14px;color:#64748B;margin:0;line-height:1.55;max-width:620px;}
+  .lj-h1{font-family:"Archivo","Inter",sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0 0 6px;color:var(--ink-2);}
+  .lj-sub{font-size:14px;color:var(--ink-mute);margin:0;line-height:1.55;max-width:620px;}
 
   /* Year pills */
   .lj-years{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 22px;}
   .lj-year{
-    background:#fff;border:1px solid #E2E8F0;border-radius:9999px;
-    padding:7px 14px;font:600 13px Inter,sans-serif;color:#475569;
+    background:var(--card);border:1px solid var(--border);border-radius:9999px;
+    padding:7px 14px;font:600 13px Inter,sans-serif;color:var(--ink-mute);
     cursor:pointer;transition:all .15s;
   }
-  .lj-year:hover{background:#F8FAFC;color:#0F172A;}
-  .lj-year.is-active{background:#0F172A;color:#fff;border-color:#0F172A;}
+  .lj-year:hover{background:var(--border-soft);color:var(--ink-2);}
+  .lj-year.is-active{background:#0F172A;color:#fff;border-color:var(--ink-2);}
 
   /* Stats strip */
   .lj-stats{
-    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
     padding:18px 22px;margin-bottom:22px;
     display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;
   }
-  .lj-stat__label{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94A3B8;margin:0 0 4px;}
-  .lj-stat__value{font-family:"Archivo","Inter",sans-serif;font-size:22px;font-weight:800;color:#0F172A;letter-spacing:-.018em;line-height:1;}
+  .lj-stat__label{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-tert);margin:0 0 4px;}
+  .lj-stat__value{font-family:"Archivo","Inter",sans-serif;font-size:22px;font-weight:800;color:var(--ink-2);letter-spacing:-.018em;line-height:1;}
 
   /* Lesson card */
   .lj-list{display:flex;flex-direction:column;gap:10px;}
   .lj-card{
-    background:#fff;border:1px solid #E2E8F0;border-radius:12px;
+    background:var(--card);border:1px solid var(--border);border-radius:12px;
     padding:18px 20px;
     display:grid;grid-template-columns:64px 1fr auto;gap:18px;align-items:flex-start;
   }
@@ -67,30 +108,30 @@
   }
   .lj-date__month{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;line-height:1;}
   .lj-date__day{font-family:"Archivo","Inter",sans-serif;font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.1;color:#1E3A8A;}
-  .lj-date__year{font-size:10px;color:#64748B;font-weight:600;letter-spacing:.04em;}
+  .lj-date__year{font-size:10px;color:var(--ink-mute);font-weight:600;letter-spacing:.04em;}
 
   .lj-body{min-width:0;}
-  .lj-focus{font-family:"Archivo","Inter",sans-serif;font-size:15.5px;font-weight:700;color:#0F172A;margin:0 0 4px;letter-spacing:-.005em;line-height:1.3;}
-  .lj-concepts{font-size:13px;color:#475569;margin:0 0 10px;line-height:1.5;}
+  .lj-focus{font-family:"Archivo","Inter",sans-serif;font-size:15.5px;font-weight:700;color:var(--ink-2);margin:0 0 4px;letter-spacing:-.005em;line-height:1.3;}
+  .lj-concepts{font-size:13px;color:var(--ink-mute);margin:0 0 10px;line-height:1.5;}
   .lj-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
   .lj-chip{
     font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
     padding:3px 9px;border-radius:9999px;
-    background:#F1F5F9;color:#475569;border:1px solid #E2E8F0;
+    background:#F1F5F9;color:var(--ink-mute);border:1px solid var(--border);
   }
   .lj-chip--status{background:#DBEAFE;color:#1E3A8A;border-color:#BFDBFE;}
   .lj-chip--type{background:#EFF6FF;color:#0071e3;border-color:#BFDBFE;}
   .lj-chip--substitute{background:#FEF3C7;color:#92400E;border-color:#FDE68A;}
   .lj-feedback{
-    background:#FAFBFC;border-left:3px solid #BFDBFE;
+    background:var(--border-soft);border-left:3px solid #BFDBFE;
     padding:10px 12px;border-radius:0 6px 6px 0;
-    font-size:13px;color:#334155;line-height:1.55;margin:0 0 8px;
+    font-size:13px;color:var(--ink);line-height:1.55;margin:0 0 8px;
   }
   .lj-feedback__label{font-size:9.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#1E40AF;margin:0 0 4px;}
   .lj-files{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
   .lj-file{
     display:inline-flex;align-items:center;gap:5px;
-    background:#F8FAFC;border:1px solid #E2E8F0;border-radius:6px;
+    background:var(--border-soft);border:1px solid var(--border);border-radius:6px;
     padding:4px 9px;font:600 11.5px Inter,sans-serif;color:#1E40AF;
     text-decoration:none;cursor:pointer;
   }
@@ -102,10 +143,10 @@
 
   /* Loading + empty */
   .lj-loading,.lj-empty{
-    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
-    padding:48px 28px;text-align:center;color:#64748B;
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:48px 28px;text-align:center;color:var(--ink-mute);
   }
-  .lj-empty__title{font-family:"Archivo","Inter",sans-serif;font-size:16px;font-weight:700;color:#0F172A;margin:0 0 6px;}
+  .lj-empty__title{font-family:"Archivo","Inter",sans-serif;font-size:16px;font-weight:700;color:var(--ink-2);margin:0 0 6px;}
   .lj-empty__sub{font-size:13px;margin:0;line-height:1.55;}
   .lj-spinner{
     width:16px;height:16px;border-radius:50%;
@@ -126,6 +167,19 @@
 <body class="pm-has-sidebar">
 
 <div id="pmSidebar"></div>
+
+<!-- Phase 19n: topbar with search + theme toggle (consistent across client pages) -->
+<header class="nx-topbar">
+  <div class="nx-search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="search" placeholder="Search sessions, messages, documents…" />
+  </div>
+  <button class="dash-theme-toggle" type="button" data-pm-theme-toggle title="Toggle light / dark theme" aria-label="Toggle theme">
+    <svg class="dash-theme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <svg class="dash-theme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.05" y2="7.05"/><line x1="16.95" y1="16.95" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.05" y2="16.95"/><line x1="16.95" y1="7.05" x2="19.07" y2="4.93"/></svg>
+  </button>
+</header>
+
 
 <main class="lj-shell">
 
