@@ -1896,34 +1896,79 @@
 
     try {
       // Pick the contract the assistant SHOULD be looking at right now.
-      // Rule (in priority order):
-      //   1. Active contract whose service window contains today
-      //      (this is the family's *currently in force* contract — the one
-      //       hours are being burned against this very moment).
-      //   2. Any other active contract (e.g. active but starts tomorrow).
-      //   3. Latest draft (so future-renewal drafts are still reachable).
-      // The previous logic ordered everything by start_at DESC and picked
-      // the first row, which meant a future-dated DRAFT renewal beat the
-      // contract that's actually live today. That made "Hours used" show 0
-      // and hid real consumption from the assistant.
+      // Priority (highest first):
+      //   1. Active contract whose service window contains today.
+      //   2. Any other active contract (active but starts tomorrow, etc.).
+      //   3. Recently expired contract (ended within last 45 days) — when
+      //      we're in the gap between expiry and the next renewal start,
+      //      THIS is where the family's live balance still lives.
+      //   4. Latest draft (future renewal — only relevant if nothing else).
+      //
+      // Three previous bugs this rewrite addresses:
+      //   • Original: sorted ['active','draft'] by start_at DESC and took
+      //     first → future-dated DRAFT beat the active contract.
+      //   • Fix v1: didn't include 'expired', so a contract that expired
+      //     today (or last week) fell off entirely and the picker landed
+      //     on the empty future draft → Hours remaining showed 40 (the
+      //     draft's untouched plan size) instead of the real 6.75 left.
+      //   • Date parsing: new Date('2026-05-15') is UTC midnight → that's
+      //     2026-05-14 17:00 Pacific, so a contract ending today looked
+      //     already-past to `new Date(end_at) >= now`. Now we treat end_at
+      //     as end-of-day local.
+      //   • assistant_id filter: legacy/imported contracts sometimes have
+      //     NULL or a different assistant_id, which dropped them from the
+      //     query entirely. RLS already gates visibility, so we no longer
+      //     require an exact assistant_id match here — we still PREFER
+      //     contracts owned by this assistant when there's a tie.
       const { data: candidates } = await sb()
         .from('contracts')
         .select('id, client_id, assistant_id, status, start_at, end_at, included_minutes, renewal_mode, notes')
         .eq('client_id', clientId)
-        .eq('assistant_id', user.id)
         // contract_status enum: draft/active/expired/completed/cancelled
-        .in('status', ['active','draft'])
+        .in('status', ['active','draft','expired'])
         .order('start_at', { ascending: false });
       const rows = Array.isArray(candidates) ? candidates : [];
-      const now = new Date();
-      const pickActiveNow = rows.find(r =>
-        r.status === 'active' &&
-        r.start_at && r.end_at &&
-        new Date(r.start_at) <= now && new Date(r.end_at) >= now
-      );
-      const pickAnyActive = rows.find(r => r.status === 'active');
-      const pickDraft = rows.find(r => r.status === 'draft');
-      out.contract = pickActiveNow || pickAnyActive || pickDraft || null;
+
+      // Date helpers that ignore timezone surprises. Parse YYYY-MM-DD as
+      // a local date so contracts ending "today" aren't treated as expired.
+      const parseLocalDate = (s) => {
+        if (!s) return null;
+        const str = String(s);
+        const m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+        const d = new Date(str);
+        return isNaN(d.getTime()) ? null : d;
+      };
+      const startOf = (d) => { const x = new Date(d); x.setHours(0,0,0,0); return x; };
+      const endOf   = (d) => { const x = new Date(d); x.setHours(23,59,59,999); return x; };
+      const today = new Date();
+      const todayStart = startOf(today);
+      const todayEnd   = endOf(today);
+
+      const containsToday = (r) => {
+        const s = parseLocalDate(r.start_at);
+        const e = parseLocalDate(r.end_at);
+        if (!s || !e) return false;
+        return startOf(s) <= todayEnd && endOf(e) >= todayStart;
+      };
+      // Prefer contracts assigned to me; when there's no match, accept any.
+      const mine = (r) => !user?.id || r.assistant_id === user.id;
+      const pickFrom = (filter) => rows.find(r => filter(r) && mine(r))
+                                 || rows.find(filter);
+
+      const pickActiveNow = pickFrom(r => r.status === 'active' && containsToday(r));
+      const pickAnyActive = pickFrom(r => r.status === 'active');
+      // "Recently expired" — ended within last 45 days. Catches the gap
+      // between an expiring contract and the next renewal starting.
+      const FORTY_FIVE_DAYS_MS = 45 * 24 * 60 * 60 * 1000;
+      const pickRecentlyExpired = pickFrom(r => {
+        if (r.status !== 'expired') return false;
+        const e = parseLocalDate(r.end_at);
+        if (!e) return false;
+        return (todayStart - endOf(e)) <= FORTY_FIVE_DAYS_MS;
+      });
+      const pickDraft = pickFrom(r => r.status === 'draft');
+      out.contract = pickActiveNow || pickAnyActive || pickRecentlyExpired || pickDraft || null;
     } catch (_) {}
 
     if (out.contract?.id) {
