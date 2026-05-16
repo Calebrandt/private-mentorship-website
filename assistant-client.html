@@ -210,6 +210,19 @@
   }
   .wc-kpi__bank-cta:hover{color:#78350F;text-decoration:underline;}
 
+  /* Phase 19d v2: Carried-over tile — calm blue so it reads as "extra
+     hours added on top of the plan", visually distinct from the gold
+     Bank tile (which is the family's untouched store). Only shown when
+     toppedUpHours > 0; without it the math reads broken (bought 40,
+     used 38.8, still has 6.75 = ?). */
+  .wc-kpi--carry{
+    background:linear-gradient(135deg,#EFF6FF,#DBEAFE);
+    border-color:#BFDBFE;
+  }
+  .wc-kpi--carry .wc-kpi__label{color:#1E40AF;}
+  .wc-kpi--carry .wc-kpi__value{color:#1E3A8A;}
+  .wc-kpi--carry .wc-kpi__sub{color:#1E40AF;}
+
   /* Phase 19d: Hours-remaining tile — color-coded urgency so the assistant
      can read the family's runway at a glance. NOT to be confused with bank
      hours (separate gold tile) — this is the live balance on the contract
@@ -415,6 +428,14 @@
         <p class="wc-kpi__label">Plan size</p>
         <span class="wc-kpi__value" id="kpiPlan">—</span>
         <p class="wc-kpi__sub" id="kpiPlanSub">hours included</p>
+      </div>
+      <!-- Carried over tile (Phase 19d v2): only shown when prior contract
+           rolled hours forward. Without this the math reads broken
+           ("bought 40, used 38.8, somehow still have 6.75 left"). -->
+      <div class="wc-kpi wc-kpi--carry" id="kpiCarryTile" hidden>
+        <p class="wc-kpi__label">Carried over</p>
+        <span class="wc-kpi__value" id="kpiCarry">—</span>
+        <p class="wc-kpi__sub">rolled in from prior contract</p>
       </div>
       <div class="wc-kpi wc-kpi--remaining" id="kpiRemainingTile">
         <p class="wc-kpi__label">Hours remaining</p>
@@ -652,7 +673,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515c"></script>
-<script src="js/hiring-service.js?v=20260515f"></script>
+<script src="js/hiring-service.js?v=20260515g"></script>
 <script src="js/messages-service.js?v=20260515c"></script>
 <script src="js/sidebar.js?v=20260515c"></script>
 <script>
@@ -765,6 +786,19 @@ function renderAppointmentRow(a, spend){
   document.getElementById('kpiPlan').textContent = planHours;
   document.getElementById('kpiUsed').textContent = usedHours;
   document.getElementById('kpiUpcoming').textContent = (ws.upcomingAppointments || []).length;
+
+  // Carried-over tile: only show when there's a real carry-in. Makes the
+  // math add up at a glance: plan + carried − used = remaining.
+  const carryTile = document.getElementById('kpiCarryTile');
+  const carryEl   = document.getElementById('kpiCarry');
+  if (carryTile && carryEl) {
+    if (toppedUpHours > 0) {
+      carryEl.textContent = toppedUpHours;
+      carryTile.hidden = false;
+    } else {
+      carryTile.hidden = true;
+    }
+  }
 
   // Hours Remaining tile — color shifts as the runway shrinks so the
   // assistant clocks it at a glance. Bank hours are SEPARATE (gold tile
