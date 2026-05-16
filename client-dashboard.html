@@ -159,31 +159,105 @@
   [data-dash-theme="dark"] #kpiRemainingTile.is-empty #kpiHours{color:#FCA5A5;}
   [data-dash-theme="dark"] #kpiRemainingTile.is-empty #kpiHoursLabel{color:#FECACA;}
 
-  /* Phase 19m: Wide usage progress bar — uses CSS vars so the card
-     surface, text colors, and track all adapt to dark mode without
-     hardcoded fallbacks looking out of place. */
+  /* Phase 19m v2: Premium usage progress bar — Stripe / Linear vibe.
+     Recessed glass track, multi-stop gradient fill, inset top shine,
+     soft state-colored outer glow, slow animated shimmer sweep. */
   .nx-usage{
     background:var(--card, #fff);border:1px solid var(--border, #E2E8F0);
-    border-radius:12px;padding:14px 18px;margin-bottom:24px;
+    border-radius:14px;padding:16px 20px;margin-bottom:24px;
     transition:background .2s ease, border-color .2s ease;
   }
-  .nx-usage__top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:8px;}
+  .nx-usage__top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:11px;}
   .nx-usage__lead{font:700 14px Inter,sans-serif;color:var(--ink, #0F172A);letter-spacing:-.005em;}
   .nx-usage__meta{font:500 12.5px Inter,sans-serif;color:var(--ink-mute, #64748B);letter-spacing:-.005em;}
-  .nx-usage__bar{height:8px;background:#F1F5F9;border-radius:9999px;overflow:hidden;}
-  .nx-usage__bar-fill{
-    height:100%;background:linear-gradient(90deg,#10B981 0%,#059669 100%);
-    border-radius:9999px;transition:width .5s ease;
+  /* Recessed glass track — inset shadow gives depth */
+  .nx-usage__bar{
+    position:relative;height:12px;border-radius:9999px;overflow:hidden;
+    background:linear-gradient(180deg, rgba(15,23,42,.05), rgba(15,23,42,.09));
+    box-shadow:inset 0 1px 2px rgba(15,23,42,.08), inset 0 0 0 1px rgba(15,23,42,.03);
   }
-  .nx-usage.is-low .nx-usage__bar-fill{background:linear-gradient(90deg,#F59E0B 0%,#D97706 100%);}
-  .nx-usage.is-empty .nx-usage__bar-fill{background:linear-gradient(90deg,#EF4444 0%,#DC2626 100%);}
+  /* Fill — rich gradient + inset top shine + outer glow */
+  .nx-usage__bar-fill{
+    position:relative;height:100%;border-radius:9999px;
+    background:linear-gradient(135deg, #34D399 0%, #10B981 55%, #059669 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.45),
+      inset 0 -1px 0 rgba(0,0,0,.10),
+      0 0 12px rgba(16,185,129,.45);
+    transition:width .8s cubic-bezier(.4, 0, .2, 1), box-shadow .3s ease;
+  }
+  /* Animated shimmer sweep — slow, premium, never gaudy */
+  .nx-usage__bar-fill::after{
+    content:'';position:absolute;inset:0;border-radius:9999px;
+    background:linear-gradient(
+      105deg,
+      transparent 35%,
+      rgba(255,255,255,.55) 50%,
+      transparent 65%
+    );
+    background-size:220% 100%;
+    animation:nx-usage-shimmer 3.2s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes nx-usage-shimmer{
+    0%   { background-position:200% 0; }
+    100% { background-position:-200% 0; }
+  }
+  .nx-usage.is-low .nx-usage__bar-fill{
+    background:linear-gradient(135deg, #FCD34D 0%, #F59E0B 55%, #D97706 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.50),
+      inset 0 -1px 0 rgba(0,0,0,.10),
+      0 0 14px rgba(245,158,11,.55);
+  }
+  .nx-usage.is-empty .nx-usage__bar-fill{
+    background:linear-gradient(135deg, #FB7185 0%, #EF4444 55%, #DC2626 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.40),
+      inset 0 -1px 0 rgba(0,0,0,.12),
+      0 0 14px rgba(239,68,68,.55);
+  }
 
-  /* Dark mode: translucent track that reads as recessed-into-card;
-     fills brighten one notch so they still pop against the dark. */
-  [data-dash-theme="dark"] .nx-usage__bar{background:rgba(255,255,255,.06);}
-  [data-dash-theme="dark"] .nx-usage__bar-fill{background:linear-gradient(90deg,#34D399 0%,#10B981 100%);}
-  [data-dash-theme="dark"] .nx-usage.is-low .nx-usage__bar-fill{background:linear-gradient(90deg,#FBBF24 0%,#F59E0B 100%);}
-  [data-dash-theme="dark"] .nx-usage.is-empty .nx-usage__bar-fill{background:linear-gradient(90deg,#F87171 0%,#EF4444 100%);}
+  /* Dark-mode: recessed translucent track on the dark card, fills
+     brighten one notch + stronger glow so they read luminous. */
+  [data-dash-theme="dark"] .nx-usage__bar{
+    background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.08));
+    box-shadow:inset 0 1px 2px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.04);
+  }
+  [data-dash-theme="dark"] .nx-usage__bar-fill{
+    background:linear-gradient(135deg, #6EE7B7 0%, #34D399 55%, #10B981 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.30),
+      inset 0 -1px 0 rgba(0,0,0,.20),
+      0 0 18px rgba(52,211,153,.50);
+  }
+  [data-dash-theme="dark"] .nx-usage__bar-fill::after{
+    background:linear-gradient(
+      105deg,
+      transparent 35%,
+      rgba(255,255,255,.35) 50%,
+      transparent 65%
+    );
+    background-size:220% 100%;
+  }
+  [data-dash-theme="dark"] .nx-usage.is-low .nx-usage__bar-fill{
+    background:linear-gradient(135deg, #FDE68A 0%, #FBBF24 55%, #F59E0B 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.40),
+      inset 0 -1px 0 rgba(0,0,0,.25),
+      0 0 20px rgba(251,191,36,.55);
+  }
+  [data-dash-theme="dark"] .nx-usage.is-empty .nx-usage__bar-fill{
+    background:linear-gradient(135deg, #FCA5A5 0%, #F87171 55%, #EF4444 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.30),
+      inset 0 -1px 0 rgba(0,0,0,.25),
+      0 0 20px rgba(248,113,113,.55);
+  }
+  /* Respect reduced-motion preferences — kill the shimmer */
+  @media (prefers-reduced-motion: reduce){
+    .nx-usage__bar-fill::after{animation:none;}
+  }
 
   /* Phase 12 — banked-hours promo strip (only visible when banked > 0) */
   .nx-bank-strip{
