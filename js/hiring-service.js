@@ -1890,17 +1890,35 @@
     } catch (_) {}
 
     try {
-      const { data: contract } = await sb()
+      // Pick the contract the assistant SHOULD be looking at right now.
+      // Rule (in priority order):
+      //   1. Active contract whose service window contains today
+      //      (this is the family's *currently in force* contract — the one
+      //       hours are being burned against this very moment).
+      //   2. Any other active contract (e.g. active but starts tomorrow).
+      //   3. Latest draft (so future-renewal drafts are still reachable).
+      // The previous logic ordered everything by start_at DESC and picked
+      // the first row, which meant a future-dated DRAFT renewal beat the
+      // contract that's actually live today. That made "Hours used" show 0
+      // and hid real consumption from the assistant.
+      const { data: candidates } = await sb()
         .from('contracts')
         .select('id, client_id, assistant_id, status, start_at, end_at, included_minutes, renewal_mode, notes')
         .eq('client_id', clientId)
         .eq('assistant_id', user.id)
         // contract_status enum: draft/active/expired/completed/cancelled
         .in('status', ['active','draft'])
-        .order('start_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      out.contract = contract;
+        .order('start_at', { ascending: false });
+      const rows = Array.isArray(candidates) ? candidates : [];
+      const now = new Date();
+      const pickActiveNow = rows.find(r =>
+        r.status === 'active' &&
+        r.start_at && r.end_at &&
+        new Date(r.start_at) <= now && new Date(r.end_at) >= now
+      );
+      const pickAnyActive = rows.find(r => r.status === 'active');
+      const pickDraft = rows.find(r => r.status === 'draft');
+      out.contract = pickActiveNow || pickAnyActive || pickDraft || null;
     } catch (_) {}
 
     if (out.contract?.id) {
