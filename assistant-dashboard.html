@@ -93,80 +93,90 @@
     .ad-weekday__unit{font-size:9.5px;}
   }
 
-  /* Phase 16 v6: Compact widget pair (My Families + Upcoming Renewals).
-     Both sit in a 2-col grid below the calendar at ~50% width each.
-     Visual vocabulary matches the right-sidebar widgets (Your Profile /
-     Jump to) — small uppercase eyebrow title, white card, tight rows. */
+  /* Phase 16 v7: Widget pair (My Families + Upcoming Renewals).
+     Sizing/spacing matches the right-sidebar widgets (.ad-prof,
+     .ad-quicklinks, .ad-section) so the whole dashboard reads as a
+     consistent system. Same header style as ad-section (padded
+     header with bottom divider), same body padding rhythm, similar
+     font sizes. Not bones-and-skeleton — proper SaaS widget weight. */
   .ad-widget-row{
-    display:grid;grid-template-columns:1fr 1fr;gap:14px;
+    display:grid;grid-template-columns:1fr 1fr;gap:18px;
     margin-bottom:22px;
   }
-  @media(max-width:900px){.ad-widget-row{grid-template-columns:1fr;}}
+  @media(max-width:1024px){.ad-widget-row{grid-template-columns:1fr;}}
   .ad-widget{
-    background:#fff;border:1px solid #E2E8F0;border-radius:12px;
-    padding:14px 16px;display:flex;flex-direction:column;gap:10px;
+    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    overflow:hidden;display:flex;flex-direction:column;
   }
-  .ad-widget__head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;}
+  .ad-widget__head{
+    padding:18px 22px;border-bottom:1px solid #F1F5F9;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+  }
   .ad-widget__title{
-    font-family:"Archivo","Inter",sans-serif;font-size:11px;font-weight:700;
-    letter-spacing:.1em;text-transform:uppercase;color:#475569;margin:0;
+    font-family:"Archivo","Inter",sans-serif;font-size:15px;font-weight:800;
+    letter-spacing:-.01em;color:#0F172A;margin:0;
   }
-  .ad-widget__action{font-size:11.5px;font-weight:600;color:#0071e3;text-decoration:none;letter-spacing:-.005em;}
+  .ad-widget__action{font-size:12.5px;font-weight:600;color:#0071e3;text-decoration:none;letter-spacing:-.005em;}
   .ad-widget__action:hover{text-decoration:underline;}
-  .ad-widget__sub{font-size:11px;color:#94A3B8;letter-spacing:.005em;}
+  .ad-widget__sub{font-size:12px;color:#64748B;letter-spacing:-.005em;}
   .ad-widget__body{display:flex;flex-direction:column;}
 
-  /* My Families row (inside widget) */
+  /* My Families row (inside widget). Substantial weight — name leads
+     visually, hours secondary, status as a small dot+label trailing. */
   .ad-family{
-    display:grid;grid-template-columns:22px 1fr auto auto;gap:10px;align-items:center;
-    padding:7px 0;
+    display:grid;grid-template-columns:32px 1fr auto auto;gap:12px;align-items:center;
+    padding:12px 22px;
     text-decoration:none;color:inherit;cursor:pointer;
     border-top:1px solid #F1F5F9;
+    transition:background .12s ease;
   }
-  .ad-family:first-child{border-top:none;padding-top:2px;}
-  .ad-family:last-child{padding-bottom:2px;}
+  .ad-family:first-child{border-top:none;}
+  .ad-family:hover{background:#F8FAFC;}
   .ad-family:hover .ad-family__name{color:#0071e3;}
   .ad-family__avatar{
-    width:22px;height:22px;border-radius:50%;
+    width:32px;height:32px;border-radius:50%;
     background:linear-gradient(135deg, var(--av-from, #3B82F6), var(--av-to, #1E40AF));
-    color:#fff;font:800 9px Inter,sans-serif;letter-spacing:-.01em;
+    color:#fff;font:800 11.5px Inter,sans-serif;letter-spacing:-.01em;
     display:flex;align-items:center;justify-content:center;flex-shrink:0;
   }
-  .ad-family__body{min-width:0;display:flex;align-items:baseline;gap:6px;}
-  .ad-family__name{font:600 12.5px Inter,sans-serif;color:#0F172A;letter-spacing:-.005em;}
-  .ad-family__plan{font:500 10.5px Inter,sans-serif;color:#94A3B8;}
-  .ad-family__hours{font:600 11.5px Inter,sans-serif;color:#0F172A;white-space:nowrap;}
-  .ad-family__hours-label{color:#94A3B8;font-weight:500;margin-left:2px;}
+  .ad-family__body{min-width:0;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
+  .ad-family__name{font:600 14px Inter,sans-serif;color:#0F172A;letter-spacing:-.005em;}
+  .ad-family__plan{font:500 12px Inter,sans-serif;color:#94A3B8;}
+  .ad-family__hours{font:700 13px Inter,sans-serif;color:#0F172A;white-space:nowrap;}
+  .ad-family__hours-label{color:#94A3B8;font-weight:500;margin-left:3px;}
   .ad-family__status{
-    display:inline-flex;align-items:center;gap:4px;
-    font:600 10px Inter,sans-serif;color:#64748B;
+    display:inline-flex;align-items:center;gap:5px;
+    font:600 11.5px Inter,sans-serif;color:#64748B;
     text-transform:capitalize;
   }
-  .ad-family__dot{width:6px;height:6px;border-radius:50%;background:#10B981;flex-shrink:0;}
+  .ad-family__dot{width:7px;height:7px;border-radius:50%;background:#10B981;flex-shrink:0;}
   .ad-family__status--draft .ad-family__dot{background:#94A3B8;}
   .ad-family__status--expired .ad-family__dot{background:#EF4444;}
 
-  /* Renewal row (inside widget) — compact version */
+  /* Renewal row (inside widget) — matches Family row weight. */
   .ad-renewal-row{
-    display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;
-    padding:7px 0;
+    display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;
+    padding:12px 22px;
     text-decoration:none;color:inherit;cursor:pointer;
     border-top:1px solid #F1F5F9;
+    transition:background .12s ease;
   }
-  .ad-renewal-row:first-child{border-top:none;padding-top:2px;}
-  .ad-renewal-row:last-child{padding-bottom:2px;}
+  .ad-renewal-row:first-child{border-top:none;}
+  .ad-renewal-row:hover{background:#F8FAFC;}
   .ad-renewal-row:hover .ad-renewal-row__name{color:#0071e3;}
   .ad-renewal-row__main{min-width:0;}
-  .ad-renewal-row__name{font:600 12.5px Inter,sans-serif;color:#0F172A;letter-spacing:-.005em;line-height:1.25;}
-  .ad-renewal-row__date{font:500 10.5px Inter,sans-serif;color:#94A3B8;margin-top:1px;}
+  .ad-renewal-row__name{font:600 14px Inter,sans-serif;color:#0F172A;letter-spacing:-.005em;line-height:1.25;}
+  .ad-renewal-row__date{font:500 12px Inter,sans-serif;color:#94A3B8;margin-top:2px;}
   .ad-renewal-row__meta{
-    font:700 9.5px Inter,sans-serif;letter-spacing:.05em;text-transform:uppercase;
+    font:700 10.5px Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;
     color:#64748B;background:#F1F5F9;border:1px solid #E2E8F0;
-    padding:3px 8px;border-radius:9999px;white-space:nowrap;
+    padding:4px 10px;border-radius:9999px;white-space:nowrap;min-width:88px;text-align:center;
   }
-  .ad-renewal-row.is-soon{background:linear-gradient(to right, transparent 0, #FFFBEB 30%);margin:0 -8px;padding-left:8px;padding-right:8px;border-radius:6px;}
+  .ad-renewal-row.is-soon{background:#FFFBEB;}
+  .ad-renewal-row.is-soon:hover{background:#FEF3C7;}
   .ad-renewal-row.is-soon .ad-renewal-row__meta{color:#92400E;background:#FEF3C7;border-color:#FDE68A;}
-  .ad-renewal-row.is-overdue{background:linear-gradient(to right, transparent 0, #FEF2F2 30%);margin:0 -8px;padding-left:8px;padding-right:8px;border-radius:6px;}
+  .ad-renewal-row.is-overdue{background:#FEF2F2;}
+  .ad-renewal-row.is-overdue:hover{background:#FEE2E2;}
   .ad-renewal-row.is-overdue .ad-renewal-row__meta{color:#991B1B;background:#FEE2E2;border-color:#FECACA;}
 
   /* Section card */
@@ -437,7 +447,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515a"></script>
-<script src="js/hiring-service.js?v=20260516e"></script>
+<script src="js/hiring-service.js?v=20260516f"></script>
 <script src="js/session-calendar.js?v=20260515a"></script>
 <script src="js/sidebar.js?v=20260515d"></script>
 <script>
@@ -604,7 +614,7 @@ async function loadFamilies(){
     const name = f.client?.full_name || 'Family';
     const clientId = f.client?.id || c.client_id;
     const plan = c.included_minutes
-      ? `${Math.round(c.included_minutes / 60)}h plan`
+      ? `${Math.round(c.included_minutes / 60)}-hour plan`
       : '';
     const remHrs = (typeof f.remainingMinutes === 'number')
       ? Math.round((f.remainingMinutes / 60) * 100) / 100
@@ -617,13 +627,14 @@ async function loadFamilies(){
     const hoursCell = remHrs != null
       ? `<span class="ad-family__hours">${remHrs}<span class="ad-family__hours-label">h left</span></span>`
       : `<span class="ad-family__hours">—</span>`;
-    // Widget-compact row: avatar · name · hours · status dot.
-    // Plan label dropped to stay narrow; surfaced again on the
-    // full assistant-clients.html roster page.
+    // Family row: avatar · name + plan · hours · status. Substantial
+     // widget sizing — name at 14px lead, plan as subtle inline meta,
+     // hours bold, status dot+label trailing.
     return `<a class="ad-family" href="${href}" style="--av-from:${from};--av-to:${to};">
       <span class="ad-family__avatar">${escapeHtml(initialsFor(name))}</span>
       <span class="ad-family__body">
         <span class="ad-family__name">${escapeHtml(name)}</span>
+        ${plan ? `<span class="ad-family__plan">${escapeHtml(plan)}</span>` : ''}
       </span>
       ${hoursCell}
       <span class="ad-family__status${statusModifier}">
@@ -710,10 +721,10 @@ async function loadRenewals(){
     } else {
       metaText = `In ${r.days} days`;
     }
-    // Compact widget row: name + short date on the left, urgency chip
-    // on the right. Long-form date too verbose for widget width.
+    // Widget row: name + readable date on the left, urgency chip
+    // on the right. Long-form month/day reads better at this weight.
     const dateText = r.date.toLocaleDateString('en-US',
-      { month:'short', day:'numeric' });
+      { month:'long', day:'numeric' });
     const href = `assistant-client.html?id=${encodeURIComponent(r.clientId)}`;
     return `<a class="ad-renewal-row ${cls}" href="${href}">
       <div class="ad-renewal-row__main">
