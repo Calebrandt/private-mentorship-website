@@ -2203,3 +2203,387 @@ body:has(.dash-main-wrap) .dash-cal-section__title{
   font:700 13px Inter,sans-serif !important;
   letter-spacing:-.008em !important;
 }
+
+
+/* ────────────────────────────────────────────────────────────
+   ASSISTANT DASHBOARD — premium upgrade
+   ────────────────────────────────────────────────────────────
+   Same playbook as the client dashboard:
+     • SIZING/TYPOGRAPHY applies to BOTH themes
+     • COLOURS/SHADOWS scoped to light mode only
+   Scoped via body:has(.ad-shell) — unique to the assistant
+   dashboard (.ad-* namespace).
+   ──────────────────────────────────────────────────────────── */
+
+/* ── SIZING + TYPOGRAPHY (both themes) ──────────────────────── */
+body:has(.ad-shell) .ad-shell{
+  padding:40px 32px 96px !important;
+  max-width:1380px !important;
+  margin:0 auto !important;
+}
+body:has(.ad-shell) .ad-eyebrow{
+  font:700 11px Inter,sans-serif !important;
+  letter-spacing:.16em !important;
+  text-transform:uppercase !important;
+  margin:0 0 10px !important;
+}
+body:has(.ad-shell) .ad-h1{
+  font:800 30px Inter,sans-serif !important;
+  letter-spacing:-.024em !important;
+  line-height:1.1 !important;
+  margin:0 0 8px !important;
+}
+body:has(.ad-shell) .ad-sub{
+  font:500 15px Inter,sans-serif !important;
+  letter-spacing:-.005em !important;
+  line-height:1.55 !important;
+}
+
+/* Welcome banner */
+body:has(.ad-shell) .ad-welcome{
+  padding:24px 26px !important;
+  border-radius:16px !important;
+  margin-bottom:24px !important;
+}
+body:has(.ad-shell) .ad-welcome__title{
+  font:800 22px Inter,sans-serif !important;
+  letter-spacing:-.018em !important;
+  line-height:1.2 !important;
+}
+body:has(.ad-shell) .ad-welcome__sub{
+  font:500 14px Inter,sans-serif !important;
+  letter-spacing:-.005em !important;
+  line-height:1.5 !important;
+  margin-top:6px !important;
+}
+
+/* KPI cards */
+body:has(.ad-shell) .ad-kpis{ gap:18px !important; }
+body:has(.ad-shell) .ad-kpi{
+  padding:24px 22px !important;
+  border-radius:16px !important;
+}
+body:has(.ad-shell) .ad-kpi__icon{
+  width:48px !important; height:48px !important;
+  border-radius:13px !important;
+}
+body:has(.ad-shell) .ad-kpi__value{
+  font:800 36px Inter,sans-serif !important;
+  letter-spacing:-.028em !important;
+  font-variant-numeric:tabular-nums !important;
+  line-height:1 !important;
+}
+body:has(.ad-shell) .ad-kpi__label{
+  font:600 13px Inter,sans-serif !important;
+  letter-spacing:-.005em !important;
+}
+body:has(.ad-shell) .ad-kpi__sub{
+  font:500 11.5px Inter,sans-serif !important;
+  letter-spacing:-.003em !important;
+  margin-top:4px !important;
+}
+
+/* Widget cards (My Families, Renewals, etc.) */
+body:has(.ad-shell) .ad-widget{
+  padding:24px 26px !important;
+  border-radius:16px !important;
+}
+body:has(.ad-shell) .ad-widget__head{
+  margin-bottom:18px !important;
+}
+body:has(.ad-shell) .ad-widget__title{
+  font:700 17px Inter,sans-serif !important;
+  letter-spacing:-.014em !important;
+}
+body:has(.ad-shell) .ad-widget__sub{
+  font:500 12.5px Inter,sans-serif !important;
+  letter-spacing:-.003em !important;
+  margin-top:5px !important;
+}
+body:has(.ad-shell) .ad-widget__action{
+  font:600 12.5px Inter,sans-serif !important;
+  letter-spacing:-.005em !important;
+}
+
+/* Section heads (when used directly) */
+body:has(.ad-shell) .ad-section__head{
+  margin-bottom:18px !important;
+}
+body:has(.ad-shell) .ad-section__title{
+  font:700 17px Inter,sans-serif !important;
+  letter-spacing:-.014em !important;
+}
+body:has(.ad-shell) .ad-section__sub{
+  font:500 12.5px Inter,sans-serif !important;
+  letter-spacing:-.003em !important;
+}
+body:has(.ad-shell) .ad-section__action{
+  font:600 12.5px Inter,sans-serif !important;
+  letter-spacing:-.005em !important;
+}
+
+/* Family rows */
+body:has(.ad-shell) .ad-family{
+  padding:14px 16px !important;
+  border-radius:12px !important;
+  gap:14px !important;
+}
+body:has(.ad-shell) .ad-family__name{
+  font:700 14px Inter,sans-serif !important;
+  letter-spacing:-.008em !important;
+}
+body:has(.ad-shell) .ad-family__plan{
+  font:500 12px Inter,sans-serif !important;
+  letter-spacing:-.003em !important;
+  margin-top:2px !important;
+}
+body:has(.ad-shell) .ad-family__hours{
+  font:700 15px Inter,sans-serif !important;
+  letter-spacing:-.010em !important;
+  font-variant-numeric:tabular-nums !important;
+}
+body:has(.ad-shell) .ad-family__hours-label{
+  font:600 10.5px Inter,sans-serif !important;
+  letter-spacing:.08em !important;
+  text-transform:uppercase !important;
+  margin-top:2px !important;
+}
+
+/* Renewal rows */
+body:has(.ad-shell) .ad-renewal-row__name{
+  font:700 13.5px Inter,sans-serif !important;
+  letter-spacing:-.008em !important;
+}
+body:has(.ad-shell) .ad-renewal-row__date{
+  font:600 13px Inter,sans-serif !important;
+  letter-spacing:-.005em !important;
+  font-variant-numeric:tabular-nums !important;
+}
+body:has(.ad-shell) .ad-renewal-row__meta{
+  font:500 11.5px Inter,sans-serif !important;
+  letter-spacing:-.003em !important;
+  margin-top:2px !important;
+}
+
+/* Weekly hours strip */
+body:has(.ad-shell) .ad-weekly{
+  padding:22px 24px !important;
+  border-radius:16px !important;
+}
+body:has(.ad-shell) .ad-weekly__title{
+  font:700 14px Inter,sans-serif !important;
+  letter-spacing:-.010em !important;
+}
+body:has(.ad-shell) .ad-weekly__summary{
+  font:500 12.5px Inter,sans-serif !important;
+  letter-spacing:-.003em !important;
+}
+body:has(.ad-shell) .ad-weekday__name{
+  font:600 10.5px Inter,sans-serif !important;
+  letter-spacing:.10em !important;
+  text-transform:uppercase !important;
+}
+body:has(.ad-shell) .ad-weekday__hours{
+  font:800 18px Inter,sans-serif !important;
+  letter-spacing:-.018em !important;
+  font-variant-numeric:tabular-nums !important;
+  line-height:1 !important;
+}
+body:has(.ad-shell) .ad-weekday__unit{
+  font:600 10px Inter,sans-serif !important;
+  letter-spacing:.04em !important;
+  text-transform:uppercase !important;
+}
+
+/* Profile card */
+body:has(.ad-shell) .ad-prof{
+  padding:22px 24px !important;
+  border-radius:16px !important;
+  gap:16px !important;
+}
+body:has(.ad-shell) .ad-prof__name{
+  font:700 16px Inter,sans-serif !important;
+  letter-spacing:-.012em !important;
+}
+body:has(.ad-shell) .ad-prof__city{
+  font:500 12.5px Inter,sans-serif !important;
+  letter-spacing:-.003em !important;
+  margin-top:3px !important;
+}
+body:has(.ad-shell) .ad-prof__pill{
+  font:600 10.5px Inter,sans-serif !important;
+  letter-spacing:.06em !important;
+  text-transform:uppercase !important;
+  padding:4px 10px !important;
+  border-radius:9999px !important;
+}
+body:has(.ad-shell) .ad-prof__edit{
+  font:600 12.5px Inter,sans-serif !important;
+  letter-spacing:-.005em !important;
+}
+
+/* Quicklinks */
+body:has(.ad-shell) .ad-quicklinks{
+  padding:20px 22px !important;
+  border-radius:16px !important;
+}
+body:has(.ad-shell) .ad-quicklinks__title{
+  font:700 14px Inter,sans-serif !important;
+  letter-spacing:-.010em !important;
+}
+body:has(.ad-shell) .ad-quicklinks__item{
+  padding:11px 12px !important;
+  border-radius:10px !important;
+  font:600 13.5px Inter,sans-serif !important;
+  letter-spacing:-.008em !important;
+}
+
+/* Empty / loading states */
+body:has(.ad-shell) .ad-empty{
+  padding:32px 18px !important;
+  border-radius:12px !important;
+}
+body:has(.ad-shell) .ad-empty__title{
+  font:700 14px Inter,sans-serif !important;
+  letter-spacing:-.008em !important;
+}
+body:has(.ad-shell) .ad-empty__sub{
+  font:500 13px Inter,sans-serif !important;
+  letter-spacing:-.005em !important;
+  margin-top:4px !important;
+  line-height:1.5 !important;
+}
+
+
+/* ── COLOURS + SHADOWS (light mode only) ────────────────────── */
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-eyebrow{
+  color:#2563eb !important;
+}
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-h1{
+  color:#0f172a !important;
+}
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-sub{
+  color:#475569 !important;
+}
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-welcome__title{
+  color:#0f172a !important;
+}
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-welcome__sub{
+  color:#475569 !important;
+}
+
+/* KPI cards — pure white + premium triple-layer shadow */
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-kpi{
+  background:#ffffff !important;
+  border:1px solid transparent !important;
+  box-shadow:
+    0 0 0 1px rgba(15,23,42,0.06),
+    0 1px 3px rgba(15,23,42,0.04),
+    0 18px 40px -20px rgba(59,130,246,0.20) !important;
+  transition:transform .18s cubic-bezier(.22,1,.36,1), box-shadow .18s ease !important;
+}
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-kpi:hover{
+  transform:translateY(-3px);
+  box-shadow:
+    0 0 0 1px rgba(59,130,246,0.22),
+    0 4px 14px -2px rgba(59,130,246,0.12),
+    0 28px 56px -20px rgba(15,23,42,0.20) !important;
+}
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-kpi__value{
+  color:#0f172a !important;
+}
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-kpi__label{
+  color:#0f172a !important;
+}
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-kpi__sub{
+  color:#64748b !important;
+}
+
+/* Widget cards */
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-widget,
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-weekly,
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-prof,
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-quicklinks{
+  background:#ffffff !important;
+  border:1px solid transparent !important;
+  box-shadow:
+    0 0 0 1px rgba(15,23,42,0.06),
+    0 1px 3px rgba(15,23,42,0.04),
+    0 16px 36px -18px rgba(15,23,42,0.14) !important;
+}
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-widget__title,
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-section__title{
+  color:#0f172a !important;
+}
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-widget__sub,
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-section__sub{
+  color:#64748b !important;
+}
+
+/* Family rows */
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-family{
+  border:1px solid transparent !important;
+}
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-family:hover{
+  background:rgba(59,130,246,0.04) !important;
+}
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-family__name{
+  color:#0f172a !important;
+}
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-family__plan{
+  color:#64748b !important;
+}
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-family__hours{
+  color:#0f172a !important;
+}
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-family__hours-label{
+  color:#94a3b8 !important;
+}
+
+/* Renewals */
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-renewal-row__name{
+  color:#0f172a !important;
+}
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-renewal-row__date{
+  color:#475569 !important;
+}
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-renewal-row__meta{
+  color:#64748b !important;
+}
+
+/* Profile pill */
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-prof__pill{
+  background:rgba(34,197,94,0.10) !important;
+  color:#15803d !important;
+  box-shadow:inset 0 0 0 1px rgba(34,197,94,0.25) !important;
+}
+
+/* Quicklinks items */
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-quicklinks__item{
+  color:#0f172a !important;
+  transition:background .14s ease, color .14s ease !important;
+}
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-quicklinks__item:hover{
+  background:rgba(59,130,246,0.06) !important;
+  color:#2563eb !important;
+}
+
+/* Empty states */
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-empty{
+  background:#ffffff !important;
+  border:1px dashed rgba(15,23,42,0.15) !important;
+}
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-empty__title{
+  color:#0f172a !important;
+}
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-empty__sub{
+  color:#64748b !important;
+}
+
+/* Weekly hours grid cells — soft surface tint */
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-weekday__hours{
+  color:#0f172a !important;
+}
+html[data-dash-theme="light"] body:has(.ad-shell) .ad-weekday__name{
+  color:#94a3b8 !important;
+}
