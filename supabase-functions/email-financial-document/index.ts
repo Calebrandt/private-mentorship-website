@@ -223,7 +223,7 @@ serve(async (req) => {
       action: "EMAIL_FINANCIAL_DOC_SENT",
       entity_type: docType,
       entity_id: docId,
-      metadata: {
+      details: {
         to,
         subject,
         filename,
