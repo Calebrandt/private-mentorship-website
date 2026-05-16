@@ -276,6 +276,38 @@
   .nx-badge--completed{background:#ede9fe;color:#6d28d9;}
   .nx-badge--expired{background:#f1f5f9;color:#64748b;}
   .nx-badge--cancelled{background:#f1f5f9;color:#64748b;text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:rgba(100,116,139,0.5);}
+  .nx-badge--paid{background:#dcfce7;color:#15803d;}
+  .nx-badge--open{background:#fef3c7;color:#a16207;}
+  .nx-badge--void{background:#fee2e2;color:#991b1b;text-decoration:line-through;}
+
+  /* Payment History — number columns + notes cell */
+  .nx-table__amount{font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink-2);font-size:14px;text-align:right;white-space:nowrap;}
+  .nx-table__hours{font-variant-numeric:tabular-nums;color:var(--ink-mute);font-size:13px;text-align:right;white-space:nowrap;}
+  .nx-table__notes{font-size:12px;color:var(--ink-mute);line-height:1.45;max-width:280px;}
+  .nx-table__inv{font-size:11px;color:var(--ink-tert);font-weight:500;font-variant-numeric:tabular-nums;margin:2px 0 0;letter-spacing:.005em;}
+  .nx-table__period{font-size:11px;color:var(--ink-tert);font-weight:500;margin:2px 0 0;}
+
+  /* Stats summary strip above the table */
+  .nx-payment-stats{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:18px 24px;background:rgba(15,23,42,0.025);
+    border-bottom:1px solid #e5e7eb;flex-wrap:wrap;
+  }
+  .nx-payment-stat{display:inline-flex;align-items:baseline;gap:8px;}
+  .nx-payment-stat__num{
+    font-family:"Archivo","Inter",sans-serif;font-size:18px;font-weight:800;
+    color:var(--ink-2);letter-spacing:-.02em;font-variant-numeric:tabular-nums;
+  }
+  .nx-payment-stat__label{
+    font-size:11px;color:var(--ink-mute);font-weight:600;
+    letter-spacing:.04em;text-transform:uppercase;
+  }
+  .nx-payment-stat__divider{width:1px;height:22px;background:#e5e7eb;}
+  [data-pm-theme="dark"] .nx-payment-stats{background:rgba(255,255,255,0.025);border-bottom-color:rgba(255,255,255,0.08);}
+  [data-pm-theme="dark"] .nx-payment-stat__divider{background:rgba(255,255,255,0.08);}
+  [data-pm-theme="dark"] .nx-badge--paid{background:rgba(34,197,94,0.16);color:#4ADE80;}
+  [data-pm-theme="dark"] .nx-badge--open{background:rgba(245,158,11,0.16);color:#FBBF24;}
+  [data-pm-theme="dark"] .nx-badge--void{background:rgba(239,68,68,0.16);color:#FCA5A5;}
 
   /* Dark theme overrides for the table */
   [data-pm-theme="dark"] .nx-card--table .nx-card__head{border-bottom-color:rgba(255,255,255,0.08);}
@@ -392,7 +424,21 @@
     const h12 = ((eh + 11) % 12) + 1;
     return `${start} – ${h12}:${String(em).padStart(2,'0')} ${period}`;
   }
-  function fmtDate(iso, opts){return iso ? new Date(iso).toLocaleDateString('en-CA', opts || { month:'long', day:'numeric', year:'numeric' }) : '—';}
+  // Bug fix: a YYYY-MM-DD string (no time) is parsed as UTC midnight by
+  // new Date(), then .toLocaleDateString() shifts to local TZ, displaying
+  // one day earlier in Western TZs. Parse YYYY-MM-DD components in local
+  // time instead. Full ISO timestamps pass through unchanged.
+  function fmtDate(iso, opts){
+    if (!iso) return '—';
+    const s = String(iso);
+    const opt = opts || { month:'long', day:'numeric', year:'numeric' };
+    // If the string is a bare date (no T), parse it as a local date
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+      const [y, m, d] = s.split('-').map(Number);
+      return new Date(y, m - 1, d).toLocaleDateString('en-CA', opt);
+    }
+    return new Date(s).toLocaleDateString('en-CA', opt);
+  }
 
   const PRICING_LABEL = {
     '1mo_24h': 'Standard 24', '1mo_40h': 'Executive 40',
@@ -452,6 +498,10 @@
   ]);
   const client = await window.pmHiring.fetchMyClientRecord().catch(()=>null);
   const pattern = contract ? await window.pmHiring.fetchMyRecurringPattern(contract.id).catch(()=>[]) : [];
+  // Phase 19b: full payment history (lifetime invoices + line items + linked contracts)
+  const paymentHistory = client?.id
+    ? await window.pmHiring.fetchClientPaymentHistory(client.id).catch(()=>[])
+    : [];
 
   // ─── Pending banner ───────────────────────────────────────────
   if (pending) {
@@ -479,9 +529,17 @@
     const startLong = fmtDate(contract.start_at, { weekday:'long', month:'long', day:'numeric', year:'numeric' });
     const endLong = fmtDate(contract.end_at, { weekday:'long', month:'long', day:'numeric', year:'numeric' });
     const daysLeft = contract.end_at ? Math.max(0, Math.ceil((new Date(contract.end_at).getTime() - Date.now()) / 86400000)) : 0;
-    const tierLabel = includedHours >= 40 ? 'Executive 40' : (includedHours >= 24 ? 'Standard 24' : `${includedHours} Hour Plan`);
-    const ratePerHour = includedHours >= 40 ? 45 : 30;
-    const monthlyPrice = ratePerHour * (includedHours >= 40 ? 40 : 24);
+    // Plan name + price come from BOTH hours AND term length. A 40-hr/month
+    // contract is $1,200 (1mo @ $30/hr); a 40-hr/2-month contract is $1,800/mo
+    // (2mo @ $45/hr). Detect the term from contract duration.
+    const contractDays = (contract.start_at && contract.end_at)
+      ? Math.round((new Date(contract.end_at).getTime() - new Date(contract.start_at).getTime()) / 86400000)
+      : 30;
+    const isOneMonthTerm = contractDays <= 45;  // ~1 month with buffer; 2-month plans are ~60 days
+    const ratePerHour = isOneMonthTerm ? 30 : 45;
+    const monthlyPrice = Math.round(ratePerHour * includedHours);
+    const tierLabel = `${includedHours} Hour Plan`;
+    const termLabel = isOneMonthTerm ? '1-month term' : '2-month term';
     const isAuto = String(contract.renewal_mode || '').toLowerCase() === 'auto';
     // Detect if the client has explicitly requested end-of-service (manual + recent EOS note).
     const eosRequested = !isAuto && /end_of_service requested/i.test(String(contract.notes || ''));
@@ -546,7 +604,7 @@
             <div class="nx-plan-row">
               <div>
                 <h3 class="nx-sub__title">Current plan</h3>
-                <p class="nx-sub__sub" style="margin-bottom:0;">${esc(tierLabel)} · ${includedHours} reserved hours${usedHours ? ' · ' + usedHours.toFixed(1) + ' used' : ''}</p>
+                <p class="nx-sub__sub" style="margin-bottom:0;">${esc(tierLabel)} · ${esc(termLabel)} · ${includedHours} reserved hours${usedHours ? ' · ' + usedHours.toFixed(1) + ' used' : ''}</p>
               </div>
               <div class="nx-plan-row__price">
                 <p class="nx-plan-row__amount">$${monthlyPrice.toLocaleString('en-CA')}</p>
@@ -630,12 +688,98 @@
     }
   });
 
-  // ─── Contract history (shadcn DataTable style) ────────────────
-  if ((contracts || []).length) {
-    // Map raw status → one of the 5 known badge variants
-    const BADGE_VARIANTS = new Set(['active','draft','completed','expired','cancelled']);
-    const badgeClass = (s) => BADGE_VARIANTS.has(s) ? s : 'completed';
+  // ─── Payment history (Phase 19b) ─────────────────────────────
+  // Replaces the old contract-history table with a richer billing-grade
+  // view that joins invoices + line items + linked contracts. Falls back
+  // to the bare contracts list if no invoices exist yet.
+  const BADGE_VARIANTS = new Set(['active','draft','completed','expired','cancelled','paid','open','void']);
+  const badgeClass = (s) => BADGE_VARIANTS.has(s) ? s : 'completed';
+  const fmtMoney = (cents, currency='CAD') => {
+    const n = Number(cents || 0) / 100;
+    return n.toLocaleString('en-CA', { style:'currency', currency, maximumFractionDigits: n >= 100 ? 0 : 2 });
+  };
 
+  if ((paymentHistory || []).length) {
+    // Summary stats: total paid, total hours bought, active contracts, oldest
+    const totalCents = paymentHistory
+      .filter(p => p.status !== 'void')
+      .reduce((s, p) => s + (Number(p.amount_paid_cents) || 0), 0);
+    const totalHours = paymentHistory
+      .filter(p => p.status !== 'void')
+      .reduce((s, p) => s + (p.line_items || []).reduce((ss, l) => ss + (Number(l.hours) || 0), 0), 0);
+    const paidCount = paymentHistory.filter(p => p.status === 'paid').length;
+    const oldest = paymentHistory.length
+      ? paymentHistory[paymentHistory.length - 1].invoice_date
+      : null;
+    const sinceStr = oldest ? new Date(oldest).toLocaleDateString('en-CA', { month:'long', year:'numeric' }) : '';
+
+    const rowsHtml = paymentHistory.map(p => {
+      const status = String(p.status || 'paid').toLowerCase();
+      const label = p.subject || ('Invoice ' + (p.invoice_number || p.id.slice(0,8)));
+      const paidDate = fmtDate(p.invoice_date, { month:'short', day:'numeric', year:'numeric' });
+      const totalHrs = (p.line_items || []).reduce((s, l) => s + (Number(l.hours) || 0), 0);
+      const hoursStr = totalHrs > 0 ? `${totalHrs}h` : '—';
+      const amountStr = fmtMoney(p.amount_paid_cents || p.total_cents, p.currency || 'CAD');
+      const periodStr = p.contract
+        ? `Contract: ${fmtDate(p.contract.start_at, { month:'short', day:'numeric' })} – ${fmtDate(p.contract.end_at, { month:'short', day:'numeric', year:'numeric' })}`
+        : 'No linked contract on file';
+      const notesHtml = p.customer_notes ? `<div class="nx-table__notes">${esc(p.customer_notes)}</div>` : '';
+      return `<tr>
+        <td class="nx-table__primary">
+          ${esc(label)}
+          <p class="nx-table__inv">${esc(p.invoice_number || ('INV-' + p.id.slice(0,8)))}</p>
+        </td>
+        <td class="nx-table__muted">
+          ${esc(paidDate)}
+          <p class="nx-table__period">${esc(periodStr)}</p>
+        </td>
+        <td class="nx-table__amount">${esc(amountStr)}</td>
+        <td class="nx-table__hours">${esc(hoursStr)}</td>
+        <td><span class="nx-badge nx-badge--${badgeClass(status)}">${esc(status)}</span></td>
+        <td>${notesHtml}</td>
+      </tr>`;
+    }).join('');
+
+    $('historyWrap').innerHTML = `<section class="nx-card nx-card--table">
+      <div class="nx-card__head">
+        <h2 class="nx-card__title">Payment history</h2>
+        <p class="nx-card__sub">Every invoice on file, with the contract it paid for and the hours purchased.</p>
+      </div>
+      <div class="nx-payment-stats">
+        <div class="nx-payment-stat">
+          <span class="nx-payment-stat__num">${esc(fmtMoney(totalCents))}</span>
+          <span class="nx-payment-stat__label">Lifetime paid</span>
+        </div>
+        <span class="nx-payment-stat__divider"></span>
+        <div class="nx-payment-stat">
+          <span class="nx-payment-stat__num">${paidCount}</span>
+          <span class="nx-payment-stat__label">Invoices paid</span>
+        </div>
+        <span class="nx-payment-stat__divider"></span>
+        <div class="nx-payment-stat">
+          <span class="nx-payment-stat__num">${totalHours}</span>
+          <span class="nx-payment-stat__label">Total hours purchased</span>
+        </div>
+        ${sinceStr ? `<div style="margin-left:auto;font-size:12px;color:var(--ink-tert);font-weight:500;">Customer since ${esc(sinceStr)}</div>` : ''}
+      </div>
+      <div class="nx-table-wrap">
+        <table class="nx-table">
+          <thead>
+            <tr>
+              <th>Contract</th>
+              <th>Paid on</th>
+              <th style="text-align:right;">Amount</th>
+              <th style="text-align:right;">Hours</th>
+              <th>Status</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>
+    </section>`;
+  } else if ((contracts || []).length) {
+    // Fallback: no invoices yet — show the bare contract list (legacy behavior)
     const rowsHtml = contracts.map(c => {
       const status = String(c.status || '').toLowerCase();
       const start  = fmtDate(c.start_at, { month:'short', day:'numeric', year:'numeric' });
@@ -650,21 +794,15 @@
         <td><span class="nx-badge nx-badge--${badgeClass(status)}">${esc(status || '—')}</span></td>
       </tr>`;
     }).join('');
-
     $('historyWrap').innerHTML = `<section class="nx-card nx-card--table">
       <div class="nx-card__head">
         <h2 class="nx-card__title">Contract history</h2>
-        <p class="nx-card__sub">All contracts on file, including past and future.</p>
+        <p class="nx-card__sub">All contracts on file. Once invoices are issued, this becomes a full payment history.</p>
       </div>
       <div class="nx-table-wrap">
         <table class="nx-table">
           <thead>
-            <tr>
-              <th>Contract</th>
-              <th>Period</th>
-              <th style="text-align:right;">Hours</th>
-              <th>Status</th>
-            </tr>
+            <tr><th>Contract</th><th>Period</th><th style="text-align:right;">Hours</th><th>Status</th></tr>
           </thead>
           <tbody>${rowsHtml}</tbody>
         </table>

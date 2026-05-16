@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lesson Tracker — Private Mentorship Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&display=swap" />
+<link rel="stylesheet" href="js/sidebar.css?v=20260516b" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;background:#F7F8FA;color:#0A0E1A;
+    font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+    font-feature-settings:"ss01","cv02","cv03","cv04";
+    text-rendering:optimizeLegibility;
+  }
+  .lt-shell{padding:44px 40px 96px;max-width:1100px;margin:0 auto;}
+
+  /* ─── Header ──────────────────────────────────────────────────────── */
+  .lt-back{
+    font-size:13px;color:#64748B;text-decoration:none;font-weight:500;
+    display:inline-flex;align-items:center;gap:6px;margin-bottom:18px;
+    transition:color .12s ease;letter-spacing:-.005em;
+  }
+  .lt-back:hover{color:#0F172A;}
+  .lt-head{margin-bottom:36px;}
+  .lt-eyebrow{
+    font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+    color:#0071e3;margin:0 0 10px;
+  }
+  .lt-h1{
+    font-family:"Archivo","Inter",sans-serif;font-size:36px;font-weight:800;
+    letter-spacing:-.028em;line-height:1.04;margin:0 0 10px;color:#0A0E1A;
+  }
+  .lt-sub{font-size:15px;color:#52606D;margin:0;line-height:1.55;max-width:680px;letter-spacing:-.005em;}
+
+  /* Stat strip — all-time totals */
+  .lt-stats{
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    margin-top:18px;padding:14px 20px;
+    background:#fff;border:1px solid #EBEEF2;border-radius:12px;
+    box-shadow:0 1px 2px rgba(15,23,42,0.03);
+  }
+  .lt-stats__item{display:inline-flex;align-items:baseline;gap:7px;}
+  .lt-stats__num{
+    font-family:"Archivo","Inter",sans-serif;font-size:20px;font-weight:800;
+    color:#0A0E1A;letter-spacing:-.022em;line-height:1;
+  }
+  .lt-stats__num--stars{color:#F59E0B;}
+  .lt-stats__label{
+    font-size:11.5px;color:#64748B;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+  }
+  .lt-stats__divider{width:1px;height:24px;background:#E5E7EB;}
+  .lt-stats__since{
+    margin-left:auto;font-size:12px;color:#9CA3AF;font-weight:500;letter-spacing:-.005em;
+  }
+  @media (max-width:760px){
+    .lt-stats{padding:12px 14px;}
+    .lt-stats__num{font-size:18px;}
+    .lt-stats__since{display:none;}
+  }
+
+  /* ─── Filters bar ─────────────────────────────────────────────────── */
+  .lt-bar{
+    display:flex;align-items:center;justify-content:space-between;gap:20px;
+    flex-wrap:wrap;margin-bottom:18px;
+  }
+  .lt-bar__left{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .lt-year-pills{
+    display:inline-flex;gap:3px;background:#fff;border:1px solid #E5E7EB;
+    border-radius:10px;padding:4px;box-shadow:0 1px 2px rgba(15,23,42,0.03);
+  }
+  .lt-year-pill{
+    background:transparent;border:none;color:#64748B;
+    font-family:inherit;font-size:13px;font-weight:600;letter-spacing:-.008em;
+    padding:7px 14px;border-radius:7px;cursor:pointer;transition:all .12s ease;
+  }
+  .lt-year-pill:hover{color:#0A0E1A;}
+  .lt-year-pill.is-active{
+    background:#0A0E1A;color:#fff;
+    box-shadow:0 1px 3px rgba(10,14,26,0.2);
+  }
+  /* Search input wrapper with leading icon + clear button + kbd hint */
+  .lt-search-wrap{
+    position:relative;display:inline-flex;align-items:center;
+  }
+  .lt-search-icon{
+    position:absolute;left:12px;width:15px;height:15px;
+    color:#9CA3AF;pointer-events:none;
+  }
+  .lt-search{
+    font-family:inherit;font-size:13.5px;color:#0A0E1A;
+    background:#fff;border:1px solid #E5E7EB;border-radius:10px;
+    padding:9px 70px 9px 36px;outline:none;width:320px;
+    box-shadow:0 1px 2px rgba(15,23,42,0.03);
+    transition:border-color .12s ease,box-shadow .12s ease,width .15s ease;
+    letter-spacing:-.005em;
+  }
+  .lt-search::placeholder{color:#9CA3AF;}
+  .lt-search:focus{
+    border-color:#0071e3;box-shadow:0 0 0 3px rgba(0,113,227,0.12);
+    width:360px;
+  }
+  .lt-search-kbd{
+    position:absolute;right:11px;
+    font-size:10.5px;font-weight:600;color:#9CA3AF;letter-spacing:.04em;
+    background:#F1F3F5;border:1px solid #E5E7EB;border-radius:5px;
+    padding:2px 6px;pointer-events:none;line-height:1;font-family:"Inter",sans-serif;
+  }
+  .lt-search-clear{
+    position:absolute;right:11px;
+    background:#E5E7EB;color:#52606D;border:none;border-radius:50%;
+    width:18px;height:18px;cursor:pointer;font-size:13px;line-height:1;
+    display:none;align-items:center;justify-content:center;padding:0;
+    transition:background .12s ease,color .12s ease;
+  }
+  .lt-search-clear:hover{background:#CBD5E1;color:#0A0E1A;}
+  .lt-search-wrap.has-value .lt-search-kbd{display:none;}
+  .lt-search-wrap.has-value .lt-search-clear{display:flex;}
+  /* When search active, dim year pills (search overrides year filter) */
+  .lt-year-pills.is-muted{opacity:0.45;pointer-events:none;filter:saturate(0.6);}
+
+  /* Highlight matched substrings in search results — premium violet glass */
+  .lt-mark{
+    background:linear-gradient(180deg,
+      rgba(196,181,253,0.38) 0%,
+      rgba(167,139,250,0.46) 100%);
+    color:#5B21B6;
+    padding:1.5px 5px;border-radius:4.5px;
+    font-weight:600;
+    box-shadow:
+      inset 0 0.5px 0 rgba(255,255,255,0.65),
+      inset 0 -1px 0 rgba(91,33,182,0.14),
+      0 0 0 1px rgba(139,92,246,0.18),
+      0 1px 3px rgba(91,33,182,0.12);
+    transition:background .15s ease;
+  }
+  .lt-mark:hover{
+    background:linear-gradient(180deg,
+      rgba(196,181,253,0.48) 0%,
+      rgba(167,139,250,0.56) 100%);
+  }
+  .lt-count{font-size:13px;color:#64748B;font-weight:500;letter-spacing:-.005em;}
+  .lt-count strong{color:#0A0E1A;font-weight:700;}
+
+  /* ─── Premium card list ───────────────────────────────────────────── */
+  .lt-list{display:flex;flex-direction:column;gap:10px;background:transparent;border:none;}
+  .lt-card{
+    background:#fff;border:1px solid #EBEEF2;border-radius:14px;
+    padding:24px 28px;display:grid;
+    grid-template-columns:96px minmax(0,1fr) auto;gap:28px;align-items:start;
+    cursor:pointer;
+    box-shadow:0 1px 2px rgba(15,23,42,0.03);
+    transition:border-color .18s ease,box-shadow .22s ease,transform .14s ease;
+  }
+  .lt-card:hover{
+    border-color:#BFD9F2;
+    box-shadow:0 12px 32px -16px rgba(0,113,227,0.22),0 0 0 1px rgba(0,113,227,0.08);
+    transform:translateY(-1px);
+  }
+  /* Date block — calendar-style with proper hierarchy */
+  .lt-card__date{
+    border-right:1px solid #F1F3F5;padding-right:24px;
+    text-align:left;
+  }
+  .lt-card__date-weekday{
+    font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:#9CA3AF;margin:0 0 4px;
+  }
+  .lt-card__date-day{
+    font-family:"Archivo","Inter",sans-serif;font-size:36px;font-weight:800;
+    letter-spacing:-.03em;color:#0A0E1A;line-height:1;margin:0;
+  }
+  .lt-card__date-month{
+    font-size:12.5px;font-weight:600;color:#52606D;margin:5px 0 0;letter-spacing:-.005em;
+  }
+  .lt-card__date-year{
+    font-size:11px;color:#9CA3AF;margin:1px 0 0;font-weight:500;
+  }
+  /* Body — focus area is the hero */
+  .lt-card__body{min-width:0;}
+  .lt-card__focus{
+    font-family:"Inter",sans-serif;font-size:16px;font-weight:600;letter-spacing:-.015em;
+    color:#0A0E1A;margin:0;line-height:1.5;
+    overflow:hidden;text-overflow:ellipsis;display:-webkit-box;
+    -webkit-line-clamp:2;-webkit-box-orient:vertical;
+  }
+  .lt-card__focus--empty{color:#9CA3AF;font-style:italic;font-weight:500;}
+  .lt-card__concepts{
+    font-size:13px;color:#64748B;margin:6px 0 0;line-height:1.5;font-weight:400;
+    overflow:hidden;text-overflow:ellipsis;display:-webkit-box;
+    -webkit-line-clamp:1;-webkit-box-orient:vertical;
+  }
+  .lt-card__meta{
+    display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;align-items:center;
+  }
+  .lt-card__type{
+    font-size:11.5px;font-weight:600;color:#52606D;
+    background:#F8FAFC;border:1px solid #E5E7EB;
+    padding:5px 11px;border-radius:7px;letter-spacing:-.005em;
+  }
+  .lt-card__files{
+    font-size:12px;color:#64748B;font-weight:500;
+    display:inline-flex;align-items:center;gap:5px;letter-spacing:-.005em;
+  }
+  .lt-card__signature{
+    font-size:12px;color:#9CA3AF;font-weight:500;margin-top:10px;letter-spacing:-.005em;
+  }
+  .lt-card__signature--sub{color:#B45309;font-weight:600;}
+  /* Right column — status + rating */
+  .lt-card__right{
+    display:flex;flex-direction:column;align-items:flex-end;gap:10px;
+    padding-top:4px;min-width:120px;
+  }
+  .lt-card__status{
+    font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    padding:5px 11px;border-radius:7px;white-space:nowrap;
+  }
+  .lt-card__status--engaging{background:#DCFCE7;color:#15803D;}
+  .lt-card__status--in_progress{background:#DBEAFE;color:#1D4ED8;}
+  .lt-card__status--maintaining_progress{background:#E0E7FF;color:#4338CA;}
+  .lt-card__status--low_energy{background:#FEF3C7;color:#A16207;}
+  .lt-card__status--low_effort{background:#FEF3C7;color:#A16207;}
+  .lt-card__status--needs_improvement{background:#FEE2E2;color:#B91C1C;}
+  .lt-card__status--completed{background:#F3E8FF;color:#6B21A8;}
+  .lt-card__rating{
+    font-size:15px;letter-spacing:2px;color:#F59E0B;line-height:1;
+    font-feature-settings:"liga" off;
+  }
+  .lt-card__rating--none{color:#E5E7EB;letter-spacing:3px;}
+
+  /* Empty / loading */
+  .lt-empty,.lt-loading{
+    background:#fff;border:1px dashed #E5E7EB;border-radius:14px;
+    padding:80px 40px;text-align:center;color:#64748B;
+  }
+  .lt-empty__title,.lt-loading__title{
+    font-family:"Archivo","Inter",sans-serif;font-size:18px;font-weight:700;
+    color:#0A0E1A;margin:0 0 7px;letter-spacing:-.018em;
+  }
+  .lt-empty__sub,.lt-loading__sub{
+    font-size:14px;margin:0;line-height:1.6;max-width:480px;
+    margin-left:auto;margin-right:auto;color:#64748B;letter-spacing:-.005em;
+  }
+  .lt-spinner{
+    width:18px;height:18px;border-radius:50%;
+    border:2px solid #E5E7EB;border-top-color:#0071e3;
+    animation:lt-spin .65s linear infinite;display:inline-block;vertical-align:middle;margin-right:10px;
+  }
+  @keyframes lt-spin{to{transform:rotate(360deg);}}
+
+  /* ─── Modal ───────────────────────────────────────────────────────── */
+  .lt-modal-backdrop{
+    position:fixed;inset:0;background:rgba(10,14,26,0.55);backdrop-filter:blur(2px);
+    display:none;align-items:flex-start;justify-content:center;
+    padding:48px 16px;z-index:50;overflow-y:auto;
+  }
+  .lt-modal-backdrop[data-open="true"]{display:flex;animation:lt-fade-in .14s ease;}
+  @keyframes lt-fade-in{from{opacity:0;}to{opacity:1;}}
+  .lt-modal{
+    background:#fff;border-radius:16px;max-width:720px;width:100%;
+    box-shadow:0 32px 80px -16px rgba(10,14,26,0.4),0 0 0 1px rgba(10,14,26,0.06);
+    overflow:hidden;
+    animation:lt-slide-up .22s cubic-bezier(0.16,1,0.3,1);
+  }
+  @keyframes lt-slide-up{from{transform:translateY(12px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+  .lt-modal__head{
+    padding:26px 32px 20px;border-bottom:1px solid #F1F3F5;
+    display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+    position:sticky;top:0;background:#fff;z-index:5;
+  }
+  .lt-modal__title{
+    font-family:"Archivo","Inter",sans-serif;font-size:21px;font-weight:800;
+    letter-spacing:-.022em;color:#0A0E1A;margin:0 0 5px;
+  }
+  .lt-modal__sub{font-size:13px;color:#64748B;margin:0;line-height:1.5;font-weight:500;letter-spacing:-.005em;}
+  .lt-modal__close{
+    background:transparent;border:none;color:#64748B;cursor:pointer;font-size:24px;
+    padding:0;line-height:1;width:32px;height:32px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .12s ease,color .12s ease;
+  }
+  .lt-modal__close:hover{background:#F1F3F5;color:#0A0E1A;}
+  .lt-modal__body{padding:22px 32px 4px;}
+  .lt-modal__footer{
+    padding:18px 32px 22px;border-top:1px solid #F1F3F5;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    background:#FAFAFB;
+  }
+  .lt-modal__footer-meta{font-size:12px;color:#64748B;font-weight:500;letter-spacing:-.005em;}
+
+  /* Form fields — premium spacing + typography */
+  .lt-field{margin-bottom:20px;}
+  .lt-field__label{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    font-size:11.5px;font-weight:700;color:#374151;letter-spacing:.08em;
+    text-transform:uppercase;margin-bottom:7px;
+  }
+  .lt-field__vis{
+    font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:none;
+    padding:3px 9px;border-radius:9999px;
+  }
+  .lt-field__vis--family{background:#DBEAFE;color:#1D4ED8;}
+  .lt-field__vis--private{background:#FEE2E2;color:#B91C1C;}
+  .lt-field__hint{font-size:12px;color:#9CA3AF;margin:6px 0 0;line-height:1.5;letter-spacing:-.005em;}
+  .lt-field__input,.lt-field__textarea,.lt-field__select{
+    width:100%;font-family:inherit;font-size:14px;color:#0A0E1A;letter-spacing:-.008em;
+    background:#fff;border:1px solid #E5E7EB;border-radius:9px;
+    padding:11px 14px;outline:none;
+    transition:border-color .12s ease,box-shadow .12s ease;
+  }
+  .lt-field__input:focus,.lt-field__textarea:focus,.lt-field__select:focus{
+    border-color:#0071e3;box-shadow:0 0 0 3px rgba(0,113,227,0.12);
+  }
+  .lt-field__textarea{min-height:78px;resize:vertical;line-height:1.55;}
+  .lt-field__textarea--lg{min-height:108px;}
+  .lt-field__row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+  /* Star picker */
+  .lt-stars{display:inline-flex;gap:3px;background:#F8FAFC;border:1px solid #E5E7EB;border-radius:7px;padding:5px 8px;}
+  .lt-star-btn{
+    background:transparent;border:none;font-size:22px;cursor:pointer;
+    color:#D1D5DB;padding:0 1px;line-height:1;font-feature-settings:"liga" off;
+    transition:color .1s ease,transform .08s ease;
+  }
+  .lt-star-btn.is-on{color:#F59E0B;}
+  .lt-star-btn:hover{transform:scale(1.18);}
+  .lt-star-clear{
+    margin-left:8px;background:transparent;border:none;font-size:11px;
+    color:#9CA3AF;cursor:pointer;font-family:inherit;font-weight:500;letter-spacing:-.005em;
+    align-self:center;
+  }
+  .lt-star-clear:hover{color:#0A0E1A;}
+
+  /* Files & links section */
+  .lt-attachments{
+    background:#F8FAFC;border:1px solid #E5E7EB;border-radius:8px;
+    padding:14px;margin-bottom:16px;
+  }
+  .lt-attachments__head{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:10px;gap:10px;
+  }
+  .lt-attachments__title{
+    font-size:11px;font-weight:700;color:#374151;letter-spacing:.06em;text-transform:uppercase;
+    display:inline-flex;align-items:center;gap:7px;
+  }
+  .lt-attachments__count{
+    font-size:10.5px;color:#64748B;font-weight:600;background:#fff;
+    border:1px solid #E5E7EB;border-radius:9999px;padding:1px 7px;
+  }
+  .lt-attachments__add{
+    background:#fff;color:#0071e3;border:1px solid #BFD9F2;border-radius:7px;
+    font-family:inherit;font-size:11.5px;font-weight:600;padding:5px 11px;
+    cursor:pointer;letter-spacing:-.005em;
+    transition:background .12s ease,border-color .12s ease;
+  }
+  .lt-attachments__add:hover{background:#EFF6FF;border-color:#0071e3;}
+  .lt-file-row{
+    display:flex;align-items:center;gap:10px;
+    padding:8px 11px;background:#fff;border:1px solid #E5E7EB;border-radius:6px;margin-bottom:5px;
+    transition:border-color .12s ease;
+  }
+  .lt-file-row:last-child{margin-bottom:0;}
+  .lt-file-row:hover{border-color:#D1D5DB;}
+  .lt-file-row__kind{
+    font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    padding:3px 7px;border-radius:4px;flex-shrink:0;
+  }
+  .lt-file-row__kind--url{background:#DBEAFE;color:#1D4ED8;}
+  .lt-file-row__kind--file{background:#F3F4F6;color:#52606D;}
+  .lt-file-row__body{flex:1;min-width:0;}
+  .lt-file-row__name{
+    font-size:12.5px;font-weight:600;color:#0A0E1A;margin:0;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-.005em;
+  }
+  .lt-file-row__name a{color:#0071e3;text-decoration:none;}
+  .lt-file-row__name a:hover{text-decoration:underline;}
+  .lt-file-row__meta{font-size:10.5px;color:#9CA3AF;margin:2px 0 0;line-height:1.4;font-weight:500;}
+  .lt-file-row__del{
+    background:transparent;border:none;color:#9CA3AF;cursor:pointer;
+    font-size:16px;line-height:1;padding:3px 6px;border-radius:5px;
+    transition:background .12s ease,color .12s ease;
+  }
+  .lt-file-row__del:hover{background:#FEE2E2;color:#B91C1C;}
+  .lt-attachments__empty{font-size:11.5px;color:#9CA3AF;margin:4px 0 0;font-style:italic;}
+
+  /* Inline URL adder (replaces browser prompt) */
+  .lt-url-form{
+    display:none;flex-direction:column;gap:8px;
+    background:#fff;border:1px solid #BFD9F2;border-radius:7px;padding:11px;margin-top:8px;
+  }
+  .lt-url-form[data-open="true"]{display:flex;}
+  .lt-url-form__row{display:grid;grid-template-columns:1fr;gap:7px;}
+  .lt-url-form__input{
+    font-family:inherit;font-size:12.5px;color:#0A0E1A;
+    background:#FAFAFB;border:1px solid #E5E7EB;border-radius:6px;padding:7px 10px;outline:none;
+  }
+  .lt-url-form__input:focus{border-color:#0071e3;background:#fff;box-shadow:0 0 0 3px rgba(0,113,227,0.10);}
+  .lt-url-form__actions{display:flex;gap:7px;justify-content:flex-end;}
+
+  /* File upload zone (drag-drop + click) */
+  .lt-upload-zone{
+    border:1px dashed #BFD9F2;background:#F0F7FF;border-radius:7px;
+    padding:14px;text-align:center;color:#1D4ED8;margin-top:8px;
+    cursor:pointer;transition:background .12s ease,border-color .12s ease;
+  }
+  .lt-upload-zone:hover{background:#E0EFFF;border-color:#0071e3;}
+  .lt-upload-zone.is-dragging{background:#DBEAFE;border-color:#0071e3;border-style:solid;}
+  .lt-upload-zone__pill{
+    display:inline-block;background:#fff;color:#0071e3;
+    font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    padding:3px 8px;border-radius:9999px;margin-bottom:5px;border:1px solid #BFD9F2;
+  }
+  .lt-upload-zone__text{font-size:11.5px;line-height:1.5;margin:0;font-weight:500;}
+  .lt-upload-zone__text strong{color:#0A0E1A;font-weight:700;}
+  .lt-upload-zone--busy{cursor:wait;opacity:.7;}
+  .lt-upload-zone__hint{font-size:10.5px;color:#64748B;margin:4px 0 0;line-height:1.4;}
+
+  /* Recent context recap (smart prep pane) */
+  .lt-recap{
+    background:linear-gradient(180deg,#FFFBEB 0%,#FFF7ED 100%);
+    border:1px solid #FED7AA;border-radius:8px;
+    margin-bottom:18px;overflow:hidden;
+  }
+  .lt-recap__head{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:10px 14px;cursor:pointer;user-select:none;
+  }
+  .lt-recap__title{
+    font-size:11px;font-weight:700;color:#9A3412;letter-spacing:.06em;text-transform:uppercase;
+    display:inline-flex;align-items:center;gap:7px;
+  }
+  .lt-recap__chev{color:#9A3412;transition:transform .15s ease;display:inline-block;font-size:10px;}
+  .lt-recap__chev.is-open{transform:rotate(90deg);}
+  .lt-recap__body{
+    border-top:1px solid #FED7AA;padding:0 14px 12px;
+    display:none;
+  }
+  .lt-recap__body.is-open{display:block;}
+  .lt-recap__row{
+    padding:11px 0;border-bottom:1px dashed #FED7AA;
+  }
+  .lt-recap__row:last-child{border-bottom:none;}
+  .lt-recap__row-head{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    margin-bottom:4px;
+  }
+  .lt-recap__row-date{
+    font-family:"Archivo","Inter",sans-serif;font-size:12px;font-weight:700;color:#7C2D12;letter-spacing:-.008em;
+  }
+  .lt-recap__row-meta{
+    font-size:10.5px;color:#9A3412;font-weight:600;display:inline-flex;align-items:center;gap:8px;
+  }
+  .lt-recap__row-rating{color:#F59E0B;font-size:11px;letter-spacing:1px;font-feature-settings:"liga" off;}
+  .lt-recap__row-focus{
+    font-size:12.5px;color:#7C2D12;line-height:1.45;margin:0;font-weight:500;
+  }
+  .lt-recap__row-focus--empty{color:#C2410C;font-style:italic;font-weight:400;}
+  .lt-recap__row-private{
+    margin-top:5px;padding:6px 8px;background:rgba(254,243,199,0.6);
+    border-left:2px solid #F59E0B;border-radius:0 4px 4px 0;
+    font-size:11.5px;color:#7C2D12;line-height:1.5;font-weight:500;
+  }
+  .lt-recap__row-private strong{
+    font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#92400E;
+    display:block;margin-bottom:2px;
+  }
+  .lt-recap__empty{
+    font-size:11.5px;color:#9A3412;padding:10px 0 2px;text-align:center;font-style:italic;
+  }
+
+  /* Modal action buttons */
+  .lt-btn{
+    font-family:inherit;font-size:13px;font-weight:600;padding:8px 16px;
+    border-radius:7px;cursor:pointer;letter-spacing:-.005em;
+    transition:background .12s ease,border-color .12s ease,box-shadow .12s ease;
+  }
+  .lt-btn--ghost{background:#fff;color:#52606D;border:1px solid #E5E7EB;}
+  .lt-btn--ghost:hover{background:#F8FAFC;color:#0A0E1A;}
+  .lt-btn--primary{
+    background:#0A0E1A;color:#fff;border:1px solid #0A0E1A;
+    box-shadow:0 1px 2px rgba(10,14,26,0.18);
+  }
+  .lt-btn--primary:hover{background:#1F2937;border-color:#1F2937;}
+  .lt-btn--small{padding:5px 11px;font-size:11.5px;}
+  .lt-btn:disabled{opacity:.5;cursor:wait;}
+
+  /* Toast */
+  .lt-toast{
+    position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(8px);
+    background:#0A0E1A;color:#fff;padding:9px 18px;border-radius:9999px;
+    font-size:12px;font-weight:600;letter-spacing:-.005em;
+    box-shadow:0 12px 32px -8px rgba(10,14,26,0.5);z-index:100;
+    opacity:0;transition:opacity .18s ease,transform .22s ease;pointer-events:none;
+    display:inline-flex;align-items:center;gap:7px;
+  }
+  .lt-toast.is-on{opacity:1;transform:translateX(-50%) translateY(0);}
+  .lt-toast__dot{width:6px;height:6px;border-radius:50%;background:#22C55E;}
+
+  /* Responsive */
+  @media (max-width:760px){
+    .lt-shell{padding:28px 20px 80px;}
+    .lt-h1{font-size:28px;}
+    .lt-card{grid-template-columns:72px minmax(0,1fr);gap:18px;padding:18px 20px;}
+    .lt-card__right{flex-direction:row;align-items:center;grid-column:1 / -1;justify-content:flex-start;padding-top:0;margin-top:8px;}
+    .lt-card__date{border-right:none;padding-right:0;}
+    .lt-card__date-day{font-size:28px;}
+    .lt-card__focus{font-size:15px;}
+    .lt-search{width:100%;}
+    .lt-field__row{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body class="pm-has-sidebar">
+<div id="pmSidebar"></div>
+
+<main class="lt-shell">
+  <a class="lt-back" href="assistant-clients.html">← Back to families</a>
+
+  <div class="lt-head">
+    <p class="lt-eyebrow">Work · Lesson Tracker</p>
+    <h1 class="lt-h1" id="ltTitle">Lesson tracker</h1>
+    <p class="lt-sub">After each session, log what you covered, attach files and links the family needs, and rate how it went. Family sees this as a read-only journal. Your private prep notes stay between you and admin.</p>
+
+    <!-- All-time stats strip -->
+    <div class="lt-stats" id="ltStats" hidden>
+      <div class="lt-stats__item">
+        <span class="lt-stats__num" id="ltStatsTotal">0</span>
+        <span class="lt-stats__label">Total sessions</span>
+      </div>
+      <span class="lt-stats__divider"></span>
+      <div class="lt-stats__item">
+        <span class="lt-stats__num" id="ltStatsYear">0</span>
+        <span class="lt-stats__label" id="ltStatsYearLabel">This year</span>
+      </div>
+      <span class="lt-stats__divider"></span>
+      <div class="lt-stats__item">
+        <span class="lt-stats__num" id="ltStatsHours">0</span>
+        <span class="lt-stats__label">Hours together</span>
+      </div>
+      <span class="lt-stats__divider"></span>
+      <div class="lt-stats__item">
+        <span class="lt-stats__num lt-stats__num--stars" id="ltStatsRating">—</span>
+        <span class="lt-stats__label">Avg rating</span>
+      </div>
+      <span class="lt-stats__since" id="ltStatsSince"></span>
+    </div>
+  </div>
+
+  <div class="lt-bar">
+    <div class="lt-bar__left">
+      <div class="lt-year-pills" id="ltYearPills"></div>
+      <div class="lt-search-wrap" id="ltSearchWrap">
+        <svg class="lt-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="lt-search" id="ltSearch" placeholder="Search lessons, files, feedback, names…" autocomplete="off" />
+        <kbd class="lt-search-kbd" id="ltSearchKbd">⌘K</kbd>
+        <button type="button" class="lt-search-clear" id="ltSearchClear" title="Clear search">×</button>
+      </div>
+    </div>
+    <span class="lt-count" id="ltCount">—</span>
+  </div>
+
+  <div class="lt-loading" id="ltLoading"><span class="lt-spinner"></span> Loading lesson history…</div>
+  <div class="lt-empty" id="ltEmpty" hidden>
+    <p class="lt-empty__title">No logs yet</p>
+    <p class="lt-empty__sub">After a session is marked complete, return here to write up what you covered.</p>
+  </div>
+  <div class="lt-list" id="ltList" hidden></div>
+</main>
+
+
+<!-- Modal: write/edit a lesson log -->
+<div class="lt-modal-backdrop" id="ltModal" data-open="false">
+  <div class="lt-modal" role="dialog" aria-modal="true">
+    <div class="lt-modal__head">
+      <div>
+        <h2 class="lt-modal__title" id="ltModalTitle">Session log</h2>
+        <p class="lt-modal__sub" id="ltModalSub">—</p>
+      </div>
+      <button type="button" class="lt-modal__close" id="ltModalClose" aria-label="Close">×</button>
+    </div>
+
+    <div class="lt-modal__body">
+      <!-- Phase 18b.3: Smart recap of the previous 3 sessions for fast prep -->
+      <div class="lt-recap" id="ltRecap" hidden>
+        <div class="lt-recap__head" id="ltRecapToggle">
+          <span class="lt-recap__title">
+            <span style="font-size:13px;">🧠</span>
+            Recent context · <span id="ltRecapCount">last 3 sessions</span>
+          </span>
+          <span class="lt-recap__chev is-open" id="ltRecapChev">▶</span>
+        </div>
+        <div class="lt-recap__body is-open" id="ltRecapBody"></div>
+      </div>
+
+      <div class="lt-field">
+        <label class="lt-field__label" for="ltFocus">
+          Life skill focus area
+          <span class="lt-field__vis lt-field__vis--family">Family sees this</span>
+        </label>
+        <textarea class="lt-field__textarea lt-field__textarea--lg" id="ltFocus" placeholder="The main thing you worked on this session."></textarea>
+      </div>
+
+      <div class="lt-field">
+        <label class="lt-field__label" for="ltConcepts">
+          Key concepts covered
+          <span class="lt-field__vis lt-field__vis--family">Family sees this</span>
+        </label>
+        <textarea class="lt-field__textarea" id="ltConcepts" placeholder="Optional — specific topics, exercises, or context."></textarea>
+      </div>
+
+      <div class="lt-field__row">
+        <div class="lt-field">
+          <label class="lt-field__label" for="ltStatus">
+            Status
+            <span class="lt-field__vis lt-field__vis--family">Family</span>
+          </label>
+          <select class="lt-field__select" id="ltStatus">
+            <option value="">— Select —</option>
+            <option value="engaging">Engaging</option>
+            <option value="in_progress">In progress</option>
+            <option value="maintaining_progress">Maintaining progress</option>
+            <option value="low_energy">Low energy</option>
+            <option value="low_effort">Low effort</option>
+            <option value="needs_improvement">Needs improvement</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+        <div class="lt-field">
+          <label class="lt-field__label" for="ltType">
+            Type
+            <span class="lt-field__vis lt-field__vis--family">Family</span>
+          </label>
+          <select class="lt-field__select" id="ltType">
+            <option value="">— Select —</option>
+            <option value="life_skills_task">Life Skills Task</option>
+            <option value="gym_session">Gym Session</option>
+            <option value="social_engagement">Social Engagement</option>
+            <option value="independent_task">Independent Task</option>
+            <option value="setback_occurred">Setback occurred</option>
+            <option value="repeated_setback">Repeated setback</option>
+            <option value="revisiting_goals">Revisiting goals</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="lt-field">
+        <label class="lt-field__label">
+          Rating
+          <span class="lt-field__vis lt-field__vis--family">Family sees this</span>
+        </label>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <div class="lt-stars" id="ltStars">
+            <button type="button" class="lt-star-btn" data-star="1">★</button>
+            <button type="button" class="lt-star-btn" data-star="2">★</button>
+            <button type="button" class="lt-star-btn" data-star="3">★</button>
+            <button type="button" class="lt-star-btn" data-star="4">★</button>
+            <button type="button" class="lt-star-btn" data-star="5">★</button>
+          </div>
+          <button type="button" class="lt-star-clear" id="ltStarClear">Clear</button>
+        </div>
+      </div>
+
+      <div class="lt-field">
+        <label class="lt-field__label" for="ltFeedback">
+          Feedback for the family
+          <span class="lt-field__vis lt-field__vis--family">Family sees this</span>
+        </label>
+        <textarea class="lt-field__textarea" id="ltFeedback" placeholder='What the family reads — e.g. "Great work today, Michael!"'></textarea>
+      </div>
+
+      <div class="lt-field">
+        <label class="lt-field__label" for="ltNext">
+          Plan for next session
+          <span class="lt-field__vis lt-field__vis--family">Family sees this</span>
+        </label>
+        <textarea class="lt-field__textarea" id="ltNext" placeholder="What's coming next — homework, focus areas, things to prep."></textarea>
+      </div>
+
+      <div class="lt-field">
+        <label class="lt-field__label" for="ltPrivate">
+          Private prep notes
+          <span class="lt-field__vis lt-field__vis--private">Only you &amp; admin</span>
+        </label>
+        <textarea class="lt-field__textarea lt-field__textarea--lg" id="ltPrivate" placeholder="Your own context-recovery doc. What was the student struggling with? What's the unresolved problem from last time? Anything you don't want to forget before the next session."></textarea>
+        <p class="lt-field__hint">Stored in a separate table with strict access — the family physically cannot read this.</p>
+      </div>
+
+      <div class="lt-attachments">
+        <div class="lt-attachments__head">
+          <span class="lt-attachments__title">
+            Files &amp; links
+            <span class="lt-attachments__count" id="ltAttachCount">0</span>
+          </span>
+          <button type="button" class="lt-attachments__add" id="ltAddUrlBtn">+ Add link</button>
+        </div>
+        <div id="ltFilesList"></div>
+
+        <!-- Inline URL form (replaces browser prompt) -->
+        <div class="lt-url-form" id="ltUrlForm" data-open="false">
+          <div class="lt-url-form__row">
+            <input type="url" class="lt-url-form__input" id="ltUrlInput" placeholder="https://..." />
+            <input type="text" class="lt-url-form__input" id="ltUrlLabel" placeholder="Short label (e.g. &quot;YouTube — proper push-up form&quot;)" />
+          </div>
+          <div class="lt-url-form__actions">
+            <button type="button" class="lt-btn lt-btn--ghost lt-btn--small" id="ltUrlCancel">Cancel</button>
+            <button type="button" class="lt-btn lt-btn--primary lt-btn--small" id="ltUrlSave">Add link</button>
+          </div>
+        </div>
+
+        <!-- File upload — drag-drop + click -->
+        <div class="lt-upload-zone" id="ltDropZone" tabindex="0">
+          <span class="lt-upload-zone__pill" id="ltDropPill">📤 Upload file</span>
+          <p class="lt-upload-zone__text" id="ltDropText"><strong>Click to choose</strong> or drag files here</p>
+          <p class="lt-upload-zone__hint">Up to 50 MB · PDF, Word, Excel, images, etc.</p>
+          <input type="file" id="ltFileInput" multiple style="display:none;" />
+        </div>
+      </div>
+    </div>
+
+    <div class="lt-modal__footer">
+      <span class="lt-modal__footer-meta" id="ltModalMeta">—</span>
+      <div style="display:flex;gap:9px;">
+        <button type="button" class="lt-btn lt-btn--ghost" id="ltCancel">Close</button>
+        <button type="button" class="lt-btn lt-btn--primary" id="ltSave">Save log</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="lt-toast" id="ltToast"><span class="lt-toast__dot"></span><span id="ltToastText">Saved</span></div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260516b"></script>
+<script src="js/hiring-service.js?v=20260516b"></script>
+<script src="js/sidebar.js?v=20260516b"></script>
+<script>
+function $(id){return document.getElementById(id);}
+function esc(s){return (s||'').toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[c]));}
+function fmtDateLong(iso){if(!iso)return '—';const d=new Date(iso);return d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});}
+function fmtDateShort(iso){if(!iso)return '—';const d=new Date(iso);return d.toLocaleDateString('en-US',{weekday:'short',month:'short'});}
+function fmtYear(iso){if(!iso)return '';return new Date(iso).getFullYear();}
+function fmtTime(iso){if(!iso)return '';return new Date(iso).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});}
+function fmtStatusLabel(s){if(!s)return '';return s.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());}
+function fmtRelative(iso){
+  if(!iso)return '';
+  const d=new Date(iso); const diffMs=Date.now()-d.getTime();
+  const sec=Math.round(diffMs/1000); const min=Math.round(sec/60); const hr=Math.round(min/60); const day=Math.round(hr/24);
+  if(sec<60)return 'just now'; if(min<60)return `${min} min ago`; if(hr<24)return `${hr}h ago`;
+  if(day<7)return `${day}d ago`; return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+function renderRowStars(n){
+  const filled = Math.max(0, Math.min(5, Number(n)||0));
+  if(filled === 0) return '<span class="lt-row__rating lt-row__rating--none">·····</span>';
+  return '<span class="lt-row__rating">' + '★'.repeat(filled) + '</span>';
+}
+function toast(msg){const t=$('ltToast');$('ltToastText').textContent=msg||'Saved';t.classList.add('is-on');setTimeout(()=>t.classList.remove('is-on'),2200);}
+
+const state = {
+  clientId: null,
+  clientName: null,
+  history: [],
+  filteredYear: null,
+  searchTerm: '',
+  editingAppointmentId: null,
+  editingClientId: null,
+  editingLogId: null,
+  editingFiles: [],
+};
+
+(async function init(){
+  await new Promise(r => setTimeout(r, 200));
+  const params = new URLSearchParams(window.location.search);
+  state.clientId = params.get('clientId');
+  if (!state.clientId) {
+    $('ltLoading').hidden = true;
+    $('ltEmpty').hidden = false;
+    $('ltEmpty').innerHTML = '<p class="lt-empty__title">No family selected</p><p class="lt-empty__sub">Open this page from a family workspace.</p>';
+    return;
+  }
+
+  try {
+    const ws = await window.pmHiring.fetchAssistantClientWorkspace(state.clientId);
+    state.clientName = ws?.client?.full_name || 'Client';
+    $('ltTitle').textContent = state.clientName + ' · Lesson tracker';
+  } catch (_) {}
+
+  await refreshHistory();
+  wireModal();
+  wireSearch();
+})();
+
+async function refreshHistory(){
+  $('ltLoading').hidden = false;
+  $('ltList').hidden = true;
+  $('ltEmpty').hidden = true;
+  try { state.history = await window.pmHiring.fetchLessonHistory(state.clientId, { limit: 500 }); }
+  catch (_) { state.history = []; }
+  $('ltLoading').hidden = true;
+  buildYearPills();
+  render();
+}
+
+function buildYearPills(){
+  const years = [...new Set(state.history.map(r => fmtYear(r.starts_at)))].sort((a,b) => b - a);
+  if (state.filteredYear == null && years.length) state.filteredYear = years[0];
+  const wrap = $('ltYearPills');
+  wrap.innerHTML = years.map(y => `<button type="button" class="lt-year-pill ${state.filteredYear === y ? 'is-active' : ''}" data-year="${y}">${y}</button>`).join('');
+  wrap.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => {
+      state.filteredYear = Number(b.dataset.year);
+      buildYearPills();
+      render();
+    });
+  });
+}
+
+function wireSearch(){
+  const input = $('ltSearch');
+  const wrap = $('ltSearchWrap');
+  const clear = $('ltSearchClear');
+  input.addEventListener('input', e => {
+    state.searchTerm = e.target.value.trim();
+    wrap.classList.toggle('has-value', state.searchTerm.length > 0);
+    render();
+  });
+  clear.addEventListener('click', () => {
+    input.value = '';
+    state.searchTerm = '';
+    wrap.classList.remove('has-value');
+    render();
+    input.focus();
+  });
+  // ⌘K / Ctrl+K to focus
+  document.addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
+      e.preventDefault();
+      input.focus();
+      input.select();
+    }
+    // Esc clears search when focused
+    if (e.key === 'Escape' && document.activeElement === input && state.searchTerm) {
+      e.preventDefault();
+      clear.click();
+    }
+  });
+}
+
+// Parse search input into normalized AND-terms.
+// "gym life" → matches rows that contain BOTH "gym" AND "life"
+function parseSearchTerms(input){
+  return (input || '').toLowerCase().split(/\s+/).filter(t => t.length > 0);
+}
+
+// Build a single lowercased blob of every field we want to search
+// across so we can do fast multi-term AND matching.
+function searchBlob(r){
+  return [
+    r.focus_area, r.key_concepts, r.feedback, r.next_session_notes,
+    r.type_label, r.status_label, r.lesson_assistant_name, r.appointment_title,
+  ].filter(Boolean).join(' ').toLowerCase();
+}
+
+function applyFilters(){
+  const terms = parseSearchTerms(state.searchTerm);
+  // When searching, IGNORE the year filter — cross-year by default.
+  // Year pills get visually dimmed in render() to signal this.
+  let rows = terms.length
+    ? state.history.slice()
+    : state.history.filter(r => !state.filteredYear || fmtYear(r.starts_at) === state.filteredYear);
+  if (terms.length) {
+    rows = rows.filter(r => {
+      const blob = searchBlob(r);
+      return terms.every(t => blob.includes(t));
+    });
+  }
+  return rows;
+}
+
+// Escape user text, then wrap matched substrings in <mark>.
+// Sorts terms longest-first to avoid nested-replacement bugs.
+function highlightText(text, terms){
+  if (!text) return '';
+  const safe = esc(text);
+  if (!terms || !terms.length) return safe;
+  const sorted = [...new Set(terms)].sort((a,b) => b.length - a.length);
+  let out = safe;
+  for (const t of sorted) {
+    if (!t) continue;
+    const re = new RegExp('(' + t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+    out = out.replace(re, '<mark class="lt-mark">$1</mark>');
+  }
+  return out;
+}
+
+function renderStats(){
+  const all = state.history;
+  if (!all.length) { $('ltStats').hidden = true; return; }
+  $('ltStats').hidden = false;
+
+  const total = all.length;
+  const thisYearCount = state.filteredYear
+    ? all.filter(r => fmtYear(r.starts_at) === state.filteredYear).length
+    : 0;
+  // Total hours = sum of duration_minutes across all logged sessions
+  const totalMinutes = all.reduce((s, r) => s + (Number(r.duration_minutes) || 0), 0);
+  const totalHours = totalMinutes ? (totalMinutes / 60).toFixed(0) : '0';
+  // Avg rating across sessions that actually have a rating > 0
+  const rated = all.filter(r => Number(r.rating) > 0);
+  const avgRating = rated.length
+    ? (rated.reduce((s, r) => s + Number(r.rating), 0) / rated.length).toFixed(1)
+    : null;
+  // Earliest session date for "since" line
+  const earliest = all.reduce((min, r) => {
+    const t = new Date(r.starts_at).getTime();
+    return (!min || t < min) ? t : min;
+  }, null);
+  const sinceStr = earliest
+    ? new Date(earliest).toLocaleDateString('en-US',{month:'long',year:'numeric'})
+    : '';
+
+  $('ltStatsTotal').textContent = total;
+  $('ltStatsYear').textContent = thisYearCount;
+  $('ltStatsYearLabel').textContent = state.filteredYear ? `In ${state.filteredYear}` : 'This year';
+  $('ltStatsHours').textContent = totalHours;
+  $('ltStatsRating').textContent = avgRating ? `${avgRating}★` : '—';
+  $('ltStatsSince').textContent = sinceStr ? `Logging since ${sinceStr}` : '';
+}
+
+function render(){
+  // ─── All-time stat strip ─────────────────────────────────────────────
+  renderStats();
+
+  const rows = applyFilters();
+  const terms = parseSearchTerms(state.searchTerm);
+  const searching = terms.length > 0;
+
+  // Dim year pills when searching — search is cross-year
+  $('ltYearPills').classList.toggle('is-muted', searching);
+
+  // Count line — different copy when searching vs browsing
+  if (searching) {
+    $('ltCount').innerHTML = rows.length
+      ? `<strong>${rows.length}</strong> match${rows.length===1?'':'es'} for "${esc(state.searchTerm)}" across <strong>all years</strong>`
+      : `No matches for "${esc(state.searchTerm)}". Try fewer words or different terms.`;
+  } else {
+    $('ltCount').innerHTML = `<strong>${rows.length}</strong> session${rows.length===1?'':'s'} logged in ${state.filteredYear || 'all time'}`;
+  }
+  if (!rows.length) {
+    $('ltEmpty').hidden = false;
+    $('ltList').hidden = true;
+    return;
+  }
+  $('ltEmpty').hidden = true;
+  $('ltList').hidden = false;
+  $('ltList').innerHTML = rows.map(r => {
+    const d = new Date(r.starts_at);
+    const weekday = d.toLocaleDateString('en-US',{weekday:'short'});
+    const dayNum = d.getDate();
+    const monthShort = d.toLocaleDateString('en-US',{month:'short'});
+    const yr = d.getFullYear();
+    // Highlight matches when searching — focus area, key concepts, signature
+    const focusRaw = r.focus_area && r.focus_area.trim() ? r.focus_area : null;
+    const focus = focusRaw
+      ? highlightText(focusRaw, terms)
+      : '<span class="lt-card__focus--empty">No focus area written</span>';
+    const conceptsHtml = r.key_concepts && r.key_concepts.trim()
+      ? `<p class="lt-card__concepts">${highlightText(r.key_concepts, terms)}</p>` : '';
+    const statusKey = (r.status_label || '').toLowerCase();
+    const statusClass = ['engaging','low_energy','low_effort','in_progress','maintaining_progress','needs_improvement','completed'].includes(statusKey) ? statusKey : '';
+    const statusBadge = r.status_label
+      ? `<span class="lt-card__status lt-card__status--${esc(statusClass || 'in_progress')}">${highlightText(fmtStatusLabel(r.status_label), terms)}</span>`
+      : '';
+    const typeBadge = r.type_label
+      ? `<span class="lt-card__type">${highlightText(fmtStatusLabel(r.type_label), terms)}</span>` : '';
+    const fileBit = r.active_file_count > 0
+      ? `<span class="lt-card__files">📎 ${r.active_file_count} attachment${r.active_file_count===1?'':'s'}</span>`
+      : '';
+    const sigClass = r.taught_by_substitute ? 'lt-card__signature lt-card__signature--sub' : 'lt-card__signature';
+    const sigText = r.lesson_assistant_name
+      ? `<p class="${sigClass}">${r.taught_by_substitute ? 'Substitute · ' : ''}Logged by ${highlightText(r.lesson_assistant_name, terms)}</p>`
+      : '';
+    // When searching cross-year, also show feedback snippet if it has a match
+    let snippetHtml = '';
+    if (terms.length && r.feedback && terms.some(t => r.feedback.toLowerCase().includes(t))) {
+      snippetHtml = `<p class="lt-card__concepts" style="font-style:italic;color:#52606D;margin-top:8px;">"${highlightText(r.feedback, terms)}"</p>`;
+    }
+    const rating = Math.max(0, Math.min(5, Number(r.rating) || 0));
+    const ratingHtml = rating > 0
+      ? `<span class="lt-card__rating">${'★'.repeat(rating)}</span>`
+      : `<span class="lt-card__rating lt-card__rating--none">·····</span>`;
+    return `<div class="lt-card" data-appt-id="${esc(r.appointment_id)}">
+      <div class="lt-card__date">
+        <p class="lt-card__date-weekday">${esc(weekday)}</p>
+        <p class="lt-card__date-day">${dayNum}</p>
+        <p class="lt-card__date-month">${esc(monthShort)}</p>
+        <p class="lt-card__date-year">${yr}</p>
+      </div>
+      <div class="lt-card__body">
+        <p class="lt-card__focus">${focus}</p>
+        ${conceptsHtml}
+        ${snippetHtml}
+        <div class="lt-card__meta">
+          ${typeBadge}
+          ${fileBit}
+        </div>
+        ${sigText}
+      </div>
+      <div class="lt-card__right">
+        ${statusBadge}
+        ${ratingHtml}
+      </div>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('.lt-card').forEach(card => {
+    card.addEventListener('click', () => openModal(card.dataset.apptId));
+  });
+}
+
+// ─── Modal ────────────────────────────────────────────────────────────
+function wireModal(){
+  $('ltModalClose').addEventListener('click', closeModal);
+  $('ltCancel').addEventListener('click', closeModal);
+  $('ltModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+  $('ltSave').addEventListener('click', saveLog);
+
+  // Star picker
+  document.querySelectorAll('.lt-star-btn').forEach(btn => {
+    btn.addEventListener('click', () => setStars(Number(btn.dataset.star)));
+  });
+  $('ltStarClear').addEventListener('click', () => setStars(0));
+
+  // Inline URL form
+  $('ltAddUrlBtn').addEventListener('click', openUrlForm);
+  $('ltUrlCancel').addEventListener('click', closeUrlForm);
+  $('ltUrlSave').addEventListener('click', saveUrl);
+  $('ltUrlInput').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('ltUrlLabel').focus(); } });
+  $('ltUrlLabel').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveUrl(); } });
+
+  // Phase 18d: file upload zone (click + drag-drop)
+  const dropZone = $('ltDropZone');
+  const fileInput = $('ltFileInput');
+  dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }});
+  fileInput.addEventListener('change', e => handleFiles(Array.from(e.target.files || [])));
+  ['dragenter','dragover'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); dropZone.classList.add('is-dragging'); }));
+  ['dragleave','drop'].forEach(evt => dropZone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); dropZone.classList.remove('is-dragging'); }));
+  dropZone.addEventListener('drop', e => {
+    const files = Array.from(e.dataTransfer?.files || []);
+    if (files.length) handleFiles(files);
+  });
+
+  // Phase 18b.3: recap pane collapse toggle
+  $('ltRecapToggle').addEventListener('click', () => {
+    const body = $('ltRecapBody'); const chev = $('ltRecapChev');
+    const open = body.classList.toggle('is-open');
+    chev.classList.toggle('is-open', open);
+  });
+
+  // Esc to close
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && $('ltModal').dataset.open === 'true') closeModal();
+  });
+}
+
+// ─── File upload handler (Phase 18d) ────────────────────────────────────
+async function handleFiles(files){
+  if (!files.length) return;
+  const dropZone = $('ltDropZone');
+  const text = $('ltDropText');
+  dropZone.classList.add('lt-upload-zone--busy');
+  // Ensure a lesson log exists first
+  let logId = state.editingLogId;
+  if (!logId) {
+    try {
+      const log = await window.pmHiring.upsertLessonLog({
+        appointmentId: state.editingAppointmentId,
+        clientId: state.editingClientId,
+        focusArea: $('ltFocus').value.trim() || null,
+      });
+      logId = log.id;
+      state.editingLogId = logId;
+    } catch (e) {
+      alert('Could not create log for upload: ' + (e?.message || e));
+      dropZone.classList.remove('lt-upload-zone--busy');
+      return;
+    }
+  }
+  // Upload each file sequentially with progress text
+  for (let i = 0; i < files.length; i++) {
+    const f = files[i];
+    text.innerHTML = `<strong>Uploading ${i+1}/${files.length}…</strong> ${esc(f.name)}`;
+    try {
+      const created = await window.pmHiring.uploadLessonFile({
+        lessonLogId: logId, clientId: state.editingClientId, file: f,
+      });
+      state.editingFiles.push(created);
+      renderFilesInModal();
+    } catch (e) {
+      alert(`Upload failed for ${f.name}: ${e?.message || e}`);
+    }
+  }
+  text.innerHTML = '<strong>Click to choose</strong> or drag files here';
+  dropZone.classList.remove('lt-upload-zone--busy');
+  $('ltFileInput').value = ''; // reset so same file can be re-selected
+  toast(`Uploaded ${files.length} file${files.length===1?'':'s'}`);
+}
+
+// ─── Recap pane (Phase 18b.3) ──────────────────────────────────────────
+async function loadRecap(appointmentId){
+  const recapWrap = $('ltRecap');
+  const body = $('ltRecapBody');
+  recapWrap.hidden = true;
+  body.innerHTML = '';
+  try {
+    const recent = await window.pmHiring.fetchRecentLessonContext({
+      clientId: state.clientId,
+      beforeAppointmentId: appointmentId,
+      limit: 3,
+    });
+    if (!recent.length) {
+      // Still show the pane but with a hint
+      $('ltRecapCount').textContent = 'no prior sessions';
+      body.innerHTML = '<p class="lt-recap__empty">This is the first logged session for this family. Welcome!</p>';
+      recapWrap.hidden = false;
+      return;
+    }
+    $('ltRecapCount').textContent = `last ${recent.length} session${recent.length===1?'':'s'}`;
+    body.innerHTML = recent.map(r => {
+      const d = new Date(r.starts_at);
+      const dateStr = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+      const filled = Math.max(0, Math.min(5, Number(r.rating) || 0));
+      const ratingHtml = filled > 0 ? `<span class="lt-recap__row-rating">${'★'.repeat(filled)}</span>` : '';
+      const statusHtml = r.status_label ? `<span>${esc(fmtStatusLabel(r.status_label))}</span>` : '';
+      const fileBit = r.active_file_count > 0 ? `<span>📎 ${r.active_file_count}</span>` : '';
+      const sigBit = r.taught_by_substitute && r.lesson_assistant_name
+        ? `<span style="color:#92400E;">Taught by ${esc(r.lesson_assistant_name)}</span>` : '';
+      const focusHtml = r.focus_area && r.focus_area.trim()
+        ? esc(r.focus_area)
+        : '<span class="lt-recap__row-focus--empty">No focus area recorded</span>';
+      const privHtml = r.internal_note_body && r.internal_note_body.trim()
+        ? `<div class="lt-recap__row-private"><strong>Your private note</strong>${esc(r.internal_note_body)}</div>`
+        : '';
+      return `<div class="lt-recap__row">
+        <div class="lt-recap__row-head">
+          <span class="lt-recap__row-date">${esc(dateStr)}</span>
+          <span class="lt-recap__row-meta">${ratingHtml}${statusHtml}${fileBit}${sigBit}</span>
+        </div>
+        <p class="lt-recap__row-focus">${focusHtml}</p>
+        ${privHtml}
+      </div>`;
+    }).join('');
+    recapWrap.hidden = false;
+  } catch (e) {
+    console.warn('loadRecap:', e);
+  }
+}
+
+function setStars(n){
+  const cur = currentStarValue();
+  const newVal = (cur === n && n > 0) ? 0 : n;
+  document.querySelectorAll('.lt-star-btn').forEach(b => {
+    b.classList.toggle('is-on', Number(b.dataset.star) <= newVal);
+  });
+}
+function currentStarValue(){ return Array.from(document.querySelectorAll('.lt-star-btn.is-on')).length; }
+
+async function openModal(appointmentId){
+  state.editingAppointmentId = appointmentId;
+  state.editingClientId = state.clientId;
+  state.editingLogId = null;
+  state.editingFiles = [];
+
+  // Reset all fields
+  ['ltFocus','ltConcepts','ltStatus','ltType','ltFeedback','ltNext','ltPrivate'].forEach(id => $(id).value = '');
+  setStars(0);
+  closeUrlForm();
+
+  const histRow = state.history.find(r => r.appointment_id === appointmentId);
+  const dateStr = histRow ? fmtDateLong(histRow.starts_at) : '';
+  const timeStr = histRow ? `${fmtTime(histRow.starts_at)} – ${fmtTime(histRow.ends_at)}` : '';
+  $('ltModalSub').textContent = [dateStr, timeStr].filter(Boolean).join(' · ');
+  $('ltModalMeta').textContent = state.clientName || '';
+
+  const log = await window.pmHiring.fetchLessonLog(appointmentId);
+  if (log) {
+    state.editingLogId = log.id;
+    $('ltFocus').value    = log.focus_area || '';
+    $('ltConcepts').value = log.key_concepts || '';
+    $('ltStatus').value   = log.status_label || '';
+    $('ltType').value     = log.type_label || '';
+    $('ltFeedback').value = log.feedback || '';
+    $('ltNext').value     = log.next_session_notes || '';
+    setStars(log.rating || 0);
+    state.editingFiles = log.files || [];
+    // Last edited footer
+    if (log.updated_at) {
+      $('ltModalMeta').textContent = `${state.clientName || ''} · Last edited ${fmtRelative(log.updated_at)}${log.assistant_display_name ? ' by ' + log.assistant_display_name : ''}`;
+    }
+    // Private notes (separate table)
+    try {
+      const priv = await window.pmHiring.fetchLessonInternalNote(log.id);
+      if (priv?.body) $('ltPrivate').value = priv.body;
+    } catch (_) {}
+  }
+  renderFilesInModal();
+  $('ltModal').dataset.open = 'true';
+  setTimeout(() => $('ltFocus').focus(), 80);
+  // Phase 18b.3: fire-and-forget recap fetch (renders when ready)
+  loadRecap(appointmentId);
+}
+
+function closeModal(){
+  $('ltModal').dataset.open = 'false';
+  closeUrlForm();
+  state.editingAppointmentId = null;
+  state.editingClientId = null;
+  state.editingLogId = null;
+  state.editingFiles = [];
+}
+
+function renderFilesInModal(){
+  $('ltAttachCount').textContent = state.editingFiles.length;
+  const list = $('ltFilesList');
+  if (!state.editingFiles.length) {
+    list.innerHTML = '<p class="lt-attachments__empty">No files or links yet.</p>';
+    return;
+  }
+  list.innerHTML = state.editingFiles.map(f => {
+    const kindClass = f.kind === 'url' ? 'lt-file-row__kind--url' : 'lt-file-row__kind--file';
+    const isLegacy = f.kind === 'file' && f.storage_path && f.storage_path.startsWith('legacy/');
+    let nameHtml;
+    if (f.kind === 'url') {
+      nameHtml = `<a href="${esc(f.external_url)}" target="_blank" rel="noopener">${esc(f.display_name)}</a>`;
+    } else if (isLegacy) {
+      nameHtml = `<span style="color:#9CA3AF;">${esc(f.display_name)}</span>`;
+    } else {
+      nameHtml = `<a href="#" data-download-id="${esc(f.id)}">${esc(f.display_name)}</a>`;
+    }
+    const sizeStr = f.size_bytes ? ` · ${(f.size_bytes/1024/1024).toFixed(1)} MB` : '';
+    const legacyTag = isLegacy ? ' · <span style="color:#92400E;">Archival placeholder (Google Drive)</span>' : '';
+    const meta = (f.uploaded_by_display_name
+      ? `Added by ${esc(f.uploaded_by_display_name)} · ${fmtRelative(f.uploaded_at)}`
+      : '') + sizeStr + legacyTag;
+    return `<div class="lt-file-row" data-file-id="${esc(f.id)}">
+      <span class="lt-file-row__kind ${kindClass}">${f.kind}</span>
+      <div class="lt-file-row__body">
+        <p class="lt-file-row__name">${nameHtml}</p>
+        ${meta ? `<p class="lt-file-row__meta">${meta}</p>` : ''}
+      </div>
+      <button type="button" class="lt-file-row__del" data-file-id="${esc(f.id)}" title="Remove">×</button>
+    </div>`;
+  }).join('');
+  list.querySelectorAll('.lt-file-row__del').forEach(b => {
+    b.addEventListener('click', e => { e.stopPropagation(); deleteFile(b.dataset.fileId); });
+  });
+  // Wire download links to fetch signed URL on click
+  list.querySelectorAll('a[data-download-id]').forEach(a => {
+    a.addEventListener('click', async e => {
+      e.preventDefault();
+      const file = state.editingFiles.find(f => f.id === a.dataset.downloadId);
+      if (!file?.storage_path) return;
+      const url = await window.pmHiring.getLessonFileSignedUrl(file.storage_path);
+      if (url) window.open(url, '_blank');
+      else alert('Could not generate download link.');
+    });
+  });
+}
+
+async function deleteFile(fileId){
+  if (!confirm('Remove this file/link? It will be hidden from the family but kept in the audit log.')) return;
+  try {
+    await window.pmHiring.softDeleteLessonFile(fileId);
+    state.editingFiles = state.editingFiles.filter(f => f.id !== fileId);
+    renderFilesInModal();
+    toast('Removed');
+  } catch (e) {
+    alert('Could not remove: ' + (e?.message || e));
+  }
+}
+
+// ─── Inline URL form ────────────────────────────────────────────────────
+function openUrlForm(){
+  $('ltUrlForm').dataset.open = 'true';
+  $('ltUrlInput').value = '';
+  $('ltUrlLabel').value = '';
+  setTimeout(() => $('ltUrlInput').focus(), 50);
+}
+function closeUrlForm(){
+  $('ltUrlForm').dataset.open = 'false';
+}
+async function saveUrl(){
+  const url = $('ltUrlInput').value.trim();
+  if (!url) { $('ltUrlInput').focus(); return; }
+  let label = $('ltUrlLabel').value.trim();
+  if (!label) label = url.replace(/^https?:\/\//,'').replace(/^www\./,'').slice(0, 60);
+  const btn = $('ltUrlSave');
+  btn.disabled = true;
+  try {
+    let logId = state.editingLogId;
+    if (!logId) {
+      // Create a log first so the URL can attach to something
+      const log = await window.pmHiring.upsertLessonLog({
+        appointmentId: state.editingAppointmentId,
+        clientId: state.editingClientId,
+        focusArea: $('ltFocus').value.trim() || null,
+      });
+      logId = log.id;
+      state.editingLogId = logId;
+    }
+    const created = await window.pmHiring.addLessonUrl({ lessonLogId: logId, displayName: label, url });
+    state.editingFiles.push(created);
+    renderFilesInModal();
+    closeUrlForm();
+    toast('Link added');
+  } catch (e) {
+    alert('Could not add link: ' + (e?.message || e));
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ─── Save the log (and close modal) ─────────────────────────────────────
+async function saveLog(){
+  const btn = $('ltSave');
+  btn.disabled = true;
+  try {
+    const log = await window.pmHiring.upsertLessonLog({
+      appointmentId: state.editingAppointmentId,
+      clientId: state.editingClientId,
+      focusArea: $('ltFocus').value.trim() || null,
+      keyConcepts: $('ltConcepts').value.trim() || null,
+      statusLabel: $('ltStatus').value || null,
+      typeLabel: $('ltType').value || null,
+      feedback: $('ltFeedback').value.trim() || null,
+      nextSessionNotes: $('ltNext').value.trim() || null,
+      rating: currentStarValue(),
+    });
+    state.editingLogId = log.id;
+    // Private internal note (separate table)
+    const priv = $('ltPrivate').value;
+    if (priv.trim() || state.editingLogId) {
+      try { await window.pmHiring.upsertLessonInternalNote({ lessonLogId: log.id, body: priv }); }
+      catch (e) { console.warn('private note save failed:', e); }
+    }
+    toast('Saved');
+    closeModal();
+    await refreshHistory();
+  } catch (e) {
+    alert('Save failed: ' + (e?.message || e));
+  } finally {
+    btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>

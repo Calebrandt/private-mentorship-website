@@ -1080,6 +1080,39 @@
     return data;
   }
 
+  // Phase 12.1: per-appointment spend breakdown.
+  // Returns { contract_minutes_used, bank_minutes_used, uncovered_minutes,
+  // is_complimentary, session_duration_minutes }. Used by the assistant
+  // workspace to show "Used X from contract + Y from bank" on completed
+  // session rows so the spend story is visible (not just a balance drop).
+  async function fetchAppointmentSpend(appointmentId) {
+    if (!appointmentId) return null;
+    try {
+      const { data, error } = await sb().rpc('get_appointment_spend', {
+        p_appointment_id: appointmentId,
+      });
+      if (error) { console.warn('fetchAppointmentSpend', error); return null; }
+      return data || null;
+    } catch (_) { return null; }
+  }
+
+  // Convenience: fetch spend for many appointments in parallel.
+  // Returns Map<appointmentId, spendObj>. Skips non-completed rows since
+  // their spend is always zero anyway.
+  async function fetchAppointmentSpendBatch(appointments) {
+    const out = new Map();
+    if (!Array.isArray(appointments) || !appointments.length) return out;
+    const completed = appointments.filter(a => (a?.status || '').toLowerCase() === 'completed');
+    if (!completed.length) return out;
+    const results = await Promise.all(
+      completed.map(a => fetchAppointmentSpend(a.id).then(s => [a.id, s]).catch(() => [a.id, null]))
+    );
+    for (const [id, spend] of results) {
+      if (spend) out.set(id, spend);
+    }
+    return out;
+  }
+
   // Phase 12.2: assistant nudges family to use their banked hours.
   // Posts a templated message to the family's CLIENT_SHARED conversation
   // thread (the same one used by messages.html). Family receives it as
@@ -1175,6 +1208,316 @@
       banked_hrs_at_send: bankedHrs,
       template_used: customBody ? 'custom' : template,
     };
+  }
+
+  // ─── Phase 18: Lesson Tracker (post-session journal) ─────────────────
+  // Each completed appointment gets a session_lesson_logs row. Assistant
+  // writes after the session: focus area, key concepts, status/type,
+  // feedback, rating. Files + URL links attach via session_lesson_files.
+  // Family reads. RLS handles all permissions.
+
+  // Fetch the lesson log for one appointment + its non-deleted files.
+  async function fetchLessonLog(appointmentId) {
+    if (!appointmentId) return null;
+    try {
+      const { data: log, error: logErr } = await sb()
+        .from('session_lesson_logs')
+        .select('id, appointment_id, client_id, assistant_id, assistant_display_name, focus_area, key_concepts, status_label, type_label, next_session_notes, feedback, rating, created_at, updated_at')
+        .eq('appointment_id', appointmentId)
+        .maybeSingle();
+      if (logErr) { console.warn('fetchLessonLog log:', logErr); return null; }
+      if (!log) return null;
+      const { data: files, error: fileErr } = await sb()
+        .from('session_lesson_files')
+        .select('id, lesson_log_id, kind, display_name, storage_path, external_url, mime_type, size_bytes, description, uploaded_by, uploaded_by_role, uploaded_by_display_name, uploaded_at')
+        .eq('lesson_log_id', log.id)
+        .is('deleted_at', null)
+        .order('uploaded_at', { ascending: true });
+      if (fileErr) console.warn('fetchLessonLog files:', fileErr);
+      return { ...log, files: files || [] };
+    } catch (e) { console.warn('fetchLessonLog threw:', e); return null; }
+  }
+
+  // Create or update a lesson log. The unique constraint on appointment_id
+  // means upserting on conflict is the right pattern.
+  async function upsertLessonLog({
+    appointmentId, clientId,
+    focusArea = null, keyConcepts = null,
+    statusLabel = null, typeLabel = null,
+    nextSessionNotes = null, feedback = null,
+    rating = null,
+  }) {
+    if (!appointmentId) throw new Error('appointmentId required');
+    if (!clientId) throw new Error('clientId required');
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not signed in');
+    // Display name from profiles (denormalized snapshot — also a trigger fallback exists)
+    let displayName = null;
+    try {
+      const { data: prof } = await sb().from('profiles').select('full_name').eq('user_id', user.id).maybeSingle();
+      displayName = prof?.full_name || null;
+    } catch (_) {}
+    const payload = {
+      appointment_id: appointmentId,
+      client_id: clientId,
+      assistant_id: user.id,
+      assistant_display_name: displayName,
+      focus_area: focusArea,
+      key_concepts: keyConcepts,
+      status_label: statusLabel,
+      type_label: typeLabel,
+      next_session_notes: nextSessionNotes,
+      feedback: feedback,
+      rating: rating == null ? null : Math.max(0, Math.min(5, Number(rating))),
+      updated_by: user.id,
+    };
+    // Check if existing row to decide insert vs update path
+    const { data: existing } = await sb()
+      .from('session_lesson_logs').select('id').eq('appointment_id', appointmentId).maybeSingle();
+    if (existing?.id) {
+      const { data, error } = await sb()
+        .from('session_lesson_logs').update(payload).eq('id', existing.id).select().single();
+      if (error) throw error;
+      return data;
+    }
+    payload.created_by = user.id;
+    const { data, error } = await sb()
+      .from('session_lesson_logs').insert(payload).select().single();
+    if (error) throw error;
+    return data;
+  }
+
+  // Add a URL link to an existing lesson log.
+  async function addLessonUrl({ lessonLogId, displayName, url, description = null }) {
+    if (!lessonLogId) throw new Error('lessonLogId required');
+    if (!url || !url.trim()) throw new Error('url required');
+    const trimmedUrl = url.trim();
+    const safeName = (displayName && displayName.trim()) || trimmedUrl;
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not signed in');
+    // Detect family vs assistant from family_assignments
+    let role = 'assistant';
+    try {
+      const { data } = await sb()
+        .from('family_assignments').select('role').eq('user_id', user.id).limit(1).maybeSingle();
+      if (data?.role === 'OWNER') role = 'family';
+    } catch (_) {}
+    const { data, error } = await sb()
+      .from('session_lesson_files')
+      .insert({
+        lesson_log_id: lessonLogId,
+        kind: 'url',
+        display_name: safeName,
+        external_url: trimmedUrl,
+        description,
+        uploaded_by: user.id,
+        uploaded_by_role: role,
+      })
+      .select().single();
+    if (error) throw error;
+    return data;
+  }
+
+  // Soft-delete a file/URL row (assistants own everything; family can only
+  // soft-delete their own uploads via RLS).
+  async function softDeleteLessonFile(fileId) {
+    if (!fileId) throw new Error('fileId required');
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not signed in');
+    const { error } = await sb()
+      .from('session_lesson_files')
+      .update({ deleted_at: new Date().toISOString(), deleted_by: user.id })
+      .eq('id', fileId);
+    if (error) throw error;
+    return true;
+  }
+
+  // Fetch the lesson history for one client (most recent first).
+  // Used by both the assistant's "Lesson history" pane and the family's
+  // read-only journal view.
+  async function fetchLessonHistory(clientId, { year = null, limit = 200 } = {}) {
+    if (!clientId) return [];
+    try {
+      let q = sb()
+        .from('v_appointment_with_lesson')
+        .select('appointment_id, client_id, starts_at, ends_at, duration_minutes, appointment_status, appointment_title, is_complimentary, lesson_log_id, lesson_assistant_id, lesson_assistant_name, focus_area, key_concepts, status_label, type_label, next_session_notes, feedback, rating, lesson_logged_at, active_file_count, taught_by_substitute')
+        .eq('client_id', clientId)
+        .not('lesson_log_id', 'is', null)
+        .order('starts_at', { ascending: false })
+        .limit(limit);
+      if (year) {
+        q = q.gte('starts_at', `${year}-01-01`).lt('starts_at', `${Number(year) + 1}-01-01`);
+      }
+      const { data, error } = await q;
+      if (error) { console.warn('fetchLessonHistory:', error); return []; }
+      return data || [];
+    } catch (e) { console.warn('fetchLessonHistory threw:', e); return []; }
+  }
+
+  // Phase 18b.1: PRIVATE internal notes (assistant-only, family CANNOT read).
+  // Lives in a separate table with strict RLS — family/client have zero
+  // policies on it so the row is invisible to them at the DB level.
+  async function fetchLessonInternalNote(lessonLogId) {
+    if (!lessonLogId) return null;
+    try {
+      const { data, error } = await sb()
+        .from('session_lesson_internal_notes')
+        .select('lesson_log_id, body, updated_at, updated_by')
+        .eq('lesson_log_id', lessonLogId)
+        .maybeSingle();
+      if (error) { console.warn('fetchLessonInternalNote:', error); return null; }
+      return data || null;
+    } catch (_) { return null; }
+  }
+
+  // Phase 18d: upload a real file to the lesson-files Storage bucket and
+  // create a matching session_lesson_files row.
+  // Path scheme: {client_id}/{lesson_log_id}/{file-uuid}-{cleanName}
+  async function uploadLessonFile({ lessonLogId, clientId, file, description = null }) {
+    if (!lessonLogId) throw new Error('lessonLogId required');
+    if (!clientId) throw new Error('clientId required');
+    if (!file) throw new Error('file required');
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not signed in');
+    // Detect family vs assistant from family_assignments
+    let role = 'assistant';
+    try {
+      const { data } = await sb()
+        .from('family_assignments').select('role').eq('user_id', user.id).limit(1).maybeSingle();
+      if (data?.role === 'OWNER') role = 'family';
+    } catch (_) {}
+    // Sanitize filename + build storage path
+    const cleanName = String(file.name || 'file').replace(/[^a-zA-Z0-9._-]+/g, '_').slice(0, 120);
+    const fileUuid = (crypto?.randomUUID && crypto.randomUUID()) || (Date.now() + '-' + Math.random().toString(36).slice(2, 10));
+    const storagePath = `${clientId}/${lessonLogId}/${fileUuid}-${cleanName}`;
+    // Upload to Storage
+    const { error: upErr } = await sb().storage
+      .from('lesson-files')
+      .upload(storagePath, file, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: file.type || 'application/octet-stream',
+      });
+    if (upErr) throw upErr;
+    // Insert metadata row
+    const { data: row, error: rowErr } = await sb()
+      .from('session_lesson_files')
+      .insert({
+        lesson_log_id: lessonLogId,
+        kind: 'file',
+        display_name: file.name || cleanName,
+        storage_path: storagePath,
+        mime_type: file.type || null,
+        size_bytes: file.size || null,
+        description,
+        uploaded_by: user.id,
+        uploaded_by_role: role,
+      })
+      .select().single();
+    if (rowErr) {
+      // Best-effort cleanup of the orphan blob if metadata insert failed
+      try { await sb().storage.from('lesson-files').remove([storagePath]); } catch (_) {}
+      throw rowErr;
+    }
+    return row;
+  }
+
+  // Get a temporary signed URL for downloading a stored lesson file.
+  // Returns null for legacy placeholder paths (those from Phase 18e
+  // historical backfill that start with "legacy/google-drive/").
+  async function getLessonFileSignedUrl(storagePath, expiresInSeconds = 3600) {
+    if (!storagePath) return null;
+    if (storagePath.startsWith('legacy/')) return null; // historical placeholder
+    try {
+      const { data, error } = await sb().storage
+        .from('lesson-files')
+        .createSignedUrl(storagePath, expiresInSeconds);
+      if (error) { console.warn('getLessonFileSignedUrl:', error); return null; }
+      return data?.signedUrl || null;
+    } catch (_) { return null; }
+  }
+
+  // Phase 18b.3: fetch the previous N lesson logs for this client (older
+  // than the given appointment) so the assistant gets quick context on
+  // what was covered last time. Includes private internal notes (RLS
+  // protects them — family can't read this RPC's output anyway since they
+  // wouldn't query for it, and the internal_notes table denies them).
+  async function fetchRecentLessonContext({ clientId, beforeAppointmentId = null, limit = 3 }) {
+    if (!clientId) return [];
+    try {
+      // Resolve the anchor date
+      let beforeDate = null;
+      if (beforeAppointmentId) {
+        const { data: a } = await sb()
+          .from('appointments').select('starts_at').eq('id', beforeAppointmentId).maybeSingle();
+        beforeDate = a?.starts_at || null;
+      }
+      let q = sb()
+        .from('v_appointment_with_lesson')
+        .select('appointment_id, starts_at, focus_area, key_concepts, status_label, type_label, rating, lesson_log_id, lesson_assistant_name, taught_by_substitute, active_file_count')
+        .eq('client_id', clientId)
+        .not('lesson_log_id', 'is', null)
+        .order('starts_at', { ascending: false })
+        .limit(limit);
+      if (beforeDate) q = q.lt('starts_at', beforeDate);
+      const { data: recent, error } = await q;
+      if (error) { console.warn('fetchRecentLessonContext:', error); return []; }
+      const rows = recent || [];
+      if (!rows.length) return [];
+      // Hydrate with private internal notes
+      const logIds = rows.map(r => r.lesson_log_id).filter(Boolean);
+      let notesByLog = new Map();
+      if (logIds.length) {
+        const { data: notes } = await sb()
+          .from('session_lesson_internal_notes')
+          .select('lesson_log_id, body')
+          .in('lesson_log_id', logIds);
+        (notes || []).forEach(n => notesByLog.set(n.lesson_log_id, n.body));
+      }
+      return rows.map(r => ({ ...r, internal_note_body: notesByLog.get(r.lesson_log_id) || null }));
+    } catch (e) { console.warn('fetchRecentLessonContext threw:', e); return []; }
+  }
+
+  async function upsertLessonInternalNote({ lessonLogId, body }) {
+    if (!lessonLogId) throw new Error('lessonLogId required');
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not signed in');
+    const trimmed = (body || '').trim() || null;
+    // Try update first; if 0 rows touched, insert
+    const { data: existing } = await sb()
+      .from('session_lesson_internal_notes')
+      .select('lesson_log_id').eq('lesson_log_id', lessonLogId).maybeSingle();
+    if (existing) {
+      const { data, error } = await sb()
+        .from('session_lesson_internal_notes')
+        .update({ body: trimmed, updated_by: user.id })
+        .eq('lesson_log_id', lessonLogId)
+        .select().single();
+      if (error) throw error;
+      return data;
+    }
+    const { data, error } = await sb()
+      .from('session_lesson_internal_notes')
+      .insert({ lesson_log_id: lessonLogId, body: trimmed, updated_by: user.id })
+      .select().single();
+    if (error) throw error;
+    return data;
+  }
+
+  // Bulk-fetch lesson logs for a set of appointments (used by row preview
+  // in assistant-schedule.html "Needs your attention" + "Recent history").
+  async function fetchLessonLogsForAppointments(appointmentIds) {
+    if (!Array.isArray(appointmentIds) || !appointmentIds.length) return new Map();
+    try {
+      const { data, error } = await sb()
+        .from('session_lesson_logs')
+        .select('id, appointment_id, focus_area, status_label, rating, assistant_display_name')
+        .in('appointment_id', appointmentIds);
+      if (error) return new Map();
+      const m = new Map();
+      (data || []).forEach(row => m.set(row.appointment_id, row));
+      return m;
+    } catch (_) { return new Map(); }
   }
 
   // ─── Phase 7: Change-token status (counter + warnings) ──────────────
@@ -1475,11 +1818,11 @@
     }
   }
 
-  // List the families this assistant is engaged with — based on contracts.
-  // Returns one row per contract with a `client` shape attached.
+  // List the families this assistant is engaged with — DEDUPED to one row
+  // per client. Picks the most-relevant contract per family: active first,
+  // then draft. (A family with both — active May contract + draft June
+  // renewal — used to show twice. Fixed 2026-05-16.)
   // Default statuses match the contract_status enum: active + draft.
-  // (Older versions of this function included 'paused' and 'pending' which
-  // are NOT in the enum — Postgres 400'd the entire query. Fixed 2026-05-15.)
   // Pass `statuses` to override.
   async function fetchMyAssignedClients({ statuses = ['active','draft'] } = {}) {
     const user = await getCurrentUser();
@@ -1504,7 +1847,18 @@
           .in('id', clientIds);
         (clients || []).forEach(c => { clientsById[c.id] = c; });
       }
-      return (contracts || []).map(c => ({
+      // Dedupe: pick best contract per client (active > draft; if same status,
+      // most recent start_at wins because we ordered DESC above).
+      const STATUS_RANK = { active: 0, draft: 1, paused: 2 };
+      const bestByClient = new Map();
+      for (const c of (contracts || [])) {
+        const existing = bestByClient.get(c.client_id);
+        if (!existing) { bestByClient.set(c.client_id, c); continue; }
+        const aRank = STATUS_RANK[(c.status || '').toLowerCase()] ?? 99;
+        const bRank = STATUS_RANK[(existing.status || '').toLowerCase()] ?? 99;
+        if (aRank < bRank) bestByClient.set(c.client_id, c);
+      }
+      return Array.from(bestByClient.values()).map(c => ({
         contract: c,
         client: clientsById[c.client_id] || { id: c.client_id, full_name: null },
       }));
@@ -1761,12 +2115,33 @@
   async function fetchMyClientRecord() {
     const { data: u } = await sb().auth.getUser();
     if (!u?.user) return null;
-    const { data, error } = await sb().from('clients')
+    // Case 1 — the client themselves (clients.profile_id matches their auth uid).
+    const { data: direct } = await sb().from('clients')
       .select('id, full_name, display_name, hours_balance, active_plan_id, plan_started_at, created_at')
       .eq('profile_id', u.user.id)
       .maybeSingle();
-    if (error) return null;
-    return data || null;
+    if (direct) return direct;
+    // Case 2 — a FAMILY MEMBER (OWNER role in family_assignments). Family
+    // members like the parent or sibling sign in and need to see their
+    // client's record. Falls back to the family_assignments lookup so
+    // every page using fetchMyClientRecord/_myClientId still works for them.
+    try {
+      const { data: fa } = await sb().from('family_assignments')
+        .select('client_id')
+        .eq('user_id', u.user.id)
+        .eq('role', 'OWNER')
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (fa?.client_id) {
+        const { data: viaFamily } = await sb().from('clients')
+          .select('id, full_name, display_name, hours_balance, active_plan_id, plan_started_at, created_at')
+          .eq('id', fa.client_id)
+          .maybeSingle();
+        return viaFamily || null;
+      }
+    } catch (_) {}
+    return null;
   }
 
   // ─── Client-side: dashboard data ──────────────────────────────────────────
@@ -1881,6 +2256,55 @@
         .order('invoice_date', { ascending: true });
       return r.data || [];
     } catch (_) { return []; }
+  }
+
+  // Phase 19b: Full payment history for one client (lifetime, both family
+  // and assistant views). Returns invoices + line items + optional linked
+  // contract details (start_at, end_at, status, included_minutes) so the UI
+  // can render a unified Payment History table without separate roundtrips.
+  async function fetchClientPaymentHistory(clientId) {
+    if (!clientId) return [];
+    try {
+      // Pull every invoice for the client (including voids — we filter visually)
+      const { data: invoices, error: invErr } = await sb()
+        .from('invoices')
+        .select('id, contract_id, status, invoice_number, invoice_date, total_cents, amount_paid_cents, balance_due_cents, currency, subject, customer_notes, billing_name, client_name, issued_at')
+        .eq('client_id', clientId)
+        .order('invoice_date', { ascending: false });
+      if (invErr) { console.warn('fetchClientPaymentHistory invoices:', invErr); return []; }
+      const rows = invoices || [];
+      if (!rows.length) return [];
+
+      // Pull line items in one shot
+      const invoiceIds = rows.map(r => r.id);
+      const { data: lines } = await sb()
+        .from('invoice_lines')
+        .select('id, invoice_id, position, description, quantity, hours, hourly_rate_cents, unit_price_cents, line_total_cents')
+        .in('invoice_id', invoiceIds)
+        .order('position', { ascending: true });
+      const linesByInvoice = new Map();
+      (lines || []).forEach(l => {
+        if (!linesByInvoice.has(l.invoice_id)) linesByInvoice.set(l.invoice_id, []);
+        linesByInvoice.get(l.invoice_id).push(l);
+      });
+
+      // Pull linked contracts in one shot (only for invoices that have contract_id)
+      const contractIds = [...new Set(rows.map(r => r.contract_id).filter(Boolean))];
+      let contractsById = new Map();
+      if (contractIds.length) {
+        const { data: contracts } = await sb()
+          .from('contracts')
+          .select('id, status, start_at, end_at, included_minutes')
+          .in('id', contractIds);
+        (contracts || []).forEach(c => contractsById.set(c.id, c));
+      }
+
+      return rows.map(r => ({
+        ...r,
+        line_items: linesByInvoice.get(r.id) || [],
+        contract: r.contract_id ? (contractsById.get(r.contract_id) || null) : null,
+      }));
+    } catch (e) { console.warn('fetchClientPaymentHistory threw:', e); return []; }
   }
 
   // Appointments — flexible filter for both upcoming + history.
@@ -2550,14 +2974,25 @@
     // Phase 12 — bank-hours (leftover carryover)
     fetchClientBankSummary, fetchMyBankSummary, fetchClientBankHistory,
     adminAdjustBankBalance,
+    // Phase 12.1 — bank-hours spend (per-appointment breakdown)
+    fetchAppointmentSpend, fetchAppointmentSpendBatch,
     // Phase 12.2 — assistant nudges family to use banked hours
     assistantSuggestBankHoursUsage,
+    // Phase 18 — Lesson Tracker (post-session journal)
+    fetchLessonLog, upsertLessonLog, addLessonUrl, softDeleteLessonFile,
+    fetchLessonHistory, fetchLessonLogsForAppointments,
+    fetchLessonInternalNote, upsertLessonInternalNote,
+    // Phase 18b.3 — Recent-session context for prep
+    fetchRecentLessonContext,
+    // Phase 18d — Real file uploads via Supabase Storage
+    uploadLessonFile, getLessonFileSignedUrl,
     // assistant-side (Phase 3)
     updateMyAssistantProfile, fetchMyAssistantHoursLedger,
     // admin: clients
     adminCreateClientAccount, adminListClients, adminFetchHomeKpis, adminFetchMonthlyStats,
     // client (self)
     fetchMyClientRecord, fetchMyConversations, fetchMyContracts, fetchMyInvoices,
+    fetchClientPaymentHistory,
     fetchMyAppointments, fetchMyAttendanceSummary, fetchAssistantNamesByIds,
     fetchMyTasksSummary, fetchMyHomeworkSummary,
     fetchMyHoursLedger, fetchMySalesReceipts,

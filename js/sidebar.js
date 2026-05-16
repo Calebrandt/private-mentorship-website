@@ -50,7 +50,7 @@
       { type: 'link', href: 'assistant-dashboard.html', label: 'Dashboard', icon: 'dashboard' },
       { type: 'link', href: 'messages.html', label: 'Inbox', icon: 'message', dynamicBadge: 'messages-unread' },
       { type: 'section', label: 'Work' },
-      { type: 'link', href: 'assistant-clients.html', label: 'My Clients', icon: 'users' },
+      { type: 'link', href: 'assistant-clients.html', label: 'My Families', icon: 'users' },
       { type: 'link', href: 'assistant-schedule.html', label: 'My Schedule', icon: 'calendar', dynamicBadge: 'assistant-needs-attention' },
       { type: 'link', href: 'assistant-availability.html', label: 'Availability', icon: 'clock' },
       { type: 'section', label: 'Earnings' },

@@ -272,6 +272,14 @@
   .wc-row__status--late_cancelled{background:#FEE2E2;color:#991B1B;}
   .wc-row__status--no_show{background:#F1F5F9;color:#64748B;}
   .wc-row__status--reserved{background:#F1F5F9;color:#64748B;}
+  /* Phase 12.1: spend breakdown chip — only shown when bank was tapped */
+  .wc-row__spend{
+    font-size:11px;color:#92400E;background:#FEF3C7;border:1px solid #FDE68A;
+    border-radius:6px;padding:2px 7px;margin-top:4px;display:inline-block;font-weight:600;
+    line-height:1.4;letter-spacing:.01em;
+  }
+  .wc-row__spend--overage{color:#991B1B;background:#FEE2E2;border-color:#FCA5A5;}
+  .wc-row__spend--comp{color:#1E3A8A;background:#DBEAFE;border-color:#BFDBFE;}
 
   /* Empty/loading */
   .wc-empty,.wc-loading{padding:32px 20px;text-align:center;color:#64748B;font-size:12.5px;line-height:1.5;}
@@ -292,6 +300,44 @@
   .wc-contract__row:nth-last-child(-n+2){border-bottom:none;padding-bottom:0;}
   .wc-contract__row dt{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A3B8;margin:0;}
   .wc-contract__row dd{font-size:13.5px;color:#0F172A;margin:0;font-weight:500;}
+
+  /* Phase 19b — Payment History card (compact, premium) */
+  .wc-payments{background:#fff;border:1px solid #E2E8F0;border-radius:14px;overflow:hidden;margin-bottom:18px;box-shadow:0 1px 2px rgba(15,23,42,0.03);}
+  .wc-payments__head{padding:18px 22px 14px;border-bottom:1px solid #F1F5F9;}
+  .wc-payments__title{font-family:"Archivo","Inter",sans-serif;font-size:15px;font-weight:800;color:#0F172A;margin:0 0 3px;letter-spacing:-.01em;}
+  .wc-payments__sub{font-size:11.5px;color:#64748B;margin:0;line-height:1.5;}
+  .wc-payments__stats{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:12px 22px;background:#F8FAFC;border-bottom:1px solid #F1F5F9;flex-wrap:wrap;
+  }
+  .wc-payments__stat{display:inline-flex;align-items:baseline;gap:6px;}
+  .wc-payments__stat-num{
+    font-family:"Archivo","Inter",sans-serif;font-size:15px;font-weight:800;color:#0F172A;
+    letter-spacing:-.02em;font-variant-numeric:tabular-nums;
+  }
+  .wc-payments__stat-label{font-size:10px;color:#64748B;font-weight:600;letter-spacing:.06em;text-transform:uppercase;}
+  .wc-payments__stat-divider{width:1px;height:18px;background:#E2E8F0;}
+  .wc-payments__since{font-size:11px;color:#94A3B8;font-weight:500;margin-left:auto;}
+  .wc-payments__list{max-height:360px;overflow-y:auto;}
+  .wc-payments__row{
+    display:grid;grid-template-columns:1fr auto auto auto;gap:14px;align-items:center;
+    padding:12px 22px;border-bottom:1px solid #F1F5F9;
+  }
+  .wc-payments__row:last-child{border-bottom:none;}
+  .wc-payments__row:hover{background:#FAFBFC;}
+  .wc-payments__row-label{font-size:13px;font-weight:600;color:#0F172A;letter-spacing:-.005em;margin:0;}
+  .wc-payments__row-date{font-size:11px;color:#94A3B8;font-weight:500;margin:2px 0 0;}
+  .wc-payments__row-notes{font-size:11px;color:#64748B;margin:3px 0 0;line-height:1.45;font-style:italic;}
+  .wc-payments__row-amount{font-size:13.5px;font-weight:700;color:#0F172A;font-variant-numeric:tabular-nums;letter-spacing:-.005em;white-space:nowrap;}
+  .wc-payments__row-hours{font-size:11.5px;color:#64748B;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .wc-payments__row-status{
+    font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    padding:3px 8px;border-radius:6px;white-space:nowrap;
+  }
+  .wc-payments__row-status--paid{background:#D1FAE5;color:#047857;}
+  .wc-payments__row-status--open{background:#FEF3C7;color:#92400E;}
+  .wc-payments__row-status--void{background:#FEE2E2;color:#991B1B;}
+  .wc-payments__empty{padding:32px 22px;text-align:center;color:#94A3B8;font-size:12.5px;}
 
   /* Header actions */
   .wc-actions{display:flex;gap:8px;}
@@ -324,6 +370,10 @@
       </div>
       <div class="wc-hero__actions">
         <span class="wc-hero__status" id="wcStatus">—</span>
+        <a class="wc-book-btn" id="wcLessonBtn" style="background:#fff;color:#0071e3;border-color:#B3D0F5;text-decoration:none;display:inline-flex;align-items:center;gap:6px;" href="#" title="Open the lesson journal for this family">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h9a2 2 0 0 1 2 2v8a1 1 0 0 1-1 1H4a2 2 0 0 1-2-2V3z"/><line x1="2" y1="7" x2="13" y2="7"/></svg>
+          Lesson tracker
+        </a>
         <button type="button" class="wc-book-btn" id="wcBookBtn" hidden>
           <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
           Book new session
@@ -351,8 +401,8 @@
       <div class="wc-kpi wc-kpi--bank" id="kpiBankTile" hidden>
         <p class="wc-kpi__label">Bank hours</p>
         <span class="wc-kpi__value" id="kpiBank">—</span>
-        <p class="wc-kpi__sub">carried over from past contracts</p>
-        <button type="button" class="wc-kpi__bank-cta" id="wcBankNudgeBtn">
+        <p class="wc-kpi__sub">Unused hours migrated from this family's prior contracts. They do not expire and can fund longer sessions, extra sessions, or special outings.</p>
+        <button type="button" class="wc-kpi__bank-cta" id="wcBankNudgeBtn" title="Sends a short message to the family suggesting how to use their banked hours. They decide whether to book.">
           Suggest using these →
         </button>
       </div>
@@ -411,6 +461,16 @@
         </div>
       </dl>
     </section>
+
+    <!-- Phase 19b: Payment History (lifetime invoices for this family) -->
+    <section class="wc-payments" id="wcPayments" hidden>
+      <div class="wc-payments__head">
+        <h3 class="wc-payments__title">Payment history</h3>
+        <p class="wc-payments__sub">Every contract this family has paid for, oldest at the bottom.</p>
+      </div>
+      <div class="wc-payments__stats" id="wcPaymentsStats"></div>
+      <div class="wc-payments__list" id="wcPaymentsList"></div>
+    </section>
   </div>
 
   <div id="wcEmpty" hidden class="wc-empty" style="margin-top:24px;padding:60px 32px;">
@@ -423,7 +483,7 @@
 <div class="wc-modal-backdrop" id="wcBookModal" data-open="false">
   <div class="wc-modal" role="dialog" aria-modal="true">
     <h3 class="wc-modal__title">Book new session</h3>
-    <p class="wc-modal__body">Propose one to three slots for an additional session beyond the family's recurring schedule. Admin reviews and approves.</p>
+    <p class="wc-modal__body">Use this for sessions outside the recurring weekly schedule. Propose one to three slots; admin typically confirms within one business day.</p>
     <div class="wc-modal__row" id="wcBookContext"></div>
 
     <div id="wcBookSlots"></div>
@@ -443,7 +503,7 @@
         <label class="wc-billing-opt">
           <input type="radio" name="wcBookBilling" value="complimentary">
           <span class="wc-billing-opt__title">Complimentary</span>
-          <span class="wc-billing-opt__sub">No deduction — make-up, courtesy, brief check-in</span>
+          <span class="wc-billing-opt__sub">No hours deduct on completion. Use for make-ups, trial sessions, brief check-ins, or goodwill time. Logged permanently.</span>
         </label>
       </div>
       <div class="wc-billing-help" id="wcBookHelp" hidden>
@@ -579,14 +639,38 @@ function paletteFor(id){
   return palettes[hash % palettes.length];
 }
 
-function renderAppointmentRow(a){
+function renderSpendChip(spend){
+  if (!spend) return '';
+  // Complimentary sessions get their own chip — no hours moved at all.
+  if (spend.is_complimentary) {
+    return `<span class="wc-row__spend wc-row__spend--comp">Complimentary — no hours used</span>`;
+  }
+  const bank = Number(spend.bank_minutes_used || 0);
+  const uncovered = Number(spend.uncovered_minutes || 0);
+  const contract = Number(spend.contract_minutes_used || 0);
+  // Only show the chip when bank or overage was involved. Normal
+  // contract-only deductions don't need a chip — the status already says
+  // "completed" and the hours tile reflects the deduction.
+  if (bank <= 0 && uncovered <= 0) return '';
+  const bits = [];
+  if (contract > 0) bits.push(`${contract} min from contract`);
+  if (bank > 0) bits.push(`${bank} min from bank`);
+  if (uncovered > 0) bits.push(`${uncovered} min uncovered`);
+  const cls = uncovered > 0 ? ' wc-row__spend--overage' : '';
+  return `<span class="wc-row__spend${cls}">${escapeHtml(bits.join(' · '))}</span>`;
+}
+
+function renderAppointmentRow(a, spend){
   const start = a.starts_at ? new Date(a.starts_at) : null;
   const statusKey = (a.status || 'scheduled').toLowerCase();
   return `<div class="wc-row">
     <div class="wc-row__when">
       ${start ? `<strong>${escapeHtml(fmtDateShort(start))}</strong><small>${escapeHtml(fmtTime(start))}${a.duration_minutes ? ' · ' + escapeHtml(fmtDuration(a.duration_minutes)) : ''}</small>` : '<strong>—</strong>'}
     </div>
-    <div class="wc-row__body"><p>${a.notes ? escapeHtml(String(a.notes).slice(0,100)) : 'Client session'}</p></div>
+    <div class="wc-row__body">
+      <p>${a.notes ? escapeHtml(String(a.notes).slice(0,100)) : 'Client session'}</p>
+      ${renderSpendChip(spend)}
+    </div>
     <span class="wc-row__status wc-row__status--${escapeHtml(statusKey)}">${escapeHtml(statusKey.replace(/_/g,' '))}</span>
   </div>`;
 }
@@ -631,6 +715,10 @@ function renderAppointmentRow(a){
   wcStatus.textContent = statusKey;
   wcStatus.className = 'wc-hero__status wc-hero__status--' + statusClass;
 
+  // Phase 18: point the Lesson Tracker button at this client's tracker
+  const lessonBtn = document.getElementById('wcLessonBtn');
+  if (lessonBtn) lessonBtn.href = 'assistant-lesson-tracker.html?clientId=' + encodeURIComponent(clientId);
+
   // KPIs
   const planHours = ws.contract.included_minutes ? Math.round(ws.contract.included_minutes/60*10)/10 : 0;
   const usedHours = ws.hoursUsedMinutes ? Math.round(ws.hoursUsedMinutes/60*10)/10 : 0;
@@ -650,6 +738,64 @@ function renderAppointmentRow(a){
     }
   } catch (_) {}
 
+  // Phase 19b — Payment History (lifetime invoices for this family)
+  (async () => {
+    try {
+      const history = await window.pmHiring.fetchClientPaymentHistory(clientId);
+      if (!history || !history.length) return;
+      const fmtMoney = (cents, currency='CAD') => {
+        const n = Number(cents || 0) / 100;
+        return n.toLocaleString('en-CA', { style:'currency', currency, maximumFractionDigits: n >= 100 ? 0 : 2 });
+      };
+      // Parse YYYY-MM-DD in LOCAL time (not UTC) so display matches the
+      // payment date as recorded, regardless of viewer's timezone.
+      const fmtDateShort2 = (iso) => {
+        if (!iso) return '—';
+        const dateOnly = String(iso).split('T')[0];
+        const [y, m, d] = dateOnly.split('-').map(Number);
+        if (!y || !m || !d) return '—';
+        return new Date(y, m - 1, d).toLocaleDateString('en-CA', { month:'short', day:'numeric', year:'numeric' });
+      };
+      const totalCents = history.filter(p => p.status !== 'void')
+        .reduce((s,p) => s + (Number(p.amount_paid_cents) || 0), 0);
+      const totalHours = history.filter(p => p.status !== 'void')
+        .reduce((s,p) => s + (p.line_items||[]).reduce((ss,l) => ss + (Number(l.hours)||0), 0), 0);
+      const paidCount = history.filter(p => p.status === 'paid').length;
+      const oldest = history.length ? history[history.length-1].invoice_date : null;
+      const sinceStr = oldest ? new Date(oldest).toLocaleDateString('en-CA',{month:'long',year:'numeric'}) : '';
+
+      document.getElementById('wcPaymentsStats').innerHTML = `
+        <div class="wc-payments__stat"><span class="wc-payments__stat-num">${escapeHtml(fmtMoney(totalCents))}</span><span class="wc-payments__stat-label">Lifetime</span></div>
+        <span class="wc-payments__stat-divider"></span>
+        <div class="wc-payments__stat"><span class="wc-payments__stat-num">${paidCount}</span><span class="wc-payments__stat-label">Invoices paid</span></div>
+        <span class="wc-payments__stat-divider"></span>
+        <div class="wc-payments__stat"><span class="wc-payments__stat-num">${totalHours}</span><span class="wc-payments__stat-label">Hours purchased</span></div>
+        ${sinceStr ? `<span class="wc-payments__since">Since ${escapeHtml(sinceStr)}</span>` : ''}
+      `;
+
+      document.getElementById('wcPaymentsList').innerHTML = history.map(p => {
+        const status = String(p.status || 'paid').toLowerCase();
+        const label = p.subject || ('Invoice ' + (p.invoice_number || p.id.slice(0,8)));
+        const totalH = (p.line_items||[]).reduce((s,l) => s + (Number(l.hours)||0), 0);
+        const hoursStr = totalH > 0 ? `${totalH}h` : '—';
+        const amount = fmtMoney(p.amount_paid_cents || p.total_cents, p.currency || 'CAD');
+        const notesHtml = p.customer_notes
+          ? `<p class="wc-payments__row-notes">${escapeHtml(p.customer_notes)}</p>` : '';
+        return `<div class="wc-payments__row">
+          <div>
+            <p class="wc-payments__row-label">${escapeHtml(label)}</p>
+            <p class="wc-payments__row-date">${escapeHtml(fmtDateShort2(p.invoice_date))} · ${escapeHtml(p.invoice_number || '')}</p>
+            ${notesHtml}
+          </div>
+          <span class="wc-payments__row-amount">${escapeHtml(amount)}</span>
+          <span class="wc-payments__row-hours">${escapeHtml(hoursStr)}</span>
+          <span class="wc-payments__row-status wc-payments__row-status--${escapeHtml(status)}">${escapeHtml(status)}</span>
+        </div>`;
+      }).join('');
+      document.getElementById('wcPayments').hidden = false;
+    } catch (e) { console.warn('payment history failed:', e); }
+  })();
+
   // Upcoming
   const upcomingList = document.getElementById('upcomingList');
   if ((ws.upcomingAppointments || []).length) {
@@ -658,10 +804,23 @@ function renderAppointmentRow(a){
     document.getElementById('upcomingEmpty').hidden = false;
   }
 
-  // Recent
+  // Recent — render first without spend data, then enrich completed rows
+  // with the bank/contract spend chip (Phase 12.1). Two-pass keeps the UI
+  // snappy: initial paint shows immediately, chips appear ~100ms later.
   const recentList = document.getElementById('recentList');
   if ((ws.recentAppointments || []).length) {
-    recentList.innerHTML = ws.recentAppointments.map(renderAppointmentRow).join('');
+    recentList.innerHTML = ws.recentAppointments.map(a => renderAppointmentRow(a)).join('');
+    // Fire-and-forget: fetch spend breakdown for completed rows, then redraw.
+    (async () => {
+      try {
+        const spendMap = await window.pmHiring.fetchAppointmentSpendBatch(ws.recentAppointments);
+        if (spendMap && spendMap.size) {
+          recentList.innerHTML = ws.recentAppointments
+            .map(a => renderAppointmentRow(a, spendMap.get(a.id)))
+            .join('');
+        }
+      } catch (_) {}
+    })();
   } else {
     document.getElementById('recentEmpty').hidden = false;
   }
@@ -669,7 +828,7 @@ function renderAppointmentRow(a){
   // Contract details
   document.getElementById('ctrStatus').textContent = statusKey;
   document.getElementById('ctrPeriod').textContent = `${fmtDate(ws.contract.start_at)} → ${fmtDate(ws.contract.end_at)}`;
-  document.getElementById('ctrMinutes').textContent = ws.contract.included_minutes ? `${ws.contract.included_minutes} min (${planHours} hrs)` : '—';
+  document.getElementById('ctrMinutes').textContent = ws.contract.included_minutes ? `${planHours} hours` : '—';
   document.getElementById('ctrRenewal').textContent = ws.contract.renewal_mode || 'manual';
 
   // Phase 4: show the "Book new session" button only for ACTIVE contracts.

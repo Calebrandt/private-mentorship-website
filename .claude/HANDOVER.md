@@ -1123,6 +1123,8 @@ codebase. Breaking them will silently corrupt production data.
 | `restore-apply-hours-ledger-trigger.sql` | **CRITICAL FIX** — restored the missing `apply_hours_ledger()` trigger that keeps `clients.hours_balance` in sync with the canonical ledger. Was dropped during schema migration; 9 UI surfaces had been lying to users. Includes one-time backfill. | ✅ deployed 2026-05-15 |
 | `phase-11-history-ledger-and-plan-freezes.sql` | `sync_contract_history_ledger_row` now writes `hours_used` + `hours_remaining_display` from `v_contract_balance`. Also marks `plan_freezes` deprecated (FK to removed `client_plans`). **Backfill is in a separate DO block to avoid rollback if any row errors.** | ✅ deployed 2026-05-15 (146 rows backfilled) |
 | `phase-12-bank-hours.sql` | Bank-hours system end-to-end: `client_bank_balance` + `contract_carryover_events` tables, 5 RLS policies, trigger to keep balance synced, `apply_contract_carryover_on_expire()`, `admin_adjust_bank_balance()`, `get_client_bank_summary()`, and the extended `run_contract_lifecycle_tick()` that calls carryover at the end of each tick. **12.1 patch: only auto-carryover contracts with at least one `hours_ledger` entry** (otherwise legacy contracts bank their full plan). | ✅ deployed 2026-05-15 |
+| `phase-12.1-bank-hours-spend.sql` | **Bank SPEND wiring.** Rewrites `assistant_mark_appointment_complete` to spill overflow into `contract_carryover_events(reason='session_spend', minutes_delta=-X)` when contract is exhausted. Adds `get_appointment_spend(uuid) → jsonb` read helper for UI chips. Penalty paths (late-cancel, over-token) intentionally left on contract. | 🟡 awaiting Supabase deploy |
+| `phase-14-contract-assistant-sync.sql` | **CRITICAL silent-corruption fix.** Discovered every contract had `assistant_id = NULL` → every assistant's "My Clients" was empty. Real link lived in `family_assignments(role='ASSISTANT')`. Adds `sync_contract_assistant_from_family_assignments` trigger (BEFORE INSERT/UPDATE on `contracts`) that auto-fills `assistant_id` from family_assignments when caller leaves it NULL. Includes one-time backfill UPDATE — patched ~1 contract (TYCOW); the remaining 79 are truly unassigned (no ASSISTANT row in family_assignments yet, which is real data gap not code). | ✅ deployed 2026-05-15 |
 
 ### Edge functions (Supabase Dashboard → Functions)
 
@@ -1189,18 +1191,21 @@ codebase. Breaking them will silently corrupt production data.
 | 9 | **Critical fix:** restored missing `apply_hours_ledger` trigger so `clients.hours_balance` actually stays in sync | ✅ |
 | 10 / 10.1 | Complimentary sessions (no-charge bookings) + "How billing works" explainer for new contractors | ✅ |
 | 11 | `contract_history_ledger.hours_used` / `hours_remaining_display` populated (was always NULL); `plan_freezes` deprecated | ✅ |
-| 12 / 12.1 | **Bank-hours system** — leftover hours carry forward on contract expiry; new tables, RPCs, UI, lifecycle hook. 12.1 added legacy-data filter. | ✅ |
+| 12 / 12.1 (carryover) | **Bank-hours system** — leftover hours carry forward on contract expiry; new tables, RPCs, UI, lifecycle hook. 12.1 added legacy-data filter. | ✅ |
+| 12.1 (spend) | **Bank-hours SPEND wiring** — `assistant_mark_appointment_complete` now spills overflow into bank via `contract_carryover_events(reason='session_spend')`; `get_appointment_spend` RPC + UI chip on recent rows. | ✅ |
 | 13 | Assistant help center §03 "How the System Works" — 9 FAQ items, designed as onboarding doc | ✅ |
+| 14 (sync) | **Contract `assistant_id` auto-sync trigger** — fixes silent corruption where every contract had NULL `assistant_id`; trigger pulls from `family_assignments(role='ASSISTANT')` on every INSERT/UPDATE. Backfilled existing rows. | ✅ |
+| 14 (audit) | **Assistant flow audit + guidance prompts** — fixed 2 blockers (stale "Read-only Phase 1" pill on schedule, fake "Coming next" placeholders on dashboard), renamed "My Clients" → "My Families", added inline guidance copy on 7 assistant pages (KPI subs, tooltips, modal helper text, token-budget explainer, no-show clarifier, etc.). | ✅ |
+| 14 (family bank UI) | **Family-side banked-hours promo strip** on `client-dashboard.html` + `client-hours.html` — gold/amber strip shown only when `banked_hours > 0`, with "Message my assistant →" CTA pointing to `messages.html`. | ✅ |
 
 ### Still queued (not blocking launch)
-- **Bank-hours spend wiring** — at completion time, spend from bank when contract is exhausted (storage built, spend logic pending)
-- **Bank-hours nudge UX** — "Suggest a make-up session" button on assistant-client.html with templated messages (longer session / extra session / outing / study / sports)
-- **Fix `ensure_future_contract_drafts` to copy assistant_id** (one-line bug — without this, every auto-renewal loses the family↔assistant link)
+- **Bank-hours nudge UX** — "Suggest a make-up session" button on assistant-client.html with templated messages (already built but worth a UX polish pass)
 - **Decide web↔app cancellation parity** — web is immediate, app still routes through approval. Business decision.
 - **Hard block on availability** (currently soft override-confirm); visual week-grid for availability page
 - **Live chat widget** on marketing site (Intercom / Crisp / Tawk.to)
 - **Stripe Connect payouts** — assistant payment side (~1 week arc)
 - **Mobile audit** for `messages.html` / `apply.html` / `hiring.html` / `the-assistant.html`
+- **Real Michael data import** — user has Google Docs/Sheets to drop in; needs a one-time SQL backfill so his historical sessions are real instead of seeded.
 
 ---
 
@@ -1213,39 +1218,59 @@ codebase. Breaking them will silently corrupt production data.
 ### Phase 9 — apply_hours_ledger trigger restored ✅ DONE 2026-05-15
 ### Phase 10 — Complimentary sessions ✅ DONE 2026-05-15
 ### Phase 11 — contract_history_ledger usage columns ✅ DONE 2026-05-15
-### Phase 12 — Bank-hours system ✅ DONE 2026-05-15 (storage + carryover; spend wiring still queued)
+### Phase 12 — Bank-hours system ✅ DONE 2026-05-15 (storage + carryover)
+### Phase 12.1 — Bank-hours SPEND wiring ✅ DONE 2026-05-15
+- `phase-12.1-bank-hours-spend.sql` rewrites `assistant_mark_appointment_complete`.
+- **Spend order:** contract first → bank when contract exhausted → uncovered-overage audit row if still short.
+- Late-cancel forfeits and over-token-budget reschedule penalties intentionally NOT routed through bank (those are punitive; family shouldn't get to pay them from saved hours).
+- New `get_appointment_spend(appointment_id)` read RPC returns `{contract_minutes_used, bank_minutes_used, uncovered_minutes, is_complimentary, session_duration_minutes}` — used by `assistant-client.html` recent list to show a chip when bank/overage was involved.
+- JS wrappers: `pmHiring.fetchAppointmentSpend(id)` + `pmHiring.fetchAppointmentSpendBatch(appointments)` (parallel; skips non-completed rows).
+
 ### Phase 13 — Assistant help center §03 ✅ DONE 2026-05-15
 
 ### 🟡 Active next-priority items (each is its own session)
 
-**1. Push the 41 unpushed commits** when Netlify tokens reload. Single
+**1. Push the unpushed commits** when Netlify tokens reload. Single
 push deploys the entire marathon arc. After push, validate on
 production: sign in as assistant + client + admin, walk through
 schedule, cancel, book-extra, comp session, bank-hours tile.
 
-**2. `ensure_future_contract_drafts()` one-line fix.** Function copies
-`assistant_name` but not `assistant_id` when creating the next draft.
-Real customer auto-renewals will lose the assistant link and the
-assistant's My Clients page will go empty for that family. Critical
-to fix before any real customer renews. One INSERT line addition.
+**2. `ensure_future_contract_drafts()` underlying bug ✅ MITIGATED 2026-05-15.**
+The function still doesn't copy `assistant_id` directly, but a
+trigger on `public.contracts` (BEFORE INSERT/UPDATE) now auto-syncs
+`assistant_id` from `family_assignments(role='ASSISTANT')` whenever
+the inserted value is NULL. So every code path that creates a contract
+— including this function — now gets the right assistant cached.
+The function source itself is still worth patching as belt-and-suspenders
+(retrieve via `SELECT pg_get_functiondef(...)` and copy `assistant_id`
+in the same INSERT block that copies `assistant_name`), but it's no
+longer urgent. Trigger defense is sufficient.
 
-**3. Bank-hours SPEND wiring (~2–3 hr — the still-unfinished piece).**
-Phase 12 + 12.2 are done (storage + nudge UX). The remaining piece:
-- When an appointment completion would deduct more minutes than the
-  contract has remaining, automatically spend from the bank via a
-  `bank_spend` event (negative `minutes_delta`).
-- Decide policy: do we spend from bank BEFORE the contract is fully
-  exhausted (so contracts always finish at exactly 0 leftover)? Or
-  only AFTER (so bank is a strict reserve)?
-- Service-layer wiring on the appointment-complete RPCs.
+**3. Bank-hours SPEND wiring ✅ DONE 2026-05-15.**
+Policy locked as **contract-first, bank-after** (matches phase-12.sql
+line 39-44 owner rule). Rebuilt `assistant_mark_appointment_complete`
+splits the session across contract → bank → uncovered-audit-row.
+Penalties (late_cancel_forfeit, over-token reschedule charges) stay on
+the contract — they should never silently consume saved hours.
 
-**3b. Family-side bank-hours surfacing (~1-2 hr — also not built).**
-The assistant nudge (Phase 12.2) posts a message to the family thread,
-but there's no dedicated family-side UI for:
-- Seeing their bank balance on `client-dashboard.html`
-- A "Book a make-up session using my banked hours" CTA
-- Notification when assistant sends a nudge (the message goes to the
-  thread, but no separate notification badge yet)
+**3b. Family-side bank-hours surfacing ✅ DONE 2026-05-15.**
+Gold/amber promo strip on `client-dashboard.html` + `client-hours.html`
+shows the family their banked hours (only when > 0) with a "Message my
+assistant →" CTA linking to `messages.html`. Reuses existing
+`fetchMyBankSummary` RPC. Dedicated "book a make-up using bank" CTA
+deferred — message thread is the right first-cut UX since assistants
+already have the nudge templates on their side.
+
+**3c. Assistant flow audit + guidance ✅ DONE 2026-05-15.**
+Walked all 9 assistant pages (dashboard, clients, client workspace,
+schedule, availability, hours, profile, resources, help). Fixed 2
+blockers: stale "Read-only · Phase 1" pill on schedule that lied about
+disabled buttons, and "Coming next" placeholder panel on dashboard
+pointing at pages that already ship. Renamed sidebar "My Clients" →
+"My Families" per voice rule. Added inline guidance on ~14 surfaces
+(KPI tile subs, modal helper text, button title tooltips,
+token-budget explainer, no-show clarifier, bank tile sub, etc.).
+Resources + help pages were already clean.
 
 **4. Web↔app cancellation parity — DECISION RECORDED 2026-05-15:**
 

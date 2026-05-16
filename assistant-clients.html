@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>My Clients — Private Mentorship Assistant</title>
+<title>My Families — Private Mentorship Assistant</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,500&display=swap" />
@@ -76,8 +76,8 @@
   <div class="ac-head">
     <div class="ac-head__body">
       <p class="ac-eyebrow">Work · Roster</p>
-      <h1 class="ac-h1">My Clients</h1>
-      <p class="ac-sub">Families currently engaged with you. Click any family to open their workspace — sessions, hours, notes, and contract details.</p>
+      <h1 class="ac-h1">My Families</h1>
+      <p class="ac-sub">Families currently engaged with you. Open a family to see their sessions, hours used, contract details, and bank balance.</p>
     </div>
     <span class="ac-count"><strong id="acCount">—</strong> Active</span>
   </div>
@@ -143,7 +143,7 @@ function paletteFor(id){
           ${hours ? `<strong>${hours}-hour plan</strong> · ` : ''}Contract: ${escapeHtml(periodStart)} → ${escapeHtml(periodEnd)}
         </p>
       </div>
-      <span class="ac-card__status ac-card__status--${escapeHtml(statusClass)}">${escapeHtml(statusKey)}</span>
+      <span class="ac-card__status ac-card__status--${escapeHtml(statusClass)}" title="Active: contract is running. Paused: family on freeze. Pending: contract approved but not started. Draft: not yet signed.">${escapeHtml(statusKey)}</span>
       <svg class="ac-card__chev" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 4 11 8 6 12"/></svg>
     </a>`;
   }).join('');

@@ -312,9 +312,8 @@
     <div class="as-head__body">
       <p class="as-eyebrow">Work · Calendar</p>
       <h1 class="as-h1">My Schedule</h1>
-      <p class="as-sub">Every session across every family you're assigned to. Reschedule and complete-session actions arrive in the next phase — this view is read-only for now.</p>
+      <p class="as-sub">Every session across every family you're assigned to. Use the row actions to mark a session complete, mark a no-show, propose a reschedule, or cancel.</p>
     </div>
-    <span class="as-ro-pill">Read-only · Phase 1</span>
   </div>
 
   <!-- Week grid -->
@@ -358,7 +357,7 @@
     <div class="as-card__head">
       <div class="as-card__titleBlock">
         <h2 class="as-card__title">Needs your attention</h2>
-        <p class="as-card__sub">Sessions that have already happened — mark each one complete or no-show.</p>
+        <p class="as-card__sub">Sessions whose start time has passed. Mark each one complete or no-show — hours do not deduct from the family's contract until you do.</p>
       </div>
     </div>
     <div id="asNeedsWrap"></div>
@@ -634,8 +633,8 @@ function upcomingRowHtml(a){
   const rightSide = pending
     ? `<span class="as-pending-pill">${escapeHtml(pending.request_type === 'cancel' ? 'Cancel pending' : 'Reschedule pending')}</span>`
     : `<div class="as-upcoming-row__btns">
-         <button type="button" class="as-btn--ghost" data-action="reschedule" data-appt-id="${escapeHtml(a.id)}">⤴ Reschedule</button>
-         <button type="button" class="as-btn--ghost is-danger" data-action="cancel-request" data-appt-id="${escapeHtml(a.id)}">✕ Cancel</button>
+         <button type="button" class="as-btn--ghost" data-action="reschedule" data-appt-id="${escapeHtml(a.id)}" title="Propose up to three alternate times. Admin picks one and notifies the family.">⤴ Reschedule</button>
+         <button type="button" class="as-btn--ghost is-danger" data-action="cancel-request" data-appt-id="${escapeHtml(a.id)}" title="Cancels this session immediately. No admin step. The family is not charged.">✕ Cancel</button>
        </div>`;
 
   return `<div class="as-upcoming-row" data-appt-id="${escapeHtml(a.id)}">
@@ -746,7 +745,7 @@ function openConfirm(kind, apptId){
     confirm.textContent = 'Mark complete';
   } else {
     title.textContent = 'Mark as no-show?';
-    body.innerHTML = `This will record a <strong>no-show</strong> for this session and forfeit <strong>${escapeHtml(hoursLabel(min))}</strong> from this family's contract.`;
+    body.innerHTML = `This will record a <strong>no-show</strong> for this session and forfeit <strong>${escapeHtml(hoursLabel(min))}</strong> from this family's contract. Use this only when the family did not show up or cancelled inside the policy window — not for your own cancellations.`;
     confirm.className = 'as-modal__confirm as-modal__confirm--no-show';
     confirm.textContent = 'Mark no-show';
   }
@@ -901,6 +900,7 @@ function openReschedule(apptId){
     <span><b>Family:</b> ${escapeHtml(clientName)}</span>
     <span><b>Duration:</b> ${escapeHtml(hoursLabel(durationOf(appt)))}</span>
     <span data-token-line>—</span>
+    <span style="color:#64748B;font-size:11.5px;line-height:1.45;margin-top:2px;">Each family has three reschedule or cancel tokens per contract period. After tokens run out, the session length deducts from the family's contract.</span>
   `;
 
   document.getElementById('asReschedReason').value = '';

@@ -40,6 +40,32 @@
 
   /* KPI cards */
   .nx-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:24px;}
+  /* Phase 12 — banked-hours promo strip (only visible when banked > 0) */
+  .nx-bank-strip{
+    background:linear-gradient(135deg,#FEF3C7 0%,#FDE68A 100%);
+    border:1px solid #FBBF24;border-radius:14px;padding:18px 22px;
+    display:flex;align-items:center;gap:16px;margin-bottom:24px;
+    box-shadow:0 2px 6px rgba(146,64,14,0.08);
+  }
+  .nx-bank-strip__icon{
+    width:48px;height:48px;border-radius:50%;
+    background:rgba(255,255,255,0.55);color:#92400E;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .nx-bank-strip__icon svg{width:24px;height:24px;stroke-width:2;}
+  .nx-bank-strip__body{flex:1;min-width:0;}
+  .nx-bank-strip__title{font-size:15px;font-weight:700;color:#78350F;margin:0 0 3px;letter-spacing:-.01em;}
+  .nx-bank-strip__sub{font-size:12.5px;color:#92400E;margin:0;line-height:1.5;}
+  .nx-bank-strip__cta{
+    background:#fff;color:#92400E;border:1px solid #FBBF24;border-radius:9999px;
+    font-size:12.5px;font-weight:600;padding:8px 14px;text-decoration:none;
+    white-space:nowrap;transition:background .15s ease;
+  }
+  .nx-bank-strip__cta:hover{background:#FEF3C7;}
+  @media (max-width:640px){
+    .nx-bank-strip{flex-direction:column;align-items:flex-start;}
+    .nx-bank-strip__cta{width:100%;text-align:center;}
+  }
   .nx-kpi{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:26px 24px;box-shadow:0 1px 2px rgba(15,23,42,0.04);transition:box-shadow .2s ease, transform .2s ease;}
   .nx-kpi:hover{box-shadow:0 12px 28px -10px rgba(15,23,42,0.14);transform:translateY(-2px);}
   .nx-kpi__icon{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:inset 0 -2px 6px rgba(0,0,0,0.10);}
@@ -198,6 +224,18 @@
     </div>
   </section>
 
+  <!-- Phase 12 — banked-hours promo strip (auto-shown when balance > 0) -->
+  <section class="nx-bank-strip" id="bankStrip" hidden>
+    <div class="nx-bank-strip__icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><path d="M7 16h2"/></svg>
+    </div>
+    <div class="nx-bank-strip__body">
+      <p class="nx-bank-strip__title">You have <span id="bankHrs">—</span> banked hour<span id="bankPlural">s</span> from past contracts</p>
+      <p class="nx-bank-strip__sub">These do not expire. Talk to your assistant about using them for a longer session, an extra session, or a special outing.</p>
+    </div>
+    <a class="nx-bank-strip__cta" href="messages.html">Message my assistant →</a>
+  </section>
+
   <!-- Hours ledger -->
   <section class="nx-card" style="margin-bottom:22px;">
     <div class="nx-card__head">
@@ -319,12 +357,25 @@
   $('nxUserAvatar').textContent = (firstName[0] || 'C').toUpperCase();
 
   // Pull data
-  const [client, ledger, invoices, receipts] = await Promise.all([
+  const [client, ledger, invoices, receipts, bank] = await Promise.all([
     window.pmHiring.fetchMyClientRecord().catch(()=>null),
     window.pmHiring.fetchMyHoursLedger({ limit: 50 }).catch(()=>({transactions:[],totalAdded:0,totalUsed:0})),
     window.pmHiring.fetchMyInvoices(12).catch(()=>[]),
     window.pmHiring.fetchMySalesReceipts({ limit: 30 }).catch(()=>[]),
+    window.pmHiring.fetchMyBankSummary().catch(()=>null),
   ]);
+
+  // Phase 12: banked-hours promo strip
+  try {
+    const bankHrs = Number(bank?.banked_hours || 0);
+    if (bankHrs > 0) {
+      const rounded = Math.round(bankHrs * 10) / 10;
+      $('bankHrs').textContent = rounded;
+      $('bankPlural').textContent = (rounded === 1) ? '' : 's';
+      const strip = document.getElementById('bankStrip');
+      if (strip) strip.hidden = false;
+    }
+  } catch (_) {}
 
   // KPIs
   $('kpiHours').textContent = Number(client?.hours_balance || 0).toFixed(1);
