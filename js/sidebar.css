@@ -480,24 +480,28 @@ body.pm-has-calendar{padding-right:320px;}
 /* ════════════════════════════════════════════════════════════
    Phase 19r — Collapse / show toggle
    ────────────────────────────────────────────────────────────
-   The right-side calendar can be hidden so the main page fills
-   the full viewport width. When collapsed:
-     • body.pm-cal-collapsed hides the aside
+   Lets the user hide the right-side calendar so the main page
+   fills the full viewport. When collapsed:
+     • body.pm-cal-collapsed hides the aside (with a slide-out)
      • the host grid (.dash-shell) flattens to 1fr
      • the fixed-mode body padding is removed
-     • a small floating "show calendar" pill appears on the right edge
+     • a labeled "Calendar" pill appears on the right edge
    ════════════════════════════════════════════════════════════ */
 
-/* Close (×) button anchored to the top-right of the calendar header */
-.dash-cal{ position:sticky; } /* already set above, restated for clarity */
+/* Small topbar row inside the calendar — gives the close button its own
+   space so it doesn't visually collide with the user-pod's chevron. */
+.dash-cal-topbar{
+  display:flex; align-items:center; justify-content:flex-end;
+  padding:4px 12px 0;
+}
 .dash-cal-close{
-  position:absolute; top:10px; right:10px; z-index:2;
-  width:26px; height:26px; padding:0;
+  display:inline-flex; align-items:center; gap:6px;
+  height:26px; padding:0 10px;
   border:1px solid var(--dash-border);
   background:var(--dash-card);
   color:var(--dash-ink-mute);
   border-radius:7px; cursor:pointer;
-  display:inline-flex; align-items:center; justify-content:center;
+  font:600 11.5px Inter,sans-serif; letter-spacing:.005em;
   transition:background .14s ease, color .14s ease, border-color .14s ease, transform .14s ease;
 }
 .dash-cal-close:hover{
@@ -505,15 +509,39 @@ body.pm-has-calendar{padding-right:320px;}
   color:var(--dash-ink-2);
   border-color:var(--dash-ink-tert);
 }
-.dash-cal-close:active{ transform:scale(.94); }
-.dash-cal-close svg{ width:14px; height:14px; display:block; }
+.dash-cal-close:active{ transform:scale(.96); }
+.dash-cal-close svg{ width:12px; height:12px; display:block; }
+.dash-cal-close__label{ line-height:1; }
 
-/* When collapsed: hide aside + remove the fixed-mode body padding */
-body.pm-cal-collapsed .dash-cal{ display:none !important; }
-body.pm-cal-collapsed.pm-has-calendar{ padding-right:0 !important; }
+/* Slide the aside out smoothly when collapsed (instead of a hard hide) */
+.dash-cal{
+  transition:transform .26s cubic-bezier(.22,1,.36,1), opacity .22s ease;
+  will-change:transform;
+}
+body.pm-cal-collapsed .dash-cal{
+  transform:translateX(110%);
+  opacity:0;
+  pointer-events:none;
+}
+/* Once the slide finishes, drop the aside out of the flow on the @1180+
+   layouts so it can't catch clicks or steal width. */
+@media (min-width:1181px){
+  body.pm-cal-collapsed .dash-cal{
+    /* keep transform for the animation */
+  }
+}
+
+/* Remove the fixed-mode body padding when hidden, so the page fills width */
+body.pm-cal-collapsed.pm-has-calendar{
+  padding-right:0 !important;
+  transition:padding-right .26s cubic-bezier(.22,1,.36,1);
+}
+body.pm-has-calendar{
+  transition:padding-right .26s cubic-bezier(.22,1,.36,1);
+}
 
 /* Flatten any host grid that reserved a column for the calendar.
-   Covers the dashboard shells used across client pages. */
+   Covers the dashboard shell used by client-dashboard. */
 body.pm-cal-collapsed .dash-shell,
 body.pm-cal-collapsed .dash-layout,
 body.pm-cal-collapsed .pm-dash-shell,
@@ -521,30 +549,49 @@ body.pm-cal-collapsed .with-right-cal{
   grid-template-columns:1fr !important;
 }
 
-/* Floating "show calendar" pill on the right edge */
+/* ── Labeled "Calendar" pill pinned to the right edge of the viewport ── */
 .dash-cal-show-pill{
-  position:fixed; top:50%; right:0; transform:translateY(-50%);
-  width:28px; height:60px;
+  position:fixed; top:50%; right:0;
+  transform:translateY(-50%);
+  display:inline-flex; align-items:center; gap:8px;
+  height:44px; padding:0 14px 0 12px;
   border:1px solid var(--dash-border);
   border-right:none;
-  border-top-left-radius:10px;
-  border-bottom-left-radius:10px;
+  border-top-left-radius:12px;
+  border-bottom-left-radius:12px;
   background:var(--dash-card);
   color:var(--dash-ink-mute);
-  display:inline-flex; align-items:center; justify-content:center;
   cursor:pointer; z-index:60;
-  box-shadow:-2px 0 8px -2px rgba(0,0,0,0.12);
-  transition:background .14s ease, color .14s ease, width .14s ease;
+  box-shadow:-3px 0 14px -4px rgba(15,23,42,0.14);
+  transition:background .16s ease, color .16s ease, padding .16s ease, transform .16s ease;
+  font-family:inherit;
+}
+.dash-cal-show-pill::after{
+  /* tiny calendar text label — only visible on hover */
+  content:"Calendar";
+  font:600 12px Inter,sans-serif;
+  letter-spacing:-.005em;
+  max-width:0; overflow:hidden; white-space:nowrap;
+  transition:max-width .18s ease, margin-right .18s ease;
 }
 .dash-cal-show-pill:hover{
   background:var(--dash-border-soft);
   color:var(--dash-ink-2);
-  width:32px;
+  padding-right:18px;
+  transform:translateY(-50%) translateX(-2px);
 }
-.dash-cal-show-pill svg{ width:14px; height:14px; display:block; }
+.dash-cal-show-pill:hover::after{
+  max-width:120px;
+}
+.dash-cal-show-pill__chev{
+  width:14px; height:14px; display:block; flex-shrink:0;
+}
+.dash-cal-show-pill__icon{
+  width:16px; height:16px; display:block; flex-shrink:0;
+}
 .dash-cal-show-pill[hidden]{ display:none; }
 [data-pm-theme="dark"] .dash-cal-show-pill{
-  box-shadow:-2px 0 12px -2px rgba(0,0,0,0.45);
+  box-shadow:-3px 0 16px -4px rgba(0,0,0,0.55);
 }
 
 /* On small screens the calendar is already hidden by the @media rule above,

@@ -9,9 +9,12 @@
   function html(initials, name, email) {
     return ''
       + '<aside class="dash-cal" aria-label="Calendar">'
-      +   '<button class="dash-cal-close" id="dashCalClose" type="button" title="Hide calendar" aria-label="Hide calendar">'
-      +     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
-      +   '</button>'
+      +   '<div class="dash-cal-topbar">'
+      +     '<button class="dash-cal-close" id="dashCalClose" type="button" title="Hide calendar" aria-label="Hide calendar">'
+      +       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>'
+      +       '<span class="dash-cal-close__label">Hide</span>'
+      +     '</button>'
+      +   '</div>'
       +   '<div class="dash-cal-user" role="button">'
       +     '<span class="dash-cal-user__avatar" id="dashCalUserAvatar">' + initials + '</span>'
       +     '<span class="dash-cal-user__body">'
@@ -145,7 +148,9 @@
     btn.type = 'button';
     btn.title = 'Show calendar';
     btn.setAttribute('aria-label', 'Show calendar');
-    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>';
+    btn.innerHTML = ''
+      + '<svg class="dash-cal-show-pill__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>'
+      + '<svg class="dash-cal-show-pill__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
     btn.addEventListener('click', function(){ setCollapsed(false); });
     document.body.appendChild(btn);
     btn.hidden = !isCollapsed();
