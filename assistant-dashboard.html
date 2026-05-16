@@ -105,16 +105,6 @@
   [data-dash-theme="dark"] .dash-theme-toggle__moon{display:none;}
   @media(max-width:780px){.nx-search{display:none;}.nx-topbar{padding:12px 16px;}}
 
-  /* Phase 19n: dash-shell grid — main content on the left, mini
-     calendar on the right (320px), same as client dashboard. Drops
-     to single column under 1180px. */
-  .dash-shell{
-    min-height:100vh;display:grid;
-    grid-template-columns:1fr 320px;background:var(--bg);
-  }
-  .dash-main-wrap{display:flex;flex-direction:column;min-width:0;background:var(--bg);}
-  @media(max-width:1180px){.dash-shell{grid-template-columns:1fr;} #pmCalendar{display:none;}}
-
   .ad-shell{padding:36px 32px 80px;max-width:1240px;margin:0 auto;}
 
   /* Hero — uses theme vars */
@@ -412,9 +402,12 @@
     display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
     box-shadow:0 2px 6px rgba(146,64,14,0.08);
   }
-  .ad-welcome__body{flex:1;min-width:260px;}
-  .ad-welcome__title{font-family:"Archivo","Inter",sans-serif;font-size:15px;font-weight:800;color:#78350F;margin:0 0 4px;letter-spacing:-.01em;}
-  .ad-welcome__sub{font-size:13px;color:#92400E;margin:0;line-height:1.55;}
+  .ad-welcome__body{flex:1;min-width:260px;max-width:780px;}
+  .ad-welcome__title{font-family:"Archivo","Inter",sans-serif;font-size:15px;font-weight:800;color:#78350F;margin:0 0 4px;letter-spacing:-.01em;text-wrap:balance;}
+  /* text-wrap:pretty prevents a single orphan word on the last line
+     ("find you." was dropping by itself and looked messy). Modern
+     browsers distribute the wrap so each line gets meaningful copy. */
+  .ad-welcome__sub{font-size:13px;color:#92400E;margin:0;line-height:1.55;text-wrap:pretty;}
   .ad-welcome a, .ad-welcome .ad-prof__edit{
     background:#fff;color:#92400E;border:1px solid #FDE68A;
     padding:8px 16px;border-radius:9999px;
@@ -432,14 +425,11 @@
 
 <div id="pmSidebar"></div>
 
-<!-- Phase 19n: dash-shell grid — main content on the left, mini
-     calendar widget injected on the right by js/right-calendar.js. -->
-<div class="dash-shell">
-<div class="dash-main-wrap">
-
 <!-- Phase 19n: top bar with search + theme toggle + userpod —
      matches the client-dashboard chrome so both views share the
-     same shell. -->
+     same shell. (Right-side mini calendar deliberately NOT mounted
+     on the assistant view per Caleb — that widget is for clients
+     only.) -->
 <header class="nx-topbar">
   <div class="nx-search">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -620,20 +610,11 @@
 
 </main>
 
-</div><!-- /.dash-main-wrap -->
-
-  <!-- Right calendar — injected by js/right-calendar.js -->
-  <div id="pmCalendar"></div>
-
-</div><!-- /.dash-shell -->
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515a"></script>
 <script src="js/hiring-service.js?v=20260516m"></script>
 <script src="js/session-calendar.js?v=20260515a"></script>
 <script src="js/sidebar.js?v=20260515d"></script>
-<!-- Phase 19n: mini calendar widget in the right column (same as client) -->
-<script src="js/right-calendar.js?v=20260512a"></script>
 <script>
 /* ============================================================================
  * assistant-dashboard.html — Phase 1 read-only home
