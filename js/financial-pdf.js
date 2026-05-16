@@ -37,8 +37,8 @@
   const BIZ = {
     name:    'Private Mentorship',
     tagline: 'Family-first academic & life mentorship',
-    email:   'caleb@privatementorship.com',
-    web:     'privatementorship.ca',
+    email:   'billing@private-mentorship.com',
+    web:     'private-mentorship.com',
     addr1:   'Vancouver, British Columbia',
     addr2:   'Canada',
   };
