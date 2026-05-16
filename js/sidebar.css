@@ -2587,3 +2587,310 @@ html[data-dash-theme="light"] body:has(.ad-shell) .ad-weekday__hours{
 html[data-dash-theme="light"] body:has(.ad-shell) .ad-weekday__name{
   color:#94a3b8 !important;
 }
+
+
+/* ════════════════════════════════════════════════════════════
+   Phase 19n + 19o — UNIVERSAL premium polish for ALL remaining
+   assistant + admin pages.
+   ────────────────────────────────────────────────────────────
+   Targets every page by class-prefix (.ac-*, .ah-*, .av-*,
+   .ap-*, .ar-*, .lt-*, .admin-*, .cc-*, .fz-*, .auth-*) plus
+   substring selectors for *-card / *-tile / *-h1 / *-sub
+   so any class-named-like-a-card gets the right treatment.
+
+   Same playbook:
+     • SIZING / TYPOGRAPHY / SPACING — applies BOTH themes
+     • COLOURS / SHADOWS — light mode only (dark untouched)
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Universal hero typography (every page's h1 + sub) ─────── */
+.ac-h1, .ah-h1, .av-h1, .ap-h1, .ar-h1, .lt-h1,
+.admin-h1, .cc-h1, .fz-h1, .auth-h1{
+  font:800 30px Inter,sans-serif !important;
+  letter-spacing:-.024em !important;
+  line-height:1.1 !important;
+  margin:0 0 8px !important;
+}
+.ac-sub, .ah-sub, .av-sub, .ap-sub, .ar-sub, .lt-sub,
+.admin-sub, .cc-sub, .fz-sub, .auth-sub{
+  font:500 15px Inter,sans-serif !important;
+  letter-spacing:-.005em !important;
+  line-height:1.55 !important;
+  max-width:680px !important;
+}
+.ac-eyebrow, .ah-eyebrow, .av-eyebrow, .ap-eyebrow, .ar-eyebrow,
+.lt-eyebrow, .admin-eyebrow, .auth-eyebrow{
+  font:700 11px Inter,sans-serif !important;
+  letter-spacing:.16em !important;
+  text-transform:uppercase !important;
+  margin:0 0 10px !important;
+}
+
+/* ── Universal shell padding ────────────────────────────────── */
+.ac-shell, .ah-shell, .av-shell, .ap-shell, .ar-shell,
+.admin-shell, .cc-shell, .fz-shell{
+  padding:40px 32px 96px !important;
+  max-width:1380px !important;
+  margin:0 auto !important;
+}
+
+/* ── Universal card elevation — light mode ──────────────────── */
+/* Substring selector catches everything ending in -card / -tile
+   / -kpi / -panel, while :not([class*="__"]) excludes BEM child
+   elements (e.g. .nx-card__head). Safe across namespaces. */
+html[data-dash-theme="light"] .ac-card,
+html[data-dash-theme="light"] .ah-card,
+html[data-dash-theme="light"] .av-card,
+html[data-dash-theme="light"] .ap-card,
+html[data-dash-theme="light"] .ar-card,
+html[data-dash-theme="light"] .admin-card,
+html[data-dash-theme="light"] .cc-card,
+html[data-dash-theme="light"] .fz-card,
+html[data-dash-theme="light"] .review-card,
+html[data-dash-theme="light"] .field-card,
+html[data-dash-theme="light"] .doc-card,
+html[data-dash-theme="light"] .corr-card,
+html[data-dash-theme="light"] .auth-card,
+html[data-dash-theme="light"] .ac-tile,
+html[data-dash-theme="light"] .ah-tile,
+html[data-dash-theme="light"] .admin-tile,
+html[data-dash-theme="light"] .ac-kpi,
+html[data-dash-theme="light"] .ah-kpi,
+html[data-dash-theme="light"] .av-kpi,
+html[data-dash-theme="light"] .admin-kpi,
+html[data-dash-theme="light"] .lt-stats,
+html[data-dash-theme="light"] .ah-summary,
+html[data-dash-theme="light"] .ap-section,
+html[data-dash-theme="light"] .ar-section{
+  background:#ffffff !important;
+  border:1px solid transparent !important;
+  border-radius:16px !important;
+  box-shadow:
+    0 0 0 1px rgba(15,23,42,0.06),
+    0 1px 3px rgba(15,23,42,0.04),
+    0 16px 36px -18px rgba(15,23,42,0.14) !important;
+}
+
+/* Universal KPI hover lift in light mode */
+html[data-dash-theme="light"] .ac-kpi:hover,
+html[data-dash-theme="light"] .ah-kpi:hover,
+html[data-dash-theme="light"] .av-kpi:hover,
+html[data-dash-theme="light"] .admin-kpi:hover{
+  transform:translateY(-3px);
+  box-shadow:
+    0 0 0 1px rgba(59,130,246,0.22),
+    0 4px 14px -2px rgba(59,130,246,0.12),
+    0 28px 56px -20px rgba(15,23,42,0.20) !important;
+  transition:transform .18s cubic-bezier(.22,1,.36,1), box-shadow .18s ease !important;
+}
+
+/* ── Hero text colour in light mode ─────────────────────────── */
+html[data-dash-theme="light"] .ac-h1,
+html[data-dash-theme="light"] .ah-h1,
+html[data-dash-theme="light"] .av-h1,
+html[data-dash-theme="light"] .ap-h1,
+html[data-dash-theme="light"] .ar-h1,
+html[data-dash-theme="light"] .lt-h1,
+html[data-dash-theme="light"] .admin-h1,
+html[data-dash-theme="light"] .cc-h1,
+html[data-dash-theme="light"] .fz-h1,
+html[data-dash-theme="light"] .auth-h1{
+  color:#0f172a !important;
+}
+html[data-dash-theme="light"] .ac-sub,
+html[data-dash-theme="light"] .ah-sub,
+html[data-dash-theme="light"] .av-sub,
+html[data-dash-theme="light"] .ap-sub,
+html[data-dash-theme="light"] .ar-sub,
+html[data-dash-theme="light"] .lt-sub,
+html[data-dash-theme="light"] .admin-sub,
+html[data-dash-theme="light"] .cc-sub,
+html[data-dash-theme="light"] .fz-sub,
+html[data-dash-theme="light"] .auth-sub{
+  color:#475569 !important;
+}
+html[data-dash-theme="light"] .ac-eyebrow,
+html[data-dash-theme="light"] .ah-eyebrow,
+html[data-dash-theme="light"] .av-eyebrow,
+html[data-dash-theme="light"] .ap-eyebrow,
+html[data-dash-theme="light"] .ar-eyebrow,
+html[data-dash-theme="light"] .lt-eyebrow,
+html[data-dash-theme="light"] .admin-eyebrow{
+  color:#2563eb !important;
+}
+
+/* ── Section / card titles + subs across all prefixes ───────── */
+.ac-card__title, .ah-card__title, .av-card__title, .ap-card__title,
+.ar-card__title, .admin-card__title, .cc-card__title, .fz-card__title,
+.review-card__title, .ac-section__title, .ah-section__title,
+.av-section__title, .ap-section__title, .ar-section__title{
+  font:700 17px Inter,sans-serif !important;
+  letter-spacing:-.014em !important;
+}
+.ac-card__sub, .ah-card__sub, .av-card__sub, .ap-card__sub,
+.ar-card__sub, .admin-card__sub, .cc-card__sub, .fz-card__sub,
+.review-card__sub{
+  font:500 12.5px Inter,sans-serif !important;
+  letter-spacing:-.003em !important;
+  margin-top:5px !important;
+}
+
+/* Light-mode colour for titles */
+html[data-dash-theme="light"] .ac-card__title,
+html[data-dash-theme="light"] .ah-card__title,
+html[data-dash-theme="light"] .av-card__title,
+html[data-dash-theme="light"] .ap-card__title,
+html[data-dash-theme="light"] .ar-card__title,
+html[data-dash-theme="light"] .admin-card__title,
+html[data-dash-theme="light"] .cc-card__title,
+html[data-dash-theme="light"] .fz-card__title,
+html[data-dash-theme="light"] .review-card__title,
+html[data-dash-theme="light"] .ac-section__title,
+html[data-dash-theme="light"] .ah-section__title,
+html[data-dash-theme="light"] .av-section__title,
+html[data-dash-theme="light"] .ap-section__title,
+html[data-dash-theme="light"] .ar-section__title{
+  color:#0f172a !important;
+}
+html[data-dash-theme="light"] .ac-card__sub,
+html[data-dash-theme="light"] .ah-card__sub,
+html[data-dash-theme="light"] .av-card__sub,
+html[data-dash-theme="light"] .ap-card__sub,
+html[data-dash-theme="light"] .ar-card__sub,
+html[data-dash-theme="light"] .admin-card__sub,
+html[data-dash-theme="light"] .cc-card__sub,
+html[data-dash-theme="light"] .fz-card__sub,
+html[data-dash-theme="light"] .review-card__sub{
+  color:#64748b !important;
+}
+
+/* ── Primary buttons across all prefixes ─────────────────────── */
+.ac-btn--primary, .ah-btn--primary, .av-btn--primary, .ap-btn--primary,
+.ar-btn--primary, .admin-btn--primary, .cc-btn--primary, .fz-btn--primary,
+.review-btn--primary, .auth-btn--primary{
+  font:700 13.5px Inter,sans-serif !important;
+  letter-spacing:-.008em !important;
+  padding:11px 20px !important;
+  border-radius:9px !important;
+  border:0 !important;
+  cursor:pointer !important;
+  transition:transform .12s ease, box-shadow .14s ease !important;
+}
+html[data-dash-theme="light"] .ac-btn--primary,
+html[data-dash-theme="light"] .ah-btn--primary,
+html[data-dash-theme="light"] .av-btn--primary,
+html[data-dash-theme="light"] .ap-btn--primary,
+html[data-dash-theme="light"] .ar-btn--primary,
+html[data-dash-theme="light"] .admin-btn--primary,
+html[data-dash-theme="light"] .cc-btn--primary,
+html[data-dash-theme="light"] .fz-btn--primary,
+html[data-dash-theme="light"] .review-btn--primary,
+html[data-dash-theme="light"] .auth-btn--primary{
+  background:linear-gradient(180deg,#2563eb 0%,#1d4ed8 100%) !important;
+  color:#ffffff !important;
+  box-shadow:
+    0 1px 2px rgba(15,23,42,0.10),
+    0 6px 18px -4px rgba(59,130,246,0.40),
+    inset 0 1px 0 rgba(255,255,255,0.18) !important;
+}
+html[data-dash-theme="light"] .ac-btn--primary:hover,
+html[data-dash-theme="light"] .ah-btn--primary:hover,
+html[data-dash-theme="light"] .av-btn--primary:hover,
+html[data-dash-theme="light"] .ap-btn--primary:hover,
+html[data-dash-theme="light"] .ar-btn--primary:hover,
+html[data-dash-theme="light"] .admin-btn--primary:hover,
+html[data-dash-theme="light"] .cc-btn--primary:hover,
+html[data-dash-theme="light"] .fz-btn--primary:hover,
+html[data-dash-theme="light"] .review-btn--primary:hover,
+html[data-dash-theme="light"] .auth-btn--primary:hover{
+  transform:translateY(-1px);
+  box-shadow:
+    0 1px 2px rgba(15,23,42,0.12),
+    0 10px 22px -4px rgba(59,130,246,0.50),
+    inset 0 1px 0 rgba(255,255,255,0.20) !important;
+}
+
+/* ── Form inputs across all prefixes ──────────────────────────── */
+.ac-input, .ah-input, .av-input, .ap-input, .ar-input,
+.admin-input, .cc-input, .fz-input, .review-input,
+.field-input, .auth-input{
+  border-radius:10px !important;
+  padding:11px 14px !important;
+  font:500 14px Inter,sans-serif !important;
+  letter-spacing:-.005em !important;
+}
+html[data-dash-theme="light"] .ac-input,
+html[data-dash-theme="light"] .ah-input,
+html[data-dash-theme="light"] .av-input,
+html[data-dash-theme="light"] .ap-input,
+html[data-dash-theme="light"] .ar-input,
+html[data-dash-theme="light"] .admin-input,
+html[data-dash-theme="light"] .cc-input,
+html[data-dash-theme="light"] .fz-input,
+html[data-dash-theme="light"] .review-input,
+html[data-dash-theme="light"] .field-input,
+html[data-dash-theme="light"] .auth-input{
+  background:#ffffff !important;
+  border:1px solid rgba(15,23,42,0.10) !important;
+  color:#0f172a !important;
+  box-shadow:0 1px 2px rgba(15,23,42,0.03) !important;
+}
+html[data-dash-theme="light"] .ac-input:focus,
+html[data-dash-theme="light"] .ah-input:focus,
+html[data-dash-theme="light"] .av-input:focus,
+html[data-dash-theme="light"] .ap-input:focus,
+html[data-dash-theme="light"] .ar-input:focus,
+html[data-dash-theme="light"] .admin-input:focus,
+html[data-dash-theme="light"] .cc-input:focus,
+html[data-dash-theme="light"] .fz-input:focus,
+html[data-dash-theme="light"] .review-input:focus,
+html[data-dash-theme="light"] .field-input:focus,
+html[data-dash-theme="light"] .auth-input:focus{
+  outline:none !important;
+  border-color:#2563eb !important;
+  box-shadow:0 0 0 4px rgba(37,99,235,0.15) !important;
+}
+
+/* ── Row elements (lists / tables / appointment rows) ──────── */
+.ac-row, .ah-row, .av-row, .ap-row, .ar-row,
+.admin-row, .cc-row, .fz-row, .review-row{
+  padding:14px 16px !important;
+  border-radius:11px !important;
+}
+html[data-dash-theme="light"] .ac-row:hover,
+html[data-dash-theme="light"] .ah-row:hover,
+html[data-dash-theme="light"] .av-row:hover,
+html[data-dash-theme="light"] .ap-row:hover,
+html[data-dash-theme="light"] .ar-row:hover,
+html[data-dash-theme="light"] .admin-row:hover,
+html[data-dash-theme="light"] .cc-row:hover,
+html[data-dash-theme="light"] .fz-row:hover,
+html[data-dash-theme="light"] .review-row:hover{
+  background:rgba(59,130,246,0.04) !important;
+}
+
+/* ── Empty / loading states ─────────────────────────────────── */
+.ac-empty, .ah-empty, .av-empty, .ap-empty, .ar-empty,
+.admin-empty, .cc-empty, .fz-empty, .review-empty,
+.ac-loading, .ah-loading, .av-loading, .ap-loading, .ar-loading,
+.admin-loading, .cc-loading, .fz-loading{
+  padding:32px 18px !important;
+  border-radius:12px !important;
+  font:500 13.5px Inter,sans-serif !important;
+  letter-spacing:-.005em !important;
+  line-height:1.55 !important;
+  text-align:center !important;
+}
+html[data-dash-theme="light"] .ac-empty,
+html[data-dash-theme="light"] .ah-empty,
+html[data-dash-theme="light"] .av-empty,
+html[data-dash-theme="light"] .ap-empty,
+html[data-dash-theme="light"] .ar-empty,
+html[data-dash-theme="light"] .admin-empty,
+html[data-dash-theme="light"] .cc-empty,
+html[data-dash-theme="light"] .fz-empty,
+html[data-dash-theme="light"] .review-empty{
+  background:#ffffff !important;
+  border:1px dashed rgba(15,23,42,0.15) !important;
+  color:#64748b !important;
+}
