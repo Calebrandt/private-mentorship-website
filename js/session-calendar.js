@@ -163,18 +163,19 @@
           if (firstName) tooltipParts.push(firstName);
           if (s.title) tooltipParts.push(s.title);
           if (cancelled) tooltipParts.push(`(${s.status.replace('_', ' ')})`);
-          tooltipParts.push('Click to open lesson');
+          if (!cancelled) tooltipParts.push('Click to preview');
           const tooltip = tooltipParts.join(' · ');
           const labelParts = [time];
           if (opts.colorByClient && firstName) labelParts.push(firstName);
           // Build a deep-link URL via the host page's eventUrl callback.
-          // Returns null when the host doesn't want the event clickable
-          // (e.g. future sessions on a host that only links past lessons).
+          // Returns null when the host doesn't want the event clickable.
           const url = typeof opts.eventUrl === 'function' ? opts.eventUrl(s) : null;
-          const tag = url ? 'a' : 'div';
-          const href = url ? ` href="${escapeHtml(url)}"` : '';
-          const cls = `pmcal-event${cancelled ? ' is-cancelled' : ''}${url ? ' is-link' : ''}`;
-          html += `<${tag}${href} class="${cls}" style="background:${colors[0]};" title="${escapeHtml(tooltip)}" data-appt-id="${escapeHtml(s.id)}">${escapeHtml(labelParts.join(' '))}</${tag}>`;
+          const clickable = !!url && !cancelled;
+          const cls = `pmcal-event${cancelled ? ' is-cancelled' : ''}${clickable ? ' is-link' : ''}`;
+          // Note: NOT an <a> anymore — we now open a confirmation/preview
+          // modal first instead of navigating directly. The URL is stashed
+          // as data-url and consumed by the modal's "Open" button.
+          html += `<button type="button" class="${cls}" style="background:${colors[0]};" title="${escapeHtml(tooltip)}" data-appt-id="${escapeHtml(s.id)}"${url ? ` data-url="${escapeHtml(url)}"` : ''}${cancelled ? ' disabled' : ''}>${escapeHtml(labelParts.join(' '))}</button>`;
         });
         if (daySessions.length > 3) {
           html += `<div class="pmcal-event-more">+${daySessions.length - 3} more</div>`;
@@ -225,17 +226,149 @@
     });
 
     // Optional day-click handler — fires only when the click landed on
-    // the day cell itself, not on an event link inside it.
+    // the day cell itself, not on an event button inside it.
     if (typeof opts.onDayClick === 'function') {
       container.querySelectorAll('.pmcal-cell').forEach(cell => {
         cell.style.cursor = 'pointer';
         cell.addEventListener('click', (e) => {
-          if (e.target.closest('.pmcal-event.is-link')) return;   // let the link navigate
+          if (e.target.closest('.pmcal-event')) return;   // event button handles itself
           const key = cell.getAttribute('data-date');
           opts.onDayClick(key, byDate[key] || []);
         });
       });
     }
+
+    // Wire session-pill clicks → open confirmation/preview modal
+    // (replaces the previous auto-navigation behavior). The modal
+    // shows the lesson preview inline + a "Open in lesson tracker"
+    // button that does the actual navigation when the user confirms.
+    container.querySelectorAll('.pmcal-event.is-link').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const apptId = btn.getAttribute('data-appt-id');
+        const url    = btn.getAttribute('data-url');
+        const sess   = (sessions || []).find(x => x.id === apptId);
+        if (!sess) return;
+        openSessionModal({
+          session: sess,
+          url,
+          clientName: clientNames[sess.client_id] || '',
+        });
+      });
+    });
+  }
+
+  // ─── Confirmation / preview modal ───────────────────────────
+
+  function ensureModal() {
+    if (document.getElementById('pmcalModal')) return;
+    const wrap = document.createElement('div');
+    wrap.id = 'pmcalModal';
+    wrap.className = 'pmcal-modal';
+    wrap.hidden = true;
+    wrap.innerHTML = `
+      <div class="pmcal-modal__backdrop" data-close="1"></div>
+      <div class="pmcal-modal__card" role="dialog" aria-labelledby="pmcalModalTitle">
+        <div class="pmcal-modal__head">
+          <div class="pmcal-modal__kind">Session</div>
+          <h3 class="pmcal-modal__title" id="pmcalModalTitle">—</h3>
+          <p class="pmcal-modal__sub" id="pmcalModalSub">—</p>
+        </div>
+        <div class="pmcal-modal__body" id="pmcalModalBody">
+          <div class="pmcal-modal__loading">Loading lesson notes…</div>
+        </div>
+        <div class="pmcal-modal__foot">
+          <button type="button" class="pmcal-modal__btn pmcal-modal__btn--ghost" data-close="1">Cancel</button>
+          <a class="pmcal-modal__btn pmcal-modal__btn--primary" id="pmcalModalOpen" href="#">
+            Open in lesson tracker
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(wrap);
+    wrap.querySelectorAll('[data-close]').forEach(el => {
+      el.addEventListener('click', () => closeSessionModal());
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !wrap.hidden) closeSessionModal();
+    });
+  }
+
+  function openSessionModal({ session, url, clientName }) {
+    ensureModal();
+    const modal = document.getElementById('pmcalModal');
+    if (!modal) return;
+    const startDate = new Date(session.starts_at);
+    const longDate = startDate.toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    const timeStr  = startDate.toLocaleTimeString('en-CA', { hour: 'numeric', minute: '2-digit' });
+    const dur = session.duration_minutes ? `${session.duration_minutes / 60}h` : '';
+    const statusPretty = (session.status || 'scheduled').replace(/_/g, ' ');
+
+    document.getElementById('pmcalModalTitle').textContent = `${longDate} · ${timeStr}`;
+    const subParts = [];
+    if (clientName) subParts.push(clientName);
+    if (session.title) subParts.push(session.title);
+    if (dur) subParts.push(dur);
+    subParts.push(statusPretty);
+    document.getElementById('pmcalModalSub').textContent = subParts.join(' · ');
+
+    const bodyEl = document.getElementById('pmcalModalBody');
+    bodyEl.innerHTML = `<div class="pmcal-modal__loading">Loading lesson notes…</div>`;
+
+    const openBtn = document.getElementById('pmcalModalOpen');
+    openBtn.setAttribute('href', url || '#');
+
+    modal.hidden = false;
+    requestAnimationFrame(() => modal.classList.add('is-shown'));
+
+    // Inline lesson-log preview. Never blocks the user — the Open
+    // button is always usable even while the fetch is in flight.
+    (async () => {
+      if (!window.pmHiring?.fetchLessonLog) {
+        bodyEl.innerHTML = `<div class="pmcal-modal__empty">No lesson preview available.</div>`;
+        return;
+      }
+      try {
+        const log = await window.pmHiring.fetchLessonLog(session.id);
+        if (!log) {
+          bodyEl.innerHTML = `<div class="pmcal-modal__empty">
+            <strong>No lesson notes yet for this session.</strong>
+            <p>The assistant logs lesson notes after each completed session.${session.status === 'scheduled' ? ' This session is still upcoming.' : ''}</p>
+          </div>`;
+          return;
+        }
+        const esc = escapeHtml;
+        const block = (label, value) => value
+          ? `<div class="pmcal-modal__field"><div class="pmcal-modal__label">${esc(label)}</div><div class="pmcal-modal__value">${esc(value)}</div></div>`
+          : '';
+        const rating = log.rating
+          ? `<div class="pmcal-modal__rating">${'★'.repeat(Math.round(log.rating))}<span class="pmcal-modal__rating-mute">${'★'.repeat(Math.max(0, 5 - Math.round(log.rating)))}</span> <span class="pmcal-modal__rating-text">${log.rating} of 5</span></div>`
+          : '';
+        bodyEl.innerHTML = `
+          ${rating}
+          ${block('Focus area', log.focus_area)}
+          ${block('Key concepts', log.key_concepts)}
+          ${block('Feedback', log.feedback)}
+          ${block('Next session notes', log.next_session_notes)}
+          ${(log.files || []).length ? `<div class="pmcal-modal__field"><div class="pmcal-modal__label">Attached files</div><div class="pmcal-modal__value">${log.files.length} file${log.files.length === 1 ? '' : 's'} attached</div></div>` : ''}
+        `;
+        if (!bodyEl.textContent.trim()) {
+          bodyEl.innerHTML = `<div class="pmcal-modal__empty"><strong>Lesson logged with no notes.</strong><p>Open the lesson tracker to view full details.</p></div>`;
+        }
+      } catch (err) {
+        console.warn('pmCalendar: lesson preview fetch failed', err);
+        bodyEl.innerHTML = `<div class="pmcal-modal__empty">Couldn't load lesson preview. Open the tracker to view.</div>`;
+      }
+    })();
+  }
+
+  function closeSessionModal() {
+    const modal = document.getElementById('pmcalModal');
+    if (!modal) return;
+    modal.classList.remove('is-shown');
+    setTimeout(() => { modal.hidden = true; }, 180);
   }
 
   // ─── Styles ─────────────────────────────────────────────────
@@ -277,6 +410,114 @@
         .pmcal-weekdays>div{font-size:9.5px;letter-spacing:.06em;}
         .pmcal-nav button{padding:5px 9px;font-size:12px;}
       }
+      /* ── Session-preview modal ───────────────────────────── */
+      .pmcal-modal{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .18s ease;}
+      .pmcal-modal.is-shown{opacity:1;}
+      .pmcal-modal[hidden]{display:none !important;}
+      .pmcal-modal__backdrop{position:absolute;inset:0;background:rgba(15,23,42,0.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+      .pmcal-modal__card{
+        position:relative;background:#ffffff;border-radius:16px;
+        width:100%;max-width:520px;max-height:85vh;display:flex;flex-direction:column;
+        box-shadow:0 0 0 1px rgba(15,23,42,0.08),0 1px 3px rgba(15,23,42,0.10),0 24px 56px -12px rgba(15,23,42,0.40);
+        transform:scale(.97);transition:transform .18s cubic-bezier(.22,1,.36,1);
+        font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;
+      }
+      .pmcal-modal.is-shown .pmcal-modal__card{transform:scale(1);}
+      /* Dark mode card */
+      html[data-dash-theme="dark"] .pmcal-modal__card,
+      html[data-pm-theme="dark"] .pmcal-modal__card{
+        background:#16171c;
+        box-shadow:0 0 0 1px rgba(255,255,255,0.08),0 1px 3px rgba(0,0,0,0.40),0 24px 56px -12px rgba(0,0,0,0.70);
+      }
+      .pmcal-modal__head{padding:22px 26px 16px;border-bottom:1px solid #EEF1F6;}
+      html[data-dash-theme="dark"] .pmcal-modal__head,
+      html[data-pm-theme="dark"] .pmcal-modal__head{border-bottom-color:rgba(255,255,255,0.08);}
+      .pmcal-modal__kind{
+        display:inline-block;font:700 9.5px Inter,sans-serif;letter-spacing:.18em;text-transform:uppercase;
+        color:#64748B;background:#F1F5F9;border:1px solid #E2E8F0;padding:4px 10px;border-radius:5px;margin-bottom:10px;
+      }
+      html[data-dash-theme="dark"] .pmcal-modal__kind,
+      html[data-pm-theme="dark"] .pmcal-modal__kind{
+        background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);color:#94A3B8;
+      }
+      .pmcal-modal__title{
+        font:700 19px Inter,sans-serif;color:#0F172A;letter-spacing:-.018em;line-height:1.25;margin:0 0 6px;
+      }
+      .pmcal-modal__sub{
+        font:500 13px Inter,sans-serif;color:#64748B;letter-spacing:-.005em;margin:0;line-height:1.5;
+      }
+      html[data-dash-theme="dark"] .pmcal-modal__title,
+      html[data-pm-theme="dark"] .pmcal-modal__title{color:#FFFFFF;}
+      html[data-dash-theme="dark"] .pmcal-modal__sub,
+      html[data-pm-theme="dark"] .pmcal-modal__sub{color:#94A3B8;}
+      .pmcal-modal__body{
+        padding:20px 26px;overflow-y:auto;flex:1;
+      }
+      .pmcal-modal__loading,.pmcal-modal__empty{
+        font:500 13.5px Inter,sans-serif;color:#64748B;text-align:center;padding:24px 8px;line-height:1.6;
+      }
+      .pmcal-modal__empty strong{display:block;color:#0F172A;font-weight:700;margin-bottom:6px;}
+      .pmcal-modal__empty p{margin:0;}
+      html[data-dash-theme="dark"] .pmcal-modal__loading,
+      html[data-pm-theme="dark"] .pmcal-modal__loading,
+      html[data-dash-theme="dark"] .pmcal-modal__empty,
+      html[data-pm-theme="dark"] .pmcal-modal__empty{color:#94A3B8;}
+      html[data-dash-theme="dark"] .pmcal-modal__empty strong,
+      html[data-pm-theme="dark"] .pmcal-modal__empty strong{color:#FFFFFF;}
+      .pmcal-modal__field{margin-bottom:14px;}
+      .pmcal-modal__field:last-child{margin-bottom:0;}
+      .pmcal-modal__label{
+        font:700 10px Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#94A3B8;margin-bottom:6px;
+      }
+      .pmcal-modal__value{
+        font:500 13.5px Inter,sans-serif;color:#1F2937;letter-spacing:-.005em;line-height:1.55;
+        white-space:pre-wrap;word-break:break-word;
+      }
+      html[data-dash-theme="dark"] .pmcal-modal__value,
+      html[data-pm-theme="dark"] .pmcal-modal__value{color:#F1F5F9;}
+      .pmcal-modal__rating{
+        font:700 17px Inter,sans-serif;color:#D97706;margin-bottom:14px;letter-spacing:.05em;
+      }
+      .pmcal-modal__rating-mute{color:#E2E8F0;}
+      .pmcal-modal__rating-text{
+        font:500 12px Inter,sans-serif;color:#94A3B8;margin-left:8px;letter-spacing:0;
+      }
+      html[data-dash-theme="dark"] .pmcal-modal__rating,
+      html[data-pm-theme="dark"] .pmcal-modal__rating{color:#FBBF24;}
+      html[data-dash-theme="dark"] .pmcal-modal__rating-mute,
+      html[data-pm-theme="dark"] .pmcal-modal__rating-mute{color:rgba(255,255,255,0.10);}
+      .pmcal-modal__foot{
+        padding:14px 18px;border-top:1px solid #EEF1F6;
+        display:flex;justify-content:flex-end;gap:8px;
+      }
+      html[data-dash-theme="dark"] .pmcal-modal__foot,
+      html[data-pm-theme="dark"] .pmcal-modal__foot{border-top-color:rgba(255,255,255,0.08);}
+      .pmcal-modal__btn{
+        display:inline-flex;align-items:center;gap:6px;
+        padding:10px 16px;border-radius:9px;
+        font:600 13px Inter,sans-serif;letter-spacing:-.005em;
+        text-decoration:none;cursor:pointer;border:1px solid transparent;
+        transition:background .14s ease,color .14s ease,border-color .14s ease,box-shadow .14s ease,transform .12s ease;
+      }
+      .pmcal-modal__btn--ghost{background:transparent;color:#475569;border-color:#E2E8F0;}
+      .pmcal-modal__btn--ghost:hover{background:#F8FAFC;color:#0F172A;border-color:#CBD5E1;}
+      html[data-dash-theme="dark"] .pmcal-modal__btn--ghost,
+      html[data-pm-theme="dark"] .pmcal-modal__btn--ghost{
+        color:#CBD5E1;border-color:rgba(255,255,255,0.10);
+      }
+      html[data-dash-theme="dark"] .pmcal-modal__btn--ghost:hover,
+      html[data-pm-theme="dark"] .pmcal-modal__btn--ghost:hover{
+        background:rgba(255,255,255,0.04);color:#FFFFFF;border-color:rgba(255,255,255,0.20);
+      }
+      .pmcal-modal__btn--primary{
+        background:linear-gradient(180deg,#2563EB 0%,#1D4ED8 100%);color:#fff;
+        box-shadow:0 1px 2px rgba(15,23,42,0.10),0 6px 14px -3px rgba(37,99,235,0.45),inset 0 1px 0 rgba(255,255,255,0.18);
+      }
+      .pmcal-modal__btn--primary:hover{
+        transform:translateY(-1px);
+        box-shadow:0 1px 2px rgba(15,23,42,0.14),0 10px 22px -4px rgba(37,99,235,0.55),inset 0 1px 0 rgba(255,255,255,0.20);
+      }
+      .pmcal-modal__btn--primary svg{width:13px;height:13px;}
     `;
     const style = document.createElement('style');
     style.id = 'pmcal-styles';
