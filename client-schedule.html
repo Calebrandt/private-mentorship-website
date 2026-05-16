@@ -382,6 +382,12 @@
   .nx-empty__hint{font-size:12px;color:var(--ink-tert);margin:6px 0 0;}
 
   .nx-skel{background:linear-gradient(90deg,#F1F5F9 25%,#E2E8F0 50%,#F1F5F9 75%);background-size:200% 100%;animation:nxshim 1.4s ease-in-out infinite;border-radius:6px;display:inline-block;height:1em;}
+  /* Dark-mode shimmer — light slate slabs flash as "white slabs" on
+     dark cards. Use a subtle dark-on-dark shimmer instead. */
+  [data-dash-theme="dark"] .nx-skel{
+    background:linear-gradient(90deg,#1c1d23 25%,#262830 50%,#1c1d23 75%);
+    background-size:200% 100%;
+  }
   @keyframes nxshim{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
 
   @media (max-width:1080px){

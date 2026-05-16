@@ -23,6 +23,19 @@
     --input-bg:#22232a;--ink:#f1f5f9;--ink-2:#ffffff;--ink-mute:#94a3b8;
     --ink-tert:#64748b;--primary:#3b82f6;--primary-hover:#2563eb;
   }
+  /* KPI icon circle backgrounds — referenced by .nx-kpi__icon--blue etc. */
+  :root,[data-dash-theme="light"]{
+    --icon-blue:linear-gradient(135deg,#3b82f6,#2563eb);
+    --icon-green:linear-gradient(135deg,#22c55e,#16a34a);
+    --icon-orange:linear-gradient(135deg,#f59e0b,#d97706);
+    --icon-purple:linear-gradient(135deg,#a855f7,#7e22ce);
+  }
+  [data-dash-theme="dark"]{
+    --icon-blue:linear-gradient(135deg,#3b82f6,#1d4ed8);
+    --icon-green:linear-gradient(135deg,#22c55e,#15803d);
+    --icon-orange:linear-gradient(135deg,#f59e0b,#b45309);
+    --icon-purple:linear-gradient(135deg,#a855f7,#6b21a8);
+  }
   .nx-topbar{
     background:var(--card);border-bottom:1px solid var(--border);
     display:flex;align-items:center;justify-content:space-between;
@@ -172,7 +185,33 @@
   .nx-empty__hint{font-size:12px;color:var(--ink-tert);margin:6px 0 0;}
 
   .nx-skel{background:linear-gradient(90deg,#F1F5F9 25%,#E2E8F0 50%,#F1F5F9 75%);background-size:200% 100%;animation:nxshim 1.4s ease-in-out infinite;border-radius:6px;display:inline-block;height:1em;}
+  /* Dark-mode skeleton — light slate slabs read as a "white slab" against
+     the dark card. Use a subtle dark-on-dark shimmer instead. */
+  [data-dash-theme="dark"] .nx-skel{
+    background:linear-gradient(90deg,#1c1d23 25%,#262830 50%,#1c1d23 75%);
+    background-size:200% 100%;
+  }
   @keyframes nxshim{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
+  /* Banked-hours CTA — the strip stays warm-gold in both modes, so the
+     button must stay readable on gold. var(--card) becomes near-black in
+     dark mode and broke against the gold; pin the button to white-on-gold
+     so it reads the same in light + dark. */
+  [data-dash-theme="dark"] .nx-bank-strip__cta{
+    background:#FFFFFF;
+    color:#92400E;
+    border-color:#FBBF24;
+  }
+  [data-dash-theme="dark"] .nx-bank-strip__cta:hover{
+    background:#FEF3C7;
+  }
+  /* The icon circle inside the strip uses rgba-white which is invisible on
+     dark backgrounds elsewhere — but the strip itself is gold, so this is
+     fine. Pin explicitly for clarity. */
+  [data-dash-theme="dark"] .nx-bank-strip__icon{
+    background:rgba(255,255,255,0.55);
+    color:#92400E;
+  }
 
   @media (max-width:1080px){
     .nx-kpis{grid-template-columns:repeat(2,1fr);}
