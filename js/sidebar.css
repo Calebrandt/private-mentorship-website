@@ -1381,36 +1381,56 @@ body.pm-cal-collapsed .with-right-cal{
 
 
 /* ════════════════════════════════════════════════════════════
-   Phase 19ac — LIGHT MODE POLISH OVERLAY
+   Phase 19ac — LIGHT MODE PREMIUM RESKIN
    ────────────────────────────────────────────────────────────
    Dark mode is perfect already and is NOT touched. This block
    only fires when the user has explicitly chosen light theme.
-   Three fixes:
-     1. Borders strengthened from #e5e7eb → #d8dde6 so card
-        edges are visible against the page background
-     2. Input bg shifted from pure white to #f1f4f8 so search
-        fields are visible inside white topbar cards
-     3. Page bg shifted from #f9fafb → #f4f6f9 so pure-white
-        cards "float" with subtle elevation
-   Plus a 1-2px elevation shadow on common card surfaces —
-   Linear/Vercel/Notion-style hairline that adds depth without
-   visual noise.
+
+   Goal: real React-app polish, not "raw HTML with borders".
+   What we do:
+     • Page background: subtle cool-grey LINEAR GRADIENT (top → bottom)
+       so the surface has motion instead of looking like flat paper
+     • Cards: pure white with MULTI-LAYER shadows (hairline ring +
+       2px drop + 16px ambient) — Stripe/Linear pattern that gives
+       real 3D float
+     • Topbar: STICKY with backdrop-blur + translucent white so it
+       feels like a real app shell when you scroll
+     • KPI cards: tinted primary-blue accent shadow when hovered —
+       gives the dashboard "alive" feel
+     • Inputs: visible grey-tinted fill with primary focus ring
+     • Status pills: inset rings in matching hue (paid green, etc.)
+     • Buttons: gentle gradient + crisp shadow
+     • Border separators have actual presence
+
+   Every selector scoped to html[data-dash-theme="light"] —
+   dark mode untouched, guaranteed.
    ════════════════════════════════════════════════════════════ */
+
 html[data-dash-theme="light"],
 html[data-pm-theme="light"]{
-  --border:#d8dde6        !important;
-  --border-soft:#eaeef3   !important;
-  --bg:#f4f6f9            !important;
-  --input-bg:#f1f4f8      !important;
-  /* Also tighten the dashboard-token namespace some pages use */
-  --dash-border:#d8dde6        !important;
-  --dash-border-soft:#eaeef3   !important;
-  --dash-bg:#f4f6f9            !important;
+  --border:#d4dae3        !important;
+  --border-soft:#e8ecf2   !important;
+  --bg:#eef1f6            !important;
+  --input-bg:#f2f4f8      !important;
+  --dash-border:#d4dae3        !important;
+  --dash-border-soft:#e8ecf2   !important;
+  --dash-bg:#eef1f6            !important;
 }
 
-/* Subtle 1px elevation on common card surfaces so they separate
-   from the page background. The double-layer shadow is a hairline
-   ring + a soft drop — the Linear / Vercel pattern. */
+/* Page background — subtle COOL GRADIENT instead of flat fill.
+   The top is a touch lighter than the bottom, giving the surface
+   a "lit from above" feel that pure-flat HTML never has. */
+html[data-dash-theme="light"] body{
+  background:
+    radial-gradient(1200px 600px at 50% -200px, rgba(59,130,246,0.06), transparent 60%),
+    linear-gradient(180deg, #f3f5fa 0%, #ecf0f6 100%) !important;
+  background-attachment:fixed !important;
+}
+
+/* Cards — Stripe/Linear-grade triple-layer shadow on pure white.
+   The hairline ring (`0 0 0 1px`) keeps the edges crisp even
+   without an opaque border. The 2px drop reads as the resting
+   shadow. The 16px ambient gives the card real lift. */
 html[data-dash-theme="light"] .nx-card,
 html[data-dash-theme="light"] .nx-kpi,
 html[data-dash-theme="light"] .nx-listrow,
@@ -1426,65 +1446,151 @@ html[data-dash-theme="light"] .ms-panel,
 html[data-dash-theme="light"] .ms-preview__stat,
 html[data-dash-theme="light"] .nx-modal__card,
 html[data-dash-theme="light"] .nx-invnote-modal__card{
+  background:#ffffff !important;
+  border-color:transparent !important;
   box-shadow:
-    0 1px 2px rgba(15,23,42,0.05),
-    0 0 0 1px rgba(15,23,42,0.04);
+    0 0 0 1px rgba(15,23,42,0.06),
+    0 1px 3px rgba(15,23,42,0.04),
+    0 12px 32px -16px rgba(15,23,42,0.12) !important;
+  border-radius:14px;
 }
 
-/* Slightly stronger lift on hover for the cards that already
-   transition box-shadow */
-html[data-dash-theme="light"] .nx-card:hover,
+/* Hover: deeper lift + a primary-blue accent ring */
 html[data-dash-theme="light"] .nx-kpi:hover,
+html[data-dash-theme="light"] .nx-card:hover,
 html[data-dash-theme="light"] .lj-card:hover{
   box-shadow:
-    0 4px 14px -4px rgba(15,23,42,0.10),
-    0 0 0 1px rgba(15,23,42,0.06);
+    0 0 0 1px rgba(59,130,246,0.20),
+    0 4px 14px -2px rgba(59,130,246,0.10),
+    0 18px 40px -16px rgba(15,23,42,0.18) !important;
+  transform:translateY(-2px);
 }
 
-/* Topbar bottom border slightly stronger so it doesn't dissolve
-   into the page background */
+/* KPI cards specifically get a permanent very-subtle blue tint
+   in their ambient shadow — makes the dashboard feel "alive" */
+html[data-dash-theme="light"] .nx-kpi{
+  box-shadow:
+    0 0 0 1px rgba(15,23,42,0.06),
+    0 1px 3px rgba(15,23,42,0.04),
+    0 16px 36px -18px rgba(59,130,246,0.18) !important;
+}
+
+/* Topbar — translucent frosted glass that floats above content
+   as the page scrolls. */
 html[data-dash-theme="light"] .nx-topbar{
-  border-bottom-color:#d8dde6 !important;
-  box-shadow:0 1px 0 rgba(15,23,42,0.03);
+  background:rgba(255,255,255,0.78) !important;
+  backdrop-filter:saturate(180%) blur(16px) !important;
+  -webkit-backdrop-filter:saturate(180%) blur(16px) !important;
+  border-bottom:1px solid rgba(15,23,42,0.06) !important;
+  box-shadow:0 1px 0 rgba(255,255,255,0.85) inset, 0 4px 24px -12px rgba(15,23,42,0.10);
 }
 
-/* Search input — add a subtle border so it reads as a real input
-   even before focus, and a hairline outline-ring on focus that
-   matches the primary accent */
+/* Search input — readable grey fill, real border, premium focus ring */
 html[data-dash-theme="light"] .nx-search input{
-  border:1px solid #e0e5ed !important;
+  background:rgba(15,23,42,0.04) !important;
+  border:1px solid rgba(15,23,42,0.08) !important;
+  transition:background .14s ease, border-color .14s ease, box-shadow .14s ease !important;
+}
+html[data-dash-theme="light"] .nx-search input:hover{
+  background:rgba(15,23,42,0.06) !important;
+  border-color:rgba(15,23,42,0.12) !important;
 }
 html[data-dash-theme="light"] .nx-search input:focus{
-  border-color:var(--primary, #2563eb) !important;
-  box-shadow:0 0 0 3px rgba(37,99,235,0.12);
+  background:#ffffff !important;
+  border-color:#3b82f6 !important;
+  box-shadow:0 0 0 4px rgba(59,130,246,0.15) !important;
+  outline:none;
 }
 
-/* Userpod — subtle elevation in light mode */
+/* Userpod — frosted-glass treatment that matches the topbar */
 html[data-dash-theme="light"] .nx-userpod{
-  box-shadow:0 1px 2px rgba(15,23,42,0.04);
+  background:rgba(255,255,255,0.85) !important;
+  border:1px solid rgba(15,23,42,0.08) !important;
+  box-shadow:
+    0 1px 2px rgba(15,23,42,0.05),
+    0 4px 12px -4px rgba(15,23,42,0.08);
 }
 
-/* Theme toggle + outline buttons get the same subtle shadow */
-html[data-dash-theme="light"] .dash-theme-toggle,
+/* Theme toggle + outline buttons */
+html[data-dash-theme="light"] .dash-theme-toggle{
+  background:rgba(255,255,255,0.92) !important;
+  border:1px solid rgba(15,23,42,0.08) !important;
+  box-shadow:0 1px 2px rgba(15,23,42,0.05);
+}
+html[data-dash-theme="light"] .dash-theme-toggle:hover{
+  background:#f8f9fc !important;
+  box-shadow:0 2px 6px -2px rgba(15,23,42,0.12);
+}
+
+/* Outline-style sub buttons get the same treatment */
 html[data-dash-theme="light"] .nx-sub__btn--outline{
+  background:#ffffff !important;
+  border:1px solid rgba(15,23,42,0.08) !important;
   box-shadow:0 1px 2px rgba(15,23,42,0.04);
+}
+html[data-dash-theme="light"] .nx-sub__btn--outline:hover{
+  background:#f8f9fc !important;
+  border-color:rgba(15,23,42,0.14) !important;
+  box-shadow:0 2px 6px -2px rgba(15,23,42,0.12);
+}
+
+/* Primary buttons get a subtle gradient + colored shadow */
+html[data-dash-theme="light"] .nx-sub__btn--primary{
+  background:linear-gradient(180deg, #3b82f6 0%, #2563eb 100%) !important;
+  box-shadow:
+    0 1px 2px rgba(15,23,42,0.10),
+    0 6px 18px -4px rgba(59,130,246,0.40),
+    inset 0 1px 0 rgba(255,255,255,0.18) !important;
+}
+html[data-dash-theme="light"] .nx-sub__btn--primary:hover{
+  box-shadow:
+    0 1px 2px rgba(15,23,42,0.12),
+    0 10px 22px -4px rgba(59,130,246,0.50),
+    inset 0 1px 0 rgba(255,255,255,0.20) !important;
 }
 
 /* Calendar aside (right side) — give the left border real presence */
 html[data-dash-theme="light"] .dash-cal{
-  border-left-color:#d8dde6 !important;
+  background:#ffffff !important;
+  border-left:1px solid rgba(15,23,42,0.06) !important;
+  box-shadow:-12px 0 32px -20px rgba(15,23,42,0.10);
 }
 
-/* Pills/chips get a 1px ring so they don't look like flat fills */
+/* Status pills/badges — inset hue rings, not flat fills */
 html[data-dash-theme="light"] .nx-pill--paid,
 html[data-dash-theme="light"] .nx-badge--paid,
 html[data-dash-theme="light"] .nx-badge--active{
-  box-shadow:inset 0 0 0 1px rgba(22,163,74,0.20);
+  box-shadow:inset 0 0 0 1px rgba(22,163,74,0.25);
 }
 html[data-dash-theme="light"] .nx-pill--open,
 html[data-dash-theme="light"] .nx-badge--open{
-  box-shadow:inset 0 0 0 1px rgba(245,158,11,0.25);
+  box-shadow:inset 0 0 0 1px rgba(245,158,11,0.30);
 }
 html[data-dash-theme="light"] .nx-badge--draft{
-  box-shadow:inset 0 0 0 1px rgba(37,99,235,0.20);
+  box-shadow:inset 0 0 0 1px rgba(37,99,235,0.25);
 }
+html[data-dash-theme="light"] .nx-badge--completed{
+  box-shadow:inset 0 0 0 1px rgba(139,92,246,0.25);
+}
+html[data-dash-theme="light"] .nx-badge--expired,
+html[data-dash-theme="light"] .nx-badge--cancelled{
+  box-shadow:inset 0 0 0 1px rgba(15,23,42,0.10);
+}
+
+/* Section dividers + tables get visible lines */
+html[data-dash-theme="light"] .nx-row{
+  border-bottom-color:rgba(15,23,42,0.06) !important;
+}
+html[data-dash-theme="light"] .nx-table th{
+  border-bottom:1px solid rgba(15,23,42,0.08) !important;
+  background:rgba(15,23,42,0.025) !important;
+}
+html[data-dash-theme="light"] .nx-table td{
+  border-bottom:1px solid rgba(15,23,42,0.05) !important;
+}
+html[data-dash-theme="light"] .nx-table tbody tr:hover{
+  background:rgba(59,130,246,0.03) !important;
+}
+
+/* Master search panel inherits the new shadows + the backdrop blur
+   feel via the existing tokens; no additional rules needed there. */
