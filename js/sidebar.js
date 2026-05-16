@@ -34,6 +34,7 @@
       { type: 'link', href: 'messages.html', label: 'Inbox', icon: 'message', dynamicBadge: 'messages-unread' },
       { type: 'section', label: 'Daily' },
       { type: 'link', href: 'client-schedule.html', label: 'Schedule', icon: 'calendar' },
+      { type: 'link', href: 'client-lesson-journal.html', label: 'Lesson Journal', icon: 'book' },
       { type: 'link', href: 'client-education.html', label: 'Education', icon: 'book' },
       { type: 'link', href: 'client-hours.html', label: 'Hours & Billing', icon: 'clock' },
       { type: 'section', label: 'Your Plan' },

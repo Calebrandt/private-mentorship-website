@@ -2482,6 +2482,21 @@
     } catch (e) { console.warn('fetchClientPaymentHistory threw:', e); return []; }
   }
 
+  // Phase 19f: Manual "Activate renewal" — flip a draft contract to
+  // active AND fire the prior contract's carryover in one transaction.
+  // Calls the SECURITY DEFINER RPC `assistant_activate_renewal` which
+  // checks the caller is the contract's assistant OR in family_assignments
+  // for the client. Returns the carryover minutes so the UI can show
+  // a confirmation like "Activated — 6.75 hrs rolled forward."
+  async function activateRenewal(contractId) {
+    if (!contractId) throw new Error('contractId is required');
+    const { data, error } = await sb().rpc('assistant_activate_renewal', {
+      p_contract_id: contractId,
+    });
+    if (error) throw error;
+    return data || null;
+  }
+
   // Appointments — flexible filter for both upcoming + history.
   async function fetchMyAppointments({ statuses = null, fromDate = null, toDate = null, limit = 50, ascending = false } = {}) {
     const myId = await _myClientId();
@@ -3167,7 +3182,7 @@
     adminCreateClientAccount, adminListClients, adminFetchHomeKpis, adminFetchMonthlyStats,
     // client (self)
     fetchMyClientRecord, fetchMyConversations, fetchMyContracts, fetchMyInvoices,
-    fetchClientPaymentHistory,
+    fetchClientPaymentHistory, activateRenewal,
     fetchMyAppointments, fetchMyAttendanceSummary, fetchAssistantNamesByIds,
     fetchMyTasksSummary, fetchMyHomeworkSummary,
     fetchMyHoursLedger, fetchMySalesReceipts,

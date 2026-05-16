@@ -53,6 +53,12 @@
   }
   .wc-book-btn:hover{background:#005CBE;border-color:#005CBE;}
   .wc-book-btn:disabled{opacity:.5;cursor:not-allowed;}
+  /* Phase 19f: "Activate renewal" — green so it reads as a positive
+     action (vs the blue 'Book' which is a routine action). */
+  .wc-book-btn--activate{
+    background:#059669;border-color:#047857;
+  }
+  .wc-book-btn--activate:hover{background:#047857;border-color:#065F46;}
 
   /* Modal — reused booking modal */
   .wc-modal-backdrop{
@@ -419,6 +425,15 @@
           <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
           Book new session
         </button>
+        <!-- Phase 19f: shown only when this contract is currently a draft.
+             One click flips it active AND fires carryover from the prior
+             expired contract. Visually distinct (green) so the assistant
+             notices the "this needs your action" state. -->
+        <button type="button" class="wc-book-btn wc-book-btn--activate" id="wcActivateBtn" hidden
+                title="Mark this renewal as active. Hours from the prior contract will roll forward automatically.">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 8 7 12 13 4"/></svg>
+          Activate renewal
+        </button>
       </div>
     </div>
 
@@ -683,15 +698,33 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515c"></script>
-<script src="js/hiring-service.js?v=20260515t"></script>
+<script src="js/hiring-service.js?v=20260515u"></script>
 <script src="js/messages-service.js?v=20260515c"></script>
 <script src="js/session-calendar.js?v=20260515a"></script>
-<script src="js/sidebar.js?v=20260515c"></script>
+<script src="js/sidebar.js?v=20260515d"></script>
 <script>
 function escapeHtml(s){return (s||'').toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[c]));}
 function initialsFor(name){return (name||'A').split(/\s+/).map(s=>s[0]||'').slice(0,2).join('').toUpperCase()||'A';}
-function fmtDate(iso){if(!iso)return '—';return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
-function fmtDateShort(iso){if(!iso)return '—';return new Date(iso).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});}
+// Parse YYYY-MM-DD as a LOCAL date so a contract ending 2026-05-15
+// shows "May 15" instead of "May 14". new Date('2026-05-15') parses
+// as UTC midnight; in Pacific that's the prior afternoon, so
+// toLocaleDateString renders yesterday. Same fix already in
+// client-contract.html. Datetime strings with explicit time/offset
+// still go through the native parser unchanged.
+function fmtDate(iso){
+  if(!iso)return '—';
+  const s = String(iso);
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const d = m ? new Date(+m[1], +m[2]-1, +m[3]) : new Date(s);
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+function fmtDateShort(iso){
+  if(!iso)return '—';
+  const s = String(iso);
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const d = m ? new Date(+m[1], +m[2]-1, +m[3]) : new Date(s);
+  return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+}
 function fmtTime(iso){if(!iso)return '—';return new Date(iso).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});}
 function fmtDuration(mins){if(!mins)return '';if(mins<60)return mins+' min';const h=Math.floor(mins/60),m=mins%60;return m===0?h+' hr':h+'h '+m+'m';}
 
@@ -779,6 +812,45 @@ function renderAppointmentRow(a, spend){
   const wcStatus = document.getElementById('wcStatus');
   wcStatus.textContent = statusKey;
   wcStatus.className = 'wc-hero__status wc-hero__status--' + statusClass;
+
+  // Phase 19f: surface the green Activate button only when this contract
+  // is currently a draft (payment landed, ready to roll forward). One
+  // click flips draft → active + fires carryover via the RPC.
+  const activateBtn = document.getElementById('wcActivateBtn');
+  if (activateBtn) {
+    if (statusKey === 'draft') {
+      activateBtn.hidden = false;
+      activateBtn.onclick = async () => {
+        const ok = confirm(
+          `Activate this renewal for ${name}?\n\n` +
+          `This flips the draft to active and rolls any leftover hours ` +
+          `forward from the previous contract automatically.`
+        );
+        if (!ok) return;
+        activateBtn.disabled = true;
+        const originalText = activateBtn.innerHTML;
+        activateBtn.innerHTML = 'Activating…';
+        try {
+          const result = await window.pmHiring.activateRenewal(ws.contract.id);
+          const carryHours = result?.carryover_minutes
+            ? Math.round((result.carryover_minutes / 60) * 100) / 100
+            : 0;
+          alert(carryHours > 0
+            ? `Renewal activated. ${carryHours} h carried forward from prior contract.`
+            : `Renewal activated. No carryover hours to roll.`);
+          // Reload so KPIs / status / carryover all repaint.
+          location.reload();
+        } catch (e) {
+          console.error('activateRenewal failed:', e);
+          alert('Could not activate: ' + (e?.message || 'unknown error'));
+          activateBtn.disabled = false;
+          activateBtn.innerHTML = originalText;
+        }
+      };
+    } else {
+      activateBtn.hidden = true;
+    }
+  }
 
   // Phase 18: point the Lesson Tracker button at this client's tracker
   const lessonBtn = document.getElementById('wcLessonBtn');

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lesson Journal — Private Mentorship</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&display=swap" />
+<link rel="stylesheet" href="js/sidebar.css?v=20260515a" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<script src="js/theme.js?v=20260512a"></script>
+<!--
+  Phase 18c — Family-side Lesson Journal (read-only).
+  Mirrors the assistant-lesson-tracker premium look but locked down to
+  read-only viewing. Family members see: focus area, key concepts,
+  feedback, rating, type, status, and any attached files (lesson
+  materials). They do NOT see internal notes (private to assistant).
+
+  RLS handles scoping: the v_appointment_with_lesson view + lesson_log
+  policies only return rows for clients the signed-in user is associated
+  with via family_assignments. No clientId is exposed in the URL — the
+  page resolves the family's client_id from the logged-in user.
+-->
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#F4F5F7;color:#0F172A;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+
+  .lj-shell{padding:36px 32px 80px;max-width:980px;margin:0 auto;}
+
+  /* Hero */
+  .lj-hero{margin-bottom:28px;}
+  .lj-eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#0071e3;margin:0 0 8px;}
+  .lj-h1{font-family:"Archivo","Inter",sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0 0 6px;color:#0F172A;}
+  .lj-sub{font-size:14px;color:#64748B;margin:0;line-height:1.55;max-width:620px;}
+
+  /* Year pills */
+  .lj-years{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 22px;}
+  .lj-year{
+    background:#fff;border:1px solid #E2E8F0;border-radius:9999px;
+    padding:7px 14px;font:600 13px Inter,sans-serif;color:#475569;
+    cursor:pointer;transition:all .15s;
+  }
+  .lj-year:hover{background:#F8FAFC;color:#0F172A;}
+  .lj-year.is-active{background:#0F172A;color:#fff;border-color:#0F172A;}
+
+  /* Stats strip */
+  .lj-stats{
+    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    padding:18px 22px;margin-bottom:22px;
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;
+  }
+  .lj-stat__label{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94A3B8;margin:0 0 4px;}
+  .lj-stat__value{font-family:"Archivo","Inter",sans-serif;font-size:22px;font-weight:800;color:#0F172A;letter-spacing:-.018em;line-height:1;}
+
+  /* Lesson card */
+  .lj-list{display:flex;flex-direction:column;gap:10px;}
+  .lj-card{
+    background:#fff;border:1px solid #E2E8F0;border-radius:12px;
+    padding:18px 20px;
+    display:grid;grid-template-columns:64px 1fr auto;gap:18px;align-items:flex-start;
+  }
+  /* Calendar-style date block */
+  .lj-date{
+    background:#EFF6FF;border:1px solid #DBEAFE;border-radius:10px;
+    padding:8px 4px;text-align:center;color:#1E40AF;
+  }
+  .lj-date__month{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;line-height:1;}
+  .lj-date__day{font-family:"Archivo","Inter",sans-serif;font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.1;color:#1E3A8A;}
+  .lj-date__year{font-size:10px;color:#64748B;font-weight:600;letter-spacing:.04em;}
+
+  .lj-body{min-width:0;}
+  .lj-focus{font-family:"Archivo","Inter",sans-serif;font-size:15.5px;font-weight:700;color:#0F172A;margin:0 0 4px;letter-spacing:-.005em;line-height:1.3;}
+  .lj-concepts{font-size:13px;color:#475569;margin:0 0 10px;line-height:1.5;}
+  .lj-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+  .lj-chip{
+    font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+    padding:3px 9px;border-radius:9999px;
+    background:#F1F5F9;color:#475569;border:1px solid #E2E8F0;
+  }
+  .lj-chip--status{background:#DBEAFE;color:#1E3A8A;border-color:#BFDBFE;}
+  .lj-chip--type{background:#EFF6FF;color:#0071e3;border-color:#BFDBFE;}
+  .lj-chip--substitute{background:#FEF3C7;color:#92400E;border-color:#FDE68A;}
+  .lj-feedback{
+    background:#FAFBFC;border-left:3px solid #BFDBFE;
+    padding:10px 12px;border-radius:0 6px 6px 0;
+    font-size:13px;color:#334155;line-height:1.55;margin:0 0 8px;
+  }
+  .lj-feedback__label{font-size:9.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#1E40AF;margin:0 0 4px;}
+  .lj-files{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .lj-file{
+    display:inline-flex;align-items:center;gap:5px;
+    background:#F8FAFC;border:1px solid #E2E8F0;border-radius:6px;
+    padding:4px 9px;font:600 11.5px Inter,sans-serif;color:#1E40AF;
+    text-decoration:none;cursor:pointer;
+  }
+  .lj-file:hover{background:#EFF6FF;border-color:#BFDBFE;}
+
+  /* Rating stars */
+  .lj-rating{display:flex;gap:1px;color:#FBBF24;font-size:16px;line-height:1;flex-shrink:0;}
+  .lj-rating__dim{color:#E2E8F0;}
+
+  /* Loading + empty */
+  .lj-loading,.lj-empty{
+    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    padding:48px 28px;text-align:center;color:#64748B;
+  }
+  .lj-empty__title{font-family:"Archivo","Inter",sans-serif;font-size:16px;font-weight:700;color:#0F172A;margin:0 0 6px;}
+  .lj-empty__sub{font-size:13px;margin:0;line-height:1.55;}
+  .lj-spinner{
+    width:16px;height:16px;border-radius:50%;
+    border:2px solid #E2E8F0;border-top-color:#0071e3;
+    animation:lj-spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px;
+  }
+  @keyframes lj-spin{to{transform:rotate(360deg);}}
+
+  @media(max-width:680px){
+    .lj-shell{padding:20px 14px 60px;}
+    .lj-h1{font-size:24px;}
+    .lj-card{grid-template-columns:48px 1fr;gap:12px;padding:14px;}
+    .lj-rating{grid-column:1 / -1;justify-content:flex-end;}
+    .lj-date__day{font-size:22px;}
+  }
+</style>
+</head>
+<body class="pm-has-sidebar">
+
+<div id="pmSidebar"></div>
+
+<main class="lj-shell">
+
+  <header class="lj-hero">
+    <p class="lj-eyebrow">Lesson Journal</p>
+    <h1 class="lj-h1" id="ljName">Lessons</h1>
+    <p class="lj-sub" id="ljSub">Every session your mentor logged — what was taught, materials shared, and notes for you.</p>
+  </header>
+
+  <div class="lj-years" id="ljYears"></div>
+
+  <div class="lj-stats" id="ljStats" hidden>
+    <div><p class="lj-stat__label">Sessions this year</p><span class="lj-stat__value" id="ljStatYear">—</span></div>
+    <div><p class="lj-stat__label">All-time sessions</p><span class="lj-stat__value" id="ljStatAll">—</span></div>
+    <div><p class="lj-stat__label">Hours logged</p><span class="lj-stat__value" id="ljStatHours">—</span></div>
+    <div><p class="lj-stat__label">Average rating</p><span class="lj-stat__value" id="ljStatRating">—</span></div>
+  </div>
+
+  <div class="lj-loading" id="ljLoading"><span class="lj-spinner"></span> Loading your lessons…</div>
+  <div class="lj-list" id="ljList" hidden></div>
+  <div class="lj-empty" id="ljEmpty" hidden>
+    <p class="lj-empty__title">No lessons logged yet</p>
+    <p class="lj-empty__sub">When your mentor logs a session, it'll appear here with what was covered, files they shared, and how it went.</p>
+  </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260515c"></script>
+<script src="js/hiring-service.js?v=20260515t"></script>
+<script src="js/messages-service.js?v=20260515c"></script>
+<script src="js/sidebar.js?v=20260515d"></script>
+<script>
+(async function init(){
+  // Wait briefly for sidebar.js to settle auth.
+  await new Promise(r => setTimeout(r, 300));
+
+  // Resolve THIS user's client_id. fetchMyClientRecord handles both
+  // direct profile linkage AND the family_assignments OWNER fallback
+  // so siblings / parents see the same household lessons.
+  let me = null;
+  try { me = await window.pmHiring.fetchMyClientRecord(); } catch (_) {}
+
+  if (!me?.id) {
+    document.getElementById('ljLoading').hidden = true;
+    document.getElementById('ljEmpty').hidden = false;
+    document.getElementById('ljEmpty').querySelector('.lj-empty__title').textContent = 'No family on file';
+    document.getElementById('ljEmpty').querySelector('.lj-empty__sub').textContent =
+      "We couldn't find a client record linked to your account. Reach out to your mentor and they can connect it.";
+    return;
+  }
+
+  document.getElementById('ljName').textContent =
+    (me.display_name || me.full_name || 'Your') + "'s Lessons";
+
+  // Fetch everything — RLS keeps it scoped to this family
+  let lessons = [];
+  try {
+    lessons = await window.pmHiring.fetchLessonHistory(me.id, { limit: 500 }) || [];
+  } catch (e) {
+    console.warn('fetchLessonHistory failed:', e);
+  }
+
+  const loadingEl = document.getElementById('ljLoading');
+  const listEl    = document.getElementById('ljList');
+  const emptyEl   = document.getElementById('ljEmpty');
+  const statsEl   = document.getElementById('ljStats');
+  const yearsEl   = document.getElementById('ljYears');
+
+  loadingEl.hidden = true;
+
+  if (!lessons.length) {
+    emptyEl.hidden = false;
+    return;
+  }
+
+  // Year set
+  const yearOf = (iso) => new Date(iso).getFullYear();
+  const allYears = [...new Set(lessons.map(l => yearOf(l.starts_at)))].sort((a,b) => b - a);
+  const currentYear = allYears[0];
+  let activeYear = currentYear;
+
+  function renderYears(){
+    yearsEl.innerHTML = ['all', ...allYears].map(y => {
+      const label = y === 'all' ? 'All time' : String(y);
+      const isActive = (y === 'all' && activeYear === 'all') || (y === activeYear);
+      return `<button type="button" class="lj-year${isActive ? ' is-active' : ''}" data-year="${y}">${label}</button>`;
+    }).join('');
+    yearsEl.querySelectorAll('[data-year]').forEach(b => {
+      b.addEventListener('click', () => {
+        const v = b.getAttribute('data-year');
+        activeYear = v === 'all' ? 'all' : Number(v);
+        renderYears();
+        renderList();
+      });
+    });
+  }
+
+  function fmtLocalDate(iso){
+    if (!iso) return null;
+    const s = String(iso);
+    const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return m ? new Date(+m[1], +m[2]-1, +m[3]) : new Date(s);
+  }
+
+  function escapeHtml(s){return (s||'').toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[c]));}
+
+  function renderStats(){
+    const yearOnly = activeYear === 'all' ? lessons : lessons.filter(l => yearOf(l.starts_at) === activeYear);
+    document.getElementById('ljStatYear').textContent = yearOnly.length;
+    document.getElementById('ljStatAll').textContent = lessons.length;
+    const totalMin = yearOnly.reduce((s, l) => s + (Number(l.duration_minutes) || 0), 0);
+    document.getElementById('ljStatHours').textContent = Math.round((totalMin / 60) * 10) / 10;
+    const rated = yearOnly.filter(l => l.rating != null);
+    if (rated.length) {
+      const avg = rated.reduce((s, l) => s + Number(l.rating || 0), 0) / rated.length;
+      document.getElementById('ljStatRating').textContent = (Math.round(avg * 10) / 10) + ' / 5';
+    } else {
+      document.getElementById('ljStatRating').textContent = '—';
+    }
+    statsEl.hidden = false;
+  }
+
+  function starsHtml(rating){
+    const n = Math.max(0, Math.min(5, Math.round(Number(rating) || 0)));
+    let out = '';
+    for (let i = 0; i < 5; i++) out += `<span class="${i < n ? '' : 'lj-rating__dim'}">★</span>`;
+    return `<div class="lj-rating" title="${n} of 5">${out}</div>`;
+  }
+
+  function renderList(){
+    renderStats();
+    const data = activeYear === 'all' ? lessons : lessons.filter(l => yearOf(l.starts_at) === activeYear);
+    if (!data.length) {
+      listEl.hidden = true;
+      emptyEl.hidden = false;
+      return;
+    }
+    emptyEl.hidden = true;
+    listEl.hidden = false;
+    listEl.innerHTML = data.map(l => {
+      const d = fmtLocalDate(l.starts_at);
+      const monthLbl = d ? d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase() : '—';
+      const dayLbl   = d ? d.getDate() : '—';
+      const yearLbl  = d ? d.getFullYear() : '';
+      const chips = [];
+      if (l.status_label) chips.push(`<span class="lj-chip lj-chip--status">${escapeHtml(l.status_label)}</span>`);
+      if (l.type_label)   chips.push(`<span class="lj-chip lj-chip--type">${escapeHtml(l.type_label)}</span>`);
+      if (l.taught_by_substitute) chips.push(`<span class="lj-chip lj-chip--substitute">Substitute teacher</span>`);
+      const concepts = l.key_concepts ? `<p class="lj-concepts">${escapeHtml(l.key_concepts)}</p>` : '';
+      const feedback = l.feedback ? `
+        <div class="lj-feedback">
+          <p class="lj-feedback__label">Note from your mentor</p>
+          ${escapeHtml(l.feedback)}
+        </div>` : '';
+      const rating = (l.rating != null) ? starsHtml(l.rating) : '<div></div>';
+      const fileCount = Number(l.active_file_count) || 0;
+      const filesHtml = fileCount > 0
+        ? `<div class="lj-files">
+             <button type="button" class="lj-file" data-lesson-files="${l.lesson_log_id}">
+               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+               ${fileCount} ${fileCount === 1 ? 'file' : 'files'} from this session
+             </button>
+           </div>`
+        : '';
+      return `
+        <article class="lj-card">
+          <div class="lj-date">
+            <div class="lj-date__month">${monthLbl}</div>
+            <div class="lj-date__day">${dayLbl}</div>
+            <div class="lj-date__year">${yearLbl}</div>
+          </div>
+          <div class="lj-body">
+            <h3 class="lj-focus">${escapeHtml(l.focus_area || 'Session')}</h3>
+            ${concepts}
+            ${chips.length ? `<div class="lj-meta">${chips.join('')}</div>` : ''}
+            ${feedback}
+            ${filesHtml}
+          </div>
+          ${rating}
+        </article>`;
+    }).join('');
+
+    // Lazy-load file lists when "X files" is clicked
+    listEl.querySelectorAll('[data-lesson-files]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const logId = btn.getAttribute('data-lesson-files');
+        btn.disabled = true; btn.textContent = 'Loading files…';
+        try {
+          const log = await window.pmHiring.fetchLessonLog
+            ? null  // fetchLessonLog wants appointment_id, not log_id — skip
+            : null;
+          // Files come from session_lesson_files via signed URLs.
+          // We pull them on demand to keep the initial render fast.
+          const sb = window.pmSupabase;
+          const { data: files, error } = await sb
+            .from('session_lesson_files')
+            .select('id, file_name, storage_path, mime_type')
+            .eq('lesson_log_id', logId)
+            .is('deleted_at', null);
+          if (error) throw error;
+          if (!files || !files.length) {
+            btn.replaceWith(Object.assign(document.createElement('span'),
+              { className: 'lj-chip', textContent: 'No files attached' }));
+            return;
+          }
+          // Generate signed URLs and replace the button with file links
+          const wrap = document.createElement('div');
+          wrap.className = 'lj-files';
+          for (const f of files) {
+            try {
+              const url = await window.pmHiring.getLessonFileSignedUrl(f.storage_path, 3600);
+              const a = document.createElement('a');
+              a.className = 'lj-file';
+              a.href = url; a.target = '_blank'; a.rel = 'noopener';
+              a.textContent = f.file_name || 'file';
+              wrap.appendChild(a);
+            } catch (_) {}
+          }
+          btn.replaceWith(wrap);
+        } catch (e) {
+          console.warn('file load failed', e);
+          btn.disabled = false; btn.textContent = 'Could not load files';
+        }
+      });
+    });
+  }
+
+  renderYears();
+  renderList();
+})();
+</script>
+
+</body>
+</html>
