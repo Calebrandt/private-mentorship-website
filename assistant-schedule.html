@@ -97,12 +97,15 @@
   /* Week grid */
   .as-week{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;}
   @media (max-width:880px){.as-week{grid-template-columns:repeat(7,minmax(140px,1fr));overflow-x:auto;}}
+  /* Day cell is the brighter card surface; inner slot uses the recessed
+     border-soft tone for clear visual hierarchy in both themes. */
   .as-day{
-    background:var(--border-soft);border:1px solid var(--border);border-radius:12px;
+    background:var(--card);border:1px solid var(--border);border-radius:12px;
     padding:12px;display:flex;flex-direction:column;gap:8px;min-height:170px;
+    transition:background .2s ease, border-color .2s ease;
   }
-  .as-day--today{border-color:#0071e3;background:var(--card);box-shadow:0 0 0 2px #DCEBFC;}
-  .as-day--past{opacity:.6;}
+  .as-day--today{border-color:#0071e3;background:var(--card);box-shadow:0 0 0 2px rgba(0,113,227,.18);}
+  .as-day--past{opacity:.7;}
   .as-day__head{display:flex;align-items:baseline;justify-content:space-between;gap:6px;}
   .as-day__name{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-tert);}
   .as-day__num{font-family:"Archivo","Inter",sans-serif;font-size:16px;font-weight:800;color:var(--ink-2);letter-spacing:-.01em;}
@@ -110,23 +113,40 @@
   .as-day__count{font-size:10.5px;color:var(--ink-tert);font-weight:600;}
   .as-day__list{display:flex;flex-direction:column;gap:6px;}
   .as-slot{
-    background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 9px;
+    background:var(--border-soft);border:1px solid var(--border);border-radius:8px;padding:7px 9px;
     font-size:11.5px;line-height:1.4;color:var(--ink-2);
     display:flex;flex-direction:column;gap:2px;
     cursor:default;
-    transition:border-color .15s ease;
+    transition:border-color .15s ease, background .15s ease;
   }
-  .as-slot:hover{border-color:var(--ink-tert);}
-  .as-slot--completed{background:#F0FDF4;border-color:#BBF7D0;}
-  .as-slot--cancelled{background:#F1F5F9;border-color:var(--border);text-decoration:line-through;color:var(--ink-tert);}
-  .as-slot--late_cancelled{background:#FEF3C7;border-color:#FDE68A;}
-  .as-slot--no_show{background:#FEE2E2;border-color:#FECACA;}
+  .as-slot:hover{border-color:var(--ink-tert);background:var(--card);}
+  /* Status-tinted slot backgrounds. In dark mode the warm tints would
+     read too bright, so each state gets a paired dark-mode override. */
+  .as-slot--completed{background:#F0FDF4;border-color:#BBF7D0;color:#0F172A;}
+  .as-slot--cancelled{background:var(--border-soft);border-color:var(--border);text-decoration:line-through;color:var(--ink-tert);}
+  .as-slot--late_cancelled{background:#FEF3C7;border-color:#FDE68A;color:#0F172A;}
+  .as-slot--no_show{background:#FEE2E2;border-color:#FECACA;color:#0F172A;}
   .as-slot__time{font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.01em;font-size:11px;color:var(--ink-mute);}
   .as-slot--completed .as-slot__time{color:#047857;}
   .as-slot--no_show .as-slot__time{color:#B91C1C;}
   .as-slot--late_cancelled .as-slot__time{color:#92400E;}
-  .as-slot__client{font-weight:700;color:var(--ink-2);font-size:11.5px;letter-spacing:-.005em;}
-  .as-day__empty{font-size:11px;color:#CBD5E1;font-style:italic;padding:6px 0;text-align:center;}
+  .as-slot__client{font-weight:700;color:inherit;font-size:11.5px;letter-spacing:-.005em;}
+  .as-day__empty{font-size:11px;color:var(--ink-tert);font-style:italic;padding:6px 0;text-align:center;}
+
+  /* Dark-mode tints for the colored states so completed/cancelled/
+     no_show stay legible. Translucent same-hue tints on the dark card. */
+  [data-dash-theme="dark"] .as-slot--completed{
+    background:rgba(34,197,94,.10);border-color:rgba(34,197,94,.32);color:#86EFAC;
+  }
+  [data-dash-theme="dark"] .as-slot--completed .as-slot__time{color:#4ADE80;}
+  [data-dash-theme="dark"] .as-slot--no_show{
+    background:rgba(239,68,68,.10);border-color:rgba(239,68,68,.32);color:#FCA5A5;
+  }
+  [data-dash-theme="dark"] .as-slot--no_show .as-slot__time{color:#F87171;}
+  [data-dash-theme="dark"] .as-slot--late_cancelled{
+    background:rgba(245,158,11,.10);border-color:rgba(245,158,11,.32);color:#FDE68A;
+  }
+  [data-dash-theme="dark"] .as-slot--late_cancelled .as-slot__time{color:#FBBF24;}
 
   /* Upcoming + history lists */
   .as-list{display:flex;flex-direction:column;}
