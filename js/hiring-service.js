@@ -2059,8 +2059,28 @@
         if (!e) return false;
         return (todayStart - endOf(e)) <= FORTY_FIVE_DAYS_MS;
       });
+      // Draft whose service window has already started — the family is
+      // already "on" this contract in calendar terms, it just needs an
+      // Activate click to confirm payment. Beats recently-expired so
+      // the Activate button is reachable in the workspace.
+      const pickStartedDraft = pickFrom(r => {
+        if (r.status !== 'draft') return false;
+        const s = parseLocalDate(r.start_at);
+        return s && startOf(s) <= todayEnd;
+      });
       const pickDraft = pickFrom(r => r.status === 'draft');
-      out.contract = pickActiveNow || pickAnyActive || pickRecentlyExpired || pickDraft || null;
+      // Priority (highest first):
+      //   1. ACTIVE that contains today
+      //   2. Any other ACTIVE
+      //   3. DRAFT that has already started (in-flight unpaid renewal)
+      //   4. Recently EXPIRED (gap right after a contract ended)
+      //   5. Latest DRAFT (future renewal)
+      out.contract = pickActiveNow
+                  || pickAnyActive
+                  || pickStartedDraft
+                  || pickRecentlyExpired
+                  || pickDraft
+                  || null;
     } catch (_) {}
 
     if (out.contract?.id) {
