@@ -133,7 +133,36 @@
   .nx-sub{font-size:14.5px;color:var(--ink-mute);margin:0;font-weight:500;letter-spacing:-.005em;}
 
   /* KPI cards row */
-  .nx-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:24px;}
+  .nx-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:14px;}
+
+  /* Phase 19m: Hours Remaining tile color states — green when
+     comfortable, amber when ≤5h or ≤25% of plan, red when depleted.
+     Same urgency vocabulary as the assistant workspace KPI tiles. */
+  #kpiRemainingTile.is-low{background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border-color:#FCD34D;}
+  #kpiRemainingTile.is-low #kpiHours{color:#78350F;}
+  #kpiRemainingTile.is-low #kpiHoursLabel{color:#92400E;}
+  #kpiRemainingTile.is-empty{background:linear-gradient(135deg,#FEF2F2,#FEE2E2);border-color:#FECACA;}
+  #kpiRemainingTile.is-empty #kpiHours{color:#7F1D1D;}
+  #kpiRemainingTile.is-empty #kpiHoursLabel{color:#991B1B;}
+
+  /* Phase 19m: Wide usage progress bar — visual readout of how much
+     of the purchased plan has been burned. Same color rhythm as the
+     Remaining tile (green default, amber when low). */
+  .nx-usage{
+    background:#fff;border:1px solid #E2E8F0;border-radius:12px;
+    padding:14px 18px;margin-bottom:24px;
+  }
+  .nx-usage__top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:8px;}
+  .nx-usage__lead{font:700 14px Inter,sans-serif;color:#0F172A;letter-spacing:-.005em;}
+  .nx-usage__meta{font:500 12.5px Inter,sans-serif;color:#64748B;letter-spacing:-.005em;}
+  .nx-usage__bar{height:8px;background:#F1F5F9;border-radius:9999px;overflow:hidden;}
+  .nx-usage__bar-fill{
+    height:100%;background:linear-gradient(90deg,#10B981 0%,#059669 100%);
+    border-radius:9999px;transition:width .5s ease;
+  }
+  .nx-usage.is-low .nx-usage__bar-fill{background:linear-gradient(90deg,#F59E0B 0%,#D97706 100%);}
+  .nx-usage.is-empty .nx-usage__bar-fill{background:linear-gradient(90deg,#EF4444 0%,#DC2626 100%);}
+
   /* Phase 12 — banked-hours promo strip (only visible when banked > 0) */
   .nx-bank-strip{
     background:linear-gradient(135deg,#FEF3C7 0%,#FDE68A 100%);
@@ -515,52 +544,67 @@
     <p class="nx-sub" id="nxSub">Your private mentorship workspace.</p>
   </header>
 
-  <!-- Section 1: 3 KPIs -->
+  <!-- Section 1: 4 KPIs — mirror the assistant workspace tiles so the
+       family and the assistant see the same vocabulary + numbers.
+       Phase 19m: replaced "Plan days remaining" (nonsense) and
+       "Sessions this month" (stale bucketing) with Hours Available
+       and Hours Used. Added a usage progress bar below. -->
   <section class="nx-kpis">
     <div class="nx-kpi">
+      <div class="nx-kpi__icon nx-kpi__icon--blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <div class="nx-kpi__bot">
+        <div>
+          <p class="nx-kpi__num" id="kpiAvailable"><span class="nx-skel" style="width:50px;"></span></p>
+          <p class="nx-kpi__label">Hours available</p>
+        </div>
+      </div>
+    </div>
+    <div class="nx-kpi" id="kpiRemainingTile">
       <div class="nx-kpi__icon nx-kpi__icon--green">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       </div>
       <div class="nx-kpi__bot">
         <div>
           <p class="nx-kpi__num" id="kpiHours"><span class="nx-skel" style="width:50px;"></span></p>
-          <p class="nx-kpi__label">Hours remaining</p>
+          <p class="nx-kpi__label" id="kpiHoursLabel">Hours remaining</p>
         </div>
       </div>
     </div>
     <div class="nx-kpi">
       <div class="nx-kpi__icon nx-kpi__icon--orange">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
       </div>
       <div class="nx-kpi__bot">
         <div>
-          <p class="nx-kpi__num" id="kpiSessions"><span class="nx-skel" style="width:50px;"></span></p>
-          <p class="nx-kpi__label">Sessions this month</p>
+          <p class="nx-kpi__num" id="kpiUsed"><span class="nx-skel" style="width:50px;"></span></p>
+          <p class="nx-kpi__label">Hours used</p>
         </div>
       </div>
     </div>
     <div class="nx-kpi">
       <div class="nx-kpi__icon nx-kpi__icon--purple">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       </div>
       <div class="nx-kpi__bot">
         <div>
-          <p class="nx-kpi__num" id="kpiPlanDays"><span class="nx-skel" style="width:50px;"></span></p>
-          <p class="nx-kpi__label">Plan days remaining</p>
+          <p class="nx-kpi__num" id="kpiUpcoming"><span class="nx-skel" style="width:50px;"></span></p>
+          <p class="nx-kpi__label">Upcoming sessions</p>
         </div>
       </div>
     </div>
-    <div class="nx-kpi">
-      <div class="nx-kpi__icon nx-kpi__icon--blue">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      </div>
-      <div class="nx-kpi__bot">
-        <div>
-          <p class="nx-kpi__num" id="kpiTasks"><span class="nx-skel" style="width:50px;"></span></p>
-          <p class="nx-kpi__label">Tasks open</p>
-        </div>
-      </div>
+  </section>
+
+  <!-- Usage progress bar — wide horizontal bar that shows how much of
+       the purchased plan has been used. Same visual as the contract
+       history rows, just bigger and pinned under the KPIs. -->
+  <section class="nx-usage" id="nxUsage" hidden>
+    <div class="nx-usage__top">
+      <span class="nx-usage__lead" id="nxUsageLead">— hours used</span>
+      <span class="nx-usage__meta" id="nxUsageMeta">of —</span>
     </div>
+    <div class="nx-usage__bar"><div class="nx-usage__bar-fill" id="nxUsageFill" style="width:0%"></div></div>
   </section>
 
   <!-- Phase 12 — banked-hours promo strip (auto-shown when balance > 0).
@@ -737,7 +781,7 @@
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260508c"></script>
-<script src="js/hiring-service.js?v=20260516i"></script>
+<script src="js/hiring-service.js?v=20260516j"></script>
 <script src="js/session-calendar.js?v=20260516a"></script>
 <script src="js/sidebar.js?v=20260515d"></script>
 <script src="js/right-calendar.js?v=20260512a"></script>
@@ -947,41 +991,62 @@
   }
 
   // ─── KPIs ────────────────────────────────────────────────────
-  // Hours remaining: use the SAME workspace fetcher the assistant view
-  // uses so the numbers match across both screens. Falls back to the
-  // stale clients.hours_balance column only if the workspace lookup
-  // fails (e.g. RLS blocks, no contract yet).
-  let _hoursRemaining = null;
-  try {
-    const ws = await window.pmHiring.fetchAssistantClientWorkspace(client.id);
-    if (ws && Number.isFinite(ws.hoursRemainingMinutes)) {
-      _hoursRemaining = Math.round((ws.hoursRemainingMinutes / 60) * 100) / 100;
-    }
-  } catch (_) {}
-  if (_hoursRemaining == null) {
-    _hoursRemaining = Number(client?.hours_balance || 0).toFixed(1);
-  }
-  $('kpiHours').textContent = _hoursRemaining;
+  // Pull EVERYTHING from the same workspace fetcher the assistant uses,
+  // so client + assistant always show identical numbers. One round-trip
+  // gives us: included_minutes, hoursToppedUpMinutes (carryover IN),
+  // hoursUsedMinutes (raw session sum), hoursRemainingMinutes (true
+  // balance), and upcomingAppointments count.
+  let ws = null;
+  try { ws = await window.pmHiring.fetchAssistantClientWorkspace(client.id); } catch (_) {}
 
-  // Sessions this month — attendance.monthly's last entry. Note: known
-  // bug — bucketing is off for clients with bulk-imported history; the
-  // unified rebuild (Phase 19m) will replace this with the same
-  // appointments query the assistant dashboard's "Hours This Month"
-  // uses, which correctly filters by starts_at in current calendar
-  // month.
-  const startOfMonth = new Date(); startOfMonth.setDate(1); startOfMonth.setHours(0,0,0,0);
-  const thisMonthCount = (attendance.monthly || []).slice(-1)[0]?.attended || 0;
-  $('kpiSessions').textContent = thisMonthCount;
-  // Plan days remaining (from current contract end)
-  const currentContract = (contracts || []).find(c => /active/i.test(String(c.status))) || (contracts || [])[0];
-  if (currentContract?.end_at) {
-    const days = Math.max(0, Math.ceil((new Date(currentContract.end_at).getTime() - Date.now()) / 86400000));
-    $('kpiPlanDays').textContent = days;
-  } else {
-    $('kpiPlanDays').textContent = '—';
+  // Mental model (locked Phase 19d, also used on assistant view):
+  //   • Available = plan + carryover (e.g. Michael: 40 + 2.75 = 42.75)
+  //   • Used      = max(0, raw_sessions - carryover_absorbed)
+  //                 (carryover bonus is consumed FIRST, so "used"
+  //                  reflects what came off the purchased plan)
+  //   • Remaining = plan + carryover − raw_sessions  (live balance)
+  const planHours      = ws?.contract?.included_minutes ? Math.round(ws.contract.included_minutes / 60 * 100) / 100 : 0;
+  const toppedUpHours  = ws?.hoursToppedUpMinutes ? Math.round(ws.hoursToppedUpMinutes / 60 * 100) / 100 : 0;
+  const rawSessionsHr  = ws?.hoursUsedMinutes ? Math.round(ws.hoursUsedMinutes / 60 * 100) / 100 : 0;
+  const availableHours = Math.round((planHours + toppedUpHours) * 100) / 100;
+  const usedAgainstPlan = Math.max(0, Math.round((rawSessionsHr - toppedUpHours) * 100) / 100);
+  const remainingHours = Number.isFinite(ws?.hoursRemainingMinutes)
+    ? Math.round(ws.hoursRemainingMinutes / 60 * 100) / 100
+    : Number(client?.hours_balance || 0);
+  const upcomingCount  = (ws?.upcomingAppointments || []).length;
+
+  $('kpiAvailable').textContent = availableHours || '—';
+  $('kpiHours').textContent     = remainingHours;
+  $('kpiUsed').textContent      = usedAgainstPlan;
+  $('kpiUpcoming').textContent  = upcomingCount;
+
+  // Color the Remaining tile by urgency (matches assistant workspace)
+  const remTile = document.getElementById('kpiRemainingTile');
+  if (remTile) {
+    remTile.classList.remove('is-low', 'is-empty');
+    if (remainingHours <= 0) {
+      remTile.classList.add('is-empty');
+    } else if (planHours > 0 && (remainingHours <= 5 || remainingHours / planHours <= 0.25)) {
+      remTile.classList.add('is-low');
+    }
   }
-  // Tasks open KPI
-  $('kpiTasks').textContent = tasks.openCount || 0;
+
+  // Wide usage progress bar — shows "X.X of Y hours used (Z% used)"
+  const usageEl = document.getElementById('nxUsage');
+  if (usageEl && planHours > 0) {
+    const pct = Math.min(100, Math.round((usedAgainstPlan / planHours) * 100));
+    document.getElementById('nxUsageLead').textContent = `${usedAgainstPlan} of ${planHours} hours used`;
+    document.getElementById('nxUsageMeta').textContent =
+      remainingHours > 0 ? `${remainingHours} h left · ${pct}% used` : `Plan fully used`;
+    const fill = document.getElementById('nxUsageFill');
+    if (fill) fill.style.width = pct + '%';
+    usageEl.classList.remove('is-low', 'is-empty');
+    if (remainingHours <= 0) usageEl.classList.add('is-empty');
+    else if (remainingHours <= 5 || remainingHours / planHours <= 0.25) usageEl.classList.add('is-low');
+    usageEl.hidden = false;
+  }
+
+  // Tasks open (kept — still surfaces a useful number further down)
   $('tasksSub').textContent = `${tasks.openCount} open · ${tasks.completedThisMonthCount} done this month`;
 
   // ─── Attendance stat tiles ────────────────────────────────────
