@@ -407,6 +407,56 @@
     .nx-contract{grid-template-columns:1fr;}
     .nx-contract__main{grid-column:span 1;}
   }
+
+  /* ════════════════════════════════════════════════════════════
+     Dark-mode overrides — the weekly grid + session rows were
+     authored in light only (hardcoded #EEF1FB / #FAFBFC / #C7D2FE
+     gradients and borders). In dark mode that made every reserved
+     day card and session-date square render as a bright blue slab.
+     Re-anchor every surface, border, and gradient to theme tokens.
+     ════════════════════════════════════════════════════════════ */
+  [data-dash-theme="dark"] .nx-day:hover{ border-color:var(--ink-tert); }
+  [data-dash-theme="dark"] .nx-day--has-slot{
+    background:linear-gradient(180deg, rgba(59,130,246,0.10) 0%, rgba(59,130,246,0.03) 60%);
+    border-color:rgba(59,130,246,0.40);
+  }
+  [data-dash-theme="dark"] .nx-day--has-slot:hover{
+    border-color:rgba(59,130,246,0.65);
+  }
+  [data-dash-theme="dark"] .nx-day--today{
+    background:linear-gradient(180deg,#3B82F6 0%,#1D4ED8 100%);
+    border-color:#3B82F6;
+    box-shadow:0 12px 24px -10px rgba(0,0,0,0.55);
+  }
+  [data-dash-theme="dark"] .nx-slot{
+    background:var(--card);
+    border-color:rgba(59,130,246,0.40);
+    box-shadow:0 2px 4px rgba(0,0,0,0.30);
+  }
+  [data-dash-theme="dark"] .nx-day--today .nx-slot{
+    background:var(--card);
+    border-color:transparent;
+  }
+  [data-dash-theme="dark"] .nx-day--today .nx-slot__time{ color:#93C5FD; }
+
+  /* Session rows (Upcoming + Recent history) */
+  [data-dash-theme="dark"] .nx-sess:hover{
+    border-color:rgba(59,130,246,0.55);
+    box-shadow:0 8px 18px -8px rgba(0,0,0,0.55);
+  }
+  [data-dash-theme="dark"] .nx-sess__date{
+    background:linear-gradient(180deg, var(--border-soft) 0%, var(--border) 100%);
+    border-color:var(--border);
+  }
+
+  /* Inline status dots — text colors need a brighter tone in dark */
+  [data-dash-theme="dark"] .nx-status--scheduled{ color:#93C5FD; }
+  [data-dash-theme="dark"] .nx-status--completed{ color:#4ADE80; }
+  [data-dash-theme="dark"] .nx-status--late{      color:#FB923C; }
+  [data-dash-theme="dark"] .nx-status--noshow{    color:#F87171; }
+
+  /* Section card backgrounds + headings stay theme-token already; no
+     additional overrides needed there. */
 </style>
 </head>
 <body class="pm-has-sidebar">
