@@ -1207,13 +1207,22 @@
     // Resolve assistant names
     const assistantIds = [...new Set(upcoming.map(a => a.assistant_id).filter(Boolean))];
     const nameMap = await window.pmHiring.fetchAssistantNamesByIds(assistantIds).catch(()=>({}));
+    // Time bug workaround (queued for proper data fix): the bulk
+    // imports stored session times naively (intended Pacific times
+    // saved as UTC), so a 10am Pacific session is stored as 10am UTC
+    // and the browser converts it back to 3am Pacific. Display in UTC
+    // formatting to preserve the intended local time until the data
+    // fix lands.
+    const TZ_OPTS = { timeZone: 'UTC' };
     upWrap.innerHTML = `<div class="nx-upcoming">${upcoming.map(a => {
       const d = new Date(a.starts_at);
-      const day = d.toLocaleDateString('en-CA',{weekday:'short'}).toUpperCase();
-      const num = d.getDate();
-      const time = d.toLocaleTimeString('en-CA',{hour:'numeric',minute:'2-digit'});
-      const date = d.toLocaleDateString('en-CA',{month:'long',day:'numeric'});
-      const assistantName = nameMap[a.assistant_id] || 'TBD';
+      const day  = d.toLocaleDateString('en-CA', { weekday:'short', ...TZ_OPTS }).toUpperCase();
+      const num  = d.getUTCDate();
+      const time = d.toLocaleTimeString('en-CA', { hour:'numeric', minute:'2-digit', ...TZ_OPTS });
+      const date = d.toLocaleDateString('en-CA', { month:'long', day:'numeric', ...TZ_OPTS });
+      // "TBD" was the old fallback when fetchAssistantNamesByIds failed
+      // (RLS / missing profile row). Friendlier copy meanwhile.
+      const assistantName = nameMap[a.assistant_id] || 'Your assistant';
       const kind = a.kind || 'Session';
       return `<div class="nx-up">
         <div class="nx-up__date">
