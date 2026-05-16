@@ -563,14 +563,10 @@
     </div>
   </section>
 
-  <!-- Phase 19m: Month calendar — same widget the assistant dashboard
-       uses, scoped to this family's sessions. Mounted right under the
-       KPIs so the family can see their schedule at a glance. -->
-  <section style="margin-bottom:22px;">
-    <div id="clientCalendar"></div>
-  </section>
-
-  <!-- Phase 12 — banked-hours promo strip (auto-shown when balance > 0) -->
+  <!-- Phase 12 — banked-hours promo strip (auto-shown when balance > 0).
+       Reordered ABOVE the calendar per Caleb 2026-05-16 — banked hours
+       are an opportunity callout, the calendar is the routine schedule
+       below it. -->
   <section class="nx-bank-strip" id="bankStrip" hidden>
     <div class="nx-bank-strip__icon">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><path d="M7 16h2"/></svg>
@@ -580,6 +576,13 @@
       <p class="nx-bank-strip__sub">These do not expire. Talk to your assistant about using them for a longer session, an extra session, or a special outing.</p>
     </div>
     <a class="nx-bank-strip__cta" href="messages.html">Message my assistant →</a>
+  </section>
+
+  <!-- Phase 19m: Month calendar — same widget the assistant dashboard
+       uses, scoped to this family's sessions. Sits below the bank strip
+       (opportunity callout) and above the deeper analytics sections. -->
+  <section style="margin-bottom:22px;">
+    <div id="clientCalendar"></div>
   </section>
 
   <!-- Section 2: Sessions overview + Conversations -->
