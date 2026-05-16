@@ -275,31 +275,60 @@
         out.scheduleRequests   = (schedReq && schedReq.requests) || schedReq || [];
         out.membershipRequests = memReq || [];
 
-        // Second batch — fan out per-client to grab lesson logs + invoices
+        // Second batch — fan out per-client to grab everything searchable
         // for the whole org. RLS already gives admin read access. Capped
         // to the first 40 clients to keep the parallel fan-out reasonable.
         const clientList = (clients || []).slice(0, 40);
+        const nameById = new Map();
+        clientList.forEach(c => nameById.set(c.id || c.client_id, c.full_name || c.client_name || c.name || ''));
         try {
-          const [lessonResults, invoiceResults] = await Promise.all([
-            Promise.all(clientList.map(c =>
-              safeCall(pm.fetchLessonHistory, c.id || c.client_id, [])
-            )),
-            Promise.all(clientList.map(c =>
-              safeCall(pm.fetchClientPaymentHistory, c.id || c.client_id, [])
-            )),
+          const [lessonResults, invoiceResults, workspaceResults] = await Promise.all([
+            Promise.all(clientList.map(c => safeCall(pm.fetchLessonHistory,        c.id || c.client_id, []))),
+            Promise.all(clientList.map(c => safeCall(pm.fetchClientPaymentHistory, c.id || c.client_id, []))),
+            // Workspace gives us each client's active contract + upcoming +
+            // recent appointments in one round-trip per client.
+            Promise.all(clientList.map(c => safeCall(pm.fetchAssistantClientWorkspace, c.id || c.client_id, null))),
           ]);
           out.lessonLogs = lessonResults.flat();
-          // fetchClientPaymentHistory returns enriched invoice rows
-          // (with .contract, .line_items) — we just need the searchable
-          // fields. Tag each with its client for the subtitle.
           out.invoices = invoiceResults.flat().map(inv => ({
             ...inv,
-            _clientName: clientList.find(c => (c.id || c.client_id) === inv.client_id)?.full_name || '',
+            _clientName: nameById.get(inv.client_id) || '',
           }));
+          // Flatten contracts + sessions out of every workspace
+          const contracts = [];
+          const sessions  = [];
+          workspaceResults.forEach((ws, i) => {
+            if (!ws) return;
+            const cid = clientList[i] && (clientList[i].id || clientList[i].client_id);
+            const cname = nameById.get(cid) || '';
+            if (ws.contract) {
+              contracts.push({ ...ws.contract, client_id: cid, _clientName: cname });
+            }
+            (ws.upcomingAppointments || []).forEach(a => sessions.push({ ...a, client_id: cid, _clientName: cname, _bucket: 'upcoming' }));
+            (ws.recentAppointments   || []).forEach(a => sessions.push({ ...a, client_id: cid, _clientName: cname, _bucket: 'past' }));
+          });
+          out.contracts = contracts;
+          out.sessions  = sessions;
         } catch (_) {
           // If the fan-out fails, the top-level lists still work
         }
       }
+
+      // Self-record — always add the signed-in user as a searchable
+      // result so admins/assistants can find "my account / my profile"
+      // by typing their own name or email.
+      try {
+        const me = await safeCall(pm.getCurrentUser, undefined, null);
+        const myProfile = await safeCall(pm.fetchCurrentUserProfile, undefined, null);
+        if (me) {
+          out._self = {
+            id: me.id,
+            email: me.email,
+            full_name: myProfile?.full_name || me.email?.split('@')[0] || 'You',
+            role: myProfile?.role || '',
+          };
+        }
+      } catch (_) {}
     } catch (e) {
       console.warn('master-search: dynamic load failed', e);
     }
@@ -352,14 +381,20 @@
 
     // Sessions
     tryEach('sessions', dyn.sessions, a => {
-      const blob = `${a.title || ''} ${a.notes || ''} ${a.kind || ''} ${a.status || ''}`.toLowerCase();
+      const hrs = a.duration_minutes ? (a.duration_minutes / 60) : 0;
+      const blob = `${a.title || ''} ${a.notes || ''} ${a.kind || ''} ${a.status || ''} ${a._clientName || ''} ${hrs}h ${hrs}`.toLowerCase();
       const dateStr = fmtDate(a.starts_at);
       if (blob.includes(q) || dateStr.toLowerCase().includes(q)) {
         const url = role === 'client' ? 'client-schedule.html' : 'assistant-schedule.html';
+        const subtitleParts = [];
+        if (a._clientName) subtitleParts.push(a._clientName);
+        subtitleParts.push(dateStr);
+        if (hrs) subtitleParts.push(hrs + 'h');
+        if (a.status) subtitleParts.push(a.status);
         results.sessions.push({
           icon: ICONS.session,
           title: a.title || 'Session',
-          subtitle: `${dateStr}${a.duration_minutes ? ' · ' + (a.duration_minutes / 60) + 'h' : ''}${a.status ? ' · ' + a.status : ''}`,
+          subtitle: subtitleParts.join(' · '),
           url: withQ(`${url}#appt-${a.id}`),
           _preview: { kind: 'session', data: a },
         });
@@ -401,16 +436,23 @@
       }
     });
 
-    // Contracts
+    // Contracts (client + admin)
     tryEach('contracts', dyn.contracts, c => {
       const label = c._label || (c.status ? c.status[0].toUpperCase() + c.status.slice(1) + ' contract' : 'Contract');
-      const blob = `${label} ${c.status || ''} ${c.assistant_name || ''}`.toLowerCase();
+      // Include hours, money equivalents, client name (admin) for broad matching
+      const hrs = c.included_hours || (c.included_minutes ? c.included_minutes / 60 : 0);
+      const blob = `${label} ${c.status || ''} ${c.assistant_name || ''} ${c._clientName || ''} ${hrs}h ${hrs}`.toLowerCase();
       const dateStr = `${fmtDate(c.start_at)} – ${fmtDate(c.end_at)}`;
       if (blob.includes(q) || dateStr.toLowerCase().includes(q)) {
+        const subtitleParts = [];
+        if (c._clientName) subtitleParts.push(c._clientName);
+        subtitleParts.push(dateStr);
+        if (hrs) subtitleParts.push(hrs + 'h');
+        if (c.status) subtitleParts.push(c.status);
         results.contracts.push({
           icon: ICONS.contract,
           title: label,
-          subtitle: `${dateStr}${c.included_hours ? ' · ' + c.included_hours + 'h' : ''}`,
+          subtitle: subtitleParts.join(' · '),
           url: withQ(`client-contract.html#contract-${c.id}`),
         });
       }
@@ -467,12 +509,34 @@
       }
     });
 
+    // Self ("Your account") — let the user find their own page by name
+    // or email. Always pinned at the top of Pages.
+    try {
+      if (dyn._self) {
+        const me = dyn._self;
+        const blob = `${me.full_name || ''} ${me.email || ''} my account profile you self`.toLowerCase();
+        if (blob.includes(q)) {
+          const myPage = role === 'client' ? 'client-dashboard.html'
+                       : role === 'assistant' ? 'assistant-profile.html'
+                       : 'admin-dashboard.html';
+          results.pages.unshift({
+            icon: ICONS.client,
+            title: `${me.full_name} (You)`,
+            subtitle: me.email + (me.role ? ' · ' + me.role : ''),
+            url: withQ(myPage),
+          });
+        }
+      }
+    } catch (_) {}
+
     // Clients (assistant + admin) — also build per-client roll-up of
     // matching items so the preview pane can show a mini-dossier.
     tryEach('clients', dyn.clients, c => {
       const cid = c.id || c.client_id;
       const name = c.full_name || c.client_name || c.name || '';
-      const blob = `${name} ${c.email || ''}`.toLowerCase();
+      // Broader blob — include id (short), email, contract status, every
+      // text field we have. Even partial matches on UUIDs work.
+      const blob = `${name} ${c.email || ''} ${c.contract_status || ''} ${(cid || '').slice(0,8)}`.toLowerCase();
       if (blob.includes(q)) {
         const isAdmin = role === 'admin';
         // Roll up everything for this client to surface in the preview
