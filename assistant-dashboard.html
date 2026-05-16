@@ -412,17 +412,10 @@
     transition:background .15s ease;
   }
   .ad-welcome a:hover{background:#FEF3C7;}
-  [data-dash-theme="dark"] .ad-welcome{
-    background:linear-gradient(135deg, rgba(245,158,11,.10), rgba(245,158,11,.18));
-    border-color:rgba(245,158,11,.35);
-    box-shadow:none;
-  }
-  [data-dash-theme="dark"] .ad-welcome__title{color:#FBBF24;}
-  [data-dash-theme="dark"] .ad-welcome__sub{color:#FCD34D;}
-  [data-dash-theme="dark"] .ad-welcome a, [data-dash-theme="dark"] .ad-welcome .ad-prof__edit{
-    background:rgba(245,158,11,.18);color:#FBBF24;border-color:rgba(245,158,11,.35);
-  }
-  [data-dash-theme="dark"] .ad-welcome a:hover{background:rgba(245,158,11,.28);}
+  /* Dark mode: keep the SAME bright gold as light mode so this matches
+     the client dashboard's .nx-bank-strip exactly (which also stays
+     bright gold in dark mode). Both bars look identical between the
+     two views, which is the whole point. */
 </style>
 </head>
 <body class="pm-has-sidebar">
@@ -645,8 +638,11 @@ function initialsFor(name){
 }
 
 (async function init(){
-  // Date header
-  document.getElementById('adDate').textContent = formatDateLong(new Date());
+  // Phase 19n: the "Friday, May 15" date pill was removed from the hero
+  // (client dashboard doesn't have it). Safe-guarded so any future
+  // re-add lights up automatically.
+  const _adDateEl = document.getElementById('adDate');
+  if (_adDateEl) _adDateEl.textContent = formatDateLong(new Date());
 
   // Wait briefly for sidebar.js to settle auth
   await new Promise(r => setTimeout(r, 300));
