@@ -297,30 +297,38 @@
   function search(query, role, dyn) {
     const q = String(query || '').trim().toLowerCase();
     if (!q) return null;
+    const qEnc = encodeURIComponent(query.trim());     // for the &q=… deep-link param
 
     const results = {
       pages: [], sessions: [], invoices: [], contracts: [], messages: [],
       clients: [], lessonLogs: [],
       applications: [], assistantProfiles: [], scheduleRequests: [], membershipRequests: [],
     };
+    // Per-section try wrapper — one bad data shape can't kill everything else.
+    const tryEach = (label, arr, fn) => {
+      try { (arr || []).forEach(fn); }
+      catch (err) { console.warn('master-search: section failed (' + label + ')', err); }
+    };
+    // Helper to append &q=… (the search query) to any deep-link URL so the
+    // landing page can also do in-page text highlighting.
+    const withQ = (url) => url + (url.includes('?') ? '&' : '?') + 'q=' + qEnc;
 
     // Pages (static)
-    (PAGE_INDEX[role] || []).forEach(p => {
+    tryEach('pages', PAGE_INDEX[role], p => {
       const blob = `${p.title} ${p.keywords || ''} ${(p.sections || []).join(' ')}`.toLowerCase();
       if (blob.includes(q)) {
-        // Try to find a matching section so the subtitle hints at WHY this page matched
         const matchedSection = (p.sections || []).find(s => s.toLowerCase().includes(q));
         results.pages.push({
           icon: ICONS.page,
           title: p.title,
           subtitle: matchedSection || 'Page',
-          url: p.url,
+          url: withQ(p.url),
         });
       }
     });
 
     // Sessions
-    (dyn.sessions || []).forEach(a => {
+    tryEach('sessions', dyn.sessions, a => {
       const blob = `${a.title || ''} ${a.notes || ''} ${a.kind || ''} ${a.status || ''}`.toLowerCase();
       const dateStr = fmtDate(a.starts_at);
       if (blob.includes(q) || dateStr.toLowerCase().includes(q)) {
@@ -329,13 +337,13 @@
           icon: ICONS.session,
           title: a.title || 'Session',
           subtitle: `${dateStr}${a.duration_minutes ? ' · ' + (a.duration_minutes / 60) + 'h' : ''}${a.status ? ' · ' + a.status : ''}`,
-          url: `${url}#appt-${a.id}`,
+          url: withQ(`${url}#appt-${a.id}`),
         });
       }
     });
 
     // Invoices (client only)
-    (dyn.invoices || []).forEach(inv => {
+    tryEach('invoices', dyn.invoices, inv => {
       const label = inv.invoice_number || ('Invoice ' + (inv.id || '').slice(0, 8));
       const blob = `${label} ${inv.subject || ''} ${inv.customer_notes || ''} ${inv.status || ''}`.toLowerCase();
       const dateStr = fmtDate(inv.invoice_date);
@@ -344,13 +352,13 @@
           icon: ICONS.invoice,
           title: label,
           subtitle: `${dateStr} · ${fmtMoney(inv.total_cents || inv.amount_paid_cents)} · ${inv.status || ''}`,
-          url: `client-hours.html#inv-${inv.id}`,
+          url: withQ(`client-hours.html#inv-${inv.id}`),
         });
       }
     });
 
     // Contracts
-    (dyn.contracts || []).forEach(c => {
+    tryEach('contracts', dyn.contracts, c => {
       const label = c._label || (c.status ? c.status[0].toUpperCase() + c.status.slice(1) + ' contract' : 'Contract');
       const blob = `${label} ${c.status || ''} ${c.assistant_name || ''}`.toLowerCase();
       const dateStr = `${fmtDate(c.start_at)} – ${fmtDate(c.end_at)}`;
@@ -359,14 +367,14 @@
           icon: ICONS.contract,
           title: label,
           subtitle: `${dateStr}${c.included_hours ? ' · ' + c.included_hours + 'h' : ''}`,
-          url: `client-contract.html#contract-${c.id}`,
+          url: withQ(`client-contract.html#contract-${c.id}`),
         });
       }
     });
 
     // Lesson logs — full-text search across appointment_title, focus_area,
     // key_concepts, next_session_notes, feedback. Lifetime, not year-scoped.
-    (dyn.lessonLogs || []).forEach(l => {
+    tryEach('lessonLogs', dyn.lessonLogs, l => {
       const blob = `${l.appointment_title || ''} ${l.focus_area || ''} ${l.key_concepts || ''} ${l.next_session_notes || ''} ${l.feedback || ''} ${l.lesson_assistant_name || ''}`.toLowerCase();
       const dateStr = fmtDate(l.starts_at);
       if (blob.includes(q) || dateStr.toLowerCase().includes(q)) {
@@ -374,33 +382,32 @@
         const lessonUrl = role === 'client'
           ? `client-lesson-journal.html?year=${year || ''}#lesson-${encodeURIComponent(l.appointment_id || '')}`
           : `assistant-lesson-tracker.html?clientId=${encodeURIComponent(l.client_id || '')}&year=${year || ''}#lesson-${encodeURIComponent(l.appointment_id || '')}`;
-        // Pick whichever field actually has the match for the subtitle
         const snippet = [l.focus_area, l.key_concepts, l.next_session_notes, l.feedback]
           .find(s => s && String(s).toLowerCase().includes(q)) || l.key_concepts || l.focus_area || '';
         results.lessonLogs.push({
           icon: ICONS.page,
           title: l.appointment_title || 'Lesson',
           subtitle: `${dateStr}${snippet ? ' · ' + String(snippet).slice(0, 80) : ''}`,
-          url: lessonUrl,
+          url: withQ(lessonUrl),
         });
       }
     });
 
     // Conversations / messages
-    (dyn.conversations || []).forEach(conv => {
+    tryEach('messages', dyn.conversations, conv => {
       const blob = `${conv.title || ''} ${conv.other_name || ''} ${conv.last_message_text || ''}`.toLowerCase();
       if (blob.includes(q)) {
         results.messages.push({
           icon: ICONS.message,
           title: conv.title || conv.other_name || 'Conversation',
           subtitle: conv.last_message_text || 'Open conversation',
-          url: `messages.html?c=${encodeURIComponent(conv.id || '')}`,
+          url: withQ(`messages.html?c=${encodeURIComponent(conv.id || '')}`),
         });
       }
     });
 
     // Clients (assistant + admin)
-    (dyn.clients || []).forEach(c => {
+    tryEach('clients', dyn.clients, c => {
       const name = c.full_name || c.client_name || c.name || '';
       const blob = `${name} ${c.email || ''}`.toLowerCase();
       if (blob.includes(q)) {
@@ -409,15 +416,15 @@
           icon: ICONS.client,
           title: name,
           subtitle: c.contract_status ? `Contract: ${c.contract_status}` : 'Client',
-          url: isAdmin
+          url: withQ(isAdmin
             ? `admin-create-client.html?id=${encodeURIComponent(c.id || c.client_id || '')}`
-            : `assistant-client.html?client_id=${encodeURIComponent(c.id || c.client_id || '')}`,
+            : `assistant-client.html?client_id=${encodeURIComponent(c.id || c.client_id || '')}`),
         });
       }
     });
 
     // Admin-only: applications, assistant profiles, schedule requests, membership requests
-    (dyn.applications || []).forEach(a => {
+    tryEach('applications', dyn.applications, a => {
       const name = a.applicant_full_name || a.full_name || a.email || 'Applicant';
       const blob = `${name} ${a.email || ''} ${a.status || ''}`.toLowerCase();
       if (blob.includes(q)) {
@@ -425,23 +432,25 @@
           icon: ICONS.client,
           title: name,
           subtitle: `Application · ${a.status || 'active'}`,
-          url: `admin-application.html?id=${encodeURIComponent(a.id || '')}`,
+          url: withQ(`admin-application.html?id=${encodeURIComponent(a.id || '')}`),
         });
       }
     });
-    (dyn.assistantProfiles || []).forEach(p => {
+    tryEach('assistantProfiles', dyn.assistantProfiles, p => {
       const name = p.display_name || p.full_name || 'Assistant';
-      const blob = `${name} ${p.city || ''} ${(p.languages || []).join(' ')}`.toLowerCase();
+      // Defensive: languages may be null/string/array depending on source
+      const langs = Array.isArray(p.languages) ? p.languages.join(' ') : String(p.languages || '');
+      const blob = `${name} ${p.city || ''} ${langs}`.toLowerCase();
       if (blob.includes(q)) {
         results.assistantProfiles.push({
           icon: ICONS.client,
           title: name,
           subtitle: `Assistant${p.city ? ' · ' + p.city : ''}`,
-          url: `admin-assistant-profiles.html?id=${encodeURIComponent(p.assistant_id || p.id || '')}`,
+          url: withQ(`admin-assistant-profiles.html?id=${encodeURIComponent(p.assistant_id || p.id || '')}`),
         });
       }
     });
-    (dyn.scheduleRequests || []).forEach(r => {
+    tryEach('scheduleRequests', dyn.scheduleRequests, r => {
       const title = r.request_type ? `${r.request_type} request` : 'Schedule request';
       const blob = `${title} ${r.status || ''} ${r.client_name || ''}`.toLowerCase();
       if (blob.includes(q)) {
@@ -449,11 +458,11 @@
           icon: ICONS.session,
           title: title,
           subtitle: `${r.status || 'pending'}${r.client_name ? ' · ' + r.client_name : ''}`,
-          url: `admin-schedule-requests.html#req-${r.id || ''}`,
+          url: withQ(`admin-schedule-requests.html#req-${r.id || ''}`),
         });
       }
     });
-    (dyn.membershipRequests || []).forEach(r => {
+    tryEach('membershipRequests', dyn.membershipRequests, r => {
       const title = `${r.requested_plan_key || 'Membership'} change`;
       const blob = `${title} ${r.status || ''} ${r.client_name || ''}`.toLowerCase();
       if (blob.includes(q)) {
@@ -461,7 +470,7 @@
           icon: ICONS.contract,
           title: title,
           subtitle: `${r.status || 'pending'}${r.client_name ? ' · ' + r.client_name : ''}`,
-          url: `admin-membership-requests.html#req-${r.id || ''}`,
+          url: withQ(`admin-membership-requests.html#req-${r.id || ''}`),
         });
       }
     });

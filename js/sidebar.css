@@ -484,24 +484,56 @@ body.pm-has-calendar{padding-right:320px;}
    soft tint so the user immediately sees which row was targeted
    without changing the row's natural look afterward.
    ════════════════════════════════════════════════════════════ */
+/* The flash now pulses TWICE so it's impossible to miss, and stays
+   on a soft amber halo for the duration instead of fading instantly. */
 @keyframes pm-deep-link-flash{
-  0%   { box-shadow:0 0 0 0 rgba(245,158,11,0.0),   inset 0 0 0 0 rgba(245,158,11,0.0); background-color:transparent; }
-  15%  { box-shadow:0 0 0 4px rgba(245,158,11,0.55), inset 0 0 0 1px rgba(245,158,11,0.55); background-color:rgba(245,158,11,0.18); }
-  100% { box-shadow:0 0 0 0 rgba(245,158,11,0.0),   inset 0 0 0 0 rgba(245,158,11,0.0); background-color:transparent; }
+  0%   { box-shadow:0 0 0 0   rgba(245,158,11,0.0); background-color:transparent; }
+  10%  { box-shadow:0 0 0 6px rgba(245,158,11,0.55); background-color:rgba(245,158,11,0.22); }
+  30%  { box-shadow:0 0 0 3px rgba(245,158,11,0.35); background-color:rgba(245,158,11,0.10); }
+  55%  { box-shadow:0 0 0 6px rgba(245,158,11,0.55); background-color:rgba(245,158,11,0.22); }
+  100% { box-shadow:0 0 0 0   rgba(245,158,11,0.0); background-color:transparent; }
 }
 .deep-link-flash{
-  animation:pm-deep-link-flash 2.0s cubic-bezier(.22,1,.36,1) forwards;
-  border-radius:10px;
-  scroll-margin-top:80px; /* don't tuck under sticky topbar */
+  animation:pm-deep-link-flash 2.6s cubic-bezier(.22,1,.36,1) forwards;
+  border-radius:12px;
+  scroll-margin-top:96px; /* don't tuck under sticky topbar */
+  position:relative;
+  z-index:1;
 }
 [data-pm-theme="dark"] .deep-link-flash,
 [data-dash-theme="dark"] .deep-link-flash{
   animation-name:pm-deep-link-flash-dark;
 }
 @keyframes pm-deep-link-flash-dark{
-  0%   { box-shadow:0 0 0 0 rgba(251,191,36,0.0),   inset 0 0 0 0 rgba(251,191,36,0.0); background-color:transparent; }
-  15%  { box-shadow:0 0 0 4px rgba(251,191,36,0.55), inset 0 0 0 1px rgba(251,191,36,0.55); background-color:rgba(251,191,36,0.16); }
-  100% { box-shadow:0 0 0 0 rgba(251,191,36,0.0),   inset 0 0 0 0 rgba(251,191,36,0.0); background-color:transparent; }
+  0%   { box-shadow:0 0 0 0   rgba(251,191,36,0.0); background-color:transparent; }
+  10%  { box-shadow:0 0 0 6px rgba(251,191,36,0.55); background-color:rgba(251,191,36,0.18); }
+  30%  { box-shadow:0 0 0 3px rgba(251,191,36,0.35); background-color:rgba(251,191,36,0.10); }
+  55%  { box-shadow:0 0 0 6px rgba(251,191,36,0.55); background-color:rgba(251,191,36,0.18); }
+  100% { box-shadow:0 0 0 0   rgba(251,191,36,0.0); background-color:transparent; }
+}
+
+/* Cmd-F style text highlight applied to occurrences of the search
+   query inside the targeted row. Persists ~5s then is removed by JS.
+   Slightly brighter than the dropdown .ms-mark so it pops in context. */
+.deep-link-mark{
+  background:rgba(245,158,11,0.45);
+  color:inherit;
+  border-radius:3px;
+  padding:0 3px;
+  box-shadow:0 0 0 1px rgba(245,158,11,0.65);
+  font-weight:inherit;
+  /* Subtle fade-in so it doesn't feel jarring */
+  animation:pm-deep-link-mark-in .25s ease-out;
+}
+[data-pm-theme="dark"] .deep-link-mark,
+[data-dash-theme="dark"] .deep-link-mark{
+  background:rgba(251,191,36,0.48);
+  color:#fef3c7;
+  box-shadow:0 0 0 1px rgba(251,191,36,0.70);
+}
+@keyframes pm-deep-link-mark-in{
+  0%   { background:rgba(245,158,11,0.85); }
+  100% { background:rgba(245,158,11,0.45); }
 }
 
 
