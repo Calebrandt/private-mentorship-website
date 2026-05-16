@@ -8,14 +8,17 @@
 //   supabase.functions.invoke('email-financial-document', { body: {...} })
 //
 // REQUEST BODY
-//   docType:   'invoice' | 'receipt' | 'paycheque'
-//   docId:     uuid of the document
-//   docNumber: optional display number (INV-000001) — used in audit + subject
-//   to:        recipient email
-//   subject:   email subject line
-//   body:      plaintext email body (also rendered as HTML below)
-//   filename:  attachment filename, e.g. INV-000001.pdf
-//   pdfBase64: base64-encoded PDF (no data:... prefix)
+//   docType:     'invoice' | 'receipt' | 'paycheque'
+//   docId:       uuid of the document
+//   docNumber:   optional display number (INV-000001) — used in audit + subject
+//   to:          recipient email
+//   subject:     email subject line
+//   body:        plaintext email body (also rendered as HTML below)
+//   filename:    attachment filename, e.g. INV-000001.pdf
+//   pdfBase64:   base64-encoded PDF (no data:... prefix)
+//   meta?:       optional { totalCents, balanceCents, docDate, dueDate,
+//                           clientName } — drives the branded amount block
+//                in the email body. All fields optional.
 //
 // RESPONSE
 //   { ok: true,  messageId, ref }      on success
@@ -42,6 +45,13 @@ const MAX_PDF_BYTES = 10 * 1024 * 1024; // 10 MB — Resend tops out around 40 M
 
 type DocType = "invoice" | "receipt" | "paycheque";
 
+interface ReqMeta {
+  totalCents?: number | null;
+  balanceCents?: number | null;
+  docDate?: string | null;
+  dueDate?: string | null;
+  clientName?: string | null;
+}
 interface ReqBody {
   docType: DocType;
   docId: string;
@@ -51,6 +61,7 @@ interface ReqBody {
   body: string;
   filename: string;
   pdfBase64: string;
+  meta?: ReqMeta | null;
 }
 
 function jsonResponse(status: number, body: unknown) {
@@ -72,8 +83,95 @@ function bodyToHtml(text: string): string {
   const escaped = escapeHtml(text || "");
   return escaped
     .split(/\n{2,}/)
-    .map((p) => `<p style="margin:0 0 14px;line-height:1.55;">${p.replace(/\n/g, "<br>")}</p>`)
+    .map((p) => `<p style="margin:0 0 14px;line-height:1.6;color:#475569;font-size:14px;">${p.replace(/\n/g, "<br>")}</p>`)
     .join("");
+}
+
+function fmtMoneyCents(cents: number | null | undefined): string {
+  const n = (Number(cents) || 0) / 100;
+  return n.toLocaleString("en-CA", { style: "currency", currency: "CAD", minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtDateShort(v: string | null | undefined): string {
+  if (!v) return "";
+  const s = String(v).slice(0, 10);
+  // ISO YYYY-MM-DD → Mon DD, YYYY
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return s;
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return `${months[Number(m[2]) - 1]} ${Number(m[3])}, ${m[1]}`;
+}
+
+// ─── Branded HTML email shell (matches the app's design) ──────────────────
+// docType drives the header title + accent colour vocabulary.
+function buildBrandedEmailHtml(opts: {
+  docType: DocType;
+  docNumber: string | null | undefined;
+  body: string;
+  filename: string;
+  meta?: ReqMeta | null;
+}): string {
+  const BRAND_PRIMARY = "#0f172a";
+  const BRAND_ACCENT  = "#2563eb";
+  const BG            = "#f1f5f9";
+
+  const docLabel = String(opts.docType).toUpperCase();
+  const num      = opts.docNumber ? `#${escapeHtml(opts.docNumber)}` : "";
+  const safeBody = bodyToHtml(opts.body || "");
+
+  const m = opts.meta || {};
+  const showAmountBlock = (m.totalCents != null) || (m.balanceCents != null);
+  const amountLabel =
+    opts.docType === "receipt"   ? "Amount Paid" :
+    opts.docType === "paycheque" ? "Net Pay" :
+                                   "Total Amount";
+  const headlineAmount = m.balanceCents != null && Number(m.balanceCents) > 0
+    ? fmtMoneyCents(m.balanceCents as number)
+    : (m.totalCents != null ? fmtMoneyCents(m.totalCents as number) : "");
+
+  const balanceLine =
+    opts.docType === "invoice" && m.totalCents != null && m.balanceCents != null
+      ? `<div><strong>Balance Due:</strong> ${fmtMoneyCents(m.balanceCents as number)}</div>` : "";
+  const issuedLine = m.docDate ? `<div>Issued on ${escapeHtml(fmtDateShort(m.docDate))}</div>` : "";
+  const dueLine    = m.dueDate ? `<div>Due by ${escapeHtml(fmtDateShort(m.dueDate))}</div>` : "";
+
+  const amountBlock = showAmountBlock ? `
+    <div style="background:#f8fafc;border:1px dashed #cbd5e1;border-radius:8px;padding:22px;text-align:center;margin:24px 0;">
+      <div style="font-size:11px;text-transform:uppercase;color:#94a3b8;letter-spacing:0.12em;font-weight:700;">${escapeHtml(amountLabel)}</div>
+      <div style="font-size:32px;color:${BRAND_PRIMARY};font-weight:700;margin:10px 0;letter-spacing:-0.01em;">${escapeHtml(headlineAmount)}</div>
+      <div style="font-size:12px;color:#64748b;line-height:1.6;">
+        ${balanceLine}
+        ${issuedLine}
+        ${dueLine}
+      </div>
+    </div>` : "";
+
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8" /></head>
+<body style="margin:0;padding:0;background:${BG};">
+  <div style="background:${BG};padding:40px 10px;font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Roboto,sans-serif;color:#334155;">
+    <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(15,23,42,0.08);">
+
+      <div style="background:${BRAND_PRIMARY};padding:30px 40px;text-align:center;">
+        <h1 style="color:#ffffff;margin:0;font-size:24px;letter-spacing:0.05em;text-transform:uppercase;font-weight:800;">${escapeHtml(docLabel)}</h1>
+        ${num ? `<p style="color:${BRAND_ACCENT};margin:6px 0 0 0;font-size:14px;font-weight:600;letter-spacing:0.04em;">${num}</p>` : ""}
+      </div>
+
+      <div style="padding:36px 40px;">
+        ${safeBody}
+        ${amountBlock}
+        <div style="margin-top:32px;padding:16px 18px;background:#f8fafc;border-radius:8px;font-size:12px;color:#475569;border-left:3px solid ${BRAND_ACCENT};">
+          <strong style="color:${BRAND_PRIMARY};">Attachment:</strong> ${escapeHtml(opts.filename)}
+        </div>
+        <div style="margin-top:36px;border-top:1px solid #e2e8f0;padding-top:20px;text-align:center;font-size:12px;color:#94a3b8;line-height:1.6;">
+          Thank you for choosing Private Mentorship.<br/>
+          Reply directly to this e-mail to reach us.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body></html>`;
 }
 
 serve(async (req) => {
@@ -149,20 +247,14 @@ serve(async (req) => {
     return jsonResponse(403, { ok: false, error: "Admin/owner role required" });
   }
 
-  // ─── Send via Resend ─────────────────────────────────────────────
-  const safeBody = bodyToHtml(emailBody || "");
-  const html = `<!DOCTYPE html>
-<html><head><meta charset="utf-8" /></head>
-<body style="margin:0;padding:24px;background:#f4f5f7;font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;color:#0f172a;">
-  <div style="max-width:580px;margin:0 auto;background:#ffffff;border-radius:14px;padding:32px;box-shadow:0 1px 2px rgba(15,23,42,0.04),0 12px 30px -10px rgba(15,23,42,0.18);">
-    <div style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#2563eb;margin-bottom:12px;">Private Mentorship · ${escapeHtml(String(docType).toUpperCase())}${docNumber ? " · " + escapeHtml(docNumber) : ""}</div>
-    ${safeBody}
-    <div style="margin-top:24px;padding-top:16px;border-top:1px solid #e5e7eb;font-size:12px;color:#94a3b8;line-height:1.5;">
-      Attachment: <strong style="color:#475569;">${escapeHtml(filename)}</strong><br>
-      Reply directly to this e-mail to reach us.
-    </div>
-  </div>
-</body></html>`;
+  // ─── Send via Resend — branded HTML shell (matches the app design) ───
+  const html = buildBrandedEmailHtml({
+    docType,
+    docNumber,
+    body: emailBody || "",
+    filename,
+    meta: body?.meta || null,
+  });
 
   const resendPayload = {
     from: NOTIFY_FROM,

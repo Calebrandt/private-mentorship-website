@@ -764,7 +764,8 @@
 <script src="js/topbar-userpod.js?v=20260516a" defer></script>
 <script src="js/master-search.js?v=20260516h" defer></script>
 <script src="js/deep-link-flash.js?v=20260516c" defer></script>
-<script src="js/financial-pdf.js?v=20260516b" defer></script>
+<script src="js/financial-pdf-templates.js?v=20260516a" defer></script>
+<script src="js/financial-pdf.js?v=20260516c" defer></script>
 <script>
 (async () => {
   const $ = id => document.getElementById(id);
@@ -1480,6 +1481,37 @@
         || currentDoc.payload?.receipt_number
         || currentDoc.payload?.paycheque_number
         || null;
+
+      // Build the `meta` block so the edge function can render the
+      // branded amount card in the email body (header card + big total).
+      const p = currentDoc.payload || {};
+      let meta = null;
+      if (currentDoc.docType === 'invoice') {
+        meta = {
+          totalCents:   Number(p.total_cents)        || 0,
+          balanceCents: Number(p.balance_due_cents)  || 0,
+          docDate:      p.invoice_date || null,
+          dueDate:      p.due_date || null,
+          clientName:   p.clients?.full_name || null,
+        };
+      } else if (currentDoc.docType === 'receipt') {
+        meta = {
+          totalCents:   Math.round(Number(p.total_amount || 0) * 100),
+          balanceCents: null,
+          docDate:      p.receipt_date || null,
+          dueDate:      null,
+          clientName:   p.clients?.full_name || null,
+        };
+      } else if (currentDoc.docType === 'paycheque') {
+        meta = {
+          totalCents:   Number(p.net_cents) || 0,
+          balanceCents: null,
+          docDate:      p.pay_date || null,
+          dueDate:      null,
+          clientName:   p.assistant_name || null,
+        };
+      }
+
       await window.pmHiring.sendFinancialEmail({
         docType: currentDoc.docType,
         docId: currentDoc.docId,
@@ -1487,6 +1519,7 @@
         to, subject, body,
         filename: currentDoc.filename,
         pdfBase64,
+        meta,
       });
       toast('Email sent ✓');
       hideModal('emailComposerModal');

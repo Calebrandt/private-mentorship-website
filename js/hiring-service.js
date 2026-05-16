@@ -3322,12 +3322,12 @@
   // verifies the caller is an admin, stamps an audit_logs row, and
   // hands the PDF + body to Resend.
   // Returns { ok, messageId } on success, throws on failure.
-  async function sendFinancialEmail({ docType, docId, docNumber, to, subject, body, filename, pdfBase64 }) {
+  async function sendFinancialEmail({ docType, docId, docNumber, to, subject, body, filename, pdfBase64, meta }) {
     if (!docType || !docId) throw new Error('sendFinancialEmail: docType and docId required');
     if (!to || !subject)    throw new Error('sendFinancialEmail: to and subject required');
     if (!pdfBase64)         throw new Error('sendFinancialEmail: pdfBase64 required');
     const { data, error } = await sb().functions.invoke('email-financial-document', {
-      body: { docType, docId, docNumber, to, subject, body, filename, pdfBase64 },
+      body: { docType, docId, docNumber, to, subject, body, filename, pdfBase64, meta },
     });
     if (error) throw new Error(error.message || 'email-financial-document failed');
     if (!data?.ok) throw new Error(data?.error || 'email-financial-document returned not-ok');
