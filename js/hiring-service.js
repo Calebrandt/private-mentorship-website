@@ -2072,15 +2072,31 @@
       // Priority (highest first):
       //   1. ACTIVE that contains today
       //   2. Any other ACTIVE
-      //   3. DRAFT that has already started (in-flight unpaid renewal)
-      //   4. Recently EXPIRED (gap right after a contract ended)
+      //   3. Recently EXPIRED (≤45 days) — when an expired contract
+      //      has residual hours, THAT'S the family's true balance
+      //      until the next renewal is paid + activated. Reordered
+      //      ABOVE started-draft per Caleb 2026-05-16: drafts are
+      //      "queued, not paid" — they shouldn't shadow the real
+      //      balance sitting on the just-ended contract.
+      //   4. DRAFT that has already started (in-flight unpaid renewal)
       //   5. Latest DRAFT (future renewal)
       out.contract = pickActiveNow
                   || pickAnyActive
-                  || pickStartedDraft
                   || pickRecentlyExpired
+                  || pickStartedDraft
                   || pickDraft
                   || null;
+      // Phase 16 v8: also surface the pending renewal draft (if any)
+      // so the workspace can show an Activate button even while the
+      // picker is parked on the recently-expired contract. This
+      // lets the assistant click Activate without having to navigate
+      // to a separate "drafts" view.
+      out.pendingRenewalContract = (out.contract && out.contract.status !== 'draft')
+        ? (pickStartedDraft || pickDraft || null)
+        : null;
+      if (out.pendingRenewalContract && out.pendingRenewalContract.id === out.contract.id) {
+        out.pendingRenewalContract = null;
+      }
     } catch (_) {}
 
     if (out.contract?.id) {
