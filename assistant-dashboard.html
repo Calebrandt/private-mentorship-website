@@ -9,40 +9,117 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,500&display=swap" />
 <link rel="stylesheet" href="js/sidebar.css?v=20260515a" />
 <link rel="icon" href="assets/logos/pm-logo.png" />
+<!-- Phase 19n: theme.js applies the saved light/dark mode BEFORE paint
+     to avoid a FOUC. Same script the client dashboard uses. -->
+<script src="js/theme.js?v=20260512a"></script>
 <style>
   *,*::before,*::after{box-sizing:border-box;}
-  html,body{margin:0;padding:0;background:#F4F5F7;color:#0F172A;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+  html,body{
+    margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    transition:background .2s ease, color .2s ease;
+  }
+
+  /* Phase 19n: Theme tokens copied from client-dashboard.html so the
+     assistant pages can toggle dark/light with the same vocabulary.
+     Light is default; [data-dash-theme="dark"] overrides apply when
+     the user flips the toggle. */
+  :root,
+  [data-dash-theme="light"]{
+    --bg:#f9fafb;                /* gray-50 page bg */
+    --card:#ffffff;
+    --border:#e5e7eb;            /* gray-200 */
+    --border-soft:#f3f4f6;       /* gray-100 */
+    --input-bg:#ffffff;
+    --ink:#1f2937;               /* gray-800 */
+    --ink-2:#111827;             /* gray-900 */
+    --ink-mute:#6b7280;          /* gray-500 */
+    --ink-tert:#9ca3af;          /* gray-400 */
+    --primary:#2563eb;
+    --primary-hover:#1d4ed8;
+    --primary-soft:#eff6ff;
+    --icon-blue-bg:#dbeafe;      --icon-blue-fg:#2563eb;
+    --icon-green-bg:#dcfce7;     --icon-green-fg:#16a34a;
+    --icon-purple-bg:#ede9fe;    --icon-purple-fg:#7c3aed;
+    --icon-indigo-bg:#e0e7ff;    --icon-indigo-fg:#4f46e5;
+    --icon-amber-bg:#FEF3C7;     --icon-amber-fg:#D97706;
+    --icon-gray-bg:#f3f4f6;      --icon-gray-fg:#4b5563;
+    --shadow-card:0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+  }
+  [data-dash-theme="dark"]{
+    --bg:#0b0c10;
+    --card:#16171c;
+    --border:#262830;
+    --border-soft:#1c1d23;
+    --input-bg:#22232a;
+    --ink:#f1f5f9;
+    --ink-2:#ffffff;
+    --ink-mute:#94a3b8;
+    --ink-tert:#64748b;
+    --primary:#3b82f6;
+    --primary-hover:#2563eb;
+    --primary-soft:rgba(59,130,246,0.14);
+    --icon-blue-bg:rgba(59,130,246,0.18);    --icon-blue-fg:#60A5FA;
+    --icon-green-bg:rgba(34,197,94,0.18);    --icon-green-fg:#4ADE80;
+    --icon-purple-bg:rgba(139,92,246,0.18);  --icon-purple-fg:#A78BFA;
+    --icon-indigo-bg:rgba(99,102,241,0.18);  --icon-indigo-fg:#818CF8;
+    --icon-amber-bg:rgba(245,158,11,0.18);   --icon-amber-fg:#FBBF24;
+    --icon-gray-bg:rgba(148,163,184,0.16);   --icon-gray-fg:#CBD5E1;
+    --shadow-card:0 1px 2px rgba(0,0,0,0.25);
+  }
 
   .ad-shell{padding:36px 32px 80px;max-width:1240px;margin:0 auto;}
 
-  /* Hero */
+  /* Hero — uses theme vars */
   .ad-hero{margin-bottom:28px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;}
   .ad-hero__body{flex:1;min-width:260px;}
-  .ad-eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#0071e3;margin:0 0 8px;}
-  .ad-h1{font-family:"Archivo","Inter",sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0 0 6px;color:#0F172A;}
-  .ad-sub{font-size:14px;color:#64748B;margin:0;line-height:1.55;max-width:620px;}
+  .ad-eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--primary);margin:0 0 8px;}
+  .ad-h1{font-family:"Archivo","Inter",sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0 0 6px;color:var(--ink-2);}
+  .ad-sub{font-size:14px;color:var(--ink-mute);margin:0;line-height:1.55;max-width:620px;}
   .ad-hero__date{
-    font-size:13px;color:#475569;font-weight:600;letter-spacing:.02em;
-    background:#fff;border:1px solid #E2E8F0;border-radius:9999px;padding:8px 18px;
+    font-size:13px;color:var(--ink-mute);font-weight:600;letter-spacing:.02em;
+    background:var(--card);border:1px solid var(--border);border-radius:9999px;padding:8px 18px;
     display:inline-flex;align-items:center;gap:8px;
   }
 
-  /* KPI tiles */
+  /* Phase 19n: KPI tiles redesigned to match client-dashboard.nx-kpi
+     pattern — colored icon on the left + number + label stacked on
+     the right. Same theme-aware visual weight across both views. */
   .ad-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
   @media(max-width:780px){.ad-kpis{grid-template-columns:1fr;}}
   .ad-kpi{
-    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
-    padding:22px;display:flex;flex-direction:column;gap:6px;
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:18px;display:flex;align-items:center;gap:14px;
+    box-shadow:var(--shadow-card);
+    transition:background .2s ease, border-color .2s ease;
   }
-  .ad-kpi__label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#94A3B8;margin:0;}
-  .ad-kpi__value{font-family:"Archivo","Inter",sans-serif;font-size:36px;font-weight:800;letter-spacing:-.02em;color:#0F172A;line-height:1;}
-  .ad-kpi__sub{font-size:12.5px;color:#64748B;margin:6px 0 0;}
+  .ad-kpi__icon{
+    flex:0 0 44px;width:44px;height:44px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .ad-kpi__icon svg{width:22px;height:22px;stroke-width:2;color:currentColor;}
+  .ad-kpi__icon--blue{background:var(--icon-blue-bg);color:var(--icon-blue-fg);}
+  .ad-kpi__icon--green{background:var(--icon-green-bg);color:var(--icon-green-fg);}
+  .ad-kpi__icon--purple{background:var(--icon-purple-bg);color:var(--icon-purple-fg);}
+  .ad-kpi__icon--indigo{background:var(--icon-indigo-bg);color:var(--icon-indigo-fg);}
+  .ad-kpi__icon--amber{background:var(--icon-amber-bg);color:var(--icon-amber-fg);}
+  .ad-kpi__body{flex:1;min-width:0;}
+  .ad-kpi__value{
+    font-family:"Archivo","Inter",sans-serif;font-size:28px;font-weight:800;
+    letter-spacing:-.02em;color:var(--ink-2);line-height:1;display:block;
+  }
+  .ad-kpi__label{
+    font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--ink-mute);margin:6px 0 0;display:block;
+  }
+  .ad-kpi__sub{font-size:12px;color:var(--ink-tert);margin:6px 0 0;line-height:1.45;}
 
   /* Phase 17.5: Weekly breakdown strip — compact, hangs neatly off
      the KPI tiles above. Smaller numbers + tighter padding so it
      reads as supporting reference data, not a primary tile. */
   .ad-weekly{
-    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
     padding:14px 18px;
     /* Sits tight under the KPI strip — KPIs margin-bottom is reduced
        below so the two cards feel connected. */
@@ -57,33 +134,33 @@
   .ad-weekly__title{
     font-family:"Archivo","Inter",sans-serif;
     font-size:13px;font-weight:700;letter-spacing:.04em;
-    text-transform:uppercase;color:#475569;margin:0;
+    text-transform:uppercase;color:var(--ink-mute);margin:0;
   }
   .ad-weekly__summary{
-    font-size:12.5px;color:#0F172A;font-weight:600;letter-spacing:-.005em;
+    font-size:12.5px;color:var(--ink-2);font-weight:600;letter-spacing:-.005em;
     background:transparent;border:none;padding:0;white-space:nowrap;
   }
   .ad-weekly__grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
   .ad-weekday{
-    background:#F8FAFC;border:1px solid #F1F5F9;border-radius:8px;
+    background:var(--border-soft);border:1px solid #F1F5F9;border-radius:8px;
     padding:8px 4px;text-align:center;
     display:flex;flex-direction:column;gap:2px;align-items:center;
   }
   .ad-weekday__name{
     font-size:9.5px;font-weight:700;letter-spacing:.08em;
-    text-transform:uppercase;color:#94A3B8;
+    text-transform:uppercase;color:var(--ink-tert);
   }
   .ad-weekday__hours{
     font-family:"Archivo","Inter",sans-serif;
-    font-size:17px;font-weight:800;color:#0F172A;line-height:1;
+    font-size:17px;font-weight:800;color:var(--ink-2);line-height:1;
   }
-  .ad-weekday__unit{font-size:10px;color:#64748B;font-weight:600;}
+  .ad-weekday__unit{font-size:10px;color:var(--ink-mute);font-weight:600;}
   .ad-weekday.is-today{background:#EFF6FF;border-color:#BFDBFE;}
   .ad-weekday.is-today .ad-weekday__hours{color:#1E40AF;}
   .ad-weekday.is-today .ad-weekday__name{color:#1E40AF;}
-  .ad-weekday.is-free{background:#FAFBFC;}
+  .ad-weekday.is-free{background:var(--border-soft);}
   .ad-weekday.is-free .ad-weekday__hours{color:#CBD5E1;font-size:14px;font-weight:700;}
-  .ad-weekday.is-free .ad-weekday__unit{color:#94A3B8;}
+  .ad-weekday.is-free .ad-weekday__unit{color:var(--ink-tert);}
   @media(max-width:680px){
     .ad-weekly{margin-top:0;padding:12px;}
     .ad-weekly__grid{gap:4px;}
@@ -105,20 +182,20 @@
   }
   @media(max-width:1024px){.ad-widget-row{grid-template-columns:1fr;}}
   .ad-widget{
-    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
     overflow:hidden;display:flex;flex-direction:column;
   }
   .ad-widget__head{
-    padding:18px 22px;border-bottom:1px solid #F1F5F9;
+    padding:18px 22px;border-bottom:1px solid var(--border-soft);
     display:flex;align-items:center;justify-content:space-between;gap:12px;
   }
   .ad-widget__title{
     font-family:"Archivo","Inter",sans-serif;font-size:15px;font-weight:800;
-    letter-spacing:-.01em;color:#0F172A;margin:0;
+    letter-spacing:-.01em;color:var(--ink-2);margin:0;
   }
   .ad-widget__action{font-size:12.5px;font-weight:600;color:#0071e3;text-decoration:none;letter-spacing:-.005em;}
   .ad-widget__action:hover{text-decoration:underline;}
-  .ad-widget__sub{font-size:12px;color:#64748B;letter-spacing:-.005em;}
+  .ad-widget__sub{font-size:12px;color:var(--ink-mute);letter-spacing:-.005em;}
   .ad-widget__body{display:flex;flex-direction:column;}
 
   /* My Families row (inside widget). Substantial weight — name leads
@@ -127,11 +204,11 @@
     display:grid;grid-template-columns:32px 1fr auto auto;gap:12px;align-items:center;
     padding:12px 22px;
     text-decoration:none;color:inherit;cursor:pointer;
-    border-top:1px solid #F1F5F9;
+    border-top:1px solid var(--border-soft);
     transition:background .12s ease;
   }
   .ad-family:first-child{border-top:none;}
-  .ad-family:hover{background:#F8FAFC;}
+  .ad-family:hover{background:var(--border-soft);}
   .ad-family:hover .ad-family__name{color:#0071e3;}
   .ad-family__avatar{
     width:32px;height:32px;border-radius:50%;
@@ -140,13 +217,13 @@
     display:flex;align-items:center;justify-content:center;flex-shrink:0;
   }
   .ad-family__body{min-width:0;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
-  .ad-family__name{font:600 14px Inter,sans-serif;color:#0F172A;letter-spacing:-.005em;}
-  .ad-family__plan{font:500 12px Inter,sans-serif;color:#94A3B8;}
-  .ad-family__hours{font:700 13px Inter,sans-serif;color:#0F172A;white-space:nowrap;}
-  .ad-family__hours-label{color:#94A3B8;font-weight:500;margin-left:3px;}
+  .ad-family__name{font:600 14px Inter,sans-serif;color:var(--ink-2);letter-spacing:-.005em;}
+  .ad-family__plan{font:500 12px Inter,sans-serif;color:var(--ink-tert);}
+  .ad-family__hours{font:700 13px Inter,sans-serif;color:var(--ink-2);white-space:nowrap;}
+  .ad-family__hours-label{color:var(--ink-tert);font-weight:500;margin-left:3px;}
   .ad-family__status{
     display:inline-flex;align-items:center;gap:5px;
-    font:600 11.5px Inter,sans-serif;color:#64748B;
+    font:600 11.5px Inter,sans-serif;color:var(--ink-mute);
     text-transform:capitalize;
   }
   .ad-family__dot{width:7px;height:7px;border-radius:50%;background:#10B981;flex-shrink:0;}
@@ -158,18 +235,18 @@
     display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;
     padding:12px 22px;
     text-decoration:none;color:inherit;cursor:pointer;
-    border-top:1px solid #F1F5F9;
+    border-top:1px solid var(--border-soft);
     transition:background .12s ease;
   }
   .ad-renewal-row:first-child{border-top:none;}
-  .ad-renewal-row:hover{background:#F8FAFC;}
+  .ad-renewal-row:hover{background:var(--border-soft);}
   .ad-renewal-row:hover .ad-renewal-row__name{color:#0071e3;}
   .ad-renewal-row__main{min-width:0;}
-  .ad-renewal-row__name{font:600 14px Inter,sans-serif;color:#0F172A;letter-spacing:-.005em;line-height:1.25;}
-  .ad-renewal-row__date{font:500 12px Inter,sans-serif;color:#94A3B8;margin-top:2px;}
+  .ad-renewal-row__name{font:600 14px Inter,sans-serif;color:var(--ink-2);letter-spacing:-.005em;line-height:1.25;}
+  .ad-renewal-row__date{font:500 12px Inter,sans-serif;color:var(--ink-tert);margin-top:2px;}
   .ad-renewal-row__meta{
     font:700 10.5px Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;
-    color:#64748B;background:#F1F5F9;border:1px solid #E2E8F0;
+    color:var(--ink-mute);background:#F1F5F9;border:1px solid var(--border);
     padding:4px 10px;border-radius:9999px;white-space:nowrap;min-width:88px;text-align:center;
   }
   .ad-renewal-row.is-soon{background:#FFFBEB;}
@@ -181,12 +258,12 @@
 
   /* Section card */
   .ad-section{
-    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
     margin-bottom:18px;overflow:hidden;
   }
-  .ad-section__head{padding:18px 22px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;justify-content:space-between;gap:12px;}
-  .ad-section__title{font-family:"Archivo","Inter",sans-serif;font-size:17px;font-weight:800;letter-spacing:-.01em;color:#0F172A;margin:0;}
-  .ad-section__sub{font-size:12.5px;color:#64748B;margin:2px 0 0;line-height:1.5;}
+  .ad-section__head{padding:18px 22px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .ad-section__title{font-family:"Archivo","Inter",sans-serif;font-size:17px;font-weight:800;letter-spacing:-.01em;color:var(--ink-2);margin:0;}
+  .ad-section__sub{font-size:12.5px;color:var(--ink-mute);margin:2px 0 0;line-height:1.5;}
   .ad-section__action{
     font-size:12.5px;font-weight:600;color:#0071e3;
     text-decoration:none;display:inline-flex;align-items:center;gap:4px;
@@ -197,15 +274,15 @@
   .ad-list{padding:0;}
   .ad-row{
     padding:14px 22px;display:grid;grid-template-columns:120px 1fr 90px;gap:18px;align-items:center;
-    border-top:1px solid #F1F5F9;
+    border-top:1px solid var(--border-soft);
   }
   .ad-row:first-child{border-top:none;}
-  .ad-row__when{font-size:13px;color:#0F172A;}
+  .ad-row__when{font-size:13px;color:var(--ink-2);}
   .ad-row__when strong{display:block;font-weight:700;}
-  .ad-row__when small{color:#64748B;font-size:12px;display:block;margin-top:1px;}
+  .ad-row__when small{color:var(--ink-mute);font-size:12px;display:block;margin-top:1px;}
   .ad-row__body{min-width:0;}
-  .ad-row__body p{margin:0;font-size:13px;color:#475569;line-height:1.5;}
-  .ad-row__body p strong{color:#0F172A;}
+  .ad-row__body p{margin:0;font-size:13px;color:var(--ink-mute);line-height:1.5;}
+  .ad-row__body p strong{color:var(--ink-2);}
   .ad-row__status{
     font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;
     padding:4px 10px;border-radius:9999px;text-align:center;justify-self:end;
@@ -214,13 +291,13 @@
 
   /* Empty state */
   .ad-empty{
-    padding:48px 28px;text-align:center;color:#64748B;
+    padding:48px 28px;text-align:center;color:var(--ink-mute);
   }
-  .ad-empty__title{font-family:"Archivo","Inter",sans-serif;font-size:16px;font-weight:700;color:#0F172A;margin:0 0 6px;}
+  .ad-empty__title{font-family:"Archivo","Inter",sans-serif;font-size:16px;font-weight:700;color:var(--ink-2);margin:0 0 6px;}
   .ad-empty__sub{font-size:13px;margin:0;line-height:1.55;}
 
   /* Loading */
-  .ad-loading{padding:28px;text-align:center;color:#64748B;font-size:13px;}
+  .ad-loading{padding:28px;text-align:center;color:var(--ink-mute);font-size:13px;}
   .ad-spinner{
     width:16px;height:16px;border-radius:50%;
     border:2px solid #E2E8F0;border-top-color:#0071e3;
@@ -241,14 +318,14 @@
     color:#fff;font-weight:800;font-size:22px;
   }
   .ad-prof__body{min-width:0;}
-  .ad-prof__name{font-family:"Archivo","Inter",sans-serif;font-size:18px;font-weight:800;letter-spacing:-.01em;color:#0F172A;margin:0 0 3px;}
-  .ad-prof__city{font-size:13px;color:#64748B;margin:0 0 8px;}
+  .ad-prof__name{font-family:"Archivo","Inter",sans-serif;font-size:18px;font-weight:800;letter-spacing:-.01em;color:var(--ink-2);margin:0 0 3px;}
+  .ad-prof__city{font-size:13px;color:var(--ink-mute);margin:0 0 8px;}
   .ad-prof__pill{
     display:inline-flex;align-items:center;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
     padding:3px 9px;border-radius:9999px;
   }
   .ad-prof__pill--published{background:#ECFDF5;color:#047857;}
-  .ad-prof__pill--draft{background:#F1F5F9;color:#64748B;}
+  .ad-prof__pill--draft{background:#F1F5F9;color:var(--ink-mute);}
   .ad-prof__pill--missing{background:#FEF3C7;color:#92400E;}
   .ad-prof__edit{
     font-size:12.5px;font-weight:600;color:#0071e3;text-decoration:none;
@@ -259,24 +336,24 @@
 
   /* Quick links grid (placeholder for Phase 2/3 destinations) */
   .ad-quicklinks{
-    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
     padding:20px 22px;
   }
-  .ad-quicklinks__title{font-family:"Archivo","Inter",sans-serif;font-size:15px;font-weight:800;color:#0F172A;margin:0 0 12px;}
+  .ad-quicklinks__title{font-family:"Archivo","Inter",sans-serif;font-size:15px;font-weight:800;color:var(--ink-2);margin:0 0 12px;}
   .ad-quicklinks__list{display:flex;flex-direction:column;gap:8px;}
   .ad-quicklinks__item{
     display:flex;align-items:center;justify-content:space-between;
     padding:11px 14px;border-radius:10px;
-    background:#F8FAFC;border:1px solid #F1F5F9;
-    font-size:13px;color:#0F172A;font-weight:600;
+    background:var(--border-soft);border:1px solid #F1F5F9;
+    font-size:13px;color:var(--ink-2);font-weight:600;
     text-decoration:none;cursor:pointer;
     transition:background .15s ease, border-color .15s ease;
   }
   .ad-quicklinks__item:hover{background:#EFF6FF;border-color:#DBEAFE;}
   .ad-quicklinks__item--soon{opacity:.55;cursor:default;}
-  .ad-quicklinks__item--soon:hover{background:#F8FAFC;border-color:#F1F5F9;}
-  .ad-quicklinks__chev{color:#94A3B8;}
-  .ad-quicklinks__soon{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94A3B8;}
+  .ad-quicklinks__item--soon:hover{background:var(--border-soft);border-color:var(--border-soft);}
+  .ad-quicklinks__chev{color:var(--ink-tert);}
+  .ad-quicklinks__soon{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-tert);}
 
   /* Welcome banner for new assistants */
   .ad-welcome{
@@ -286,8 +363,8 @@
     display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
   }
   .ad-welcome__body{flex:1;min-width:260px;}
-  .ad-welcome__title{font-family:"Archivo","Inter",sans-serif;font-size:15px;font-weight:800;color:#0F172A;margin:0 0 4px;}
-  .ad-welcome__sub{font-size:13px;color:#475569;margin:0;line-height:1.55;}
+  .ad-welcome__title{font-family:"Archivo","Inter",sans-serif;font-size:15px;font-weight:800;color:var(--ink-2);margin:0 0 4px;}
+  .ad-welcome__sub{font-size:13px;color:var(--ink-mute);margin:0;line-height:1.55;}
 </style>
 </head>
 <body class="pm-has-sidebar">
@@ -317,19 +394,34 @@
   <!-- KPI tiles -->
   <section class="ad-kpis" id="adKpis">
     <div class="ad-kpi">
-      <p class="ad-kpi__label">Active Engagements</p>
-      <span class="ad-kpi__value" id="kpiEngagements">—</span>
-      <p class="ad-kpi__sub">Families currently assigned to you</p>
+      <div class="ad-kpi__icon ad-kpi__icon--purple">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div class="ad-kpi__body">
+        <span class="ad-kpi__value" id="kpiEngagements">—</span>
+        <p class="ad-kpi__label">Active Engagements</p>
+        <p class="ad-kpi__sub">Families currently assigned to you</p>
+      </div>
     </div>
     <div class="ad-kpi">
-      <p class="ad-kpi__label">Hours This Month</p>
-      <span class="ad-kpi__value" id="kpiHours">—</span>
-      <p class="ad-kpi__sub">Every session on your calendar this month — delivered plus booked-ahead, across every family.</p>
+      <div class="ad-kpi__icon ad-kpi__icon--blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div class="ad-kpi__body">
+        <span class="ad-kpi__value" id="kpiHours">—</span>
+        <p class="ad-kpi__label">Hours This Month</p>
+        <p class="ad-kpi__sub">Every session on your calendar — delivered plus booked-ahead.</p>
+      </div>
     </div>
     <div class="ad-kpi">
-      <p class="ad-kpi__label">Earned This Month</p>
-      <span class="ad-kpi__value" id="kpiMoney">—</span>
-      <p class="ad-kpi__sub">Your 70% takeshare on every session this month at the contract rate ($30 or $45/hr). Total expected take by month-end.</p>
+      <div class="ad-kpi__icon ad-kpi__icon--green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+      <div class="ad-kpi__body">
+        <span class="ad-kpi__value" id="kpiMoney">—</span>
+        <p class="ad-kpi__label">Earned This Month</p>
+        <p class="ad-kpi__sub">Your 70% takeshare on every session at the contract rate.</p>
+      </div>
     </div>
   </section>
 
