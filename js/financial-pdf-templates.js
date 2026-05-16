@@ -37,10 +37,9 @@
   'use strict';
 
   // ─── Brand assets ─────────────────────────────────────────────────
-  // pm-monogram.png is a pre-cropped 700×550 image of just the PM
-  // mark — no wordmark, no excess padding. Lets us drop the mark
-  // straight into the circle without any clip math.
-  const LOGO_URL = 'assets/logos/pm-monogram.png';
+  // Full PM logo: mark + "PRIVATE MENTORSHIP" wordmark + swoosh,
+  // 1024×1024 square. Shown plainly on the sidebar (no circle frame).
+  const LOGO_URL = 'assets/logos/pm-logo.png';
 
   const COMPANY_NAME    = 'Private Mentorship';
   const COMPANY_ADDR_1  = 'Richmond, British Columbia';
@@ -113,14 +112,14 @@
       padding: 56px 30px 56px 38px;
       display: flex; flex-direction: column;
     }
-    /* Logo: drop the circle frame, just show the PM monogram clean.
-       Fighting the circle crop wasn't worth it — a plain logo at a
-       confident size on the sidebar reads as more premium anyway. */
+    /* Logo: full lockup (PM mark + "PRIVATE MENTORSHIP" wordmark +
+       swoosh), shown plainly on the sidebar. No circle frame — the
+       lockup IS the brand mark and reads premium at this size. */
     .brand-logo {
       display: block;
-      width: 132px;
+      width: 156px;
       height: auto;
-      margin: 0 0 56px 0;
+      margin: -10px -10px 46px -10px;  /* compensate for source padding */
     }
     .meta-block { margin-bottom: 28px; }
     .meta-block.last { flex: 1; }
