@@ -309,12 +309,12 @@
     <a class="nx-bank-strip__cta" href="messages.html">Message my assistant →</a>
   </section>
 
-  <!-- Hours ledger -->
+  <!-- Hours activity (sessions attended + contract activations + admin adjustments) -->
   <section class="nx-card" style="margin-bottom:22px;">
     <div class="nx-card__head">
       <div>
-        <h2 class="nx-card__title">Hours ledger</h2>
-        <p class="nx-card__sub">Every hour added or used on your account</p>
+        <h2 class="nx-card__title">Hours activity</h2>
+        <p class="nx-card__sub">Sessions, contract activations, and any adjustments — newest first.</p>
       </div>
     </div>
     <div id="ledgerWrap"><div class="nx-empty">Loading…</div></div>
@@ -479,33 +479,69 @@
   const openInvCount = (invoices || []).filter(i => i.status === 'open').length;
   $('kpiInvoiceOpen').textContent = openInvCount;
 
-  // ─── Hours ledger table ──────────────────────────────────────
-  const txns = ledger.transactions || [];
+  // ─── Activity feed (sessions + ledger entries) ──────────────
+  // The hours_ledger table only records contract activations and admin
+  // adjustments — it does NOT contain individual session attendance.
+  // Sessions live in `appointments`. Show both together so a "Hours
+  // used" KPI of 6.75 is backed up by the actual sessions that consumed
+  // those hours, not just the ledger entries.
+  const ledgerTxns = ledger.transactions || [];
+  const recentAppts = ws?.recentAppointments || [];
+
+  // Normalize both into a unified row shape:
+  //   { date, label, kind: 'add'|'session'|'admin', deltaHours }
+  const rows = [];
+  for (const t of ledgerTxns) {
+    const delta = Number(t.delta_hours || 0);
+    rows.push({
+      date: t.created_at,
+      label: t.reason || (delta > 0 ? 'Hours added' : 'Hours used'),
+      kind: delta > 0 ? 'add' : 'admin',
+      delta: delta,
+    });
+  }
+  for (const a of recentAppts) {
+    const mins = Number(a.duration_minutes || 0);
+    if (mins <= 0) continue;
+    // Skip cancelled / no-show sessions from the activity feed
+    if (a.status === 'cancelled') continue;
+    rows.push({
+      date: a.starts_at,
+      label: a.title || 'Session attended',
+      kind: 'session',
+      delta: -(mins / 60),
+    });
+  }
+  // Sort newest first
+  rows.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
   const wrap = $('ledgerWrap');
-  if (!txns.length) {
-    wrap.innerHTML = `<div class="nx-empty">No hours transactions yet.<p class="nx-empty__hint">When hours are added or used, they'll show here.</p></div>`;
+  if (!rows.length) {
+    wrap.innerHTML = `<div class="nx-empty">No activity yet.<p class="nx-empty__hint">Once sessions happen or hours are added, they'll show here.</p></div>`;
   } else {
-    // Compute running balance from the OLDEST forward, then display newest-first
-    const oldestFirst = [...txns].reverse();
+    // Running balance — compute from oldest forward so the newest row shows
+    // the current balance, then reverse for display.
+    const oldestFirst = [...rows].reverse();
     let bal = 0;
-    const withBal = oldestFirst.map(t => { bal += Number(t.delta_hours || 0); return { ...t, _balance: bal }; });
+    const withBal = oldestFirst.map(r => { bal += r.delta; return { ...r, _balance: bal }; });
     const newestFirst = [...withBal].reverse();
     wrap.innerHTML = `<table class="nx-table">
       <thead><tr>
         <th>Date</th><th>Description</th><th>Type</th><th style="text-align:right;">Hours</th><th style="text-align:right;">Balance</th>
       </tr></thead>
       <tbody>
-        ${newestFirst.map(t => {
-          const isAdd = Number(t.delta_hours) > 0;
+        ${newestFirst.map(r => {
+          const isAdd = r.delta > 0;
           const tagCls = isAdd ? 'nx-tag--add' : 'nx-tag--use';
           const amtCls = isAdd ? 'nx-amount--add' : 'nx-amount--use';
           const arrow = isAdd ? '↑' : '↓';
+          const typeLabel = r.kind === 'session' ? 'Session' : (isAdd ? 'Added' : 'Adjustment');
           return `<tr>
-            <td>${esc(fmtDate(t.created_at))}</td>
-            <td>${esc(t.reason || '—')}</td>
-            <td><span class="nx-tag ${tagCls}">${arrow} ${isAdd ? 'Added' : 'Used'}</span></td>
-            <td class="nx-amount ${amtCls}" style="text-align:right;">${(isAdd ? '+' : '')}${Number(t.delta_hours).toFixed(1)}</td>
-            <td class="nx-amount" style="text-align:right;">${Number(t._balance).toFixed(1)}</td>
+            <td>${esc(fmtDate(r.date))}</td>
+            <td>${esc(r.label)}</td>
+            <td><span class="nx-tag ${tagCls}">${arrow} ${typeLabel}</span></td>
+            <td class="nx-amount ${amtCls}" style="text-align:right;">${(isAdd ? '+' : '')}${r.delta.toFixed(2)}</td>
+            <td class="nx-amount" style="text-align:right;">${r._balance.toFixed(2)}</td>
           </tr>`;
         }).join('')}
       </tbody>
