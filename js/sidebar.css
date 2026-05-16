@@ -1789,3 +1789,173 @@ html[data-dash-theme="light"] .pm-gift button[type="submit"]:hover{
     0 14px 28px -4px rgba(37,99,235,0.55),
     inset 0 1px 0 rgba(255,255,255,0.22) !important;
 }
+
+
+/* ────────────────────────────────────────────────────────────
+   CLIENT DASHBOARD — premium upgrade
+   ────────────────────────────────────────────────────────────
+   Same playbook as the gift page: bump SIZING/TYPOGRAPHY/SPACING
+   for both themes; layer COLOR/SHADOW polish only in light mode.
+   Scoped via body:has(.dash-main-wrap) so only the client
+   dashboard picks it up (not every page with .nx-h1).
+   ──────────────────────────────────────────────────────────── */
+
+/* ── SIZING + TYPOGRAPHY (both themes) ──────────────────────── */
+body:has(.dash-main-wrap) .nx-shell{
+  padding:40px 32px 96px !important;
+}
+body:has(.dash-main-wrap) .nx-head{
+  margin-bottom:32px !important;
+}
+body:has(.dash-main-wrap) .nx-h1{
+  font:800 30px Inter,sans-serif !important;
+  letter-spacing:-.024em !important;
+  line-height:1.1 !important;
+  margin:0 0 8px !important;
+}
+body:has(.dash-main-wrap) .nx-sub{
+  font:500 15px Inter,sans-serif !important;
+  letter-spacing:-.005em !important;
+  line-height:1.55 !important;
+}
+
+/* KPI cards — taller, more breathing room, bigger numbers */
+body:has(.dash-main-wrap) .nx-kpi{
+  padding:28px 26px !important;
+  border-radius:16px !important;
+}
+body:has(.dash-main-wrap) .nx-kpi__num{
+  font:800 40px Inter,sans-serif !important;
+  letter-spacing:-.032em !important;
+}
+body:has(.dash-main-wrap) .nx-kpi__label{
+  font:500 13.5px Inter,sans-serif !important;
+  letter-spacing:-.005em !important;
+}
+body:has(.dash-main-wrap) .nx-kpis{ gap:18px !important; }
+
+/* Generic cards — bigger radius, more padding so things breathe */
+body:has(.dash-main-wrap) .nx-card{
+  padding:26px 26px !important;
+  border-radius:16px !important;
+}
+body:has(.dash-main-wrap) .nx-card__title{
+  font:700 17px Inter,sans-serif !important;
+  letter-spacing:-.014em !important;
+}
+body:has(.dash-main-wrap) .nx-card__sub{
+  font:500 12.5px Inter,sans-serif !important;
+  letter-spacing:-.003em !important;
+  margin-top:5px !important;
+}
+
+/* Contract history rows — clean spacing, real type */
+body:has(.dash-main-wrap) .nx-contract{
+  padding:14px 0 !important;
+}
+body:has(.dash-main-wrap) .nx-contract__label{
+  font:700 14px Inter,sans-serif !important;
+  letter-spacing:-.008em !important;
+}
+body:has(.dash-main-wrap) .nx-contract__dates{
+  font:500 12px Inter,sans-serif !important;
+  letter-spacing:-.003em !important;
+  margin-top:2px !important;
+}
+body:has(.dash-main-wrap) .nx-contract__hours{
+  font:500 12.5px Inter,sans-serif !important;
+  letter-spacing:-.005em !important;
+}
+
+/* Conversation rows */
+body:has(.dash-main-wrap) .nx-convo{
+  padding:12px 14px !important;
+  border-radius:11px !important;
+}
+
+
+/* ── COLOURS + SHADOWS (light mode only) ────────────────────── */
+html[data-dash-theme="light"] body:has(.dash-main-wrap) .nx-h1{
+  color:#0f172a !important;
+}
+html[data-dash-theme="light"] body:has(.dash-main-wrap) .nx-sub{
+  color:#475569 !important;
+}
+html[data-dash-theme="light"] body:has(.dash-main-wrap) .nx-card__title{
+  color:#0f172a !important;
+}
+html[data-dash-theme="light"] body:has(.dash-main-wrap) .nx-card__sub{
+  color:#64748b !important;
+}
+
+/* KPI cards — premium triple-layer shadow with subtle blue ambient */
+html[data-dash-theme="light"] body:has(.dash-main-wrap) .nx-kpi{
+  background:#ffffff !important;
+  border:1px solid transparent !important;
+  box-shadow:
+    0 0 0 1px rgba(15,23,42,0.06),
+    0 1px 3px rgba(15,23,42,0.04),
+    0 18px 40px -20px rgba(59,130,246,0.20) !important;
+  transition:transform .18s cubic-bezier(.22,1,.36,1), box-shadow .18s ease !important;
+}
+html[data-dash-theme="light"] body:has(.dash-main-wrap) .nx-kpi:hover{
+  transform:translateY(-3px);
+  box-shadow:
+    0 0 0 1px rgba(59,130,246,0.22),
+    0 4px 14px -2px rgba(59,130,246,0.12),
+    0 28px 56px -20px rgba(15,23,42,0.20) !important;
+}
+html[data-dash-theme="light"] body:has(.dash-main-wrap) .nx-kpi__num{
+  color:#0f172a !important;
+}
+html[data-dash-theme="light"] body:has(.dash-main-wrap) .nx-kpi__label{
+  color:#64748b !important;
+}
+
+/* Generic cards */
+html[data-dash-theme="light"] body:has(.dash-main-wrap) .nx-card{
+  background:#ffffff !important;
+  border:1px solid transparent !important;
+  box-shadow:
+    0 0 0 1px rgba(15,23,42,0.06),
+    0 1px 3px rgba(15,23,42,0.04),
+    0 16px 36px -18px rgba(15,23,42,0.14) !important;
+}
+
+/* Contract rows separators */
+html[data-dash-theme="light"] body:has(.dash-main-wrap) .nx-contract{
+  border-bottom:1px solid rgba(15,23,42,0.06) !important;
+}
+html[data-dash-theme="light"] body:has(.dash-main-wrap) .nx-contract:last-child{
+  border-bottom:none !important;
+}
+html[data-dash-theme="light"] body:has(.dash-main-wrap) .nx-contract:hover{
+  background:rgba(59,130,246,0.04) !important;
+}
+html[data-dash-theme="light"] body:has(.dash-main-wrap) .nx-contract__label{
+  color:#0f172a !important;
+}
+html[data-dash-theme="light"] body:has(.dash-main-wrap) .nx-contract__dates{
+  color:#64748b !important;
+}
+html[data-dash-theme="light"] body:has(.dash-main-wrap) .nx-contract__hours{
+  color:#475569 !important;
+}
+
+/* Contracts toggle button — match the premium palette */
+html[data-dash-theme="light"] body:has(.dash-main-wrap) .nx-contracts__toggle{
+  background:#ffffff !important;
+  border:1px solid rgba(15,23,42,0.10) !important;
+  color:#475569 !important;
+  box-shadow:0 1px 2px rgba(15,23,42,0.04) !important;
+}
+html[data-dash-theme="light"] body:has(.dash-main-wrap) .nx-contracts__toggle:hover{
+  background:#f8fafc !important;
+  border-color:rgba(15,23,42,0.16) !important;
+  color:#0f172a !important;
+}
+
+/* Conversation rows */
+html[data-dash-theme="light"] body:has(.dash-main-wrap) .nx-convo:hover{
+  background:rgba(59,130,246,0.04) !important;
+}
