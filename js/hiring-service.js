@@ -656,14 +656,17 @@
     if (!user) return empty;
     const out = { ...empty };
 
-    // Active engagements = active contracts assigned to me
+    // Active engagements = distinct families I'm assigned to (not contracts).
+    // Was: count(contracts WHERE assistant_id=me AND status='active').
+    // That dropped families whose current contract is a 'draft' awaiting
+    // activation (e.g. Michael when his brother hasn't paid the renewal
+    // yet) — so the headline read 2 instead of the truth (3 real
+    // families I serve). Use the deduped assigned-clients fetcher so
+    // the number reflects "people I work with," not "contracts in a
+    // particular status."
     try {
-      const { count } = await sb()
-        .from('contracts')
-        .select('id', { count: 'exact', head: true })
-        .eq('assistant_id', user.id)
-        .eq('status', 'active');
-      out.activeEngagements = count || 0;
+      const fams = await fetchMyAssignedClients({ statuses: ['active', 'draft'] });
+      out.activeEngagements = (fams || []).length;
     } catch (_) {}
 
     // Upcoming sessions = scheduled appointments tied to my contracts, starting in the future.
