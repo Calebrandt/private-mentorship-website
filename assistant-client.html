@@ -35,17 +35,36 @@
   .wc-eyebrow{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#0071e3;margin:0 0 6px;}
   .wc-hero__name{font-family:"Archivo","Inter",sans-serif;font-size:24px;font-weight:800;letter-spacing:-.018em;line-height:1.1;color:#0F172A;margin:0 0 4px;}
   .wc-hero__sub{font-size:13px;color:#64748B;margin:0;}
-  /* Phase 16 v1: renewal-date pill in the hero. Sits just under the
-     service period so the next renewal date is impossible to miss.
-     Color shifts to amber when due within 14 days, red when overdue. */
+  /* Phase 16 v2: renewal-date chip in the hero. Business-grade typography
+     instead of the emoji-bell pill. Three-part layout:
+       [calendar icon] | LABEL eyebrow | bold date · subtle countdown
+     Neutral by default (gray on white), amber when ≤14 days, red when
+     overdue. Same vocabulary as a Stripe/Linear sidebar — quiet but
+     unmissable. */
   .wc-hero__renewal{
-    display:inline-flex;align-items:center;gap:6px;
-    margin:8px 0 0;padding:5px 12px;
-    background:#EFF6FF;border:1px solid #BFDBFE;border-radius:9999px;
-    font:600 12.5px Inter,sans-serif;color:#1E40AF;letter-spacing:-.005em;
+    display:inline-flex;align-items:center;gap:10px;
+    margin:12px 0 0;padding:7px 14px;
+    background:#FFFFFF;border:1px solid #E2E8F0;border-radius:10px;
+    box-shadow:0 1px 0 rgba(15,23,42,.02);
   }
-  .wc-hero__renewal.is-soon{background:#FFFBEB;border-color:#FDE68A;color:#92400E;}
-  .wc-hero__renewal.is-overdue{background:#FEF2F2;border-color:#FECACA;color:#991B1B;}
+  .wc-hero__renewal__icon{color:#94A3B8;flex-shrink:0;display:inline-flex;}
+  .wc-hero__renewal__label{
+    font:700 9.5px Inter,sans-serif;letter-spacing:.12em;
+    text-transform:uppercase;color:#94A3B8;
+    border-right:1px solid #E2E8F0;padding-right:10px;
+  }
+  .wc-hero__renewal__date{font:700 13px Inter,sans-serif;letter-spacing:-.01em;color:#0F172A;}
+  .wc-hero__renewal__meta{font:600 12px Inter,sans-serif;color:#64748B;letter-spacing:-.005em;}
+  .wc-hero__renewal.is-soon{background:#FFFBEB;border-color:#FCD34D;}
+  .wc-hero__renewal.is-soon .wc-hero__renewal__icon{color:#D97706;}
+  .wc-hero__renewal.is-soon .wc-hero__renewal__label{color:#92400E;border-color:#FDE68A;}
+  .wc-hero__renewal.is-soon .wc-hero__renewal__date{color:#78350F;}
+  .wc-hero__renewal.is-soon .wc-hero__renewal__meta{color:#92400E;}
+  .wc-hero__renewal.is-overdue{background:#FEF2F2;border-color:#FCA5A5;}
+  .wc-hero__renewal.is-overdue .wc-hero__renewal__icon{color:#DC2626;}
+  .wc-hero__renewal.is-overdue .wc-hero__renewal__label{color:#991B1B;border-color:#FECACA;}
+  .wc-hero__renewal.is-overdue .wc-hero__renewal__date{color:#7F1D1D;}
+  .wc-hero__renewal.is-overdue .wc-hero__renewal__meta{color:#991B1B;}
   .wc-hero__status{
     font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
     padding:5px 12px;border-radius:9999px;white-space:nowrap;
@@ -719,7 +738,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515c"></script>
-<script src="js/hiring-service.js?v=20260515y"></script>
+<script src="js/hiring-service.js?v=20260515z"></script>
 <script src="js/messages-service.js?v=20260515c"></script>
 <script src="js/session-calendar.js?v=20260515a"></script>
 <script src="js/sidebar.js?v=20260515d"></script>
@@ -835,46 +854,61 @@ function renderAppointmentRow(a, spend){
   document.getElementById('wcSub').textContent =
     `${fmtDate(ws.contract.start_at)} → ${fmtDate(ws.contract.end_at)}`;
 
-  // Phase 16 v1: Renewal-due pill. Uses the active contract's end_at as
-  // the renewal date (that's when the family needs to pay for the next
-  // 1- or 2-month cycle). For drafts that haven't started yet, use
-  // start_at instead (when the renewal cycle BEGINS). Color cues:
-  //   • Green/blue (default)  — more than 14 days out
-  //   • Amber (.is-soon)      — 14 days or less
-  //   • Red (.is-overdue)     — past due
+  // Phase 16 v2: Renewal-date chip. Calendar SVG icon + uppercase
+  // eyebrow label + bold date + subtle countdown. No emoji. Date is
+  // the active contract's end_at (when this cycle ends and payment
+  // for the next one is due); for a draft, the start_at (when the
+  // unpaid renewal cycle begins). Color cues match KPI tiles:
+  //   • Default (gray on white)  — more than 14 days out
+  //   • Amber (.is-soon)         — 14 days or less, including today
+  //   • Red   (.is-overdue)      — past due
   (function renderRenewal(){
     const renewalEl = document.getElementById('wcRenewal');
     if (!renewalEl) return;
     const status = (ws.contract.status || '').toLowerCase();
-    // For active contracts: renewal date = when this contract ends
-    // For drafts: renewal date = when this draft starts (already arrived means it needs to activate)
     const renewalIso = (status === 'draft')
       ? ws.contract.start_at
       : ws.contract.end_at;
     if (!renewalIso) { renewalEl.hidden = true; return; }
-    const renewalDate = (() => {
-      const s = String(renewalIso);
-      const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
-      return m ? new Date(+m[1], +m[2]-1, +m[3]) : new Date(s);
-    })();
+
+    const s = String(renewalIso);
+    const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    const renewalDate = m ? new Date(+m[1], +m[2]-1, +m[3]) : new Date(s);
     const now = new Date();
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const daysUntil = Math.round((renewalDate - startOfToday) / 86400000);
 
-    let label, cls = '';
+    // Headline date — always Month Day, Year (e.g. "June 3, 2026")
+    const dateText = renewalDate.toLocaleDateString('en-US',
+      { month:'long', day:'numeric', year:'numeric' });
+
+    // Secondary meta — countdown, one short phrase
+    let metaText = '';
+    let cls = '';
     if (daysUntil < 0) {
-      label = `Renewal overdue — ${Math.abs(daysUntil)} day${Math.abs(daysUntil) === 1 ? '' : 's'} past`;
+      const n = Math.abs(daysUntil);
+      metaText = `Overdue by ${n} day${n === 1 ? '' : 's'}`;
       cls = 'is-overdue';
     } else if (daysUntil === 0) {
-      label = 'Renewal due today';
+      metaText = 'Due today';
+      cls = 'is-soon';
+    } else if (daysUntil === 1) {
+      metaText = 'Due tomorrow';
       cls = 'is-soon';
     } else if (daysUntil <= 14) {
-      label = `Renewal due in ${daysUntil} day${daysUntil === 1 ? '' : 's'} · ${fmtDate(renewalIso)}`;
+      metaText = `In ${daysUntil} days`;
       cls = 'is-soon';
     } else {
-      label = `Next renewal: ${fmtDate(renewalIso)} (${daysUntil} days)`;
+      metaText = `In ${daysUntil} days`;
     }
-    renewalEl.textContent = '🔔 ' + label;
+
+    // Build the chip — SVG calendar icon + eyebrow label + date + meta
+    const calendarSvg = `<svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="3.5" width="11" height="10" rx="1.2"/><line x1="2.5" y1="6.5" x2="13.5" y2="6.5"/><line x1="5.5" y1="2" x2="5.5" y2="4.5"/><line x1="10.5" y1="2" x2="10.5" y2="4.5"/></svg>`;
+    renewalEl.innerHTML =
+      `<span class="wc-hero__renewal__icon">${calendarSvg}</span>` +
+      `<span class="wc-hero__renewal__label">Next Renewal</span>` +
+      `<span class="wc-hero__renewal__date">${dateText}</span>` +
+      `<span class="wc-hero__renewal__meta">${metaText}</span>`;
     renewalEl.className = 'wc-hero__renewal' + (cls ? ' ' + cls : '');
     renewalEl.hidden = false;
   })();
