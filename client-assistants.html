@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@500;600;700;800;900&family=Playfair+Display:ital,wght@1,400;1,500&display=swap" />
 <link rel="stylesheet" href="js/sidebar.css?v=20260516b" />
 <link rel="icon" href="assets/logos/pm-logo.png" />
+<script src="js/theme.js?v=20260516b"></script>
 <style>
   /* Phase 19n: shared theme tokens — same vocabulary as client-dashboard
      so the dark/light toggle persists and works on every client page. */
@@ -241,14 +242,115 @@
     width:100%;max-width:680px;max-height:90vh;overflow-y:auto;
     box-shadow:0 30px 70px -20px rgba(15,23,42,0.5);
   }
-  .ca-modal__head{padding:24px 30px 18px;border-bottom:1px solid #E2E8F0;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
-  .ca-modal__title{font-family:"Archivo","Inter",sans-serif;font-size:22px;font-weight:800;letter-spacing:-.015em;margin:0 0 4px;}
+  .ca-modal__head{padding:24px 30px 18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
+  .ca-modal__title{font-family:"Archivo","Inter",sans-serif;font-size:22px;font-weight:800;letter-spacing:-.015em;margin:0 0 4px;color:var(--ink-2);}
   .ca-modal__sub{font-size:13px;color:var(--ink-mute);margin:0;}
   .ca-modal__close{background:transparent;border:none;font-size:24px;color:var(--ink-tert);cursor:pointer;line-height:1;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;}
   .ca-modal__body{padding:24px 30px;display:flex;flex-direction:column;gap:18px;}
   .ca-modal__section h4{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-tert);margin:0 0 8px;}
   .ca-modal__section p{font-size:14px;color:var(--ink);line-height:1.6;margin:0;}
-  .ca-modal__foot{padding:18px 30px;border-top:1px solid #E2E8F0;display:flex;justify-content:flex-end;gap:10px;}
+  .ca-modal__foot{padding:18px 30px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
+
+  /* ════════════════════════════════════════════════════════════
+     Dark-mode overrides — the page was originally light-only and used
+     hardcoded #E2E8F0 / #CBD5E1 / a light pastel banner. These re-anchor
+     every surface, border, and the pre-engagement banner to the theme
+     tokens so the page reads as intentional in dark mode.
+     ════════════════════════════════════════════════════════════ */
+  [data-pm-theme="dark"] .ca-tabs{border-bottom:1px solid var(--border);}
+  [data-pm-theme="dark"] .ca-filter__select{
+    background:var(--input-bg);
+    border:1px solid var(--border);
+    color:var(--ink);
+  }
+  [data-pm-theme="dark"] .ca-tab__count[data-count="0"]{
+    background:var(--border);
+    color:var(--ink-tert);
+  }
+  [data-pm-theme="dark"] .ca-card:hover{
+    border-color:var(--primary);
+    box-shadow:0 4px 14px -4px rgba(0,0,0,0.45);
+  }
+  [data-pm-theme="dark"] .ca-btn--ghost{
+    border-color:var(--border);
+    color:var(--ink);
+  }
+  [data-pm-theme="dark"] .ca-btn--ghost:hover{
+    background:var(--border-soft);
+    border-color:var(--ink-tert);
+  }
+  [data-pm-theme="dark"] .ca-btn--ghost-danger{
+    background:transparent;
+    border-color:rgba(239,68,68,0.45);
+    color:#FCA5A5;
+  }
+  [data-pm-theme="dark"] .ca-btn--ghost-danger:hover{
+    background:rgba(239,68,68,0.10);
+  }
+  [data-pm-theme="dark"] .ca-empty,
+  [data-pm-theme="dark"] .ca-loading{
+    background:var(--card);
+    border:1px dashed var(--border);
+    color:var(--ink-mute);
+  }
+  [data-pm-theme="dark"] .ca-spinner{
+    border:2px solid var(--border);
+    border-top-color:var(--primary);
+  }
+  /* Pre-engagement banner — keep the cool blue/green vibe but on dark */
+  [data-pm-theme="dark"] .ca-preengage{
+    background:linear-gradient(135deg,
+      rgba(56,189,248,0.10),
+      rgba(16,185,129,0.10));
+    border:1px solid rgba(56,189,248,0.28);
+    color:var(--ink);
+  }
+  [data-pm-theme="dark"] .ca-preengage strong{color:var(--ink-2);}
+  /* Status pills — keep the same hues but ensure readability on dark */
+  [data-pm-theme="dark"] .ca-status--shortlisted{
+    background:rgba(255,255,255,0.06);color:var(--ink-mute);
+  }
+  [data-pm-theme="dark"] .ca-status--introduction_requested{
+    background:rgba(245,158,11,0.16);color:#FBBF24;
+  }
+  [data-pm-theme="dark"] .ca-status--meeting_scheduled{
+    background:rgba(59,130,246,0.16);color:#93C5FD;
+  }
+  [data-pm-theme="dark"] .ca-status--meeting_complete{
+    background:rgba(168,85,247,0.16);color:#D8B4FE;
+  }
+  [data-pm-theme="dark"] .ca-status--engaged{
+    background:rgba(34,197,94,0.16);color:#86EFAC;
+  }
+  [data-pm-theme="dark"] .ca-status--declined{
+    background:rgba(239,68,68,0.16);color:#FCA5A5;
+  }
+  /* Submit bar — already dark; just add a soft border in dark so it doesn't
+     blend into the page background */
+  [data-pm-theme="dark"] .ca-submitbar{
+    background:#0F172A;
+    border:1px solid var(--border);
+  }
+  [data-pm-theme="dark"] .ca-submitbar__btn{
+    background:var(--card);
+    color:var(--ink-2);
+  }
+  /* Submitted-successfully banner — re-tinted for dark */
+  [data-pm-theme="dark"] #picksSubmitted{
+    background:rgba(34,197,94,0.10) !important;
+    border-color:rgba(34,197,94,0.40) !important;
+  }
+  [data-pm-theme="dark"] #picksSubmitted .ca-empty__title{color:#86EFAC !important;}
+  /* Modal panel — dark surface */
+  [data-pm-theme="dark"] .ca-modal__panel{
+    background:var(--card);
+    border:1px solid var(--border);
+    box-shadow:0 30px 70px -20px rgba(0,0,0,0.7);
+  }
+  [data-pm-theme="dark"] .ca-tag{
+    background:var(--border-soft);
+    color:var(--ink-mute);
+  }
 </style>
 </head>
 <body class="pm-has-sidebar">

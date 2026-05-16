@@ -368,6 +368,104 @@
     .nx-hero__tier{font-size:26px;}
     .nx-search{display:none;}
   }
+
+  /* ════════════════════════════════════════════════════════════
+     Dark-mode overrides — the original card was authored in light only
+     (hardcoded rgba whites + #e5e7eb borders). These re-anchor every
+     surface, border, and divider to the theme tokens so the page looks
+     intentional in dark mode instead of washed-out grey.
+     ════════════════════════════════════════════════════════════ */
+  [data-pm-theme="dark"] .nx-glass{
+    background:var(--card);
+    border:1px solid var(--border);
+    box-shadow:0 1px 2px rgba(0,0,0,0.30), 0 18px 40px -22px rgba(0,0,0,0.55);
+  }
+  [data-pm-theme="dark"] .nx-glass::before{
+    background:linear-gradient(135deg,rgba(255,255,255,0.04) 0%,transparent 50%);
+  }
+  [data-pm-theme="dark"] .nx-glass__eyebrow{
+    background:rgba(255,255,255,0.04);
+    border:1px solid var(--border);
+    color:var(--ink-mute);
+  }
+  [data-pm-theme="dark"] .nx-glass__badge{
+    background:rgba(255,255,255,0.04);
+    border:1px solid var(--border);
+    color:var(--ink-mute);
+  }
+  [data-pm-theme="dark"] .nx-glass__badge--active{
+    border-color:rgba(34,197,94,0.40);
+    background:rgba(34,197,94,0.14);
+    color:#4ADE80;
+  }
+  [data-pm-theme="dark"] .nx-glass__badge--ending{
+    border-color:rgba(245,158,11,0.40);
+    background:rgba(245,158,11,0.14);
+    color:#FBBF24;
+  }
+  [data-pm-theme="dark"] .nx-sub{
+    background:var(--border-soft);
+    border:1px solid var(--border);
+  }
+  [data-pm-theme="dark"] .nx-sched-row{
+    background:var(--card);
+    border:1px solid var(--border);
+  }
+  [data-pm-theme="dark"] .nx-sched-row__day{
+    border-right:1px solid var(--border);
+  }
+  [data-pm-theme="dark"] .nx-feat__check{
+    background:rgba(96,165,250,0.14);
+    border:1px solid var(--border);
+    color:#93C5FD;
+  }
+  [data-pm-theme="dark"] .nx-sub__btn--outline{
+    background:rgba(255,255,255,0.04);
+    border:1px solid var(--border);
+    color:var(--ink-mute);
+  }
+  [data-pm-theme="dark"] .nx-sub__btn--outline:hover{
+    color:var(--primary);
+    border-color:var(--primary);
+  }
+  [data-pm-theme="dark"] .nx-mb__btn--ghost{
+    background:var(--border-soft);
+    color:var(--ink);
+  }
+  [data-pm-theme="dark"] .nx-mb__btn--ghost:hover{
+    background:var(--border);
+  }
+
+  /* Payment-history table */
+  [data-pm-theme="dark"] .nx-card--table .nx-card__head{
+    border-bottom:1px solid var(--border);
+  }
+  [data-pm-theme="dark"] .nx-table thead{
+    background:rgba(255,255,255,0.025);
+  }
+  [data-pm-theme="dark"] .nx-table th{
+    border-bottom:1px solid var(--border);
+    color:var(--ink-mute);
+  }
+  [data-pm-theme="dark"] .nx-table td{
+    border-bottom:1px solid var(--border-soft);
+  }
+  [data-pm-theme="dark"] .nx-table tbody tr:hover{
+    background:rgba(255,255,255,0.025);
+  }
+  [data-pm-theme="dark"] .nx-payment-stats{
+    background:rgba(255,255,255,0.025);
+    border-bottom:1px solid var(--border);
+  }
+  [data-pm-theme="dark"] .nx-payment-stat__divider{
+    background:var(--border);
+  }
+
+  /* Pending banner — warm amber callout. Keep the warm-gold gradient in both
+     modes (it's a deliberate "your action is pending" callout) but pin the
+     text colors so they stay readable against the gold. */
+  .nx-pending__title{color:#78350F;}
+  .nx-pending__sub{color:#92400E;}
 </style>
 </head>
 <body class="pm-has-sidebar">
@@ -524,8 +622,10 @@
   const profile = await window.pmHiring.fetchCurrentUserProfile().catch(() => null);
   const fullName = profile?.full_name || user.email?.split('@')[0] || 'Client';
   const firstName = fullName.split(' ')[0];
-  $('nxUserName').textContent = firstName;
-  $('nxUserAvatar').textContent = (firstName[0] || 'C').toUpperCase();
+  // (Topbar no longer has a userpod — sidebar handles the account. Safely
+  // update only if the elements exist, so the page still renders without them.)
+  const _n = $('nxUserName');    if (_n) _n.textContent = firstName;
+  const _a = $('nxUserAvatar');  if (_a) _a.textContent = (firstName[0] || 'C').toUpperCase();
 
   // Pull data
   const [contract, pending, contracts] = await Promise.all([
