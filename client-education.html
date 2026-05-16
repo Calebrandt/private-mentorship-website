@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="js/sidebar.css?v=20260516c" />
+  <link rel="stylesheet" href="js/sidebar.css?v=20260516d" />
   <link rel="icon" href="assets/logos/pm-logo.png" />
   <script src="js/theme.js?v=20260516b"></script>
   <style>
@@ -942,12 +942,21 @@
 
 <script>
   // Theme toggle (dark / pearl white) — persists to localStorage
+  // ALSO mirrors into data-pm-theme so the sidebar + right-calendar
+  // (which read pm-theme tokens) follow the same dark/light state.
   (function(){
     var STORAGE_KEY = 'pmEduTheme';
     var saved = null;
     try { saved = localStorage.getItem(STORAGE_KEY); } catch(_){}
     var initial = (saved === 'light' || saved === 'dark') ? saved : 'dark';
     document.documentElement.setAttribute('data-edu-theme', initial);
+    // Sync the site-wide theme on first paint so sidebar + calendar match
+    if (window.pmTheme && typeof window.pmTheme.set === 'function') {
+      window.pmTheme.set(initial);
+    } else {
+      document.documentElement.setAttribute('data-pm-theme', initial);
+      document.documentElement.setAttribute('data-dash-theme', initial);
+    }
     document.addEventListener('click', function(e){
       var btn = e.target.closest('#eduThemeToggle');
       if (!btn) return;
@@ -955,6 +964,22 @@
       var next = current === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-edu-theme', next);
       try { localStorage.setItem(STORAGE_KEY, next); } catch(_){}
+      // Keep sidebar + calendar in sync with the edu toggle
+      if (window.pmTheme && typeof window.pmTheme.set === 'function') {
+        window.pmTheme.set(next);
+      } else {
+        document.documentElement.setAttribute('data-pm-theme', next);
+        document.documentElement.setAttribute('data-dash-theme', next);
+      }
+    });
+    // If the site-wide theme changes elsewhere (e.g. dashboard tab),
+    // mirror it back into the edu attribute so the page content follows.
+    window.addEventListener('pm-theme-change', function(ev){
+      var t = ev && ev.detail && ev.detail.theme;
+      if (t !== 'light' && t !== 'dark') return;
+      if (document.documentElement.getAttribute('data-edu-theme') === t) return;
+      document.documentElement.setAttribute('data-edu-theme', t);
+      try { localStorage.setItem(STORAGE_KEY, t); } catch(_){}
     });
   })();
 

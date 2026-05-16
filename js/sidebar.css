@@ -549,49 +549,77 @@ body.pm-cal-collapsed .with-right-cal{
   grid-template-columns:1fr !important;
 }
 
-/* ── Labeled "Calendar" pill pinned to the right edge of the viewport ── */
+/* ── Subtle "Calendar" tab pinned to the right edge of the viewport ──
+   Default state: a slim ~12px tab peeking out of the edge with a single
+   chevron — enough to notice without competing with page content.
+   Hover/focus: expands to reveal the calendar icon + "Calendar" label.
+   ─────────────────────────────────────────────────────────────────── */
 .dash-cal-show-pill{
   position:fixed; top:50%; right:0;
   transform:translateY(-50%);
-  display:inline-flex; align-items:center; gap:8px;
-  height:44px; padding:0 14px 0 12px;
+  display:inline-flex; align-items:center; gap:0;
+  height:56px; width:14px;             /* slim by default */
+  padding:0; overflow:hidden;
   border:1px solid var(--dash-border);
   border-right:none;
-  border-top-left-radius:12px;
-  border-bottom-left-radius:12px;
+  border-top-left-radius:10px;
+  border-bottom-left-radius:10px;
   background:var(--dash-card);
   color:var(--dash-ink-mute);
   cursor:pointer; z-index:60;
-  box-shadow:-3px 0 14px -4px rgba(15,23,42,0.14);
-  transition:background .16s ease, color .16s ease, padding .16s ease, transform .16s ease;
+  box-shadow:-2px 0 8px -3px rgba(15,23,42,0.10);
+  transition:width .20s cubic-bezier(.22,1,.36,1),
+             padding .20s cubic-bezier(.22,1,.36,1),
+             background .14s ease, color .14s ease, gap .20s ease;
   font-family:inherit;
 }
 .dash-cal-show-pill::after{
-  /* tiny calendar text label — only visible on hover */
+  /* "Calendar" label — only visible on hover */
   content:"Calendar";
   font:600 12px Inter,sans-serif;
   letter-spacing:-.005em;
-  max-width:0; overflow:hidden; white-space:nowrap;
-  transition:max-width .18s ease, margin-right .18s ease;
+  white-space:nowrap;
+  opacity:0;
+  transition:opacity .14s ease .06s;
 }
-.dash-cal-show-pill:hover{
+.dash-cal-show-pill:hover,
+.dash-cal-show-pill:focus-visible{
+  width:120px; gap:8px; padding:0 14px 0 12px;
   background:var(--dash-border-soft);
   color:var(--dash-ink-2);
-  padding-right:18px;
-  transform:translateY(-50%) translateX(-2px);
+  outline:none;
 }
-.dash-cal-show-pill:hover::after{
-  max-width:120px;
+.dash-cal-show-pill:hover::after,
+.dash-cal-show-pill:focus-visible::after{
+  opacity:1;
 }
 .dash-cal-show-pill__chev{
-  width:14px; height:14px; display:block; flex-shrink:0;
+  width:12px; height:12px; display:block; flex-shrink:0; margin:0 auto;
 }
 .dash-cal-show-pill__icon{
-  width:16px; height:16px; display:block; flex-shrink:0;
+  width:15px; height:15px; display:none; flex-shrink:0;
+}
+.dash-cal-show-pill:hover .dash-cal-show-pill__icon,
+.dash-cal-show-pill:focus-visible .dash-cal-show-pill__icon{
+  display:block;
 }
 .dash-cal-show-pill[hidden]{ display:none; }
-[data-pm-theme="dark"] .dash-cal-show-pill{
-  box-shadow:-3px 0 16px -4px rgba(0,0,0,0.55);
+
+/* Dark mode — pin to the dark surface explicitly. Covers both possible
+   attributes (theme.js sets both data-pm-theme and data-dash-theme). */
+[data-pm-theme="dark"] .dash-cal-show-pill,
+[data-dash-theme="dark"] .dash-cal-show-pill{
+  background:#16171c;
+  border-color:#262830;
+  color:#94a3b8;
+  box-shadow:-2px 0 10px -3px rgba(0,0,0,0.55);
+}
+[data-pm-theme="dark"] .dash-cal-show-pill:hover,
+[data-pm-theme="dark"] .dash-cal-show-pill:focus-visible,
+[data-dash-theme="dark"] .dash-cal-show-pill:hover,
+[data-dash-theme="dark"] .dash-cal-show-pill:focus-visible{
+  background:#1c1d23;
+  color:#f1f5f9;
 }
 
 /* On small screens the calendar is already hidden by the @media rule above,
