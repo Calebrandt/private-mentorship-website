@@ -334,7 +334,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515a"></script>
-<script src="js/hiring-service.js?v=20260515s"></script>
+<script src="js/hiring-service.js?v=20260515t"></script>
 <script src="js/session-calendar.js?v=20260515a"></script>
 <script src="js/sidebar.js?v=20260515c"></script>
 <script>
@@ -437,36 +437,41 @@ function initialsFor(name){
   loadWeekly();
 })();
 
-// Weekly breakdown — bucket THIS week's sessions by weekday (Mon–Sun)
+// Weekly breakdown — bucket THIS week's sessions by weekday (Sun–Sat)
 // so the assistant sees a 7-cell strip showing how few hours each day
 // actually requires. The selling point during training is freedom:
-// most days you work 0-3 hours, max 5 days a week, the rest is yours.
+// most days you work 0–3 hours, max 5 days a week, the rest is yours.
+//
+// Week starts on SUNDAY to align column-for-column with the month
+// calendar widget below (which is also Sun-first). The vertical grid
+// match makes the dashboard read as one connected layout instead of
+// two separate widgets.
 async function loadWeekly(){
   const grid = document.getElementById('adWeeklyGrid');
   const summaryEl = document.getElementById('adWeeklySummary');
   if (!grid) return;
 
-  // Start of Mon-Sun week containing today (local time).
+  // Start of Sun–Sat week containing today (local time).
   const today = new Date();
-  const dow = today.getDay(); // 0=Sun, 1=Mon, …
-  const monOffset = dow === 0 ? -6 : 1 - dow;
-  const monday = new Date(today);
-  monday.setDate(today.getDate() + monOffset);
-  monday.setHours(0, 0, 0, 0);
-  const nextMonday = new Date(monday);
-  nextMonday.setDate(monday.getDate() + 7);
+  const dow = today.getDay(); // 0=Sun … 6=Sat
+  const sunday = new Date(today);
+  sunday.setDate(today.getDate() - dow);
+  sunday.setHours(0, 0, 0, 0);
+  const nextSunday = new Date(sunday);
+  nextSunday.setDate(sunday.getDate() + 7);
 
   let appts = [];
   try {
     appts = await window.pmHiring.fetchAssistantAppointmentsRange({
-      fromDate: monday.toISOString(),
-      toDate:   nextMonday.toISOString(),
+      fromDate: sunday.toISOString(),
+      toDate:   nextSunday.toISOString(),
       statuses: ['scheduled', 'completed'],
       limit: 200,
     }) || [];
   } catch (e) { console.warn('weekly load failed', e); }
 
-  // Bucket by Mon-Sun (index 0..6 where 0=Mon)
+  // Bucket directly by Date.getDay() — 0=Sun … 6=Sat — matches the
+  // calendar widget's column order so the strip aligns perfectly.
   const minutesByDay = [0, 0, 0, 0, 0, 0, 0];
   appts.forEach(a => {
     const d = new Date(a.starts_at);
@@ -474,16 +479,12 @@ async function loadWeekly(){
     if (!mins && a.ends_at) {
       mins = Math.max(0, Math.round((new Date(a.ends_at) - d) / 60000));
     }
-    const w = d.getDay();           // 0=Sun
-    const idx = w === 0 ? 6 : w - 1; // 0=Mon..6=Sun
-    minutesByDay[idx] += mins;
+    minutesByDay[d.getDay()] += mins;
   });
 
-  const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const todayIdx = (() => {
-    const w = today.getDay();
-    return w === 0 ? 6 : w - 1;
-  })();
+  // Labels match the calendar widget exactly.
+  const labels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const todayIdx = today.getDay();
 
   // Cell HTML
   const cells = labels.map((lab, i) => {
