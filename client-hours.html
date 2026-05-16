@@ -169,8 +169,30 @@
   .nx-listrow__icon--receipt{background:linear-gradient(135deg,#5750F1,#0ABEF9);}
   .nx-listrow__icon svg{width:18px;height:18px;stroke-width:2.4;}
   .nx-listrow__body{flex:1;min-width:0;}
-  .nx-listrow__title{font-size:14.5px;font-weight:700;color:var(--ink-2);margin:0;letter-spacing:-.005em;}
+  .nx-listrow__title{font-size:14.5px;font-weight:700;color:var(--ink-2);margin:0;letter-spacing:-.005em;display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;}
   .nx-listrow__sub{font-size:12px;color:var(--ink-mute);margin:3px 0 0;font-weight:500;}
+
+  /* Invoice "note" chip — small inline badge next to the invoice number
+     when customer_notes is non-empty. Hovering shows the full note via
+     the native title attribute; the snippet line below shows it inline. */
+  .nx-inv-note__chip{
+    display:inline-flex;align-items:center;gap:4px;
+    padding:2px 8px 2px 6px;border-radius:9999px;
+    background:rgba(245,158,11,0.12);color:#92400E;
+    border:1px solid rgba(245,158,11,0.30);
+    font:600 10.5px Inter,sans-serif;letter-spacing:.04em;text-transform:uppercase;
+    cursor:help;
+  }
+  .nx-inv-note__chip svg{width:11px;height:11px;}
+  .nx-inv-note__text{
+    margin:4px 0 0;font:500 12px Inter,sans-serif;
+    color:var(--ink-mute);line-height:1.45;
+    max-width:520px;
+  }
+  [data-dash-theme="dark"] .nx-inv-note__chip{
+    background:rgba(245,158,11,0.16);color:#FBBF24;
+    border-color:rgba(245,158,11,0.40);
+  }
   .nx-listrow__right{text-align:right;flex-shrink:0;}
   .nx-listrow__amount{font-size:18px;font-weight:800;color:var(--ink-2);margin:0;letter-spacing:-.018em;font-variant-numeric:tabular-nums;}
   .nx-listrow__pill{
@@ -569,15 +591,21 @@
     invWrap.innerHTML = `<div class="nx-empty">No invoices yet.<p class="nx-empty__hint">Invoices issued by Private Mentorship will appear here.</p></div>`;
   } else {
     const sorted = [...invoices].sort((a,b) => new Date(b.invoice_date).getTime() - new Date(a.invoice_date).getTime());
+    const noteIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
     invWrap.innerHTML = `<div class="nx-list">${sorted.map(inv => {
       const status = String(inv.status || '').toLowerCase();
       const tone = status === 'paid' ? 'paid' : (status === 'void' ? 'open' : 'open');
       const docIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
+      const note = (inv.customer_notes || '').trim();
+      const titleLine = `${esc(inv.invoice_number || ('Invoice ' + inv.id.slice(0,8)))}${
+        note ? `<span class="nx-inv-note__chip" title="${esc(note)}">${noteIcon}<span>note</span></span>` : ''
+      }`;
       return `<div class="nx-listrow">
         <div class="nx-listrow__icon nx-listrow__icon--${tone}">${docIcon}</div>
         <div class="nx-listrow__body">
-          <p class="nx-listrow__title">${esc(inv.invoice_number || ('Invoice ' + inv.id.slice(0,8)))}</p>
+          <p class="nx-listrow__title">${titleLine}</p>
           <p class="nx-listrow__sub">${esc(fmtDate(inv.invoice_date))}</p>
+          ${note ? `<p class="nx-inv-note__text">${esc(note)}</p>` : ''}
         </div>
         <div class="nx-listrow__right">
           <p class="nx-listrow__amount">${esc(fmtMoneyCents(inv.total_cents))}</p>
