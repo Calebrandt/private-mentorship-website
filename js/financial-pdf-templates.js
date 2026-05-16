@@ -116,18 +116,25 @@
     /* Uses pre-cropped pm-monogram.png (690×640 tight crop of just the
        PM mark, derived from Rec.png — no wordmark, no padding). Switched
        from background-image back to <img> because html2canvas captures
-       <img> tags at full quality; background images render blurry. */
+       <img> tags at full quality; background images render blurry.
+       Image is absolutely-positioned + transform-centered with a small
+       upward bias (-58% vs default -50%) — the source crop has the
+       sparkle dots at the top adding visual weight, so the PM mark's
+       optical centre sits below the geometric centre of the image. */
     .logo-circle {
       width: 100px; height: 100px; border-radius: 50%;
       border: 1.5px solid #a8a8a8;
       background: #ffffff;
       overflow: hidden;
-      display: flex; align-items: center; justify-content: center;
+      position: relative;
       margin-bottom: 56px;
       box-shadow: 0 0 0 6px #ececec;
     }
     .logo-circle img {
-      width: 72%; height: auto; display: block;
+      position: absolute;
+      width: 76%; height: auto;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -58%);
     }
     .meta-block { margin-bottom: 28px; }
     .meta-block.last { flex: 1; }
