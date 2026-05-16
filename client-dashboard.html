@@ -159,6 +159,21 @@
   [data-dash-theme="dark"] #kpiRemainingTile.is-empty #kpiHours{color:#FCA5A5;}
   [data-dash-theme="dark"] #kpiRemainingTile.is-empty #kpiHoursLabel{color:#FECACA;}
 
+  /* Icon color follows the tile state — a green clock icon on an amber
+     "running low" tile reads as a bug. Recolor so the icon matches. */
+  #kpiRemainingTile.is-low .nx-kpi__icon{
+    background:#FEF3C7;color:#D97706;
+  }
+  #kpiRemainingTile.is-empty .nx-kpi__icon{
+    background:#FEE2E2;color:#DC2626;
+  }
+  [data-dash-theme="dark"] #kpiRemainingTile.is-low .nx-kpi__icon{
+    background:rgba(245,158,11,.18);color:#FBBF24;
+  }
+  [data-dash-theme="dark"] #kpiRemainingTile.is-empty .nx-kpi__icon{
+    background:rgba(239,68,68,.18);color:#FCA5A5;
+  }
+
   /* Phase 19m v2: Premium usage progress bar — Stripe / Linear vibe.
      Recessed glass track, multi-stop gradient fill, inset top shine,
      soft state-colored outer glow, slow animated shimmer sweep. */
