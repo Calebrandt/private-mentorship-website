@@ -274,7 +274,7 @@
       </div>
       <div class="nx-kpi__bot"><div>
         <p class="nx-kpi__num" id="kpiUsed"><span class="nx-skel" style="width:60px;"></span></p>
-        <p class="nx-kpi__label">Hours used (all time)</p>
+        <p class="nx-kpi__label">Hours used</p>
       </div></div>
     </div>
     <div class="nx-kpi">
@@ -438,6 +438,13 @@
     window.pmHiring.fetchMyBankSummary().catch(()=>null),
   ]);
 
+  // Pull the SAME workspace summary the dashboard uses so the two pages
+  // can never disagree on hours math. (Phase 19d: carryover-absorbed-first)
+  let ws = null;
+  if (client?.id) {
+    try { ws = await window.pmHiring.fetchAssistantClientWorkspace(client.id); } catch (_) {}
+  }
+
   // Phase 12: banked-hours promo strip
   try {
     const bankHrs = Number(bank?.banked_hours || 0);
@@ -450,9 +457,23 @@
     }
   } catch (_) {}
 
-  // KPIs
-  $('kpiHours').textContent = Number(client?.hours_balance || 0).toFixed(1);
-  $('kpiUsed').textContent = (ledger.totalUsed || 0).toFixed(1);
+  // KPIs — match the dashboard exactly. Mental model:
+  //   • Available = plan + carryover
+  //   • Used      = max(0, raw_sessions - carryover_absorbed)
+  //   • Remaining = plan + carryover − raw_sessions
+  // Fall back to raw client.hours_balance only if the workspace fetcher
+  // didn't return — never silently show different numbers from the
+  // dashboard.
+  const planHours      = ws?.contract?.included_minutes ? Math.round(ws.contract.included_minutes / 60 * 100) / 100 : 0;
+  const toppedUpHours  = ws?.hoursToppedUpMinutes ? Math.round(ws.hoursToppedUpMinutes / 60 * 100) / 100 : 0;
+  const rawSessionsHr  = ws?.hoursUsedMinutes ? Math.round(ws.hoursUsedMinutes / 60 * 100) / 100 : 0;
+  const usedAgainstPlan = Math.max(0, Math.round((rawSessionsHr - toppedUpHours) * 100) / 100);
+  const remainingHours = Number.isFinite(ws?.hoursRemainingMinutes)
+    ? Math.round(ws.hoursRemainingMinutes / 60 * 100) / 100
+    : Number(client?.hours_balance || 0);
+
+  $('kpiHours').textContent = Number(remainingHours).toFixed(1);
+  $('kpiUsed').textContent  = Number(usedAgainstPlan).toFixed(1);
   const totalPaidCents = (invoices || []).filter(i => i.status === 'paid').reduce((s,i) => s + (i.amount_paid_cents || 0), 0);
   $('kpiTotalPaid').textContent = (totalPaidCents/100).toLocaleString('en-CA', {style:'currency',currency:'CAD',maximumFractionDigits:0});
   const openInvCount = (invoices || []).filter(i => i.status === 'open').length;
