@@ -432,15 +432,26 @@
       150
     );
 
-    // Lines table
+    // Lines table — invoice_lines stores prices as integer cents
+    // (unit_price_cents / line_total_cents), unlike sales_receipt_lines
+    // which stores them as numeric dollars. Don't confuse the two.
     const lines = Array.isArray(inv.lines) ? inv.lines : [];
-    const lineRows = lines.length ? lines.map(l => ({
-      _ccy: ccy,
-      description: l.description || '—',
-      qty: (Number(l.quantity) || 0).toFixed(Number.isInteger(+l.quantity) ? 0 : 2),
-      unit: dollarsToCents(l.unit_price),
-      total: dollarsToCents(l.line_total != null ? l.line_total : (Number(l.quantity) || 0) * (Number(l.unit_price) || 0)),
-    })) : [{ _ccy: ccy, description: '(no line items recorded)', qty: '', unit: 0, total: 0 }];
+    const lineRows = lines.length ? lines.map(l => {
+      const unitCents = Number(l.unit_price_cents);
+      const totalCents = Number(l.line_total_cents);
+      const qty = Number(l.quantity) || 0;
+      // If a legacy row has no line_total_cents, derive it
+      const derivedTotal = Number.isFinite(totalCents) && totalCents > 0
+        ? totalCents
+        : (qty * (Number.isFinite(unitCents) ? unitCents : 0));
+      return {
+        _ccy: ccy,
+        description: l.description || '—',
+        qty: qty.toFixed(Number.isInteger(qty) ? 0 : 2),
+        unit: Number.isFinite(unitCents) ? unitCents : 0,
+        total: derivedTotal,
+      };
+    }) : [{ _ccy: ccy, description: '(no line items recorded)', qty: '', unit: 0, total: 0 }];
 
     const afterTable = paintTable(doc, [
       { key: 'description', label: 'Description', w: 0.58 },
