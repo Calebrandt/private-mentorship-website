@@ -940,7 +940,7 @@
     const pending = pendingByApt[a.id];
     const pendingLabel = pending ? (pending.request_type === 'cancel' ? 'Cancel pending' : 'Reschedule pending') : null;
     const buttonsDisabled = !!pending;
-    return `<div class="nx-sess" data-apt-id="${esc(a.id)}">
+    return `<div class="nx-sess" id="appt-${esc(a.id)}" data-apt-id="${esc(a.id)}">
       <div class="nx-sess__date">
         <p class="nx-sess__day">${esc(day)}</p>
         <p class="nx-sess__num">${num}</p>
@@ -1309,6 +1309,7 @@
 })();
 </script>
 <script src="js/topbar-userpod.js?v=20260516a" defer></script>
-<script src="js/master-search.js?v=20260516a" defer></script>
+<script src="js/master-search.js?v=20260516b" defer></script>
+<script src="js/deep-link-flash.js?v=20260516a" defer></script>
 </body>
 </html>

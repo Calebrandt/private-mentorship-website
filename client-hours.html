@@ -698,7 +698,7 @@
             ${noteIcon}<span>View note</span>
           </button>`
         : '';
-      return `<div class="nx-listrow">
+      return `<div class="nx-listrow" id="inv-${esc(inv.id)}">
         <div class="nx-listrow__icon nx-listrow__icon--${tone}">${docIcon}</div>
         <div class="nx-listrow__body">
           <p class="nx-listrow__title">${esc(label)}</p>
@@ -745,6 +745,7 @@
 })();
 </script>
 <script src="js/topbar-userpod.js?v=20260516a" defer></script>
-<script src="js/master-search.js?v=20260516a" defer></script>
+<script src="js/master-search.js?v=20260516b" defer></script>
+<script src="js/deep-link-flash.js?v=20260516a" defer></script>
 </body>
 </html>

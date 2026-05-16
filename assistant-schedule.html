@@ -714,7 +714,7 @@ function upcomingRowHtml(a){
          <button type="button" class="as-btn--ghost is-danger" data-action="cancel-request" data-appt-id="${escapeHtml(a.id)}" title="Cancels this session immediately. No admin step. The family is not charged.">✕ Cancel</button>
        </div>`;
 
-  return `<div class="as-upcoming-row" data-appt-id="${escapeHtml(a.id)}">
+  return `<div class="as-upcoming-row" id="appt-${escapeHtml(a.id)}" data-appt-id="${escapeHtml(a.id)}">
     <div class="as-row__date">${escapeHtml(dateMain)}<small>${escapeHtml(String(dateYear))} · ${escapeHtml(time)}</small></div>
     <div class="as-row__body">
       <div class="as-row__client">${escapeHtml(clientName)}</div>
@@ -771,7 +771,7 @@ function renderNeedsAttention(){
     const time = fmtTime(d);
     const clientName = a.client?.full_name || (a.client_id ? 'Client ' + a.client_id.slice(0,6) : '—');
     const min = durationOf(a);
-    return `<div class="as-action-row" data-appt-id="${escapeHtml(a.id)}">
+    return `<div class="as-action-row" id="appt-${escapeHtml(a.id)}" data-appt-id="${escapeHtml(a.id)}">
       <div class="as-row__date">${escapeHtml(dateMain)}<small>${escapeHtml(String(dateYear))} · ${escapeHtml(time)}</small></div>
       <div class="as-row__body">
         <div class="as-row__client">${escapeHtml(clientName)}</div>
@@ -1179,6 +1179,7 @@ document.getElementById('asToday').addEventListener('click', () => {
   await loadAll();
 })();
 </script>
-<script src="js/master-search.js?v=20260516a" defer></script>
+<script src="js/master-search.js?v=20260516b" defer></script>
+<script src="js/deep-link-flash.js?v=20260516a" defer></script>
 </body>
 </html>

@@ -478,6 +478,34 @@ body.pm-has-calendar{padding-right:320px;}
 .dash-cal-section__row.is-on .dash-cal-section__label{color:var(--dash-ink-2);font-weight:600;}
 
 /* ════════════════════════════════════════════════════════════
+   Deep-link flash — applied to any element whose id matches the
+   URL hash on page load (or after a hashchange). Triggered by
+   js/deep-link-flash.js. The animation pulses an amber outline +
+   soft tint so the user immediately sees which row was targeted
+   without changing the row's natural look afterward.
+   ════════════════════════════════════════════════════════════ */
+@keyframes pm-deep-link-flash{
+  0%   { box-shadow:0 0 0 0 rgba(245,158,11,0.0),   inset 0 0 0 0 rgba(245,158,11,0.0); background-color:transparent; }
+  15%  { box-shadow:0 0 0 4px rgba(245,158,11,0.55), inset 0 0 0 1px rgba(245,158,11,0.55); background-color:rgba(245,158,11,0.18); }
+  100% { box-shadow:0 0 0 0 rgba(245,158,11,0.0),   inset 0 0 0 0 rgba(245,158,11,0.0); background-color:transparent; }
+}
+.deep-link-flash{
+  animation:pm-deep-link-flash 2.0s cubic-bezier(.22,1,.36,1) forwards;
+  border-radius:10px;
+  scroll-margin-top:80px; /* don't tuck under sticky topbar */
+}
+[data-pm-theme="dark"] .deep-link-flash,
+[data-dash-theme="dark"] .deep-link-flash{
+  animation-name:pm-deep-link-flash-dark;
+}
+@keyframes pm-deep-link-flash-dark{
+  0%   { box-shadow:0 0 0 0 rgba(251,191,36,0.0),   inset 0 0 0 0 rgba(251,191,36,0.0); background-color:transparent; }
+  15%  { box-shadow:0 0 0 4px rgba(251,191,36,0.55), inset 0 0 0 1px rgba(251,191,36,0.55); background-color:rgba(251,191,36,0.16); }
+  100% { box-shadow:0 0 0 0 rgba(251,191,36,0.0),   inset 0 0 0 0 rgba(251,191,36,0.0); background-color:transparent; }
+}
+
+
+/* ════════════════════════════════════════════════════════════
    Master search — dropdown panel below .nx-search input.
    Powered by js/master-search.js. Theme-aware via the same
    --card / --border / --ink tokens every page defines.

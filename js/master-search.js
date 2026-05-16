@@ -43,12 +43,18 @@
     const q = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     return safe.replace(new RegExp(q, 'gi'), m => `<mark class="ms-mark">${m}</mark>`);
   }
-  function detectRole() {
+  function detectRoleFromUrl() {
     const p = (location.pathname.split('/').pop() || '').toLowerCase();
     if (p.startsWith('client-'))    return 'client';
     if (p.startsWith('assistant-')) return 'assistant';
     if (p.startsWith('admin-'))     return 'admin';
-    // messages.html and others: try to read from a previously cached profile
+    return null;
+  }
+  // Sync best-effort guess from URL or cached profile. Used as initial
+  // value before the async detectRole() resolves.
+  function detectRoleSync() {
+    const fromUrl = detectRoleFromUrl();
+    if (fromUrl) return fromUrl;
     try {
       const cached = window.__pmCachedProfile;
       if (cached?.role) {
@@ -58,7 +64,30 @@
         if (r.includes('ADMIN') || r.includes('OWNER')) return 'admin';
       }
     } catch (_) {}
-    return 'client';   // sensible default for messages.html on a client
+    return 'client';   // sensible default
+  }
+  // True role detection: URL pattern wins; if ambiguous (messages.html,
+  // signin.html etc.) we fetch the user's profile and decide from role.
+  // Memoized so we only ever fetch once.
+  let _roleCache = null;
+  async function detectRole() {
+    if (_roleCache) return _roleCache;
+    const fromUrl = detectRoleFromUrl();
+    if (fromUrl) { _roleCache = fromUrl; return _roleCache; }
+    // Ambiguous page — try profile.role
+    try {
+      const profile = await window.pmHiring?.fetchCurrentUserProfile?.();
+      if (profile) {
+        window.__pmCachedProfile = profile;
+        const r = String(profile.role || '').toUpperCase();
+        if (r.includes('ADMIN') || r.includes('OWNER')) _roleCache = 'admin';
+        else if (r.includes('ASSISTANT'))                _roleCache = 'assistant';
+        else                                              _roleCache = 'client';
+        return _roleCache;
+      }
+    } catch (_) {}
+    _roleCache = 'client';
+    return _roleCache;
   }
   function fmtDate(iso) {
     if (!iso) return '';
@@ -191,6 +220,20 @@
           }).catch(() => null);
           out.sessions = (range?.appointments || []).map(a => ({ ...a }));
         } catch (_) {}
+      } else if (role === 'admin') {
+        // Admin can see the whole org. Pull a sane batch from each list.
+        const [apps, clients, profiles, schedReq, memReq] = await Promise.all([
+          window.pmHiring.adminListApplications?.({ status: 'active' }).catch(() => []),
+          window.pmHiring.adminListClients?.({ limit: 200 }).catch(() => []),
+          window.pmHiring.adminListAssistantProfiles?.().catch(() => []),
+          window.pmHiring.adminListScheduleRequests?.({ statuses: ['pending'], limit: 100 }).catch(() => ({ requests: [] })),
+          window.pmHiring.adminListMembershipRequests?.({ limit: 100 }).catch(() => []),
+        ]);
+        out.applications      = apps || [];
+        out.clients           = clients || [];
+        out.assistantProfiles = profiles || [];
+        out.scheduleRequests  = (schedReq && schedReq.requests) || schedReq || [];
+        out.membershipRequests = memReq || [];
       }
     } catch (e) {
       console.warn('master-search: dynamic load failed', e);
@@ -213,7 +256,11 @@
     const q = String(query || '').trim().toLowerCase();
     if (!q) return null;
 
-    const results = { pages: [], sessions: [], invoices: [], contracts: [], messages: [], clients: [], lessonLogs: [] };
+    const results = {
+      pages: [], sessions: [], invoices: [], contracts: [], messages: [],
+      clients: [], lessonLogs: [],
+      applications: [], assistantProfiles: [], scheduleRequests: [], membershipRequests: [],
+    };
 
     // Pages (static)
     (PAGE_INDEX[role] || []).forEach(p => {
@@ -288,16 +335,69 @@
       }
     });
 
-    // Clients (assistant only)
+    // Clients (assistant + admin)
     (dyn.clients || []).forEach(c => {
       const name = c.full_name || c.client_name || c.name || '';
       const blob = `${name} ${c.email || ''}`.toLowerCase();
       if (blob.includes(q)) {
+        const isAdmin = role === 'admin';
         results.clients.push({
           icon: ICONS.client,
           title: name,
-          subtitle: c.contract_status ? `Contract: ${c.contract_status}` : 'Active engagement',
-          url: `assistant-client.html?client_id=${encodeURIComponent(c.id || c.client_id || '')}`,
+          subtitle: c.contract_status ? `Contract: ${c.contract_status}` : 'Client',
+          url: isAdmin
+            ? `admin-create-client.html?id=${encodeURIComponent(c.id || c.client_id || '')}`
+            : `assistant-client.html?client_id=${encodeURIComponent(c.id || c.client_id || '')}`,
+        });
+      }
+    });
+
+    // Admin-only: applications, assistant profiles, schedule requests, membership requests
+    (dyn.applications || []).forEach(a => {
+      const name = a.applicant_full_name || a.full_name || a.email || 'Applicant';
+      const blob = `${name} ${a.email || ''} ${a.status || ''}`.toLowerCase();
+      if (blob.includes(q)) {
+        results.applications.push({
+          icon: ICONS.client,
+          title: name,
+          subtitle: `Application · ${a.status || 'active'}`,
+          url: `admin-application.html?id=${encodeURIComponent(a.id || '')}`,
+        });
+      }
+    });
+    (dyn.assistantProfiles || []).forEach(p => {
+      const name = p.display_name || p.full_name || 'Assistant';
+      const blob = `${name} ${p.city || ''} ${(p.languages || []).join(' ')}`.toLowerCase();
+      if (blob.includes(q)) {
+        results.assistantProfiles.push({
+          icon: ICONS.client,
+          title: name,
+          subtitle: `Assistant${p.city ? ' · ' + p.city : ''}`,
+          url: `admin-assistant-profiles.html?id=${encodeURIComponent(p.assistant_id || p.id || '')}`,
+        });
+      }
+    });
+    (dyn.scheduleRequests || []).forEach(r => {
+      const title = r.request_type ? `${r.request_type} request` : 'Schedule request';
+      const blob = `${title} ${r.status || ''} ${r.client_name || ''}`.toLowerCase();
+      if (blob.includes(q)) {
+        results.scheduleRequests.push({
+          icon: ICONS.session,
+          title: title,
+          subtitle: `${r.status || 'pending'}${r.client_name ? ' · ' + r.client_name : ''}`,
+          url: `admin-schedule-requests.html#req-${r.id || ''}`,
+        });
+      }
+    });
+    (dyn.membershipRequests || []).forEach(r => {
+      const title = `${r.requested_plan_key || 'Membership'} change`;
+      const blob = `${title} ${r.status || ''} ${r.client_name || ''}`.toLowerCase();
+      if (blob.includes(q)) {
+        results.membershipRequests.push({
+          icon: ICONS.contract,
+          title: title,
+          subtitle: `${r.status || 'pending'}${r.client_name ? ' · ' + r.client_name : ''}`,
+          url: `admin-membership-requests.html#req-${r.id || ''}`,
         });
       }
     });
@@ -307,18 +407,25 @@
 
   function totalCount(r) {
     if (!r) return 0;
-    return (r.pages.length + r.sessions.length + r.invoices.length + r.contracts.length + r.messages.length + r.clients.length + r.lessonLogs.length);
+    return (r.pages.length + r.sessions.length + r.invoices.length + r.contracts.length
+          + r.messages.length + r.clients.length + r.lessonLogs.length
+          + (r.applications?.length || 0) + (r.assistantProfiles?.length || 0)
+          + (r.scheduleRequests?.length || 0) + (r.membershipRequests?.length || 0));
   }
 
   // ── Render dropdown ─────────────────────────────────────────────
   function renderDropdown(panel, results, query, state) {
     const sections = [
-      { key: 'pages',     label: 'Pages',         items: results.pages },
-      { key: 'clients',   label: 'Clients',       items: results.clients },
-      { key: 'sessions',  label: 'Sessions',      items: results.sessions },
-      { key: 'invoices',  label: 'Invoices',      items: results.invoices },
-      { key: 'contracts', label: 'Contracts',     items: results.contracts },
-      { key: 'messages',  label: 'Messages',      items: results.messages },
+      { key: 'pages',              label: 'Pages',               items: results.pages },
+      { key: 'clients',            label: 'Clients',             items: results.clients },
+      { key: 'applications',       label: 'Applications',        items: results.applications },
+      { key: 'assistantProfiles',  label: 'Assistants',          items: results.assistantProfiles },
+      { key: 'sessions',           label: 'Sessions',            items: results.sessions },
+      { key: 'invoices',           label: 'Invoices',            items: results.invoices },
+      { key: 'contracts',          label: 'Contracts',           items: results.contracts },
+      { key: 'scheduleRequests',   label: 'Schedule requests',   items: results.scheduleRequests },
+      { key: 'membershipRequests', label: 'Membership requests', items: results.membershipRequests },
+      { key: 'messages',           label: 'Messages',            items: results.messages },
     ].filter(s => s.items && s.items.length);
 
     if (!sections.length) {
@@ -353,7 +460,9 @@
     if (!input || input.__pmMsWired) return;
     input.__pmMsWired = true;
 
-    const role = detectRole();
+    // Start with sync-best-guess role; resolve true role async and swap.
+    let role = detectRoleSync();
+    detectRole().then(r => { role = r; });
     const wrap = input.closest('.nx-search');
     if (!wrap) return;
 

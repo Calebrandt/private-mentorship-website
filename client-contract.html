@@ -859,7 +859,7 @@
         ? `Contract: ${fmtDate(p.contract.start_at, { month:'short', day:'numeric' })} – ${fmtDate(p.contract.end_at, { month:'short', day:'numeric', year:'numeric' })}`
         : 'No linked contract on file';
       const notesHtml = p.customer_notes ? `<div class="nx-table__notes">${esc(p.customer_notes)}</div>` : '';
-      return `<tr>
+      return `<tr id="inv-${esc(p.id)}">
         <td class="nx-table__primary">
           ${esc(label)}
           <p class="nx-table__inv">${esc(p.invoice_number || ('INV-' + p.id.slice(0,8)))}</p>
@@ -922,7 +922,7 @@
       const isActive = status === 'active';
       const label = c._label || (isActive ? 'Active contract' : 'Contract');
       const hours = c.included_hours ? `${c.included_hours}h` : '—';
-      return `<tr>
+      return `<tr id="contract-${esc(c.id)}">
         <td class="nx-table__primary">${esc(label)}</td>
         <td class="nx-table__muted">${esc(start)} – ${esc(end)}</td>
         <td class="nx-table__nums">${esc(hours)}</td>
@@ -947,6 +947,7 @@
 })();
 </script>
 <script src="js/topbar-userpod.js?v=20260516a" defer></script>
-<script src="js/master-search.js?v=20260516a" defer></script>
+<script src="js/master-search.js?v=20260516b" defer></script>
+<script src="js/deep-link-flash.js?v=20260516a" defer></script>
 </body>
 </html>
