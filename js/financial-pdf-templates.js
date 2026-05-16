@@ -78,13 +78,14 @@
   function titleCase(s) {
     return String(s || '').replace(/[_-]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   }
-  function stampFor(status, docType) {
+  // Stamps only fire for void/reissued docs — paid invoices use a subtle
+  // text line instead (an invoice is a request for payment; stamping
+  // "PAID" on it is redundant when the body already shows balance = 0).
+  // Receipts are inherently "paid" — the doc title says so.
+  function stampFor(status /*, docType */) {
     const s = String(status || '').toLowerCase();
-    if (s === 'paid') return { label: 'PAID',     color: '#0d2240', show: true };
-    if (s === 'void') return { label: 'VOID',     color: '#b91c1c', show: true };
+    if (s === 'void')     return { label: 'VOID',     color: '#b91c1c', show: true };
     if (s === 'reissued') return { label: 'REISSUED', color: '#6e6e6e', show: true };
-    if (docType === 'receipt')   return { label: 'PAID', color: '#0d2240', show: true };
-    if (docType === 'paycheque' && (s === 'issued' || s === 'paid')) return { label: 'ISSUED', color: '#0d2240', show: true };
     return { label: '', color: '', show: false };
   }
 
@@ -230,23 +231,35 @@
       padding-left: 0.42em;  /* compensate visually for the trailing track */
     }
 
-    /* ── Corner stamp ──────────────────────────────────────────── */
+    /* ── Stamp (only used for VOID / REISSUED) ─────────────────────
+       Positioned in the lower-right area, above THANK YOU, big enough
+       to read like an accountant slammed it down on the doc. */
     .stamp {
       position: absolute;
-      top: 30px; right: 32px;
-      transform: rotate(-8deg);
-      border: 2px double currentColor;
-      padding: 7px 16px 5px 16px;
-      font-family: 'Montserrat', sans-serif; font-weight: 600;
-      font-size: 14px; letter-spacing: 0.28em;
+      bottom: 170px; right: 90px;
+      transform: rotate(-9deg);
+      border: 4px double currentColor;
+      padding: 14px 30px 10px 30px;
+      font-family: 'Montserrat', sans-serif; font-weight: 700;
+      font-size: 34px; letter-spacing: 0.22em;
       text-align: center; line-height: 1;
-      opacity: 0.68;
+      opacity: 0.82;
       pointer-events: none;
     }
     .stamp small {
-      display: block; font-size: 6.5px; letter-spacing: 0.3em;
-      font-weight: 600; margin-top: 4px; opacity: 0.85;
+      display: block; font-size: 8px; letter-spacing: 0.32em;
+      font-weight: 600; margin-top: 6px; opacity: 0.85;
     }
+
+    /* ── Subtle "Paid in full" line under totals (invoice when paid) */
+    .paid-note {
+      margin-top: 10px; text-align: right;
+      font-family: 'Montserrat', sans-serif; font-weight: 500;
+      font-size: 9px; letter-spacing: 0.28em;
+      text-transform: uppercase; color: #1f1f1f;
+      padding-right: 14px;
+    }
+    .paid-note .dot { color: #b4b4b4; padding: 0 6px; }
     `;
   }
 
@@ -292,7 +305,8 @@
     if (!inv) throw new Error('buildInvoiceHtml: missing invoice payload');
 
     const ccy = (inv.currency || 'CAD').toUpperCase();
-    const stamp = stampFor(inv.status, 'invoice');
+    const stamp = stampFor(inv.status);
+    const isPaid = String(inv.status || '').toLowerCase() === 'paid';
 
     const client = inv.clients || {};
     const clientName = client.full_name || inv.party_name || '—';
@@ -372,6 +386,7 @@
               <div class="t-line"><span class="label">Amount Paid</span><span class="val">${fmtMoney(paidCents, ccy)}</span></div>
               <div class="t-line"><span class="label">Tax (0%)</span><span class="val">${fmtMoney(0, ccy)}</span></div>
               <div class="t-line is-amount-due"><span class="label">Amount Due</span><span class="val">${fmtMoney(balanceCents, ccy)}</span></div>
+              ${isPaid ? `<div class="paid-note">Paid in full<span class="dot">·</span>${escapeHtml(fmtDateLong(inv.invoice_date))}</div>` : ''}
             </div>
           </div>
 
@@ -386,7 +401,7 @@
     if (!rec) throw new Error('buildReceiptHtml: missing receipt payload');
 
     const ccy = 'CAD';
-    const stamp = rec.voided_at ? stampFor('void', 'receipt') : stampFor('paid', 'receipt');
+    const stamp = rec.voided_at ? stampFor('void') : stampFor('');
 
     const client = rec.clients || {};
     const invoice = rec.invoices || {};
@@ -479,7 +494,7 @@
     if (!pay) throw new Error('buildPaychequeHtml: missing paycheque payload');
 
     const ccy = (pay.currency || 'CAD').toUpperCase();
-    const stamp = stampFor(pay.status || 'issued', 'paycheque');
+    const stamp = stampFor(pay.status || 'issued');
 
     const lines = Array.isArray(pay.lines) ? pay.lines : [];
     const rowsHtml = lines.length ? lines.map(l => {
