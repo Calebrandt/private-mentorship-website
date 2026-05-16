@@ -221,11 +221,15 @@
     try {
       if (role === 'client') {
         const client = await safeCall(pm.fetchMyClientRecord, undefined, null);
-        const [ws, invoices, contracts, convos] = await Promise.all([
+        const [ws, invoices, contracts, convos, lessonHistory] = await Promise.all([
           client?.id ? safeCall(pm.fetchAssistantClientWorkspace, client.id, null) : Promise.resolve(null),
           safeCall(pm.fetchMyInvoices, 24, []),
           safeCall(pm.fetchMyContracts, undefined, []),
           safeCall(pm.fetchMyConversations, 30, []),
+          // Lifetime lesson history (limit 500). Each row has focus_area,
+          // key_concepts, next_session_notes, feedback, appointment_title
+          // — full-text searchable. RLS scopes this to the family.
+          client?.id ? safeCall(pm.fetchLessonHistory, client.id, []) : Promise.resolve([]),
         ]);
         if (ws) {
           out.sessions = [
@@ -236,6 +240,7 @@
         out.invoices      = invoices || [];
         out.contracts     = contracts || [];
         out.conversations = convos || [];
+        out.lessonLogs    = lessonHistory || [];
       } else if (role === 'assistant') {
         const start = new Date(); start.setDate(start.getDate() - 60);
         const end   = new Date(); end.setDate(end.getDate() + 30);
@@ -245,6 +250,16 @@
         ]);
         out.clients  = clients || [];
         out.sessions = (range?.appointments || []).map(a => ({ ...a }));
+        // Assistant lesson history: lifetime per assigned client, merged.
+        // 200 logs per client is plenty; capped via the fetcher's default.
+        try {
+          const lessonResults = await Promise.all(
+            (out.clients || []).map(c =>
+              safeCall(pm.fetchLessonHistory, c.id || c.client_id, [])
+            )
+          );
+          out.lessonLogs = lessonResults.flat();
+        } catch (_) { out.lessonLogs = []; }
       } else if (role === 'admin') {
         // Admin can see the whole org. Pull a sane batch from each list.
         // Every fetcher is wrapped in safeCall with a 5s timeout, so any
@@ -349,6 +364,28 @@
       }
     });
 
+    // Lesson logs — full-text search across appointment_title, focus_area,
+    // key_concepts, next_session_notes, feedback. Lifetime, not year-scoped.
+    (dyn.lessonLogs || []).forEach(l => {
+      const blob = `${l.appointment_title || ''} ${l.focus_area || ''} ${l.key_concepts || ''} ${l.next_session_notes || ''} ${l.feedback || ''} ${l.lesson_assistant_name || ''}`.toLowerCase();
+      const dateStr = fmtDate(l.starts_at);
+      if (blob.includes(q) || dateStr.toLowerCase().includes(q)) {
+        const year = l.starts_at ? new Date(l.starts_at).getFullYear() : null;
+        const lessonUrl = role === 'client'
+          ? `client-lesson-journal.html?year=${year || ''}#lesson-${encodeURIComponent(l.appointment_id || '')}`
+          : `assistant-lesson-tracker.html?clientId=${encodeURIComponent(l.client_id || '')}&year=${year || ''}#lesson-${encodeURIComponent(l.appointment_id || '')}`;
+        // Pick whichever field actually has the match for the subtitle
+        const snippet = [l.focus_area, l.key_concepts, l.next_session_notes, l.feedback]
+          .find(s => s && String(s).toLowerCase().includes(q)) || l.key_concepts || l.focus_area || '';
+        results.lessonLogs.push({
+          icon: ICONS.page,
+          title: l.appointment_title || 'Lesson',
+          subtitle: `${dateStr}${snippet ? ' · ' + String(snippet).slice(0, 80) : ''}`,
+          url: lessonUrl,
+        });
+      }
+    });
+
     // Conversations / messages
     (dyn.conversations || []).forEach(conv => {
       const blob = `${conv.title || ''} ${conv.other_name || ''} ${conv.last_message_text || ''}`.toLowerCase();
@@ -447,6 +484,7 @@
       { key: 'clients',            label: 'Clients',             items: results.clients },
       { key: 'applications',       label: 'Applications',        items: results.applications },
       { key: 'assistantProfiles',  label: 'Assistants',          items: results.assistantProfiles },
+      { key: 'lessonLogs',         label: 'Lessons',             items: results.lessonLogs },
       { key: 'sessions',           label: 'Sessions',            items: results.sessions },
       { key: 'invoices',           label: 'Invoices',            items: results.invoices },
       { key: 'contracts',          label: 'Contracts',           items: results.contracts },

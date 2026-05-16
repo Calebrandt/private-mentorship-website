@@ -282,7 +282,24 @@
   const yearOf = (iso) => new Date(iso).getFullYear();
   const allYears = [...new Set(lessons.map(l => yearOf(l.starts_at)))].sort((a,b) => b - a);
   const currentYear = allYears[0];
+  // Master search deep-link: if URL has ?year=… or a #lesson-<id> hash,
+  // jump straight to the right year so the row is in the rendered list.
   let activeYear = currentYear;
+  try {
+    const urlYear = new URLSearchParams(location.search).get('year');
+    if (urlYear === 'all')          activeYear = 'all';
+    else if (urlYear && /^\d{4}$/.test(urlYear)) activeYear = Number(urlYear);
+    else {
+      // Fallback: derive year from the #lesson-<appointmentId> hash by
+      // finding the matching lesson and switching to that year.
+      const hash = (location.hash || '').replace(/^#/, '');
+      const m = hash.match(/^lesson-(.+)$/);
+      if (m) {
+        const target = lessons.find(l => l.appointment_id === m[1]);
+        if (target) activeYear = yearOf(target.starts_at);
+      }
+    }
+  } catch (_) {}
 
   function renderYears(){
     yearsEl.innerHTML = ['all', ...allYears].map(y => {
@@ -368,7 +385,7 @@
            </div>`
         : '';
       return `
-        <article class="lj-card">
+        <article class="lj-card" id="lesson-${escapeHtml(l.appointment_id)}">
           <div class="lj-date">
             <div class="lj-date__month">${monthLbl}</div>
             <div class="lj-date__day">${dayLbl}</div>
@@ -447,7 +464,7 @@
 </script>
 
 <script src="js/topbar-userpod.js?v=20260516a" defer></script>
-<script src="js/master-search.js?v=20260516c" defer></script>
+<script src="js/master-search.js?v=20260516d" defer></script>
 <script src="js/deep-link-flash.js?v=20260516a" defer></script>
 </body>
 </html>

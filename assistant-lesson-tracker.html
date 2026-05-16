@@ -866,6 +866,16 @@ async function refreshHistory(){
 
 function buildYearPills(){
   const years = [...new Set(state.history.map(r => fmtYear(r.starts_at)))].sort((a,b) => b - a);
+  // Master-search deep-link: honor ?year=… on first build so the right
+  // year is selected before the user has to click anything.
+  if (state.filteredYear == null) {
+    try {
+      const urlYear = new URLSearchParams(location.search).get('year');
+      if (urlYear && /^\d{4}$/.test(urlYear) && years.includes(Number(urlYear))) {
+        state.filteredYear = Number(urlYear);
+      }
+    } catch (_) {}
+  }
   if (state.filteredYear == null && years.length) state.filteredYear = years[0];
   const wrap = $('ltYearPills');
   wrap.innerHTML = years.map(y => `<button type="button" class="lt-year-pill ${state.filteredYear === y ? 'is-active' : ''}" data-year="${y}">${y}</button>`).join('');
@@ -1052,7 +1062,7 @@ function render(){
     const ratingHtml = rating > 0
       ? `<span class="lt-card__rating">${'★'.repeat(rating)}</span>`
       : `<span class="lt-card__rating lt-card__rating--none">·····</span>`;
-    return `<div class="lt-card" data-appt-id="${esc(r.appointment_id)}">
+    return `<div class="lt-card" id="lesson-${esc(r.appointment_id)}" data-appt-id="${esc(r.appointment_id)}">
       <div class="lt-card__date">
         <p class="lt-card__date-weekday">${esc(weekday)}</p>
         <p class="lt-card__date-day">${dayNum}</p>
@@ -1416,7 +1426,7 @@ async function saveLog(){
   }
 }
 </script>
-<script src="js/master-search.js?v=20260516c" defer></script>
+<script src="js/master-search.js?v=20260516d" defer></script>
 <script src="js/deep-link-flash.js?v=20260516a" defer></script>
 </body>
 </html>
