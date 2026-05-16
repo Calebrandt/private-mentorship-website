@@ -698,7 +698,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515c"></script>
-<script src="js/hiring-service.js?v=20260515u"></script>
+<script src="js/hiring-service.js?v=20260515v"></script>
 <script src="js/messages-service.js?v=20260515c"></script>
 <script src="js/session-calendar.js?v=20260515a"></script>
 <script src="js/sidebar.js?v=20260515d"></script>
@@ -714,14 +714,20 @@ function initialsFor(name){return (name||'A').split(/\s+/).map(s=>s[0]||'').slic
 function fmtDate(iso){
   if(!iso)return '—';
   const s = String(iso);
-  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  // Match Y-M-D at start of string (NO $ anchor) so this also catches
+  // timestamps like '2026-05-15T00:00:00+00:00' that Supabase returns
+  // for timestamptz columns. Without dropping the anchor the regex
+  // missed every timestamp and fell through to new Date(s), which
+  // parses as UTC midnight and shifts back a day in Pacific —
+  // header would read "May 14" for a May 15 end_at.
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
   const d = m ? new Date(+m[1], +m[2]-1, +m[3]) : new Date(s);
   return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 }
 function fmtDateShort(iso){
   if(!iso)return '—';
   const s = String(iso);
-  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
   const d = m ? new Date(+m[1], +m[2]-1, +m[3]) : new Date(s);
   return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 }
