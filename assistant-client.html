@@ -652,7 +652,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515c"></script>
-<script src="js/hiring-service.js?v=20260515e"></script>
+<script src="js/hiring-service.js?v=20260515f"></script>
 <script src="js/messages-service.js?v=20260515c"></script>
 <script src="js/sidebar.js?v=20260515c"></script>
 <script>
@@ -781,17 +781,18 @@ function renderAppointmentRow(a, spend){
   if (remTile && remEl) {
     remEl.textContent = remainingHours;
     remTile.classList.remove('is-low','is-empty');
-    // Thresholds (Phase 19d, retuned 2026-05-16 per Caleb):
-    //   • Red (is-empty)  — 0 or negative
-    //   • Amber (is-low)  — ≤2h OR ≤10% of plan (genuinely about to run out)
-    //   • Green (default) — everything else
-    // First pass used ≤5h or ≤25% — Michael's 6.75/40 (17%) tripped amber
-    // even though 3–4 sessions still fit. Loosened so green stays green
-    // until someone is actually running out.
+    // Thresholds (Phase 19d, locked 2026-05-16 per Caleb):
+    //   • Red (is-empty)  — 0 or negative (contract drained)
+    //   • Amber (is-low)  — ≤5h OR ≤25% of plan (running low)
+    //   • Green (default) — comfortable
+    // Briefly tried looser ≤2h / ≤10% but Caleb wanted the sensitive
+    // thresholds back — earlier amber prompts a renewal conversation
+    // sooner, which is the right behavior for a small book of
+    // long-term clients.
     if (remainingHours <= 0) {
       remTile.classList.add('is-empty');
       if (remSubEl) remSubEl.textContent = 'contract is fully used';
-    } else if (planHours > 0 && (remainingHours <= 2 || remainingHours / planHours <= 0.10)) {
+    } else if (planHours > 0 && (remainingHours <= 5 || remainingHours / planHours <= 0.25)) {
       remTile.classList.add('is-low');
       if (remSubEl) remSubEl.textContent = 'running low — consider renewal';
     } else if (remSubEl) {
