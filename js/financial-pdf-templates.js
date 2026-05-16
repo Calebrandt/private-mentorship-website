@@ -36,9 +36,12 @@
 (function () {
   'use strict';
 
-  // ─── Brand assets (Supabase storage, public) ──────────────────────
-  const LOGO_URL =
-    'https://llkicgphkvciumfzhbkk.supabase.co/storage/v1/object/public/branding/RecLogo.png';
+  // ─── Brand assets ─────────────────────────────────────────────────
+  // Square pm-logo.png lives in the website's local assets folder.
+  // Used as a background-image with positioning to crop to just the
+  // PM monogram (top half) — the wordmark is hidden so the circle
+  // shows a clean mark instead of a tiny illegible everything.
+  const LOGO_URL = 'assets/logos/pm-logo.png';
 
   const COMPANY_NAME    = 'Private Mentorship';
   const COMPANY_ADDR_1  = 'Richmond, British Columbia';
@@ -111,15 +114,20 @@
       padding: 56px 30px 56px 38px;
       display: flex; flex-direction: column;
     }
+    /* The PM logo PNG is the full lockup (mark + "PRIVATE MENTORSHIP"
+       wordmark + padding). Cropped via background-image positioning to
+       show only the PM monogram, scaled to fill the circle properly. */
     .logo-circle {
-      width: 78px; height: 78px; border-radius: 50%;
-      border: 1px solid #b4b4b4;
-      display: flex; align-items: center; justify-content: center;
-      background: #ececec; overflow: hidden; margin-bottom: 58px;
-    }
-    .logo-circle img {
-      width: 70%; height: 70%; object-fit: contain;
-      mix-blend-mode: multiply; opacity: 0.92;
+      width: 102px; height: 102px; border-radius: 50%;
+      border: 1.5px solid #a8a8a8;
+      background-color: #ffffff;
+      background-image: url('${LOGO_URL}');
+      background-repeat: no-repeat;
+      background-position: center 8%;   /* anchor near top so PM mark sits centered */
+      background-size: 175% auto;        /* scale up so wordmark is cropped out */
+      background-blend-mode: multiply;
+      margin-bottom: 56px;
+      box-shadow: 0 0 0 6px #ececec;     /* subtle outer ring blends into sidebar */
     }
     .meta-block { margin-bottom: 28px; }
     .meta-block.last { flex: 1; }
@@ -285,7 +293,11 @@
 
     return `
     <aside class="sidebar">
-      <div class="logo-circle"><img src="${LOGO_URL}" alt="${escapeHtml(COMPANY_NAME)}" crossorigin="anonymous" /></div>
+      <div class="logo-circle" role="img" aria-label="${escapeHtml(COMPANY_NAME)}"></div>
+      <!-- Hidden preload — financial-pdf.js waits for <img> tags before
+           capturing, so this ensures the background-image is decoded
+           before html2canvas snapshots the DOM. -->
+      <img src="${LOGO_URL}" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" />
       ${metaHtml}
       ${paymentRows && paymentRows.length ? `
         <div class="meta-block payment last">
