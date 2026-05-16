@@ -24,7 +24,7 @@
 // REQUIRED ENV VARS (set via the Supabase dashboard → Functions → email-financial-document → "Secrets"):
 //   RESEND_API_KEY        — same Resend key the rest of the site uses
 //   NOTIFY_FROM_EMAIL     — verified From: header, e.g. "Private Mentorship <billing@private-mentorship.com>"
-//   REPLY_TO_EMAIL        — (optional) Reply-To address (defaults to caleb@private-mentorship.com)
+//   REPLY_TO_EMAIL        — (optional) Reply-To address (defaults to billing@private-mentorship.com)
 //
 // SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are auto-provided by the runtime.
 // ─────────────────────────────────────────────────────────────────────
@@ -87,7 +87,7 @@ serve(async (req) => {
   // ─── Env ──────────────────────────────────────────────────────────
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") || "";
   const NOTIFY_FROM    = Deno.env.get("NOTIFY_FROM_EMAIL") || "Private Mentorship <billing@private-mentorship.com>";
-  const REPLY_TO       = Deno.env.get("REPLY_TO_EMAIL") || "caleb@private-mentorship.com";
+  const REPLY_TO       = Deno.env.get("REPLY_TO_EMAIL") || "billing@private-mentorship.com";
 
   if (!RESEND_API_KEY) {
     return jsonResponse(500, { ok: false, error: "RESEND_API_KEY not configured." });
