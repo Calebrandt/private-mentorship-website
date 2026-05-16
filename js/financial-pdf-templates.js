@@ -92,8 +92,11 @@
   function sharedCss() {
     return `
     * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
-    body { margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-           background: #ffffff; color: #2b2b2b; font-size: 11px; line-height: 1.45; }
+    body { margin: 0; padding: 0;
+           font-family: 'Montserrat', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+           background: #ffffff; color: #1f1f1f; font-size: 10.5px; line-height: 1.5;
+           font-weight: 300;
+    }
 
     .page {
       width: 794px; min-height: 1100px; margin: 0 auto;
@@ -103,134 +106,145 @@
 
     /* ── Sidebar ────────────────────────────────────────────────── */
     .sidebar {
-      width: 230px; flex-shrink: 0; background: #ececec;
-      padding: 48px 28px 48px 32px;
+      width: 235px; flex-shrink: 0; background: #ececec;
+      padding: 56px 30px 56px 38px;
       display: flex; flex-direction: column;
     }
     .logo-circle {
-      width: 76px; height: 76px; border-radius: 50%;
-      border: 1px solid #a6a6a6;
+      width: 78px; height: 78px; border-radius: 50%;
+      border: 1px solid #b4b4b4;
       display: flex; align-items: center; justify-content: center;
-      background: #f5f5f5; overflow: hidden; margin-bottom: 50px;
+      background: #ececec; overflow: hidden; margin-bottom: 58px;
     }
     .logo-circle img {
-      width: 78%; height: 78%; object-fit: contain;
-      mix-blend-mode: multiply;
+      width: 70%; height: 70%; object-fit: contain;
+      mix-blend-mode: multiply; opacity: 0.92;
     }
-    .meta-block { margin-bottom: 26px; }
+    .meta-block { margin-bottom: 28px; }
     .meta-block.last { flex: 1; }
     .meta-label {
-      font-size: 9px; font-weight: 600; letter-spacing: 0.22em;
-      text-transform: uppercase; color: #2b2b2b; margin-bottom: 6px;
+      font-size: 8.5px; font-weight: 600;
+      letter-spacing: 0.28em;
+      text-transform: uppercase; color: #1f1f1f;
+      margin-bottom: 7px;
     }
     .meta-value {
-      font-size: 11px; color: #2b2b2b; font-weight: 400;
-      letter-spacing: 0.03em; line-height: 1.5; word-break: break-word;
+      font-size: 10.5px; color: #4b4b4b; font-weight: 300;
+      letter-spacing: 0.04em; line-height: 1.55; word-break: break-word;
     }
     .meta-block.payment .meta-value-row {
       margin-bottom: 14px;
     }
     .meta-sub-label {
-      font-size: 8.5px; font-weight: 600; letter-spacing: 0.22em;
-      text-transform: uppercase; color: #6e6e6e; margin-bottom: 3px;
+      font-size: 8.5px; font-weight: 600; letter-spacing: 0.28em;
+      text-transform: uppercase; color: #1f1f1f; margin-bottom: 4px;
     }
 
     /* ── Main right column ──────────────────────────────────────── */
     .main {
-      flex: 1; padding: 48px 56px 48px 52px;
+      flex: 1; padding: 56px 60px 56px 56px;
       display: flex; flex-direction: column;
       position: relative;
     }
 
     .doc-headline {
-      font-family: 'Inter', sans-serif;
-      font-weight: 300; font-size: 64px; line-height: 0.95;
-      letter-spacing: 0.04em; color: #2b2b2b;
-      text-transform: uppercase; margin: 0 0 36px 0;
+      font-family: 'Montserrat', 'Inter', sans-serif;
+      font-weight: 200; font-size: 78px; line-height: 0.95;
+      letter-spacing: 0.16em; color: #1f1f1f;
+      text-transform: uppercase;
+      margin: 0 0 44px -2px;
     }
 
     .parties {
-      display: flex; gap: 60px; margin-bottom: 36px;
+      display: flex; gap: 50px; margin-bottom: 44px;
     }
     .party-col { flex: 1; }
     .party-label {
-      font-size: 9px; font-weight: 600; letter-spacing: 0.22em;
-      text-transform: uppercase; color: #2b2b2b; margin-bottom: 6px;
+      font-size: 9px; font-weight: 600;
+      letter-spacing: 0.28em;
+      text-transform: uppercase; color: #1f1f1f;
+      margin-bottom: 8px;
     }
     .party-name {
-      font-size: 11px; color: #2b2b2b; font-weight: 400;
-      letter-spacing: 0.02em; line-height: 1.55; word-break: break-word;
+      font-size: 10.5px; color: #4b4b4b; font-weight: 300;
+      letter-spacing: 0.04em; line-height: 1.6; word-break: break-word;
     }
 
     /* ── Items table ───────────────────────────────────────────── */
     .items {
-      width: 100%; border-collapse: collapse; margin-bottom: 32px;
+      width: 100%; border-collapse: collapse; margin-bottom: 36px;
     }
     .items thead th {
       text-align: left;
-      font-size: 9px; font-weight: 600; letter-spacing: 0.18em;
-      text-transform: uppercase; color: #2b2b2b;
-      padding: 10px 6px; border-bottom: 1px solid #2b2b2b;
+      font-size: 9px; font-weight: 600;
+      letter-spacing: 0.24em;
+      text-transform: uppercase; color: #1f1f1f;
+      padding: 12px 4px; border-bottom: 1px solid #1f1f1f;
     }
     .items thead th.center { text-align: center; }
     .items thead th.right { text-align: right; }
     .items tbody td {
-      padding: 13px 6px; border-bottom: 1px solid #e2e2e2;
-      vertical-align: top; font-size: 11px; color: #2b2b2b;
-      letter-spacing: 0.01em;
+      padding: 18px 4px;
+      border-bottom: 1px solid #e2e2e2;
+      vertical-align: top; font-size: 10.5px; color: #4b4b4b;
+      font-weight: 300; letter-spacing: 0.02em;
     }
     .items td.center { text-align: center; }
-    .items td.right { text-align: right; font-variant-numeric: tabular-nums; }
-    .items .it-desc { font-weight: 400; }
+    .items td.right { text-align: right;
+      font-variant-numeric: tabular-nums; font-weight: 300;
+    }
+    .items .it-desc { font-weight: 400; color: #1f1f1f; }
 
     /* ── Totals stack — right-aligned with grey highlight on Amount Due */
-    .totals-row { display: flex; justify-content: flex-end; }
-    .totals { min-width: 280px; }
+    .totals-row { display: flex; justify-content: flex-end; margin-top: 6px; }
+    .totals { min-width: 290px; }
     .totals .t-line {
-      display: flex; justify-content: space-between;
-      padding: 9px 12px; font-size: 11px; color: #2b2b2b;
-      letter-spacing: 0.05em;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 9px 14px; font-size: 10.5px; color: #1f1f1f;
     }
     .totals .t-line .label {
-      font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
-      font-size: 10px; color: #6e6e6e;
+      font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase;
+      font-size: 9.5px; color: #4b4b4b;
     }
     .totals .t-line .val {
-      font-weight: 400; font-variant-numeric: tabular-nums;
+      font-weight: 300; font-variant-numeric: tabular-nums;
+      letter-spacing: 0.02em; color: #1f1f1f;
     }
     .totals .t-line.is-amount-due {
-      background: #e9e9e9;
-      margin-top: 4px;
+      background: #d8d8d8;
+      margin-top: 6px;
     }
     .totals .t-line.is-amount-due .label,
     .totals .t-line.is-amount-due .val {
-      font-weight: 700; color: #2b2b2b; font-size: 11px;
+      font-weight: 700; color: #1f1f1f; font-size: 10.5px;
     }
 
     /* ── Thank you ─────────────────────────────────────────────── */
     .thank-you {
-      margin-top: auto; padding-top: 60px; padding-bottom: 8px;
+      margin-top: auto; padding-top: 72px; padding-bottom: 12px;
       text-align: center;
-      font-family: 'Inter', sans-serif;
-      font-weight: 200; font-size: 38px; letter-spacing: 0.32em;
-      text-transform: uppercase; color: #2b2b2b;
+      font-family: 'Montserrat', 'Inter', sans-serif;
+      font-weight: 200; font-size: 46px;
+      letter-spacing: 0.42em;
+      text-transform: uppercase; color: #1f1f1f;
+      padding-left: 0.42em;  /* compensate visually for the trailing track */
     }
 
     /* ── Corner stamp ──────────────────────────────────────────── */
     .stamp {
       position: absolute;
-      top: 32px; right: 32px;
+      top: 30px; right: 32px;
       transform: rotate(-8deg);
-      border: 3px double currentColor;
-      padding: 8px 18px 6px 18px;
-      font-family: 'Inter', sans-serif; font-weight: 700;
-      font-size: 18px; letter-spacing: 0.22em;
+      border: 2px double currentColor;
+      padding: 7px 16px 5px 16px;
+      font-family: 'Montserrat', sans-serif; font-weight: 600;
+      font-size: 14px; letter-spacing: 0.28em;
       text-align: center; line-height: 1;
-      opacity: 0.72;
+      opacity: 0.68;
       pointer-events: none;
     }
     .stamp small {
-      display: block; font-size: 7px; letter-spacing: 0.3em;
+      display: block; font-size: 6.5px; letter-spacing: 0.3em;
       font-weight: 600; margin-top: 4px; opacity: 0.85;
     }
     `;
@@ -238,7 +252,7 @@
 
   function fontsLink() {
     return `<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet" />`;
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />`;
   }
 
   // ─── Sidebar builder (varies by doc type) ─────────────────────────
