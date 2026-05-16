@@ -678,7 +678,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515c"></script>
-<script src="js/hiring-service.js?v=20260515h"></script>
+<script src="js/hiring-service.js?v=20260515i"></script>
 <script src="js/messages-service.js?v=20260515c"></script>
 <script src="js/sidebar.js?v=20260515c"></script>
 <script>
@@ -780,14 +780,24 @@ function renderAppointmentRow(a, spend){
 
   // KPIs
   const planHours = ws.contract.included_minutes ? Math.round(ws.contract.included_minutes/60*10)/10 : 0;
-  const usedHours = ws.hoursUsedMinutes ? Math.round(ws.hoursUsedMinutes/60*10)/10 : 0;
-  // Phase 19d: true remaining = included + sum(all ledger deltas).
-  // Captures carryovers INTO this contract (e.g. Michael: 40 plan + 2.75
-  // carried over - 36 used = 6.75 left). Computed in hiring-service.js.
+  // totalSessionsHours = every session that hit the ledger (raw negative
+  //   deltas). For Michael that's 36 (12 × 3h sessions).
+  // toppedUpHours      = carryover hours that rolled in from the prior
+  //   contract. For Michael that's 2.75.
+  const totalSessionsHours = ws.hoursUsedMinutes ? Math.round(ws.hoursUsedMinutes/60*100)/100 : 0;
   const toppedUpHours = ws.hoursToppedUpMinutes ? Math.round(ws.hoursToppedUpMinutes/60*100)/100 : 0;
+
+  // Caleb's mental model (locked 2026-05-16):
+  //   "Carryover hours act as a bonus that gets burned FIRST. Then
+  //    deductions come off the actual purchased plan. 'Hours used'
+  //    should only count what came off the 40 the family paid for."
+  // For Michael: 36 total sessions − 2.75 carryover absorbed = 33.25
+  // used against the 40 he purchased → 40 − 33.25 = 6.75 remaining.
+  const usedHours = Math.max(0, Math.round((totalSessionsHours - toppedUpHours) * 100) / 100);
   const remainingHours = Number.isFinite(ws.hoursRemainingMinutes)
     ? Math.round(ws.hoursRemainingMinutes/60*100)/100
     : Math.max(0, planHours - usedHours);
+
   // "Hours available" tile = plan + any carryover IN (positive ledger
   // top-ups from prior contract). One headline number so the assistant
   // doesn't have to add tiles in their head. When a carry exists, the
