@@ -770,6 +770,11 @@ function renderAppointmentRow(a, spend){
   // assistant clocks it at a glance. Bank hours are SEPARATE (gold tile
   // below) and intentionally not added in here — those are the family's
   // store, not the live contract balance.
+  // Subline kept INTENTIONALLY plain ("left on this contract") so the
+  // big number is unambiguous. Earlier experiment added "incl. X h
+  // carried over" and a "+X carried in" line under Plan size — both
+  // confused the user because they couldn't tell whether the carry was
+  // already counted in the headline or stacked on top. Removed.
   const remTile = document.getElementById('kpiRemainingTile');
   const remEl = document.getElementById('kpiRemaining');
   const remSubEl = document.getElementById('kpiRemainingSub');
@@ -782,19 +787,14 @@ function renderAppointmentRow(a, spend){
     } else if (planHours > 0 && (remainingHours <= 5 || remainingHours / planHours <= 0.25)) {
       remTile.classList.add('is-low');
       if (remSubEl) remSubEl.textContent = 'running low — consider renewal';
-    } else if (toppedUpHours > 0 && remSubEl) {
-      remSubEl.textContent = `incl. ${toppedUpHours} h carried over`;
     } else if (remSubEl) {
       remSubEl.textContent = 'left on this contract';
     }
   }
-  // Plan-size subline: if there was a carry-in, say so honestly.
+  // Plan-size subline: keep plain. No "+X carried in" stacking — that
+  // confused the relationship between Plan size and Hours remaining.
   const planSubEl = document.getElementById('kpiPlanSub');
-  if (planSubEl) {
-    planSubEl.textContent = toppedUpHours > 0
-      ? `hours included (+${toppedUpHours} carried in)`
-      : 'hours included';
-  }
+  if (planSubEl) planSubEl.textContent = 'hours included';
 
   // Phase 12: show bank-hours tile if the family has any saved-up hours.
   // Phase 12.2: also wires the "Suggest using these" nudge button.
