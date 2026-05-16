@@ -113,28 +113,14 @@
       padding: 56px 30px 56px 38px;
       display: flex; flex-direction: column;
     }
-    /* Uses pre-cropped pm-monogram.png (690×640 tight crop of just the
-       PM mark, derived from Rec.png — no wordmark, no padding). Switched
-       from background-image back to <img> because html2canvas captures
-       <img> tags at full quality; background images render blurry.
-       Image is absolutely-positioned + transform-centered with a small
-       upward bias (-58% vs default -50%) — the source crop has the
-       sparkle dots at the top adding visual weight, so the PM mark's
-       optical centre sits below the geometric centre of the image. */
-    .logo-circle {
-      width: 100px; height: 100px; border-radius: 50%;
-      border: 1.5px solid #a8a8a8;
-      background: #ffffff;
-      overflow: hidden;
-      position: relative;
-      margin-bottom: 56px;
-      box-shadow: 0 0 0 6px #ececec;
-    }
-    .logo-circle img {
-      position: absolute;
-      width: 76%; height: auto;
-      left: 50%; top: 50%;
-      transform: translate(-50%, -58%);
+    /* Logo: drop the circle frame, just show the PM monogram clean.
+       Fighting the circle crop wasn't worth it — a plain logo at a
+       confident size on the sidebar reads as more premium anyway. */
+    .brand-logo {
+      display: block;
+      width: 132px;
+      height: auto;
+      margin: 0 0 56px 0;
     }
     .meta-block { margin-bottom: 28px; }
     .meta-block.last { flex: 1; }
@@ -300,7 +286,7 @@
 
     return `
     <aside class="sidebar">
-      <div class="logo-circle"><img src="${LOGO_URL}" alt="${escapeHtml(COMPANY_NAME)}" /></div>
+      <img class="brand-logo" src="${LOGO_URL}" alt="${escapeHtml(COMPANY_NAME)}" />
       ${metaHtml}
       ${paymentRows && paymentRows.length ? `
         <div class="meta-block payment last">
