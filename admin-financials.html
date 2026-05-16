@@ -210,6 +210,47 @@
   .fin-subform__title{font:700 11px Inter,sans-serif;letter-spacing:.10em;text-transform:uppercase;
     color:var(--primary);margin-bottom:10px;}
 
+  /* Quick plan picker — 4 (or 5) tile buttons in a row */
+  .fin-plans{display:grid;grid-template-columns:repeat(5, 1fr);gap:8px;}
+  @media(max-width:760px){.fin-plans{grid-template-columns:repeat(2, 1fr);}}
+  .fin-plan{
+    background:var(--card);border:1px solid var(--border);border-radius:11px;
+    padding:11px 10px;cursor:pointer;text-align:center;
+    display:flex;flex-direction:column;gap:3px;align-items:center;
+    transition:background .12s ease, border-color .12s ease, transform .12s ease, box-shadow .12s ease;
+    font-family:inherit;
+  }
+  .fin-plan:hover{
+    border-color:var(--primary);background:rgba(59,130,246,0.04);
+    transform:translateY(-1px);
+    box-shadow:0 4px 12px -4px rgba(59,130,246,0.20);
+  }
+  .fin-plan.is-active{
+    border-color:var(--primary);background:rgba(59,130,246,0.08);
+    box-shadow:0 0 0 2px rgba(59,130,246,0.18), 0 4px 12px -4px rgba(59,130,246,0.25);
+  }
+  .fin-plan__hdr{font:700 11.5px Inter,sans-serif;color:var(--ink-2);letter-spacing:-.005em;}
+  .fin-plan__sub{font:500 10px Inter,sans-serif;color:var(--ink-mute);letter-spacing:.01em;line-height:1.3;}
+  .fin-plan__price{
+    font:800 14px "JetBrains Mono",ui-monospace,monospace;
+    color:var(--primary);letter-spacing:-.01em;margin-top:3px;
+  }
+  .fin-plan--custom .fin-plan__price{color:var(--ink-tert);}
+  .fin-plan.is-active .fin-plan__hdr{color:var(--primary);}
+
+  /* Quick-notes chip row (above the textarea) */
+  .fin-quicknotes{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+  .fin-quicknotes button{
+    background:var(--border-soft);color:var(--ink);
+    border:1px solid var(--border);border-radius:7px;
+    padding:5px 11px;font:600 11.5px Inter,sans-serif;cursor:pointer;
+    letter-spacing:-.005em;
+    transition:background .12s ease, color .12s ease, border-color .12s ease;
+  }
+  .fin-quicknotes button:hover{
+    background:rgba(59,130,246,0.08);color:var(--primary);border-color:var(--primary);
+  }
+
   /* Toast */
   .fin-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
     background:var(--ink-2);color:#fff;padding:12px 22px;border-radius:9999px;
@@ -331,6 +372,39 @@
         <label class="fin-field__label" for="invClient">Client</label>
         <select class="fin-field__select" id="invClient"></select>
       </div>
+
+      <!-- Quick plan picker — fills line items + subject + notes in one click -->
+      <div class="fin-field">
+        <label class="fin-field__label">Quick plan (pick one to auto-fill, or build a custom invoice below)</label>
+        <div class="fin-plans" id="invPlans">
+          <button type="button" class="fin-plan" data-plan="1mo_24h">
+            <span class="fin-plan__hdr">Standard</span>
+            <span class="fin-plan__sub">1-month · 24 hrs · $30/hr</span>
+            <span class="fin-plan__price">$720</span>
+          </button>
+          <button type="button" class="fin-plan" data-plan="1mo_40h">
+            <span class="fin-plan__hdr">Executive</span>
+            <span class="fin-plan__sub">1-month · 40 hrs · $30/hr</span>
+            <span class="fin-plan__price">$1,200</span>
+          </button>
+          <button type="button" class="fin-plan" data-plan="2mo_24h">
+            <span class="fin-plan__hdr">Standard</span>
+            <span class="fin-plan__sub">2-month · 24 hrs · $45/hr</span>
+            <span class="fin-plan__price">$1,080</span>
+          </button>
+          <button type="button" class="fin-plan" data-plan="2mo_40h">
+            <span class="fin-plan__hdr">Executive</span>
+            <span class="fin-plan__sub">2-month · 40 hrs · $45/hr</span>
+            <span class="fin-plan__price">$1,800</span>
+          </button>
+          <button type="button" class="fin-plan fin-plan--custom" data-plan="custom">
+            <span class="fin-plan__hdr">Custom</span>
+            <span class="fin-plan__sub">Build manually</span>
+            <span class="fin-plan__price">—</span>
+          </button>
+        </div>
+      </div>
+
       <div class="fin-field__row">
         <div class="fin-field">
           <label class="fin-field__label" for="invDate">Invoice date</label>
@@ -341,10 +415,23 @@
           <input class="fin-field__input" type="date" id="invDue" />
         </div>
       </div>
+
       <div class="fin-field">
-        <label class="fin-field__label" for="invSubject">Subject (optional)</label>
-        <input class="fin-field__input" type="text" id="invSubject" placeholder="e.g. Renewal contract #18" />
+        <label class="fin-field__label" for="invSubject">Subject</label>
+        <input class="fin-field__input" type="text" id="invSubject" list="invSubjectList"
+               placeholder="Start typing or pick a suggestion below" />
+        <datalist id="invSubjectList">
+          <option value="1-month Standard plan — 24 reserved hours"></option>
+          <option value="1-month Executive plan — 40 reserved hours"></option>
+          <option value="2-month Standard plan — 24 reserved hours"></option>
+          <option value="2-month Executive plan — 40 reserved hours"></option>
+          <option value="Renewal contract"></option>
+          <option value="Initial contract"></option>
+          <option value="Additional sessions / one-off"></option>
+          <option value="Gift card"></option>
+        </datalist>
       </div>
+
       <div class="fin-field">
         <label class="fin-field__label">Line items</label>
         <div class="fin-lines">
@@ -355,9 +442,17 @@
           <button class="fin-lines__add" type="button" id="invAddLine">+ Add line</button>
         </div>
       </div>
+
       <div class="fin-field">
-        <label class="fin-field__label" for="invNotes">Customer notes (optional)</label>
-        <textarea class="fin-field__textarea" id="invNotes" placeholder="Shown on the invoice / PDF"></textarea>
+        <label class="fin-field__label" for="invNotes">Customer notes (shown on the invoice / PDF)</label>
+        <div class="fin-quicknotes" id="invQuickNotes">
+          <button type="button" data-note="Thank you for your continued business with Private Mentorship.">Thank you</button>
+          <button type="button" data-note="Paid in advance for the upcoming term.">Paid in advance</button>
+          <button type="button" data-note="Carryover hours from previous contract included.">Carryover included</button>
+          <button type="button" data-note="Please remit payment by e-transfer to caleb@privatementorship.com.">E-transfer instructions</button>
+          <button type="button" data-note="">Clear</button>
+        </div>
+        <textarea class="fin-field__textarea" id="invNotes" placeholder="Free text — click a chip above or type your own"></textarea>
       </div>
     </div>
     <div class="fin-modal__foot">
@@ -427,6 +522,30 @@
 
       <div class="fin-subform" id="contractSubform" hidden>
         <div class="fin-subform__title">New contract details</div>
+
+        <!-- Quick plan picker for contract — sets included_hours + end date -->
+        <div class="fin-field">
+          <label class="fin-field__label">Quick plan</label>
+          <div class="fin-plans" id="ctPlans">
+            <button type="button" class="fin-plan" data-plan="1mo_24h">
+              <span class="fin-plan__hdr">Standard</span>
+              <span class="fin-plan__sub">1-month · 24 hrs</span>
+            </button>
+            <button type="button" class="fin-plan" data-plan="1mo_40h">
+              <span class="fin-plan__hdr">Executive</span>
+              <span class="fin-plan__sub">1-month · 40 hrs</span>
+            </button>
+            <button type="button" class="fin-plan" data-plan="2mo_24h">
+              <span class="fin-plan__hdr">Standard</span>
+              <span class="fin-plan__sub">2-month · 24 hrs</span>
+            </button>
+            <button type="button" class="fin-plan" data-plan="2mo_40h">
+              <span class="fin-plan__hdr">Executive</span>
+              <span class="fin-plan__sub">2-month · 40 hrs</span>
+            </button>
+          </div>
+        </div>
+
         <div class="fin-field__row">
           <div class="fin-field">
             <label class="fin-field__label" for="ctIncluded">Included hours</label>
@@ -734,6 +853,60 @@
 
   $('btnNewInvoice').addEventListener('click', () => showModal('invoiceModal'));
 
+  // ─── Plan catalog — single source of truth for all 4 packages ──
+  const PLANS = {
+    '1mo_24h': { months:1, hours:24, rate:30, price:720,
+      description:'1-month Standard plan — 24 reserved hours ($30/hr)',
+      subject:'1-month Standard plan — 24 reserved hours' },
+    '1mo_40h': { months:1, hours:40, rate:30, price:1200,
+      description:'1-month Executive plan — 40 reserved hours ($30/hr)',
+      subject:'1-month Executive plan — 40 reserved hours' },
+    '2mo_24h': { months:2, hours:24, rate:45, price:1080,
+      description:'2-month Standard plan — 24 reserved hours ($45/hr)',
+      subject:'2-month Standard plan — 24 reserved hours' },
+    '2mo_40h': { months:2, hours:40, rate:45, price:1800,
+      description:'2-month Executive plan — 40 reserved hours ($45/hr)',
+      subject:'2-month Executive plan — 40 reserved hours' },
+  };
+
+  // ─── Invoice quick-plan picker ─────────────────────────────
+  $('invPlans').querySelectorAll('.fin-plan').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $('invPlans').querySelectorAll('.fin-plan').forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      const key = btn.dataset.plan;
+      if (key === 'custom') {
+        // Reset to a blank line — let user build manually
+        invLinesState.splice(0, invLinesState.length, { description:'', quantity:1, unitPrice:0, hours:null });
+        renderInvLines(invLinesState);
+        return;
+      }
+      const p = PLANS[key];
+      if (!p) return;
+      // Auto-fill: ONE line item, subject, default due date (term end)
+      invLinesState.splice(0, invLinesState.length, {
+        description: p.description,
+        quantity: 1,
+        unitPrice: p.price,
+        hours: p.hours,
+      });
+      renderInvLines(invLinesState);
+      $('invSubject').value = p.subject;
+      // Due date defaults to end of plan term
+      const start = $('invDate').value || todayIso();
+      const d = new Date(start);
+      d.setMonth(d.getMonth() + p.months);
+      $('invDue').value = d.toISOString().split('T')[0];
+    });
+  });
+
+  // ─── Invoice quick-notes chips ─────────────────────────────
+  $('invQuickNotes').querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $('invNotes').value = btn.dataset.note || '';
+    });
+  });
+
   $('invSubmit').addEventListener('click', async () => {
     const clientId = $('invClient').value;
     if (!clientId) { toast('Pick a client', 'error'); return; }
@@ -807,6 +980,21 @@
       $('ctStart').value = todayIso();
       $('ctEnd').value = plusDaysIso(todayIso(), 30);
     }
+  });
+
+  // Contract sub-form plan picker — sets included_hours + end date
+  $('ctPlans').querySelectorAll('.fin-plan').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $('ctPlans').querySelectorAll('.fin-plan').forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      const p = PLANS[btn.dataset.plan];
+      if (!p) return;
+      $('ctIncluded').value = p.hours;
+      const start = $('ctStart').value || todayIso();
+      const d = new Date(start);
+      d.setMonth(d.getMonth() + p.months);
+      $('ctEnd').value = d.toISOString().split('T')[0];
+    });
   });
 
   $('paySubmit').addEventListener('click', async () => {
