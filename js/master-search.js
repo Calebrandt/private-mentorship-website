@@ -178,6 +178,32 @@
   // ── Dynamic data cache (per-role, 30s TTL) ──────────────────────
   const CACHE = { role: null, fetchedAt: 0, data: null };
   const CACHE_TTL_MS = 30 * 1000;
+  const FETCH_TIMEOUT_MS = 5000;     // give each fetcher up to 5s
+
+  // Safe call helper: returns a Promise that ALWAYS resolves to `fallback`
+  // on any failure — missing function, sync throw, async rejection, OR
+  // timeout. One bad fetcher can't ever hang the whole loadDynamic.
+  function safeCall(fn, args, fallback) {
+    if (typeof fn !== 'function') return Promise.resolve(fallback);
+    return new Promise((resolve) => {
+      let settled = false;
+      const done = (v) => { if (!settled) { settled = true; resolve(v); } };
+      const timer = setTimeout(() => done(fallback), FETCH_TIMEOUT_MS);
+      try {
+        Promise.resolve(fn(args))
+          .then(v => { clearTimeout(timer); done(v == null ? fallback : v); })
+          .catch(err => {
+            clearTimeout(timer);
+            console.warn('master-search: fetcher failed', fn.name || '(anon)', err);
+            done(fallback);
+          });
+      } catch (err) {
+        clearTimeout(timer);
+        console.warn('master-search: fetcher threw sync', fn.name || '(anon)', err);
+        done(fallback);
+      }
+    });
+  }
 
   async function loadDynamic(role) {
     if (!window.pmHiring) return {};
@@ -185,16 +211,21 @@
     if (CACHE.role === role && CACHE.data && (now - CACHE.fetchedAt) < CACHE_TTL_MS) {
       return CACHE.data;
     }
-    const out = { sessions: [], invoices: [], contracts: [], conversations: [], clients: [], lessonLogs: [] };
+    const out = {
+      sessions: [], invoices: [], contracts: [], conversations: [],
+      clients: [], lessonLogs: [],
+      applications: [], assistantProfiles: [], scheduleRequests: [], membershipRequests: [],
+    };
+    const pm = window.pmHiring;
 
     try {
       if (role === 'client') {
-        const client = await window.pmHiring.fetchMyClientRecord?.().catch(() => null);
+        const client = await safeCall(pm.fetchMyClientRecord, undefined, null);
         const [ws, invoices, contracts, convos] = await Promise.all([
-          client?.id ? window.pmHiring.fetchAssistantClientWorkspace(client.id).catch(() => null) : Promise.resolve(null),
-          window.pmHiring.fetchMyInvoices?.(24).catch(() => []),
-          window.pmHiring.fetchMyContracts?.().catch(() => []),
-          window.pmHiring.fetchMyConversations?.(30).catch(() => []),
+          client?.id ? safeCall(pm.fetchAssistantClientWorkspace, client.id, null) : Promise.resolve(null),
+          safeCall(pm.fetchMyInvoices, 24, []),
+          safeCall(pm.fetchMyContracts, undefined, []),
+          safeCall(pm.fetchMyConversations, 30, []),
         ]);
         if (ws) {
           out.sessions = [
@@ -206,33 +237,29 @@
         out.contracts     = contracts || [];
         out.conversations = convos || [];
       } else if (role === 'assistant') {
-        const [clients] = await Promise.all([
-          window.pmHiring.fetchMyAssignedClients?.({ statuses: ['active','draft'] }).catch(() => []),
+        const start = new Date(); start.setDate(start.getDate() - 60);
+        const end   = new Date(); end.setDate(end.getDate() + 30);
+        const [clients, range] = await Promise.all([
+          safeCall(pm.fetchMyAssignedClients, { statuses: ['active','draft'] }, []),
+          safeCall(pm.fetchAssistantAppointmentsRange, { startIso: start.toISOString(), endIso: end.toISOString() }, null),
         ]);
-        out.clients = clients || [];
-        // For sessions on the assistant side, pull a 90-day window
-        try {
-          const start = new Date(); start.setDate(start.getDate() - 60);
-          const end   = new Date(); end.setDate(end.getDate() + 30);
-          const range = await window.pmHiring.fetchAssistantAppointmentsRange?.({
-            startIso: start.toISOString(),
-            endIso:   end.toISOString(),
-          }).catch(() => null);
-          out.sessions = (range?.appointments || []).map(a => ({ ...a }));
-        } catch (_) {}
+        out.clients  = clients || [];
+        out.sessions = (range?.appointments || []).map(a => ({ ...a }));
       } else if (role === 'admin') {
         // Admin can see the whole org. Pull a sane batch from each list.
+        // Every fetcher is wrapped in safeCall with a 5s timeout, so any
+        // one hang/missing-function can't stall the others.
         const [apps, clients, profiles, schedReq, memReq] = await Promise.all([
-          window.pmHiring.adminListApplications?.({ status: 'active' }).catch(() => []),
-          window.pmHiring.adminListClients?.({ limit: 200 }).catch(() => []),
-          window.pmHiring.adminListAssistantProfiles?.().catch(() => []),
-          window.pmHiring.adminListScheduleRequests?.({ statuses: ['pending'], limit: 100 }).catch(() => ({ requests: [] })),
-          window.pmHiring.adminListMembershipRequests?.({ limit: 100 }).catch(() => []),
+          safeCall(pm.adminListApplications,       { status: 'active' }, []),
+          safeCall(pm.adminListClients,            { limit: 200 },       []),
+          safeCall(pm.adminListAssistantProfiles,  undefined,            []),
+          safeCall(pm.adminListScheduleRequests,   { statuses: ['pending'], limit: 100 }, { requests: [] }),
+          safeCall(pm.adminListMembershipRequests, { limit: 100 },       []),
         ]);
-        out.applications      = apps || [];
-        out.clients           = clients || [];
-        out.assistantProfiles = profiles || [];
-        out.scheduleRequests  = (schedReq && schedReq.requests) || schedReq || [];
+        out.applications       = apps || [];
+        out.clients            = clients || [];
+        out.assistantProfiles  = profiles || [];
+        out.scheduleRequests   = (schedReq && schedReq.requests) || schedReq || [];
         out.membershipRequests = memReq || [];
       }
     } catch (e) {
@@ -499,17 +526,24 @@
         close();
         return;
       }
-      // Loading state on first run
+      // Loading state on first run only
       if (!CACHE.data) {
         panel.innerHTML = `<div class="ms-empty">Searching…</div>`;
         open();
       }
-      const dyn = await loadDynamic(role);
-      // Bail if user typed something else while we were loading
-      if (state.query !== q) return;
-      const results = search(q, role, dyn);
-      open();
-      renderDropdown(panel, results, q, state);
+      try {
+        const dyn = await loadDynamic(role);
+        // Bail if user typed something else while we were loading
+        if (state.query !== q) return;
+        const results = search(q, role, dyn);
+        open();
+        renderDropdown(panel, results, q, state);
+      } catch (err) {
+        console.warn('master-search: render failed', err);
+        if (state.query !== q) return;
+        panel.innerHTML = `<div class="ms-empty">Search hit an error. Try again.</div>`;
+        open();
+      }
     }, 220);
 
     input.addEventListener('input', () => run(input.value));
