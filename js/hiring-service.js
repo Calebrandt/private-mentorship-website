@@ -3281,7 +3281,7 @@
   // ─── Single-doc reads (with lines) ───────────────────────────
   async function adminGetInvoice(invoiceId) {
     const [{ data: inv, error: ie }, { data: lines, error: le }, { data: receipts }] = await Promise.all([
-      sb().from('invoices').select('*, clients(id, full_name)').eq('id', invoiceId).maybeSingle(),
+      sb().from('invoices').select('*, clients(id, full_name, email)').eq('id', invoiceId).maybeSingle(),
       sb().from('invoice_lines').select('*').eq('invoice_id', invoiceId).order('position'),
       sb().from('sales_receipts').select('id, receipt_number, receipt_date, total_amount, payment_mode, reference, voided_at')
         .eq('invoice_id', invoiceId).order('receipt_date', { ascending: false }),
@@ -3293,7 +3293,7 @@
 
   async function adminGetReceipt(receiptId) {
     const [{ data: r, error: re }, { data: lines, error: le }] = await Promise.all([
-      sb().from('sales_receipts').select('*, clients(id, full_name), invoices(id, invoice_number)').eq('id', receiptId).maybeSingle(),
+      sb().from('sales_receipts').select('*, clients(id, full_name, email), invoices(id, invoice_number)').eq('id', receiptId).maybeSingle(),
       sb().from('sales_receipt_lines').select('*').eq('receipt_id', receiptId).order('line_index'),
     ]);
     if (re) console.warn('adminGetReceipt header:', re);
@@ -3315,6 +3315,23 @@
       assistantName = prof?.full_name || '';
     } catch (_) {}
     return { ...p, assistant_name: assistantName, lines: lines || [] };
+  }
+
+  // ─── Email a financial document (Phase 19c.4) ────────────────
+  // Calls the email-financial-document edge function. Server-side it
+  // verifies the caller is an admin, stamps an audit_logs row, and
+  // hands the PDF + body to Resend.
+  // Returns { ok, messageId } on success, throws on failure.
+  async function sendFinancialEmail({ docType, docId, docNumber, to, subject, body, filename, pdfBase64 }) {
+    if (!docType || !docId) throw new Error('sendFinancialEmail: docType and docId required');
+    if (!to || !subject)    throw new Error('sendFinancialEmail: to and subject required');
+    if (!pdfBase64)         throw new Error('sendFinancialEmail: pdfBase64 required');
+    const { data, error } = await sb().functions.invoke('email-financial-document', {
+      body: { docType, docId, docNumber, to, subject, body, filename, pdfBase64 },
+    });
+    if (error) throw new Error(error.message || 'email-financial-document failed');
+    if (!data?.ok) throw new Error(data?.error || 'email-financial-document returned not-ok');
+    return data;
   }
 
   // ─── Assistant picker (for paycheque form) ───────────────────
@@ -3422,5 +3439,7 @@
     adminVoidInvoice, adminVoidReceipt, adminVoidPaycheque, adminReissueInvoice,
     adminListFinancialDocuments, adminGetInvoice, adminGetReceipt, adminGetPaycheque,
     adminListAssistants,
+    // Phase 19c.4 — branded email send
+    sendFinancialEmail,
   };
 })();

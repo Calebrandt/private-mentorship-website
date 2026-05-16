@@ -260,6 +260,44 @@
   .fin-toast.is-shown{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
   .fin-toast--success{background:linear-gradient(135deg,#16a34a,#22c55e);}
   .fin-toast--error{background:linear-gradient(135deg,#dc2626,#ef4444);}
+
+  /* PDF preview modal — wider card, flush body for the iframe */
+  .fin-modal--wide .fin-modal__card{max-width:920px;height:90vh;}
+  .fin-modal__body--flush{padding:0;}
+  .fin-pdf-stage{
+    position:relative;width:100%;height:100%;min-height:520px;
+    background:linear-gradient(180deg,#f4f5f7 0%,#e8eaf0 100%);
+    display:flex;align-items:center;justify-content:center;overflow:hidden;
+  }
+  [data-dash-theme="dark"] .fin-pdf-stage{background:linear-gradient(180deg,#0e1014 0%,#16171c 100%);}
+  .fin-pdf-stage iframe{width:100%;height:100%;border:0;display:block;background:#fff;}
+  .fin-pdf-spinner{
+    font:600 13px Inter,sans-serif;color:var(--ink-mute);letter-spacing:-.005em;
+    padding:24px 32px;background:var(--card);border:1px solid var(--border);
+    border-radius:11px;box-shadow:0 8px 24px -8px rgba(15,23,42,0.20);
+  }
+  .fin-pdf-error{
+    color:#dc2626;background:rgba(220,38,38,0.06);
+    border:1px solid rgba(220,38,38,0.25);padding:16px 22px;border-radius:10px;
+    font:500 13px Inter,sans-serif;max-width:420px;text-align:center;
+  }
+
+  /* Email attachment chip */
+  .fin-attachment{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:8px 14px;background:var(--border-soft);
+    border:1px solid var(--border);border-radius:8px;
+    font:600 13px Inter,sans-serif;color:var(--ink-2);
+  }
+  .fin-attachment svg{color:var(--ink-mute);}
+
+  /* Add new row-action variants for PDF + email */
+  .fin-row-actions button.is-pdf:hover{
+    background:rgba(59,130,246,0.06);color:var(--primary);border-color:rgba(59,130,246,0.50);
+  }
+  .fin-row-actions button.is-email:hover{
+    background:rgba(22,163,74,0.06);color:#15803d;border-color:rgba(22,163,74,0.50);
+  }
 </style>
 </head>
 <body class="pm-has-sidebar">
@@ -644,6 +682,78 @@
   </div>
 </div>
 
+<!-- PDF preview modal (shows the freshly-rendered PDF inline) -->
+<div class="fin-modal fin-modal--wide" id="pdfPreviewModal" aria-hidden="true">
+  <div class="fin-modal__card">
+    <div class="fin-modal__head">
+      <div>
+        <h2 class="fin-modal__title" id="pdfPreviewTitle">Document preview</h2>
+        <p class="fin-modal__sub" id="pdfPreviewSub">—</p>
+      </div>
+      <button class="fin-modal__close" type="button" data-close-modal="pdfPreviewModal" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="fin-modal__body fin-modal__body--flush">
+      <div class="fin-pdf-stage" id="pdfPreviewStage">
+        <div class="fin-pdf-spinner">Rendering PDF…</div>
+      </div>
+    </div>
+    <div class="fin-modal__foot">
+      <button class="fin-btn fin-btn--ghost" type="button" data-close-modal="pdfPreviewModal">Close</button>
+      <button class="fin-btn fin-btn--ghost" type="button" id="pdfPreviewDownload">Download PDF</button>
+      <button class="fin-btn fin-btn--primary" type="button" id="pdfPreviewEmail">Email to client →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Email composer modal -->
+<div class="fin-modal" id="emailComposerModal" aria-hidden="true">
+  <div class="fin-modal__card">
+    <div class="fin-modal__head">
+      <div>
+        <h2 class="fin-modal__title">Email document</h2>
+        <p class="fin-modal__sub" id="emailComposerSub">PDF attached automatically</p>
+      </div>
+      <button class="fin-modal__close" type="button" data-close-modal="emailComposerModal" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="fin-modal__body">
+      <div class="fin-field">
+        <label class="fin-field__label" for="emailTo">To</label>
+        <input class="fin-field__input" type="email" id="emailTo" placeholder="client@example.com" />
+        <div class="fin-field__hint" id="emailToHint">Auto-filled from the client record when available.</div>
+      </div>
+      <div class="fin-field">
+        <label class="fin-field__label" for="emailSubject">Subject</label>
+        <input class="fin-field__input" type="text" id="emailSubject" />
+      </div>
+      <div class="fin-field">
+        <label class="fin-field__label">Quick body templates</label>
+        <div class="fin-quicknotes" id="emailQuickBodies">
+          <button type="button" data-tpl="invoice_new">New invoice</button>
+          <button type="button" data-tpl="invoice_reminder">Payment reminder</button>
+          <button type="button" data-tpl="receipt_thanks">Receipt — thank you</button>
+          <button type="button" data-tpl="paycheque_pay">Paycheque issued</button>
+        </div>
+        <textarea class="fin-field__textarea" id="emailBody" rows="10"></textarea>
+      </div>
+      <div class="fin-field" id="emailAttachmentRow">
+        <label class="fin-field__label">Attachment</label>
+        <div class="fin-attachment">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+          <span id="emailAttachmentName">—</span>
+        </div>
+      </div>
+    </div>
+    <div class="fin-modal__foot">
+      <button class="fin-btn fin-btn--ghost" type="button" data-close-modal="emailComposerModal">Cancel</button>
+      <button class="fin-btn fin-btn--primary" type="button" id="emailSendBtn">Send email</button>
+    </div>
+  </div>
+</div>
+
 <div class="fin-toast" id="finToast"><span id="finToastText">Done</span></div>
 
 
@@ -654,6 +764,7 @@
 <script src="js/topbar-userpod.js?v=20260516a" defer></script>
 <script src="js/master-search.js?v=20260516h" defer></script>
 <script src="js/deep-link-flash.js?v=20260516c" defer></script>
+<script src="js/financial-pdf.js?v=20260516a" defer></script>
 <script>
 (async () => {
   const $ = id => document.getElementById(id);
@@ -753,12 +864,16 @@
       <td class="fin-amount ${i.balance_cents > 0 ? '' : 'fin-mute'}">${esc(fmtMoney(i.balance_cents, i.currency))}</td>
       <td><span class="${pillClass(i.status)}">${esc(i.status)}</span></td>
       <td><div class="fin-row-actions">
+        <button class="is-pdf" data-pdf-inv="${esc(i.doc_id)}" title="Preview & download PDF">PDF</button>
+        <button class="is-email" data-email-inv="${esc(i.doc_id)}" title="Email PDF to client">Email</button>
         ${i.status === 'open' ? `<button data-pay="${esc(i.doc_id)}">Record payment</button>` : ''}
         ${i.status !== 'void' ? `<button class="is-danger" data-void-inv="${esc(i.doc_id)}">Void</button>` : ''}
       </div></td>
     </tr>`).join('')}</tbody></table>`;
     wrap.querySelectorAll('[data-pay]').forEach(b => b.addEventListener('click', () => openPaymentModal(b.dataset.pay)));
     wrap.querySelectorAll('[data-void-inv]').forEach(b => b.addEventListener('click', () => onVoidInvoice(b.dataset.voidInv)));
+    wrap.querySelectorAll('[data-pdf-inv]').forEach(b => b.addEventListener('click', () => openPdfPreview('invoice', b.dataset.pdfInv)));
+    wrap.querySelectorAll('[data-email-inv]').forEach(b => b.addEventListener('click', () => openEmailComposer('invoice', b.dataset.emailInv)));
   }
   function renderReceipts(){
     const wrap = $('receiptsList');
@@ -775,10 +890,14 @@
       <td class="fin-amount">${esc(fmtMoney(r.gross_cents, r.currency))}</td>
       <td><span class="${pillClass(r.status)}">${esc(r.status)}</span></td>
       <td><div class="fin-row-actions">
+        <button class="is-pdf" data-pdf-rcp="${esc(r.doc_id)}" title="Preview & download PDF">PDF</button>
+        <button class="is-email" data-email-rcp="${esc(r.doc_id)}" title="Email PDF to client">Email</button>
         ${r.status !== 'void' ? `<button class="is-danger" data-void-rcp="${esc(r.doc_id)}">Void</button>` : ''}
       </div></td>
     </tr>`).join('')}</tbody></table>`;
     wrap.querySelectorAll('[data-void-rcp]').forEach(b => b.addEventListener('click', () => onVoidReceipt(b.dataset.voidRcp)));
+    wrap.querySelectorAll('[data-pdf-rcp]').forEach(b => b.addEventListener('click', () => openPdfPreview('receipt', b.dataset.pdfRcp)));
+    wrap.querySelectorAll('[data-email-rcp]').forEach(b => b.addEventListener('click', () => openEmailComposer('receipt', b.dataset.emailRcp)));
   }
   function renderPaycheques(){
     const wrap = $('paychequesList');
@@ -795,10 +914,14 @@
       <td class="fin-amount">${esc(fmtMoney(p.gross_cents, p.currency))}</td>
       <td><span class="${pillClass(p.status)}">${esc(p.status)}</span></td>
       <td><div class="fin-row-actions">
+        <button class="is-pdf" data-pdf-payq="${esc(p.doc_id)}" title="Preview & download PDF">PDF</button>
+        <button class="is-email" data-email-payq="${esc(p.doc_id)}" title="Email PDF to assistant">Email</button>
         ${p.status !== 'void' ? `<button class="is-danger" data-void-payq="${esc(p.doc_id)}">Void</button>` : ''}
       </div></td>
     </tr>`).join('')}</tbody></table>`;
     wrap.querySelectorAll('[data-void-payq]').forEach(b => b.addEventListener('click', () => onVoidPaycheque(b.dataset.voidPayq)));
+    wrap.querySelectorAll('[data-pdf-payq]').forEach(b => b.addEventListener('click', () => openPdfPreview('paycheque', b.dataset.pdfPayq)));
+    wrap.querySelectorAll('[data-email-payq]').forEach(b => b.addEventListener('click', () => openEmailComposer('paycheque', b.dataset.emailPayq)));
   }
   renderInvoices(); renderReceipts(); renderPaycheques();
 
@@ -1138,6 +1261,244 @@
       toast('Paycheque voided'); await refresh(); }
     catch (e) { toast('Failed: ' + e.message, 'error'); }
   }
+
+  // ─── PDF preview + Email composer (Phase 19c.4) ───────────────────
+  // Current in-flight document — used by the preview + email modals
+  let currentDoc = null; // { docType, docId, blob, dataUrl, filename, payload }
+
+  function waitForPdfModule(timeout = 5000) {
+    return new Promise((resolve, reject) => {
+      const start = Date.now();
+      (function tick(){
+        if (window.pmPDF) return resolve(window.pmPDF);
+        if (Date.now() - start > timeout) return reject(new Error('PDF module failed to load'));
+        setTimeout(tick, 50);
+      })();
+    });
+  }
+
+  function _docLabel(docType, docNumber) {
+    if (docType === 'invoice')   return `Invoice ${docNumber || ''}`.trim();
+    if (docType === 'receipt')   return `Receipt ${docNumber || ''}`.trim();
+    if (docType === 'paycheque') return `Paycheque ${docNumber || ''}`.trim();
+    return 'Document';
+  }
+
+  async function openPdfPreview(docType, docId) {
+    try {
+      const stage = $('pdfPreviewStage');
+      $('pdfPreviewTitle').textContent = 'Document preview';
+      $('pdfPreviewSub').textContent = 'Rendering…';
+      stage.innerHTML = '<div class="fin-pdf-spinner">Rendering PDF…</div>';
+      showModal('pdfPreviewModal');
+
+      const pdf = await waitForPdfModule();
+      const out = await pdf.buildDoc({ docType, docId });
+      currentDoc = { docType, docId, ...out };
+
+      // Replace spinner with iframe
+      const url = URL.createObjectURL(out.blob);
+      stage.innerHTML = `<iframe src="${url}#toolbar=0&navpanes=0" title="PDF preview"></iframe>`;
+      const number = out.payload?.invoice_number || out.payload?.receipt_number || out.payload?.paycheque_number || '';
+      $('pdfPreviewTitle').textContent = _docLabel(docType, number);
+      $('pdfPreviewSub').textContent   = out.filename;
+    } catch (e) {
+      console.error(e);
+      $('pdfPreviewStage').innerHTML = `<div class="fin-pdf-error">${esc(e.message || 'Failed to render PDF')}</div>`;
+      toast('PDF failed: ' + (e.message || 'unknown'), 'error');
+    }
+  }
+
+  $('pdfPreviewDownload')?.addEventListener('click', () => {
+    if (!currentDoc?.blob) return;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(currentDoc.blob);
+    a.download = currentDoc.filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(a.href); }, 1500);
+  });
+
+  $('pdfPreviewEmail')?.addEventListener('click', () => {
+    if (!currentDoc) return;
+    hideModal('pdfPreviewModal');
+    openEmailComposerFromCurrent();
+  });
+
+  // ─── Email composer ────────────────────────────────────────────────
+  const EMAIL_TEMPLATES = {
+    invoice_new: (ctx) => ({
+      subject: `New invoice ${ctx.number} from Private Mentorship`,
+      body: [
+        `Hi ${ctx.firstName || 'there'},`,
+        ``,
+        `Please find attached invoice ${ctx.number} for ${ctx.amount}, due ${ctx.dueDate}.`,
+        ``,
+        `Payment instructions:`,
+        `• E-transfer to caleb@privatementorship.com (auto-deposit — no security question required)`,
+        ``,
+        `Reply to this email if you have any questions.`,
+        ``,
+        `Thank you,`,
+        `Caleb Brandt`,
+        `Private Mentorship`,
+      ].join('\n'),
+    }),
+    invoice_reminder: (ctx) => ({
+      subject: `Friendly reminder — invoice ${ctx.number}`,
+      body: [
+        `Hi ${ctx.firstName || 'there'},`,
+        ``,
+        `Just a friendly reminder that invoice ${ctx.number} for ${ctx.amount} remains outstanding (issued ${ctx.docDate}).`,
+        ``,
+        `If you've already sent payment, please disregard this note.`,
+        ``,
+        `Thank you,`,
+        `Caleb Brandt`,
+        `Private Mentorship`,
+      ].join('\n'),
+    }),
+    receipt_thanks: (ctx) => ({
+      subject: `Receipt ${ctx.number} — payment received, thank you!`,
+      body: [
+        `Hi ${ctx.firstName || 'there'},`,
+        ``,
+        `Thank you — we've received your payment of ${ctx.amount}. Your official receipt ${ctx.number} is attached for your records.`,
+        ``,
+        `We look forward to the continued partnership.`,
+        ``,
+        `All the best,`,
+        `Caleb Brandt`,
+        `Private Mentorship`,
+      ].join('\n'),
+    }),
+    paycheque_pay: (ctx) => ({
+      subject: `Paycheque ${ctx.number} — Private Mentorship`,
+      body: [
+        `Hi ${ctx.firstName || 'team'},`,
+        ``,
+        `Your paycheque ${ctx.number} is attached. Net pay: ${ctx.amount}, dated ${ctx.docDate}.`,
+        ``,
+        `Please retain for your tax records — T4A slips are issued annually in February.`,
+        ``,
+        `Thank you for your work,`,
+        `Caleb Brandt`,
+        `Private Mentorship`,
+      ].join('\n'),
+    }),
+  };
+
+  function _buildEmailContext(docType, payload) {
+    const number = payload?.invoice_number || payload?.receipt_number || payload?.paycheque_number || '';
+    const fullName = payload?.clients?.full_name || payload?.assistant_name || payload?.party_name || '';
+    const firstName = fullName.split(' ')[0] || '';
+    const email = payload?.clients?.email || payload?.assistant_email || '';
+    const ccy = (payload?.currency || 'CAD').toUpperCase();
+    let amount = '$0.00';
+    let docDate = '';
+    let dueDate = '';
+    if (docType === 'invoice') {
+      amount = (Number(payload.balance_due_cents)>0 ? Number(payload.balance_due_cents) : Number(payload.total_cents)||0);
+      amount = (amount/100).toLocaleString('en-CA', { style:'currency', currency: ccy, minimumFractionDigits:2, maximumFractionDigits:2 });
+      docDate = fmtDate(payload.invoice_date);
+      dueDate = fmtDate(payload.due_date);
+    } else if (docType === 'receipt') {
+      amount = (Number(payload.total_amount)||0).toLocaleString('en-CA', { style:'currency', currency: ccy, minimumFractionDigits:2, maximumFractionDigits:2 });
+      docDate = fmtDate(payload.receipt_date);
+    } else {
+      amount = ((Number(payload.net_cents)||0)/100).toLocaleString('en-CA', { style:'currency', currency: ccy, minimumFractionDigits:2, maximumFractionDigits:2 });
+      docDate = fmtDate(payload.pay_date);
+    }
+    return { number, firstName, fullName, email, amount, docDate, dueDate, ccy };
+  }
+
+  async function openEmailComposer(docType, docId) {
+    try {
+      // Render PDF first so the attachment is ready
+      toast('Preparing attachment…');
+      const pdf = await waitForPdfModule();
+      const out = await pdf.buildDoc({ docType, docId });
+      currentDoc = { docType, docId, ...out };
+      openEmailComposerFromCurrent();
+    } catch (e) {
+      console.error(e);
+      toast('Failed to prepare email: ' + (e.message || 'unknown'), 'error');
+    }
+  }
+
+  function openEmailComposerFromCurrent() {
+    if (!currentDoc?.payload) { toast('No document loaded', 'error'); return; }
+    const ctx = _buildEmailContext(currentDoc.docType, currentDoc.payload);
+    const tpl = currentDoc.docType === 'invoice' ? 'invoice_new'
+              : currentDoc.docType === 'receipt' ? 'receipt_thanks'
+              : 'paycheque_pay';
+    const filled = EMAIL_TEMPLATES[tpl](ctx);
+    $('emailTo').value = ctx.email || '';
+    $('emailToHint').textContent = ctx.email
+      ? `From the ${currentDoc.docType === 'paycheque' ? 'assistant' : 'client'} profile · ${ctx.fullName}`
+      : `No email on file for ${ctx.fullName || 'this party'} — enter one above.`;
+    $('emailSubject').value = filled.subject;
+    $('emailBody').value = filled.body;
+    $('emailAttachmentName').textContent = currentDoc.filename;
+    $('emailComposerSub').textContent = `Send ${currentDoc.filename} to your ${currentDoc.docType === 'paycheque' ? 'assistant' : 'client'}.`;
+    showModal('emailComposerModal');
+  }
+
+  // Quick body templates
+  document.querySelectorAll('#emailQuickBodies button').forEach(b => {
+    b.addEventListener('click', () => {
+      if (!currentDoc?.payload) return;
+      const tpl = b.dataset.tpl;
+      const fn = EMAIL_TEMPLATES[tpl];
+      if (!fn) return;
+      const ctx = _buildEmailContext(currentDoc.docType, currentDoc.payload);
+      const filled = fn(ctx);
+      $('emailSubject').value = filled.subject;
+      $('emailBody').value = filled.body;
+    });
+  });
+
+  // Send button → calls email-financial-document edge function via pmHiring wrapper
+  $('emailSendBtn')?.addEventListener('click', async () => {
+    if (!currentDoc?.blob || !currentDoc?.payload) { toast('No document loaded', 'error'); return; }
+    const to      = $('emailTo').value.trim();
+    const subject = $('emailSubject').value.trim();
+    const body    = $('emailBody').value;
+    if (!to)      { toast('Recipient email required', 'error'); return; }
+    if (!subject) { toast('Subject required', 'error'); return; }
+
+    const btn = $('emailSendBtn');
+    const orig = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Sending…';
+    try {
+      // Convert blob → base64 (strip data:application/pdf;base64, prefix)
+      const pdfBase64 = await new Promise((res, rej) => {
+        const fr = new FileReader();
+        fr.onload = () => res(String(fr.result).split(',')[1] || '');
+        fr.onerror = () => rej(fr.error);
+        fr.readAsDataURL(currentDoc.blob);
+      });
+      const docNumber = currentDoc.payload?.invoice_number
+        || currentDoc.payload?.receipt_number
+        || currentDoc.payload?.paycheque_number
+        || null;
+      await window.pmHiring.sendFinancialEmail({
+        docType: currentDoc.docType,
+        docId: currentDoc.docId,
+        docNumber,
+        to, subject, body,
+        filename: currentDoc.filename,
+        pdfBase64,
+      });
+      toast('Email sent ✓');
+      hideModal('emailComposerModal');
+    } catch (e) {
+      console.error(e);
+      toast('Send failed: ' + (e.message || 'unknown'), 'error');
+    } finally {
+      btn.disabled = false; btn.textContent = orig;
+    }
+  });
 })();
 </script>
 </body>
