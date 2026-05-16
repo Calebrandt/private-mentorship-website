@@ -93,6 +93,53 @@
     .ad-weekday__unit{font-size:9.5px;}
   }
 
+  /* Phase 16 v4: My Families quick-access card grid. One card per
+     assigned family — avatar, name, plan size, hours remaining,
+     status. Whole card is a clickable <a> → workspace. Premium feel
+     matching the KPI tiles (white surface, thin border, gentle hover). */
+  .ad-families{margin-bottom:22px;}
+  .ad-families__head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px;}
+  .ad-families__title{font-family:"Archivo","Inter",sans-serif;font-size:17px;font-weight:800;letter-spacing:-.01em;color:#0F172A;margin:0;}
+  .ad-families__action{font-size:12.5px;font-weight:600;color:#0071e3;text-decoration:none;}
+  .ad-families__action:hover{text-decoration:underline;}
+  .ad-families__grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+  .ad-family{
+    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    padding:16px 18px;text-decoration:none;color:inherit;cursor:pointer;
+    display:flex;flex-direction:column;gap:10px;
+    transition:transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+  }
+  .ad-family:hover{
+    border-color:#BFDBFE;transform:translateY(-1px);
+    box-shadow:0 4px 12px -2px rgba(15,23,42,.08);
+  }
+  .ad-family__head{display:flex;align-items:center;gap:11px;}
+  .ad-family__avatar{
+    flex:0 0 38px;width:38px;height:38px;border-radius:50%;
+    background:linear-gradient(135deg, var(--av-from, #3B82F6), var(--av-to, #1E40AF));
+    color:#fff;font:800 13px Inter,sans-serif;letter-spacing:-.01em;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .ad-family__name{font:700 14px Inter,sans-serif;color:#0F172A;letter-spacing:-.005em;line-height:1.2;}
+  .ad-family__plan{font:500 11.5px Inter,sans-serif;color:#94A3B8;letter-spacing:.005em;margin-top:2px;}
+  .ad-family__metrics{
+    display:flex;align-items:flex-end;justify-content:space-between;gap:10px;
+    border-top:1px solid #F1F5F9;padding-top:10px;
+  }
+  .ad-family__hours{font-family:"Archivo","Inter",sans-serif;font-size:22px;font-weight:800;color:#0F172A;letter-spacing:-.018em;line-height:1;}
+  .ad-family__hours-label{font:600 10.5px Inter,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:#94A3B8;margin-top:3px;}
+  .ad-family__status{
+    font:700 10px Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;
+    padding:4px 9px;border-radius:9999px;white-space:nowrap;flex-shrink:0;
+    background:#DCFCE7;color:#166534;border:1px solid #BBF7D0;
+  }
+  .ad-family__status--draft{background:#F1F5F9;color:#475569;border-color:#E2E8F0;}
+  .ad-family__status--expired{background:#FEF2F2;color:#991B1B;border-color:#FECACA;}
+  @media(max-width:680px){
+    .ad-families__grid{grid-template-columns:1fr;}
+    .ad-family{padding:14px;}
+  }
+
   /* Phase 16 v3: Upcoming renewals roll-up. Compact list, one row per
      assigned family, sorted by renewal date. Visual language matches
      the renewal chip on the family workspace (white default, amber
@@ -302,6 +349,18 @@
     </div>
   </section>
 
+  <!-- Phase 16 v4: My Families quick-access roster. Compact card grid,
+       one card per assigned family, click to open the workspace. Lives
+       above the Upcoming Renewals panel so the broader "people I work
+       with" context comes before the action-required dates. -->
+  <section class="ad-families" id="adFamilies" hidden>
+    <header class="ad-families__head">
+      <h3 class="ad-families__title">My Families</h3>
+      <a class="ad-families__action" href="assistant-clients.html">Open My Families →</a>
+    </header>
+    <div class="ad-families__grid" id="adFamiliesGrid"></div>
+  </section>
+
   <!-- Phase 16 v3: Upcoming renewals roll-up — every assigned family's
        next renewal date at a glance, sorted closest-first, color-coded
        by urgency. Click a row to open that family's workspace. -->
@@ -388,7 +447,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515a"></script>
-<script src="js/hiring-service.js?v=20260516a"></script>
+<script src="js/hiring-service.js?v=20260516b"></script>
 <script src="js/session-calendar.js?v=20260515a"></script>
 <script src="js/sidebar.js?v=20260515d"></script>
 <script>
@@ -490,9 +549,101 @@ function initialsFor(name){
   // Phase 17.5 — weekly hours breakdown ("look how little you actually work")
   loadWeekly();
 
+  // Phase 16 v4 — My Families quick-access card grid
+  loadFamilies();
+
   // Phase 16 v3 — upcoming renewals roll-up across every assigned family
   loadRenewals();
 })();
+
+// My Families roster — compact clickable cards showing name, plan,
+// hours remaining, status. Sorted alphabetically. Click → workspace.
+async function loadFamilies(){
+  const section = document.getElementById('adFamilies');
+  const grid    = document.getElementById('adFamiliesGrid');
+  if (!section || !grid) return;
+
+  let families = [];
+  try {
+    families = await window.pmHiring.fetchMyAssignedClients() || [];
+  } catch (e) {
+    console.warn('loadFamilies fetch failed:', e);
+    return;
+  }
+  if (!families.length) { section.hidden = true; return; }
+
+  // Pull hours-remaining per family in parallel via the workspace fetcher
+  // (which already sums ledger + handles carryover). One round-trip per
+  // family is fine at this scale (3-20 families); revisit if it grows.
+  const enriched = await Promise.all(families.map(async (f) => {
+    let remainingMin = null;
+    try {
+      const ws = await window.pmHiring.fetchAssistantClientWorkspace(f.client?.id || f.contract?.client_id);
+      if (ws?.contract) remainingMin = ws.hoursRemainingMinutes;
+    } catch (_) {}
+    return { ...f, remainingMinutes: remainingMin };
+  }));
+
+  // Sort alphabetically by family name
+  enriched.sort((a, b) => {
+    const an = (a.client?.full_name || '').toLowerCase();
+    const bn = (b.client?.full_name || '').toLowerCase();
+    return an.localeCompare(bn);
+  });
+
+  // Stable color per client (same palette as the calendar widget so the
+  // same family wears the same color across the whole dashboard).
+  const PALETTE = [
+    ['#3B82F6', '#1E40AF'], ['#10B981', '#047857'],
+    ['#8B5CF6', '#5B21B6'], ['#F59E0B', '#B45309'],
+    ['#EF4444', '#991B1B'], ['#06B6D4', '#0E7490'],
+    ['#EC4899', '#9D174D'], ['#14B8A6', '#0F766E'],
+  ];
+  const colorFor = (id) => {
+    if (!id) return PALETTE[0];
+    let h = 0;
+    for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+    return PALETTE[h % PALETTE.length];
+  };
+  const initialsFor = (name) =>
+    (name || 'F').split(/\s+/).map(s => s[0] || '').slice(0, 2).join('').toUpperCase() || 'F';
+
+  grid.innerHTML = enriched.map(f => {
+    const c = f.contract || {};
+    const status = (c.status || 'active').toLowerCase();
+    const name = f.client?.full_name || 'Family';
+    const clientId = f.client?.id || c.client_id;
+    const plan = c.included_minutes
+      ? `${Math.round(c.included_minutes / 60)}-hour plan`
+      : 'Plan';
+    const remHrs = (typeof f.remainingMinutes === 'number')
+      ? Math.round((f.remainingMinutes / 60) * 100) / 100
+      : null;
+    const [from, to] = colorFor(clientId);
+    const statusCls = status === 'active' ? '' :
+                      status === 'draft' ? ' ad-family__status--draft' :
+                      ' ad-family__status--expired';
+    const href = `assistant-client.html?id=${encodeURIComponent(clientId)}`;
+    return `<a class="ad-family" href="${href}" style="--av-from:${from};--av-to:${to};">
+      <div class="ad-family__head">
+        <div class="ad-family__avatar">${escapeHtml(initialsFor(name))}</div>
+        <div>
+          <div class="ad-family__name">${escapeHtml(name)}</div>
+          <div class="ad-family__plan">${escapeHtml(plan)}</div>
+        </div>
+      </div>
+      <div class="ad-family__metrics">
+        <div>
+          <div class="ad-family__hours">${remHrs != null ? remHrs : '—'}</div>
+          <div class="ad-family__hours-label">hours left</div>
+        </div>
+        <div class="ad-family__status${statusCls}">${escapeHtml(status)}</div>
+      </div>
+    </a>`;
+  }).join('');
+
+  section.hidden = false;
+}
 
 // Upcoming renewals: one row per assigned family, sorted closest-first.
 // For each family we use their active contract's end_at as the renewal
