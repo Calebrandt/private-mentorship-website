@@ -93,6 +93,49 @@
     .ad-weekday__unit{font-size:9.5px;}
   }
 
+  /* Phase 16 v3: Upcoming renewals roll-up. Compact list, one row per
+     assigned family, sorted by renewal date. Visual language matches
+     the renewal chip on the family workspace (white default, amber
+     ≤14 days, red overdue) so the assistant gets the same color
+     vocabulary in both places. */
+  .ad-renewals{
+    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    padding:18px 22px;margin-bottom:22px;
+  }
+  .ad-renewals__head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap;}
+  .ad-renewals__title{font-family:"Archivo","Inter",sans-serif;font-size:17px;font-weight:800;letter-spacing:-.01em;color:#0F172A;margin:0;}
+  .ad-renewals__sub{font-size:12.5px;color:#64748B;margin:0;}
+  .ad-renewals__list{display:flex;flex-direction:column;gap:6px;}
+  .ad-renewal-row{
+    display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:center;
+    padding:11px 14px;background:#FAFBFC;border:1px solid #F1F5F9;border-radius:10px;
+    text-decoration:none;color:inherit;cursor:pointer;
+    transition:background .12s ease, border-color .12s ease;
+  }
+  .ad-renewal-row:hover{background:#F1F5F9;border-color:#E2E8F0;}
+  .ad-renewal-row__name{font:700 14px Inter,sans-serif;color:#0F172A;letter-spacing:-.005em;line-height:1.2;}
+  .ad-renewal-row__sub{font:500 11.5px Inter,sans-serif;color:#94A3B8;margin-top:2px;letter-spacing:.005em;}
+  .ad-renewal-row__date{font:700 13px Inter,sans-serif;color:#0F172A;letter-spacing:-.005em;text-align:right;white-space:nowrap;}
+  .ad-renewal-row__meta{
+    font:700 11px Inter,sans-serif;letter-spacing:.04em;text-transform:uppercase;
+    color:#64748B;background:#F1F5F9;border:1px solid #E2E8F0;
+    padding:4px 10px;border-radius:9999px;white-space:nowrap;min-width:90px;text-align:center;
+  }
+  .ad-renewal-row.is-soon{background:#FFFBEB;border-color:#FCD34D;}
+  .ad-renewal-row.is-soon:hover{background:#FEF3C7;border-color:#FBBF24;}
+  .ad-renewal-row.is-soon .ad-renewal-row__date{color:#78350F;}
+  .ad-renewal-row.is-soon .ad-renewal-row__meta{color:#92400E;background:#FEF3C7;border-color:#FDE68A;}
+  .ad-renewal-row.is-overdue{background:#FEF2F2;border-color:#FCA5A5;}
+  .ad-renewal-row.is-overdue:hover{background:#FEE2E2;border-color:#F87171;}
+  .ad-renewal-row.is-overdue .ad-renewal-row__date{color:#7F1D1D;}
+  .ad-renewal-row.is-overdue .ad-renewal-row__meta{color:#991B1B;background:#FEE2E2;border-color:#FECACA;}
+  @media(max-width:680px){
+    .ad-renewals{padding:14px;}
+    .ad-renewal-row{grid-template-columns:1fr auto;gap:8px;padding:9px 11px;}
+    .ad-renewal-row__date{font-size:12px;}
+    .ad-renewal-row__meta{grid-column:1 / -1;justify-self:start;min-width:0;}
+  }
+
   /* Section card */
   .ad-section{
     background:#fff;border:1px solid #E2E8F0;border-radius:14px;
@@ -259,6 +302,17 @@
     </div>
   </section>
 
+  <!-- Phase 16 v3: Upcoming renewals roll-up — every assigned family's
+       next renewal date at a glance, sorted closest-first, color-coded
+       by urgency. Click a row to open that family's workspace. -->
+  <section class="ad-renewals" id="adRenewals" hidden>
+    <header class="ad-renewals__head">
+      <h3 class="ad-renewals__title">Upcoming renewals</h3>
+      <p class="ad-renewals__sub" id="adRenewalsSub">—</p>
+    </header>
+    <div class="ad-renewals__list" id="adRenewalsList"></div>
+  </section>
+
   <!-- Phase 17: month calendar — all families, color-coded -->
   <section style="margin-bottom:22px;">
     <div id="adCalendar"></div>
@@ -334,7 +388,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515a"></script>
-<script src="js/hiring-service.js?v=20260515z"></script>
+<script src="js/hiring-service.js?v=20260516a"></script>
 <script src="js/session-calendar.js?v=20260515a"></script>
 <script src="js/sidebar.js?v=20260515d"></script>
 <script>
@@ -435,7 +489,111 @@ function initialsFor(name){
 
   // Phase 17.5 — weekly hours breakdown ("look how little you actually work")
   loadWeekly();
+
+  // Phase 16 v3 — upcoming renewals roll-up across every assigned family
+  loadRenewals();
 })();
+
+// Upcoming renewals: one row per assigned family, sorted closest-first.
+// For each family we use their active contract's end_at as the renewal
+// date (when this cycle ends + payment for the next one is due).
+// If the family is currently on a draft (between cycles), use the draft's
+// start_at instead — that's when the unpaid renewal cycle begins.
+// Same color vocabulary as the workspace chip: amber ≤14 days, red overdue.
+async function loadRenewals(){
+  const section   = document.getElementById('adRenewals');
+  const listEl    = document.getElementById('adRenewalsList');
+  const subEl     = document.getElementById('adRenewalsSub');
+  if (!section || !listEl) return;
+
+  let families = [];
+  try {
+    families = await window.pmHiring.fetchMyAssignedClients() || [];
+  } catch (e) {
+    console.warn('loadRenewals failed:', e);
+    return;
+  }
+  if (!families.length) { section.hidden = true; return; }
+
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const parseLocal = (s) => {
+    if (!s) return null;
+    const str = String(s);
+    const m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return m ? new Date(+m[1], +m[2]-1, +m[3]) : new Date(str);
+  };
+
+  // Build sortable rows
+  const rows = families.map(f => {
+    const c = f.contract || {};
+    const status = (c.status || '').toLowerCase();
+    const iso = (status === 'draft') ? c.start_at : c.end_at;
+    const date = parseLocal(iso);
+    const days = date ? Math.round((date - startOfToday) / 86400000) : null;
+    return {
+      clientId: f.client?.id || c.client_id,
+      name: f.client?.full_name || 'Family',
+      planLabel: c.included_minutes
+        ? `${Math.round(c.included_minutes / 60)}-hour plan`
+        : 'Plan',
+      iso,
+      date,
+      days,
+      status,
+    };
+  }).filter(r => r.iso && r.date);
+
+  if (!rows.length) { section.hidden = true; return; }
+
+  // Sort: overdue first (most negative), then ascending days
+  rows.sort((a, b) => a.days - b.days);
+
+  // Build rows
+  listEl.innerHTML = rows.map(r => {
+    let cls = '';
+    let metaText;
+    if (r.days < 0) {
+      cls = 'is-overdue';
+      const n = Math.abs(r.days);
+      metaText = `Overdue · ${n}d`;
+    } else if (r.days === 0) {
+      cls = 'is-soon';
+      metaText = 'Due today';
+    } else if (r.days === 1) {
+      cls = 'is-soon';
+      metaText = 'Due tomorrow';
+    } else if (r.days <= 14) {
+      cls = 'is-soon';
+      metaText = `In ${r.days} days`;
+    } else {
+      metaText = `In ${r.days} days`;
+    }
+    const dateText = r.date.toLocaleDateString('en-US',
+      { month:'long', day:'numeric', year:'numeric' });
+    const href = `assistant-client.html?id=${encodeURIComponent(r.clientId)}`;
+    return `<a class="ad-renewal-row ${cls}" href="${href}">
+      <div>
+        <div class="ad-renewal-row__name">${escapeHtml(r.name)}</div>
+        <div class="ad-renewal-row__sub">${escapeHtml(r.planLabel)}${r.status === 'draft' ? ' · awaiting activation' : ''}</div>
+      </div>
+      <div class="ad-renewal-row__date">${dateText}</div>
+      <div class="ad-renewal-row__meta">${metaText}</div>
+    </a>`;
+  }).join('');
+
+  // Subtitle: succinct summary
+  const soonCount    = rows.filter(r => r.days >= 0 && r.days <= 14).length;
+  const overdueCount = rows.filter(r => r.days < 0).length;
+  if (overdueCount) {
+    subEl.textContent = `${overdueCount} overdue · ${rows.length} total`;
+  } else if (soonCount) {
+    subEl.textContent = `${soonCount} renewing soon · ${rows.length} total`;
+  } else {
+    subEl.textContent = `${rows.length} families · all renewals more than 2 weeks out`;
+  }
+  section.hidden = false;
+}
 
 // Weekly breakdown — bucket THIS week's sessions by weekday (Sun–Sat)
 // so the assistant sees a 7-cell strip showing how few hours each day
