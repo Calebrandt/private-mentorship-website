@@ -35,6 +35,17 @@
   .wc-eyebrow{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#0071e3;margin:0 0 6px;}
   .wc-hero__name{font-family:"Archivo","Inter",sans-serif;font-size:24px;font-weight:800;letter-spacing:-.018em;line-height:1.1;color:#0F172A;margin:0 0 4px;}
   .wc-hero__sub{font-size:13px;color:#64748B;margin:0;}
+  /* Phase 16 v1: renewal-date pill in the hero. Sits just under the
+     service period so the next renewal date is impossible to miss.
+     Color shifts to amber when due within 14 days, red when overdue. */
+  .wc-hero__renewal{
+    display:inline-flex;align-items:center;gap:6px;
+    margin:8px 0 0;padding:5px 12px;
+    background:#EFF6FF;border:1px solid #BFDBFE;border-radius:9999px;
+    font:600 12.5px Inter,sans-serif;color:#1E40AF;letter-spacing:-.005em;
+  }
+  .wc-hero__renewal.is-soon{background:#FFFBEB;border-color:#FDE68A;color:#92400E;}
+  .wc-hero__renewal.is-overdue{background:#FEF2F2;border-color:#FECACA;color:#991B1B;}
   .wc-hero__status{
     font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
     padding:5px 12px;border-radius:9999px;white-space:nowrap;
@@ -419,6 +430,11 @@
         <p class="wc-eyebrow">Family workspace</p>
         <h1 class="wc-hero__name" id="wcName">—</h1>
         <p class="wc-hero__sub" id="wcSub">—</p>
+        <!-- Phase 16 v1: prominent renewal-date pill so assistant, family,
+             and admin all see when the next renewal is due at a glance.
+             Computed from the active contract's end_at + next-draft's
+             start_at. Hidden until populated. -->
+        <p class="wc-hero__renewal" id="wcRenewal" hidden></p>
       </div>
       <div class="wc-hero__actions">
         <span class="wc-hero__status" id="wcStatus">—</span>
@@ -703,7 +719,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515c"></script>
-<script src="js/hiring-service.js?v=20260515x"></script>
+<script src="js/hiring-service.js?v=20260515y"></script>
 <script src="js/messages-service.js?v=20260515c"></script>
 <script src="js/session-calendar.js?v=20260515a"></script>
 <script src="js/sidebar.js?v=20260515d"></script>
@@ -818,6 +834,50 @@ function renderAppointmentRow(a, spend){
   document.getElementById('wcName').textContent = name;
   document.getElementById('wcSub').textContent =
     `${fmtDate(ws.contract.start_at)} → ${fmtDate(ws.contract.end_at)}`;
+
+  // Phase 16 v1: Renewal-due pill. Uses the active contract's end_at as
+  // the renewal date (that's when the family needs to pay for the next
+  // 1- or 2-month cycle). For drafts that haven't started yet, use
+  // start_at instead (when the renewal cycle BEGINS). Color cues:
+  //   • Green/blue (default)  — more than 14 days out
+  //   • Amber (.is-soon)      — 14 days or less
+  //   • Red (.is-overdue)     — past due
+  (function renderRenewal(){
+    const renewalEl = document.getElementById('wcRenewal');
+    if (!renewalEl) return;
+    const status = (ws.contract.status || '').toLowerCase();
+    // For active contracts: renewal date = when this contract ends
+    // For drafts: renewal date = when this draft starts (already arrived means it needs to activate)
+    const renewalIso = (status === 'draft')
+      ? ws.contract.start_at
+      : ws.contract.end_at;
+    if (!renewalIso) { renewalEl.hidden = true; return; }
+    const renewalDate = (() => {
+      const s = String(renewalIso);
+      const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      return m ? new Date(+m[1], +m[2]-1, +m[3]) : new Date(s);
+    })();
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const daysUntil = Math.round((renewalDate - startOfToday) / 86400000);
+
+    let label, cls = '';
+    if (daysUntil < 0) {
+      label = `Renewal overdue — ${Math.abs(daysUntil)} day${Math.abs(daysUntil) === 1 ? '' : 's'} past`;
+      cls = 'is-overdue';
+    } else if (daysUntil === 0) {
+      label = 'Renewal due today';
+      cls = 'is-soon';
+    } else if (daysUntil <= 14) {
+      label = `Renewal due in ${daysUntil} day${daysUntil === 1 ? '' : 's'} · ${fmtDate(renewalIso)}`;
+      cls = 'is-soon';
+    } else {
+      label = `Next renewal: ${fmtDate(renewalIso)} (${daysUntil} days)`;
+    }
+    renewalEl.textContent = '🔔 ' + label;
+    renewalEl.className = 'wc-hero__renewal' + (cls ? ' ' + cls : '');
+    renewalEl.hidden = false;
+  })();
   const statusKey = (ws.contract.status || 'active').toLowerCase();
   const statusClass = ['active','paused','pending','draft'].includes(statusKey) ? statusKey : 'active';
   const wcStatus = document.getElementById('wcStatus');
