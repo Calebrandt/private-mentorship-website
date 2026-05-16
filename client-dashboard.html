@@ -911,7 +911,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260508c"></script>
 <script src="js/hiring-service.js?v=20260516m"></script>
-<script src="js/session-calendar.js?v=20260516a"></script>
+<script src="js/session-calendar.js?v=20260516b"></script>
 <script src="js/sidebar.js?v=20260515d"></script>
 <script src="js/right-calendar.js?v=20260516c"></script>
 <script src="js/incoming-call-ring.js?v=20260509a" defer></script>
@@ -1115,7 +1115,14 @@
   if (window.pmCalendar?.mount && client?.id && document.getElementById('clientCalendar')) {
     window.pmCalendar.mount('clientCalendar', {
       clientId: client.id,
-      subtitle: 'Your sessions this month',
+      subtitle: 'Your sessions this month — click any session to open the lesson journal',
+      // Click a session pill → deep-link straight to that lesson in the
+      // family-side journal. deep-link-flash.js scrolls + flashes it.
+      eventUrl: (s) => {
+        if (!s || !s.id) return null;
+        const yr = s.starts_at ? new Date(s.starts_at).getFullYear() : '';
+        return `client-lesson-journal.html?year=${yr}#lesson-${encodeURIComponent(s.id)}`;
+      },
     }).catch(e => console.warn('clientCalendar mount failed:', e));
   }
 

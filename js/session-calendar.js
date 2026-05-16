@@ -163,10 +163,18 @@
           if (firstName) tooltipParts.push(firstName);
           if (s.title) tooltipParts.push(s.title);
           if (cancelled) tooltipParts.push(`(${s.status.replace('_', ' ')})`);
+          tooltipParts.push('Click to open lesson');
           const tooltip = tooltipParts.join(' · ');
           const labelParts = [time];
           if (opts.colorByClient && firstName) labelParts.push(firstName);
-          html += `<div class="pmcal-event${cancelled ? ' is-cancelled' : ''}" style="background:${colors[0]};" title="${escapeHtml(tooltip)}">${escapeHtml(labelParts.join(' '))}</div>`;
+          // Build a deep-link URL via the host page's eventUrl callback.
+          // Returns null when the host doesn't want the event clickable
+          // (e.g. future sessions on a host that only links past lessons).
+          const url = typeof opts.eventUrl === 'function' ? opts.eventUrl(s) : null;
+          const tag = url ? 'a' : 'div';
+          const href = url ? ` href="${escapeHtml(url)}"` : '';
+          const cls = `pmcal-event${cancelled ? ' is-cancelled' : ''}${url ? ' is-link' : ''}`;
+          html += `<${tag}${href} class="${cls}" style="background:${colors[0]};" title="${escapeHtml(tooltip)}" data-appt-id="${escapeHtml(s.id)}">${escapeHtml(labelParts.join(' '))}</${tag}>`;
         });
         if (daySessions.length > 3) {
           html += `<div class="pmcal-event-more">+${daySessions.length - 3} more</div>`;
@@ -216,11 +224,13 @@
       });
     });
 
-    // Optional day-click handler
+    // Optional day-click handler — fires only when the click landed on
+    // the day cell itself, not on an event link inside it.
     if (typeof opts.onDayClick === 'function') {
       container.querySelectorAll('.pmcal-cell').forEach(cell => {
         cell.style.cursor = 'pointer';
-        cell.addEventListener('click', () => {
+        cell.addEventListener('click', (e) => {
+          if (e.target.closest('.pmcal-event.is-link')) return;   // let the link navigate
           const key = cell.getAttribute('data-date');
           opts.onDayClick(key, byDate[key] || []);
         });
@@ -252,8 +262,12 @@
       .pmcal-cell.is-today .pmcal-day{color:#1E40AF;font-weight:800;}
       .pmcal-day{font-family:Archivo,Inter,sans-serif;font-size:13.5px;font-weight:700;color:#475569;line-height:1;}
       .pmcal-events{display:flex;flex-direction:column;gap:2px;overflow:hidden;}
-      .pmcal-event{color:#fff;font-size:10.5px;font-weight:600;padding:2px 6px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.005em;line-height:1.35;}
+      .pmcal-event{color:#fff;font-size:10.5px;font-weight:600;padding:2px 6px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.005em;line-height:1.35;display:block;}
+      a.pmcal-event{text-decoration:none;}
+      .pmcal-event.is-link{cursor:pointer;transition:transform .12s ease, box-shadow .12s ease, filter .12s ease;}
+      .pmcal-event.is-link:hover{transform:translateY(-1px);filter:brightness(1.08) saturate(1.1);box-shadow:0 4px 10px -3px rgba(15,23,42,0.25);}
       .pmcal-event.is-cancelled{opacity:0.45;text-decoration:line-through;}
+      .pmcal-event.is-cancelled.is-link:hover{filter:none;transform:none;box-shadow:none;cursor:default;}
       .pmcal-event-more{font-size:10px;color:#64748B;font-weight:700;padding:1px 4px;}
       @media(max-width:680px){
         .pmcal{padding:14px;}

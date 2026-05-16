@@ -613,7 +613,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515a"></script>
 <script src="js/hiring-service.js?v=20260516m"></script>
-<script src="js/session-calendar.js?v=20260515a"></script>
+<script src="js/session-calendar.js?v=20260516b"></script>
 <script src="js/sidebar.js?v=20260515d"></script>
 <script>
 /* ============================================================================
@@ -715,7 +715,18 @@ function initialsFor(name){
   if (window.pmCalendar?.mount && document.getElementById('adCalendar')) {
     window.pmCalendar.mount('adCalendar', {
       colorByClient: true,
-      subtitle: 'All your sessions this month, color-coded by family',
+      subtitle: 'All your sessions this month — click any session to open the lesson tracker',
+      // Click a session pill → deep-link straight to that lesson in
+      // assistant-lesson-tracker. Includes clientId so the page auto-
+      // selects the right family, plus the year so it's on the right
+      // tab, plus the appointment hash so deep-link-flash scrolls
+      // and pulses the matching card.
+      eventUrl: (s) => {
+        if (!s || !s.id) return null;
+        const yr  = s.starts_at ? new Date(s.starts_at).getFullYear() : '';
+        const cid = encodeURIComponent(s.client_id || '');
+        return `assistant-lesson-tracker.html?clientId=${cid}&year=${yr}#lesson-${encodeURIComponent(s.id)}`;
+      },
     }).catch(e => console.warn('pmCalendar mount failed:', e));
   }
 
