@@ -229,6 +229,61 @@
   .wc-toast[data-open="true"]{display:block;}
   .wc-toast--error{background:#991B1B;}
 
+  /* Phase 19m v2: Premium usage progress bar — Stripe / Linear vibe.
+     Recessed glass track, 3-stop diagonal gradient fill, inset top
+     shine, soft state-colored outer glow, slow animated shimmer.
+     Twin of .nx-usage on client-dashboard.html so the family and the
+     assistant see the same polish across both views. */
+  .wc-usage{
+    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    padding:16px 20px;margin-bottom:18px;
+  }
+  .wc-usage__top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:11px;}
+  .wc-usage__lead{font:700 14px Inter,sans-serif;color:#0F172A;letter-spacing:-.005em;}
+  .wc-usage__meta{font:500 12.5px Inter,sans-serif;color:#64748B;letter-spacing:-.005em;}
+  .wc-usage__bar{
+    position:relative;height:12px;border-radius:9999px;overflow:hidden;
+    background:linear-gradient(180deg, rgba(15,23,42,.05), rgba(15,23,42,.09));
+    box-shadow:inset 0 1px 2px rgba(15,23,42,.08), inset 0 0 0 1px rgba(15,23,42,.03);
+  }
+  .wc-usage__bar-fill{
+    position:relative;height:100%;border-radius:9999px;
+    background:linear-gradient(135deg, #34D399 0%, #10B981 55%, #059669 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.45),
+      inset 0 -1px 0 rgba(0,0,0,.10),
+      0 0 12px rgba(16,185,129,.45);
+    transition:width .8s cubic-bezier(.4, 0, .2, 1), box-shadow .3s ease;
+  }
+  .wc-usage__bar-fill::after{
+    content:'';position:absolute;inset:0;border-radius:9999px;
+    background:linear-gradient(105deg, transparent 35%, rgba(255,255,255,.55) 50%, transparent 65%);
+    background-size:220% 100%;
+    animation:wc-usage-shimmer 3.2s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes wc-usage-shimmer{
+    0%   { background-position:200% 0; }
+    100% { background-position:-200% 0; }
+  }
+  .wc-usage.is-low .wc-usage__bar-fill{
+    background:linear-gradient(135deg, #FCD34D 0%, #F59E0B 55%, #D97706 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.50),
+      inset 0 -1px 0 rgba(0,0,0,.10),
+      0 0 14px rgba(245,158,11,.55);
+  }
+  .wc-usage.is-empty .wc-usage__bar-fill{
+    background:linear-gradient(135deg, #FB7185 0%, #EF4444 55%, #DC2626 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.40),
+      inset 0 -1px 0 rgba(0,0,0,.12),
+      0 0 14px rgba(239,68,68,.55);
+  }
+  @media (prefers-reduced-motion: reduce){
+    .wc-usage__bar-fill::after{animation:none;}
+  }
+
   /* KPI tiles */
   .wc-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:18px;}
   .wc-kpi{background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:18px 20px;}
@@ -522,6 +577,17 @@
       </div>
     </section>
 
+    <!-- Phase 19m: Premium usage progress bar — mirrors the client
+         dashboard. Recessed glass track, 3-stop diagonal gradient,
+         inset top shine, soft state-colored glow, animated shimmer. -->
+    <section class="wc-usage" id="wcUsage" hidden>
+      <div class="wc-usage__top">
+        <span class="wc-usage__lead" id="wcUsageLead">— hours used</span>
+        <span class="wc-usage__meta" id="wcUsageMeta">of —</span>
+      </div>
+      <div class="wc-usage__bar"><div class="wc-usage__bar-fill" id="wcUsageFill" style="width:0%"></div></div>
+    </section>
+
     <!-- Phase 17: month calendar (this family's sessions) -->
     <section class="wc-section" style="margin-bottom:18px;padding:0;border:none;">
       <div id="wcCalendar"></div>
@@ -738,7 +804,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515c"></script>
-<script src="js/hiring-service.js?v=20260516j"></script>
+<script src="js/hiring-service.js?v=20260516k"></script>
 <script src="js/messages-service.js?v=20260515c"></script>
 <script src="js/session-calendar.js?v=20260515a"></script>
 <script src="js/sidebar.js?v=20260515d"></script>
@@ -999,6 +1065,26 @@ function renderAppointmentRow(a, spend){
   // Hide the legacy Carried Over tile (kept in DOM for back-compat).
   const carryTile = document.getElementById('kpiCarryTile');
   if (carryTile) carryTile.hidden = true;
+
+  // Phase 19m: Premium usage progress bar (twin of client dashboard).
+  // Shows "X of Y hours used  ·  Z h left · N% used" with a recessed
+  // glass bar + state-colored gradient + slow shimmer. Same math model.
+  const usageEl = document.getElementById('wcUsage');
+  if (usageEl && planHours > 0) {
+    const pct = Math.min(100, Math.round((usedHours / planHours) * 100));
+    document.getElementById('wcUsageLead').textContent = `${usedHours} of ${planHours} hours used`;
+    const remForMeta = Number.isFinite(ws.hoursRemainingMinutes)
+      ? Math.round((ws.hoursRemainingMinutes / 60) * 100) / 100
+      : Math.max(0, planHours - usedHours);
+    document.getElementById('wcUsageMeta').textContent =
+      remForMeta > 0 ? `${remForMeta} h left · ${pct}% used` : `Plan fully used`;
+    const fill = document.getElementById('wcUsageFill');
+    if (fill) fill.style.width = pct + '%';
+    usageEl.classList.remove('is-low', 'is-empty');
+    if (remForMeta <= 0) usageEl.classList.add('is-empty');
+    else if (remForMeta <= 5 || remForMeta / planHours <= 0.25) usageEl.classList.add('is-low');
+    usageEl.hidden = false;
+  }
 
   // Hours Remaining tile — color shifts as the runway shrinks so the
   // assistant clocks it at a glance. Bank hours are SEPARATE (gold tile
