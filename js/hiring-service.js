@@ -2489,7 +2489,10 @@
     const cutoff = new Date(); cutoff.setMonth(cutoff.getMonth() - monthsBack);
     try {
       const r = await sb().from('invoices')
-        .select('id, status, invoice_date, total_cents, amount_paid_cents')
+        // Phase 19s: include invoice_number, customer_notes, subject, contract_id
+        // so the hours page can render the real invoice label + the "note"
+        // chip/snippet when admin attached context (e.g. "missed payment").
+        .select('id, contract_id, status, invoice_number, invoice_date, total_cents, amount_paid_cents, currency, subject, customer_notes')
         .eq('client_id', myId)
         .gte('invoice_date', cutoff.toISOString().split('T')[0])
         .neq('status', 'void')
