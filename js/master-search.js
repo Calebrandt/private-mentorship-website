@@ -261,9 +261,7 @@
           out.lessonLogs = lessonResults.flat();
         } catch (_) { out.lessonLogs = []; }
       } else if (role === 'admin') {
-        // Admin can see the whole org. Pull a sane batch from each list.
-        // Every fetcher is wrapped in safeCall with a 5s timeout, so any
-        // one hang/missing-function can't stall the others.
+        // Admin can see the whole org. First batch — top-level lists.
         const [apps, clients, profiles, schedReq, memReq] = await Promise.all([
           safeCall(pm.adminListApplications,       { status: 'active' }, []),
           safeCall(pm.adminListClients,            { limit: 200 },       []),
@@ -276,6 +274,31 @@
         out.assistantProfiles  = profiles || [];
         out.scheduleRequests   = (schedReq && schedReq.requests) || schedReq || [];
         out.membershipRequests = memReq || [];
+
+        // Second batch — fan out per-client to grab lesson logs + invoices
+        // for the whole org. RLS already gives admin read access. Capped
+        // to the first 40 clients to keep the parallel fan-out reasonable.
+        const clientList = (clients || []).slice(0, 40);
+        try {
+          const [lessonResults, invoiceResults] = await Promise.all([
+            Promise.all(clientList.map(c =>
+              safeCall(pm.fetchLessonHistory, c.id || c.client_id, [])
+            )),
+            Promise.all(clientList.map(c =>
+              safeCall(pm.fetchClientPaymentHistory, c.id || c.client_id, [])
+            )),
+          ]);
+          out.lessonLogs = lessonResults.flat();
+          // fetchClientPaymentHistory returns enriched invoice rows
+          // (with .contract, .line_items) — we just need the searchable
+          // fields. Tag each with its client for the subtitle.
+          out.invoices = invoiceResults.flat().map(inv => ({
+            ...inv,
+            _clientName: clientList.find(c => (c.id || c.client_id) === inv.client_id)?.full_name || '',
+          }));
+        } catch (_) {
+          // If the fan-out fails, the top-level lists still work
+        }
       }
     } catch (e) {
       console.warn('master-search: dynamic load failed', e);
@@ -342,17 +365,28 @@
       }
     });
 
-    // Invoices (client only)
+    // Invoices (client + admin)
     tryEach('invoices', dyn.invoices, inv => {
       const label = inv.invoice_number || ('Invoice ' + (inv.id || '').slice(0, 8));
-      const blob = `${label} ${inv.subject || ''} ${inv.customer_notes || ''} ${inv.status || ''}`.toLowerCase();
+      const blob = `${label} ${inv.subject || ''} ${inv.customer_notes || ''} ${inv.status || ''} ${inv._clientName || ''}`.toLowerCase();
       const dateStr = fmtDate(inv.invoice_date);
       if (blob.includes(q) || dateStr.toLowerCase().includes(q)) {
+        const subtitleParts = [];
+        if (inv._clientName) subtitleParts.push(inv._clientName);
+        subtitleParts.push(dateStr);
+        subtitleParts.push(fmtMoney(inv.total_cents || inv.amount_paid_cents));
+        if (inv.status) subtitleParts.push(inv.status);
         results.invoices.push({
           icon: ICONS.invoice,
           title: label,
-          subtitle: `${dateStr} · ${fmtMoney(inv.total_cents || inv.amount_paid_cents)} · ${inv.status || ''}`,
-          url: withQ(`client-hours.html#inv-${inv.id}`),
+          subtitle: subtitleParts.join(' · '),
+          // Admin doesn't have client-hours.html — fall back to a general invoice view
+          url: withQ(role === 'admin' ? `admin-dashboard.html#inv-${inv.id}` : `client-hours.html#inv-${inv.id}`),
+          _preview: {
+            kind: 'invoice',
+            data: inv,
+            clientName: inv._clientName || '',
+          },
         });
       }
     });
@@ -379,16 +413,33 @@
       const dateStr = fmtDate(l.starts_at);
       if (blob.includes(q) || dateStr.toLowerCase().includes(q)) {
         const year = l.starts_at ? new Date(l.starts_at).getFullYear() : null;
+        // Client → own journal page; assistant/admin → lesson tracker
+        // scoped to the specific client via ?clientId=…
         const lessonUrl = role === 'client'
           ? `client-lesson-journal.html?year=${year || ''}#lesson-${encodeURIComponent(l.appointment_id || '')}`
           : `assistant-lesson-tracker.html?clientId=${encodeURIComponent(l.client_id || '')}&year=${year || ''}#lesson-${encodeURIComponent(l.appointment_id || '')}`;
         const snippet = [l.focus_area, l.key_concepts, l.next_session_notes, l.feedback]
           .find(s => s && String(s).toLowerCase().includes(q)) || l.key_concepts || l.focus_area || '';
+        // For admin/assistant context, prepend the client name to the
+        // subtitle so it's obvious WHO the lesson belongs to.
+        const clientPrefix = (role === 'admin' || role === 'assistant')
+          ? ((dyn.clients || []).find(c => (c.id || c.client_id) === l.client_id)?.full_name || '')
+          : '';
+        const subtitleParts = [];
+        if (clientPrefix) subtitleParts.push(clientPrefix);
+        subtitleParts.push(dateStr);
+        if (snippet) subtitleParts.push(String(snippet).slice(0, 80));
         results.lessonLogs.push({
           icon: ICONS.page,
           title: l.appointment_title || 'Lesson',
-          subtitle: `${dateStr}${snippet ? ' · ' + String(snippet).slice(0, 80) : ''}`,
+          subtitle: subtitleParts.join(' · '),
           url: withQ(lessonUrl),
+          // For preview pane — keep the full data
+          _preview: {
+            kind: 'lesson',
+            data: l,
+            clientName: clientPrefix,
+          },
         });
       }
     });
@@ -486,6 +537,57 @@
           + (r.scheduleRequests?.length || 0) + (r.membershipRequests?.length || 0));
   }
 
+  // ── Preview pane ────────────────────────────────────────────────
+  // Renders the full body of a single result (lesson, invoice, session)
+  // inline next to the dropdown so the user can peek without navigating.
+  // Spy-tool vibe for admin, but also useful for client/assistant.
+  function renderPreview(previewEl, item, query) {
+    if (!previewEl) return;
+    if (!item || !item._preview) {
+      previewEl.innerHTML = '<div class="ms-preview__empty">Hover or arrow-key over a result to preview it here.</div>';
+      return;
+    }
+    const { kind, data, clientName } = item._preview;
+    const h = (s) => highlight(s == null ? '' : String(s), query);
+    let html = '';
+    if (kind === 'lesson') {
+      const dateStr = fmtDate(data.starts_at);
+      html = `
+        <div class="ms-preview__head">
+          <div class="ms-preview__kind">Lesson</div>
+          <h4 class="ms-preview__title">${h(data.appointment_title || 'Lesson')}</h4>
+          <div class="ms-preview__meta">${clientName ? h(clientName) + ' · ' : ''}${h(dateStr)}${data.duration_minutes ? ' · ' + (data.duration_minutes / 60) + 'h' : ''}</div>
+        </div>
+        ${data.focus_area ? `<div class="ms-preview__sec"><div class="ms-preview__label">Focus area</div><div class="ms-preview__body">${h(data.focus_area)}</div></div>` : ''}
+        ${data.key_concepts ? `<div class="ms-preview__sec"><div class="ms-preview__label">Key concepts</div><div class="ms-preview__body">${h(data.key_concepts)}</div></div>` : ''}
+        ${data.feedback ? `<div class="ms-preview__sec"><div class="ms-preview__label">Feedback</div><div class="ms-preview__body">${h(data.feedback)}</div></div>` : ''}
+        ${data.next_session_notes ? `<div class="ms-preview__sec"><div class="ms-preview__label">Next session notes</div><div class="ms-preview__body">${h(data.next_session_notes)}</div></div>` : ''}
+        ${data.lesson_assistant_name ? `<div class="ms-preview__foot">Logged by ${h(data.lesson_assistant_name)}</div>` : ''}
+      `;
+    } else if (kind === 'invoice') {
+      const dateStr = fmtDate(data.invoice_date);
+      html = `
+        <div class="ms-preview__head">
+          <div class="ms-preview__kind">Invoice</div>
+          <h4 class="ms-preview__title">${h(data.invoice_number || ('Invoice ' + (data.id || '').slice(0, 8)))}</h4>
+          <div class="ms-preview__meta">${clientName ? h(clientName) + ' · ' : ''}${h(dateStr)} · ${h(fmtMoney(data.total_cents || data.amount_paid_cents))} · ${h(data.status || '')}</div>
+        </div>
+        ${data.subject ? `<div class="ms-preview__sec"><div class="ms-preview__label">Subject</div><div class="ms-preview__body">${h(data.subject)}</div></div>` : ''}
+        ${data.customer_notes ? `<div class="ms-preview__sec"><div class="ms-preview__label">Customer note</div><div class="ms-preview__body">${h(data.customer_notes)}</div></div>` : ''}
+        ${data.contract ? `<div class="ms-preview__sec"><div class="ms-preview__label">Linked contract</div><div class="ms-preview__body">${h(fmtDate(data.contract.start_at))} – ${h(fmtDate(data.contract.end_at))}</div></div>` : ''}
+      `;
+    } else {
+      // Generic fallback
+      html = `
+        <div class="ms-preview__head">
+          <h4 class="ms-preview__title">${h(item.title || '')}</h4>
+          <div class="ms-preview__meta">${h(item.subtitle || '')}</div>
+        </div>
+      `;
+    }
+    previewEl.innerHTML = html;
+  }
+
   // ── Render dropdown ─────────────────────────────────────────────
   function renderDropdown(panel, results, query, state) {
     const sections = [
@@ -540,24 +642,31 @@
     const wrap = input.closest('.nx-search');
     if (!wrap) return;
 
-    // Inject the dropdown panel as a sibling of the input
-    const panel = document.createElement('div');
-    panel.className = 'ms-panel';
-    panel.hidden = true;
-    wrap.appendChild(panel);
+    // Inject the dropdown wrapper as a sibling of the input. Split into
+    // two columns: results on the left, preview pane on the right.
+    const panelWrap = document.createElement('div');
+    panelWrap.className = 'ms-panel';
+    panelWrap.hidden = true;
+    panelWrap.innerHTML = `
+      <div class="ms-panel__results"></div>
+      <div class="ms-panel__preview"><div class="ms-preview__empty">Hover or arrow-key over a result to preview it here.</div></div>
+    `;
+    wrap.appendChild(panelWrap);
+    const panel       = panelWrap.querySelector('.ms-panel__results');
+    const previewEl   = panelWrap.querySelector('.ms-panel__preview');
 
     const state = { open: false, flat: [], selectedIdx: -1, query: '' };
 
     function close() {
       state.open = false;
       state.selectedIdx = -1;
-      panel.hidden = true;
-      panel.classList.remove('is-shown');
+      panelWrap.hidden = true;
+      panelWrap.classList.remove('is-shown');
     }
     function open() {
       state.open = true;
-      panel.hidden = false;
-      panel.classList.add('is-shown');
+      panelWrap.hidden = false;
+      panelWrap.classList.add('is-shown');
     }
     function setSelected(idx) {
       state.selectedIdx = idx;
@@ -565,6 +674,10 @@
         el.classList.toggle('is-selected', i === idx);
         if (i === idx) el.scrollIntoView({ block: 'nearest' });
       });
+      // Update preview pane to match
+      if (idx >= 0 && state.flat[idx]) {
+        renderPreview(previewEl, state.flat[idx], state.query);
+      }
     }
 
     const run = debounce(async (q) => {
@@ -585,6 +698,20 @@
         const results = search(q, role, dyn);
         open();
         renderDropdown(panel, results, q, state);
+        // Wire hover-to-preview on each item
+        panel.querySelectorAll('.ms-item').forEach((el, i) => {
+          el.addEventListener('mouseenter', () => {
+            state.selectedIdx = i;
+            panel.querySelectorAll('.ms-item').forEach((e2, j) => e2.classList.toggle('is-selected', j === i));
+            if (state.flat[i]) renderPreview(previewEl, state.flat[i], state.query);
+          });
+        });
+        // Auto-select first result so the preview shows something immediately
+        if (state.flat.length > 0) {
+          renderPreview(previewEl, state.flat[0], state.query);
+        } else {
+          renderPreview(previewEl, null, state.query);
+        }
       } catch (err) {
         console.warn('master-search: render failed', err);
         if (state.query !== q) return;
@@ -595,7 +722,7 @@
 
     input.addEventListener('input', () => run(input.value));
     input.addEventListener('focus', () => {
-      if (state.query && totalCount(search(state.query, role, CACHE.data || {})) > 0) open();
+      if (state.query && CACHE.data && totalCount(search(state.query, role, CACHE.data)) > 0) open();
     });
     input.addEventListener('keydown', (e) => {
       if (!state.open) return;
