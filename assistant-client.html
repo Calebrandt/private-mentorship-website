@@ -210,6 +210,34 @@
   }
   .wc-kpi__bank-cta:hover{color:#78350F;text-decoration:underline;}
 
+  /* Phase 19d: Hours-remaining tile — color-coded urgency so the assistant
+     can read the family's runway at a glance. NOT to be confused with bank
+     hours (separate gold tile) — this is the live balance on the contract
+     that's in force right now. */
+  .wc-kpi--remaining{
+    background:linear-gradient(135deg,#F0FDF4,#DCFCE7);
+    border-color:#BBF7D0;
+  }
+  .wc-kpi--remaining .wc-kpi__label{color:#166534;}
+  .wc-kpi--remaining .wc-kpi__value{color:#14532D;}
+  .wc-kpi--remaining .wc-kpi__sub{color:#166534;}
+  /* Running low (<= 25% of plan size, or <= 5 hours) — amber */
+  .wc-kpi--remaining.is-low{
+    background:linear-gradient(135deg,#FFFBEB,#FEF3C7);
+    border-color:#FCD34D;
+  }
+  .wc-kpi--remaining.is-low .wc-kpi__label{color:#92400E;}
+  .wc-kpi--remaining.is-low .wc-kpi__value{color:#78350F;}
+  .wc-kpi--remaining.is-low .wc-kpi__sub{color:#92400E;}
+  /* At/below zero — red */
+  .wc-kpi--remaining.is-empty{
+    background:linear-gradient(135deg,#FEF2F2,#FEE2E2);
+    border-color:#FECACA;
+  }
+  .wc-kpi--remaining.is-empty .wc-kpi__label{color:#991B1B;}
+  .wc-kpi--remaining.is-empty .wc-kpi__value{color:#7F1D1D;}
+  .wc-kpi--remaining.is-empty .wc-kpi__sub{color:#991B1B;}
+
   /* Bank nudge modal — template picker */
   .wc-nudge-card{
     background:#fff;border:1.5px solid #E2E8F0;border-radius:10px;
@@ -386,7 +414,12 @@
       <div class="wc-kpi">
         <p class="wc-kpi__label">Plan size</p>
         <span class="wc-kpi__value" id="kpiPlan">—</span>
-        <p class="wc-kpi__sub">hours included</p>
+        <p class="wc-kpi__sub" id="kpiPlanSub">hours included</p>
+      </div>
+      <div class="wc-kpi wc-kpi--remaining" id="kpiRemainingTile">
+        <p class="wc-kpi__label">Hours remaining</p>
+        <span class="wc-kpi__value" id="kpiRemaining">—</span>
+        <p class="wc-kpi__sub" id="kpiRemainingSub">left on this contract</p>
       </div>
       <div class="wc-kpi">
         <p class="wc-kpi__label">Hours used</p>
@@ -722,9 +755,46 @@ function renderAppointmentRow(a, spend){
   // KPIs
   const planHours = ws.contract.included_minutes ? Math.round(ws.contract.included_minutes/60*10)/10 : 0;
   const usedHours = ws.hoursUsedMinutes ? Math.round(ws.hoursUsedMinutes/60*10)/10 : 0;
+  // Phase 19d: true remaining = included + sum(all ledger deltas).
+  // Captures carryovers INTO this contract (e.g. Michael: 40 plan + 2.75
+  // carried over - 36 used = 6.75 left). Computed in hiring-service.js.
+  const toppedUpHours = ws.hoursToppedUpMinutes ? Math.round(ws.hoursToppedUpMinutes/60*100)/100 : 0;
+  const remainingHours = Number.isFinite(ws.hoursRemainingMinutes)
+    ? Math.round(ws.hoursRemainingMinutes/60*100)/100
+    : Math.max(0, planHours - usedHours);
   document.getElementById('kpiPlan').textContent = planHours;
   document.getElementById('kpiUsed').textContent = usedHours;
   document.getElementById('kpiUpcoming').textContent = (ws.upcomingAppointments || []).length;
+
+  // Hours Remaining tile — color shifts as the runway shrinks so the
+  // assistant clocks it at a glance. Bank hours are SEPARATE (gold tile
+  // below) and intentionally not added in here — those are the family's
+  // store, not the live contract balance.
+  const remTile = document.getElementById('kpiRemainingTile');
+  const remEl = document.getElementById('kpiRemaining');
+  const remSubEl = document.getElementById('kpiRemainingSub');
+  if (remTile && remEl) {
+    remEl.textContent = remainingHours;
+    remTile.classList.remove('is-low','is-empty');
+    if (remainingHours <= 0) {
+      remTile.classList.add('is-empty');
+      if (remSubEl) remSubEl.textContent = 'contract is fully used';
+    } else if (planHours > 0 && (remainingHours <= 5 || remainingHours / planHours <= 0.25)) {
+      remTile.classList.add('is-low');
+      if (remSubEl) remSubEl.textContent = 'running low — consider renewal';
+    } else if (toppedUpHours > 0 && remSubEl) {
+      remSubEl.textContent = `incl. ${toppedUpHours} h carried over`;
+    } else if (remSubEl) {
+      remSubEl.textContent = 'left on this contract';
+    }
+  }
+  // Plan-size subline: if there was a carry-in, say so honestly.
+  const planSubEl = document.getElementById('kpiPlanSub');
+  if (planSubEl) {
+    planSubEl.textContent = toppedUpHours > 0
+      ? `hours included (+${toppedUpHours} carried in)`
+      : 'hours included';
+  }
 
   // Phase 12: show bank-hours tile if the family has any saved-up hours.
   // Phase 12.2: also wires the "Suggest using these" nudge button.

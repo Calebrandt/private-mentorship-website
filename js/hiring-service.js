@@ -1880,6 +1880,11 @@
       upcomingAppointments: [],
       recentAppointments: [],
       hoursUsedMinutes: 0,
+      // Phase 19d: positive ledger entries that came INTO this contract
+      // (carryovers from prior contract, top-ups, refunds). Needed so the
+      // assistant sees the TRUE remaining balance, not just included - used.
+      hoursToppedUpMinutes: 0,
+      hoursRemainingMinutes: 0,
     };
 
     try {
@@ -1945,17 +1950,32 @@
         out.recentAppointments = recent || [];
       } catch (_) {}
       // Hours used = sum of negative minutes_delta (consumption) on this contract's ledger.
-      // Positive deltas are top-ups / refunds and should not count as "used".
+      // Hours topped up = sum of positive minutes_delta (carryovers INTO this contract,
+      //   admin top-ups, refunds, etc.). Counted separately so the UI can show
+      //   "you started with 40h + 2.75h carried over" instead of pretending the
+      //   contract just has 42.75h plain.
+      // Hours remaining = included_minutes + sum(all deltas)
+      //   (positive deltas add, negative deltas subtract — same as how the
+      //   ledger naturally accumulates). This is the source of truth for
+      //   "how many hours does this family have left RIGHT NOW".
       try {
         const { data: ledger } = await sb()
           .from('hours_ledger')
           .select('minutes_delta')
           .eq('contract_id', out.contract.id);
-        const usedMin = (ledger || []).reduce((s, r) => {
+        let usedMin = 0;
+        let toppedUpMin = 0;
+        let netDeltaMin = 0;
+        (ledger || []).forEach(r => {
           const v = Number(r.minutes_delta) || 0;
-          return v < 0 ? s + Math.abs(v) : s;
-        }, 0);
+          netDeltaMin += v;
+          if (v < 0) usedMin += Math.abs(v);
+          else if (v > 0) toppedUpMin += v;
+        });
         out.hoursUsedMinutes = Math.round(usedMin);
+        out.hoursToppedUpMinutes = Math.round(toppedUpMin);
+        const included = Number(out.contract.included_minutes) || 0;
+        out.hoursRemainingMinutes = Math.round(included + netDeltaMin);
       } catch (_) {}
     }
     return out;
