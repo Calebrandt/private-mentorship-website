@@ -113,20 +113,21 @@
       padding: 56px 30px 56px 38px;
       display: flex; flex-direction: column;
     }
-    /* Uses pre-cropped pm-monogram.png (700×550, just the PM mark, no
-       wordmark). Simple center placement at 72% size — leaves a small
-       breathing margin inside the circle ring. */
+    /* Uses pre-cropped pm-monogram.png (690×640 tight crop of just the
+       PM mark, derived from Rec.png — no wordmark, no padding). Switched
+       from background-image back to <img> because html2canvas captures
+       <img> tags at full quality; background images render blurry. */
     .logo-circle {
       width: 100px; height: 100px; border-radius: 50%;
       border: 1.5px solid #a8a8a8;
-      background-color: #ffffff;
-      background-image: url('${LOGO_URL}');
-      background-repeat: no-repeat;
-      background-position: center center;
-      background-size: 72% auto;
-      background-blend-mode: multiply;
+      background: #ffffff;
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
       margin-bottom: 56px;
       box-shadow: 0 0 0 6px #ececec;
+    }
+    .logo-circle img {
+      width: 72%; height: auto; display: block;
     }
     .meta-block { margin-bottom: 28px; }
     .meta-block.last { flex: 1; }
@@ -292,11 +293,7 @@
 
     return `
     <aside class="sidebar">
-      <div class="logo-circle" role="img" aria-label="${escapeHtml(COMPANY_NAME)}"></div>
-      <!-- Hidden preload — financial-pdf.js waits for <img> tags before
-           capturing, so this ensures the background-image is decoded
-           before html2canvas snapshots the DOM. -->
-      <img src="${LOGO_URL}" alt="" aria-hidden="true" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" />
+      <div class="logo-circle"><img src="${LOGO_URL}" alt="${escapeHtml(COMPANY_NAME)}" /></div>
       ${metaHtml}
       ${paymentRows && paymentRows.length ? `
         <div class="meta-block payment last">
