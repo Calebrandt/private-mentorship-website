@@ -2435,17 +2435,33 @@
         }));
       } catch (_) {}
     }
-    // Compute used minutes via hours_ledger per contract.
+    // Compute hours math per contract from hours_ledger. Same model as
+    // the assistant workspace KPI tiles (Phase 19d): carryover absorbed
+    // first, so "used_hours" = sessions that hit the purchased plan
+    // (not including carryover bonus). "remaining" = included + ALL
+    // deltas (positive carry-in + negative consumption).
     for (const c of contracts) {
-      let usedMin = 0;
+      let usedMinRaw = 0;       // sum of |negative deltas| — total sessions
+      let toppedUpMin = 0;      // sum of positive deltas — carryover IN / top-ups
       try {
         const r = await sb().from('hours_ledger').select('minutes_delta').eq('contract_id', c.id);
-        usedMin = (r.data || []).reduce((s, row) => s + (row.minutes_delta < 0 ? -row.minutes_delta : 0), 0);
+        (r.data || []).forEach(row => {
+          const v = Number(row.minutes_delta) || 0;
+          if (v < 0) usedMinRaw += Math.abs(v);
+          else if (v > 0) toppedUpMin += v;
+        });
       } catch (_) {}
-      c.used_minutes = usedMin;
-      c.used_hours = +(usedMin / 60).toFixed(1);
-      c.included_hours = +((c.included_minutes || 0) / 60).toFixed(1);
-      c.remaining_hours = +(c.included_hours - c.used_hours).toFixed(1);
+      const included = c.included_minutes || 0;
+      const remainingMin = included + toppedUpMin - usedMinRaw;
+      // "Used against plan" = sessions minus carryover absorbed first
+      const usedAgainstPlanMin = Math.max(0, usedMinRaw - toppedUpMin);
+
+      c.used_minutes      = usedMinRaw;
+      c.topped_up_minutes = toppedUpMin;
+      c.included_hours    = +((included / 60).toFixed(2));
+      c.topped_up_hours   = +((toppedUpMin / 60).toFixed(2));
+      c.used_hours        = +((usedAgainstPlanMin / 60).toFixed(2));
+      c.remaining_hours   = +((remainingMin / 60).toFixed(2));
     }
     // Label oldest as "Initial Contract", later as "Renewal #N"
     const ascending = [...contracts].reverse();

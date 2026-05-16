@@ -1054,13 +1054,29 @@
   if (!contracts.length) {
     cWrap.innerHTML = `<div class="nx-empty">No contracts yet.<p class="nx-empty__hint">Your contract history will show here.</p></div>`;
   } else {
+    // Parse YYYY-MM-DD as local date so dates display correctly in
+    // Pacific (prevents the UTC-midnight off-by-one shift). Same fix
+    // applied earlier to assistant-client.html header.
+    const _fmtLocal = (iso) => {
+      if (!iso) return '—';
+      const s = String(iso);
+      const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      const d = m ? new Date(+m[1], +m[2]-1, +m[3]) : new Date(s);
+      return d.toLocaleDateString('en-CA', { month:'short', day:'numeric', year:'numeric' });
+    };
     cWrap.innerHTML = `<div class="nx-contracts">${contracts.map(c => {
       const used = Number(c.used_hours || 0);
       const total = Number(c.included_hours || 0);
+      const toppedUp = Number(c.topped_up_hours || 0);
+      // Progress bar reflects sessions against the purchased plan only
+      // (mental model: carryover bonus is consumed first as freebie).
       const pct = total > 0 ? Math.min(100, (used / total) * 100) : 0;
       const status = String(c.status || '').toLowerCase();
-      const start = c.start_at ? new Date(c.start_at).toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'}) : '—';
-      const end = c.end_at ? new Date(c.end_at).toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'}) : 'Ongoing';
+      const start = c.start_at ? _fmtLocal(c.start_at) : '—';
+      const end = c.end_at ? _fmtLocal(c.end_at) : 'Ongoing';
+      // Subline shows carryover when present, so the math reads honest:
+      //   "33.25 of 40 hrs used (+2.75 carried in)  ·  6.75 remaining"
+      const carryNote = toppedUp > 0 ? ` <span style="color:var(--ink-mute,#94A3B8);font-weight:500;">+${toppedUp.toFixed(2)} carried in</span>` : '';
       return `<div class="nx-contract">
         <div class="nx-contract__head">
           <div>
@@ -1070,8 +1086,8 @@
           <span class="nx-contract__pill nx-pill--${esc(status)}">${esc(status || 'unknown')}</span>
         </div>
         <div class="nx-contract__hours">
-          <span><strong>${used.toFixed(1)}</strong> of ${total.toFixed(1)} hrs used</span>
-          <span>${(c.remaining_hours || 0).toFixed(1)} remaining</span>
+          <span><strong>${used.toFixed(2)}</strong> of ${total.toFixed(1)} hrs used${carryNote}</span>
+          <span>${(c.remaining_hours || 0).toFixed(2)} remaining</span>
         </div>
         <div class="nx-contract__bar"><div class="nx-contract__bar-fill" style="width:${pct.toFixed(1)}%"></div></div>
       </div>`;
