@@ -3179,6 +3179,156 @@
     }
   }
 
+  // ════════════════════════════════════════════════════════════
+  // Phase 19c — Bookkeeping service layer
+  // Thin wrappers around the SECURITY DEFINER RPCs installed in
+  // phase-19c2-bookkeeping-rpcs.sql. All admin-only; the RPCs
+  // themselves enforce is_admin() and bubble PostgREST errors.
+  // ════════════════════════════════════════════════════════════
+
+  async function _callRpc(fnName, params) {
+    const { data, error } = await sb().rpc(fnName, params);
+    if (error) {
+      console.warn('rpc ' + fnName + ' failed:', error);
+      throw new Error(error.message || ('RPC ' + fnName + ' failed'));
+    }
+    if (data && data.ok === false) {
+      throw new Error(data.error || (fnName + ' returned ok=false'));
+    }
+    return data;
+  }
+
+  // ─── Invoices ────────────────────────────────────────────────
+  // lines: [{ description, quantity, unit_price_cents, hours?, hourly_rate_cents? }]
+  async function adminIssueInvoice({ clientId, lines, invoiceDate, dueDate, subject, customerNotes, terms, currency, salesperson } = {}) {
+    return _callRpc('issue_invoice', {
+      p_client_id:      clientId,
+      p_lines:          lines || [],
+      p_invoice_date:   invoiceDate || null,
+      p_due_date:       dueDate || null,
+      p_subject:        subject || null,
+      p_customer_notes: customerNotes || null,
+      p_terms:          terms || 'Due on Receipt',
+      p_currency:       currency || 'CAD',
+      p_salesperson:    salesperson || null,
+    });
+  }
+
+  // createContractArgs (optional):
+  //   { included_hours, start_at, end_at, carry_hours?, assistant_id?, renewal_mode? }
+  async function adminRecordPayment({ invoiceId, amountCents, paymentMode, reference, notes, receiptDate, createContractArgs } = {}) {
+    return _callRpc('record_payment_received', {
+      p_invoice_id:           invoiceId,
+      p_amount_cents:         amountCents,
+      p_payment_mode:         paymentMode || 'cash',
+      p_reference:            reference || null,
+      p_notes:                notes || null,
+      p_receipt_date:         receiptDate || null,
+      p_create_contract_args: createContractArgs || null,
+    });
+  }
+
+  async function adminVoidInvoice({ invoiceId, reason } = {}) {
+    return _callRpc('void_invoice', { p_invoice_id: invoiceId, p_reason: reason || 'Voided' });
+  }
+
+  async function adminReissueInvoice({ invoiceId, reason } = {}) {
+    return _callRpc('reissue_invoice', { p_invoice_id: invoiceId, p_reason: reason || 'Reissued' });
+  }
+
+  // ─── Receipts ────────────────────────────────────────────────
+  async function adminVoidReceipt({ receiptId, reason } = {}) {
+    return _callRpc('void_receipt', { p_receipt_id: receiptId, p_reason: reason || 'Voided' });
+  }
+
+  // ─── Paycheques ──────────────────────────────────────────────
+  // lines: [{ description, appointment_id?, hours, hourly_rate_cents }]
+  async function adminIssuePaycheque({ assistantId, lines, payDate, periodStart, periodEnd, paymentMode, reference, notes, deductionsCents, currency } = {}) {
+    return _callRpc('issue_paycheque', {
+      p_assistant_id:     assistantId,
+      p_lines:            lines || [],
+      p_pay_date:         payDate || null,
+      p_period_start:     periodStart || null,
+      p_period_end:       periodEnd || null,
+      p_payment_mode:     paymentMode || 'e-transfer',
+      p_reference:        reference || null,
+      p_notes:            notes || null,
+      p_deductions_cents: deductionsCents || 0,
+      p_currency:         currency || 'CAD',
+    });
+  }
+
+  async function adminVoidPaycheque({ paychequeId, reason } = {}) {
+    return _callRpc('void_paycheque', { p_paycheque_id: paychequeId, p_reason: reason || 'Voided' });
+  }
+
+  // ─── Unified read ────────────────────────────────────────────
+  async function adminListFinancialDocuments({ limit = 200, docType = null, partyId = null, dateFrom = null, dateTo = null } = {}) {
+    let q = sb().from('v_financial_documents')
+      .select('*')
+      .order('doc_date', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    if (docType)  q = q.eq('doc_type', docType);
+    if (partyId)  q = q.eq('party_id', partyId);
+    if (dateFrom) q = q.gte('doc_date', dateFrom);
+    if (dateTo)   q = q.lte('doc_date', dateTo);
+    const { data, error } = await q;
+    if (error) { console.warn('adminListFinancialDocuments:', error); return []; }
+    return data || [];
+  }
+
+  // ─── Single-doc reads (with lines) ───────────────────────────
+  async function adminGetInvoice(invoiceId) {
+    const [{ data: inv, error: ie }, { data: lines, error: le }, { data: receipts }] = await Promise.all([
+      sb().from('invoices').select('*, clients(id, full_name)').eq('id', invoiceId).maybeSingle(),
+      sb().from('invoice_lines').select('*').eq('invoice_id', invoiceId).order('position'),
+      sb().from('sales_receipts').select('id, receipt_number, receipt_date, total_amount, payment_mode, reference, voided_at')
+        .eq('invoice_id', invoiceId).order('receipt_date', { ascending: false }),
+    ]);
+    if (ie) console.warn('adminGetInvoice header:', ie);
+    if (le) console.warn('adminGetInvoice lines:', le);
+    return inv ? { ...inv, lines: lines || [], receipts: receipts || [] } : null;
+  }
+
+  async function adminGetReceipt(receiptId) {
+    const [{ data: r, error: re }, { data: lines, error: le }] = await Promise.all([
+      sb().from('sales_receipts').select('*, clients(id, full_name), invoices(id, invoice_number)').eq('id', receiptId).maybeSingle(),
+      sb().from('sales_receipt_lines').select('*').eq('receipt_id', receiptId).order('line_index'),
+    ]);
+    if (re) console.warn('adminGetReceipt header:', re);
+    if (le) console.warn('adminGetReceipt lines:', le);
+    return r ? { ...r, lines: lines || [] } : null;
+  }
+
+  async function adminGetPaycheque(paychequeId) {
+    const [{ data: p, error: pe }, { data: lines, error: le }] = await Promise.all([
+      sb().from('paycheques').select('*').eq('id', paychequeId).maybeSingle(),
+      sb().from('paycheque_lines').select('*').eq('paycheque_id', paychequeId).order('position'),
+    ]);
+    if (pe) console.warn('adminGetPaycheque header:', pe);
+    if (le) console.warn('adminGetPaycheque lines:', le);
+    if (!p) return null;
+    let assistantName = '';
+    try {
+      const { data: prof } = await sb().from('profiles').select('full_name').eq('user_id', p.assistant_id).maybeSingle();
+      assistantName = prof?.full_name || '';
+    } catch (_) {}
+    return { ...p, assistant_name: assistantName, lines: lines || [] };
+  }
+
+  // ─── Assistant picker (for paycheque form) ───────────────────
+  async function adminListAssistants() {
+    try {
+      const { data } = await sb().from('profiles')
+        .select('user_id, full_name, role')
+        .ilike('role', '%ASSISTANT%')
+        .order('full_name');
+      return data || [];
+    } catch (e) { console.warn('adminListAssistants:', e); return []; }
+  }
+
+
   // ─── Public surface ──────────────────────────────────────────────────────
   window.pmHiring = {
     // auth
@@ -3267,5 +3417,10 @@
     clientRequestEndOfService, clientReactivateAutoRenew,
     // notifications
     notifyOwnerOfSubmission,
+    // Phase 19c — bookkeeping (admin)
+    adminIssueInvoice, adminRecordPayment, adminIssuePaycheque,
+    adminVoidInvoice, adminVoidReceipt, adminVoidPaycheque, adminReissueInvoice,
+    adminListFinancialDocuments, adminGetInvoice, adminGetReceipt, adminGetPaycheque,
+    adminListAssistants,
   };
 })();

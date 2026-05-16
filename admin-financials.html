@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Financials — Private Mentorship Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
+<link rel="stylesheet" href="js/sidebar.css?v=20260516s" />
+<link rel="icon" href="assets/logos/pm-logo.png" />
+<script src="js/theme.js?v=20260516b"></script>
+<style>
+  /* Theme tokens — same vocabulary as the rest of admin */
+  :root,[data-dash-theme="light"]{
+    --bg:#f9fafb;--card:#ffffff;--border:#e5e7eb;--border-soft:#f3f4f6;
+    --input-bg:#ffffff;--ink:#1f2937;--ink-2:#111827;--ink-mute:#6b7280;
+    --ink-tert:#9ca3af;--primary:#2563eb;--primary-hover:#1d4ed8;
+  }
+  [data-dash-theme="dark"]{
+    --bg:#0b0c10;--card:#16171c;--border:#262830;--border-soft:#1c1d23;
+    --input-bg:#22232a;--ink:#f1f5f9;--ink-2:#ffffff;--ink-mute:#94a3b8;
+    --ink-tert:#64748b;--primary:#3b82f6;--primary-hover:#2563eb;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+
+  /* Topbar — same vocabulary as other admin pages */
+  .nx-topbar{
+    background:var(--card);border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 26px;gap:16px;position:sticky;top:0;z-index:20;
+  }
+  .nx-search{flex:1;max-width:520px;position:relative;}
+  .nx-search input{
+    width:100%;background:var(--input-bg);border:1px solid transparent;
+    border-radius:10px;padding:10px 14px 10px 38px;
+    font:500 13.5px Inter,sans-serif;color:var(--ink);
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .nx-search input::placeholder{color:var(--ink-tert);font-weight:400;}
+  .nx-search input:focus{outline:none;border-color:var(--primary);background:var(--card);}
+  .nx-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--ink-tert);}
+  .dash-theme-toggle{
+    display:inline-flex;align-items:center;justify-content:center;
+    padding:7px 10px;background:var(--card);color:var(--ink-mute);
+    border:1px solid var(--border);border-radius:8px;cursor:pointer;
+    transition:background .14s ease, color .14s ease;
+  }
+  .dash-theme-toggle:hover{background:var(--border-soft);color:var(--ink-2);}
+  .dash-theme-toggle svg{width:14px;height:14px;}
+  .dash-theme-toggle__sun{display:none;}
+  .dash-theme-toggle__moon{display:block;}
+  [data-dash-theme="dark"] .dash-theme-toggle__sun{display:block;}
+  [data-dash-theme="dark"] .dash-theme-toggle__moon{display:none;}
+  @media(max-width:780px){.nx-search{display:none;}.nx-topbar{padding:12px 16px;}}
+
+  /* Shell — picked up by universal premium polish via .admin-shell */
+  .admin-shell{padding:40px 32px 96px;max-width:1280px;margin:0 auto;}
+  .admin-h1{font:800 30px Inter,sans-serif;letter-spacing:-.024em;line-height:1.1;margin:0 0 8px;color:var(--ink-2);}
+  .admin-sub{font:500 15px Inter,sans-serif;letter-spacing:-.005em;line-height:1.55;color:var(--ink-mute);margin:0;}
+
+  /* Tab bar */
+  .fin-tabs{display:flex;gap:6px;margin:24px 0 18px;border-bottom:1px solid var(--border);}
+  .fin-tab{
+    background:transparent;border:none;cursor:pointer;
+    padding:10px 18px 12px;
+    font:600 13.5px Inter,sans-serif;letter-spacing:-.005em;
+    color:var(--ink-mute);position:relative;
+    transition:color .12s ease;
+  }
+  .fin-tab:hover{color:var(--ink-2);}
+  .fin-tab.is-active{color:var(--ink-2);}
+  .fin-tab.is-active::after{
+    content:"";position:absolute;left:18px;right:18px;bottom:-1px;height:2px;background:var(--primary);
+  }
+  .fin-tab__count{
+    display:inline-block;min-width:20px;padding:1px 7px;margin-left:6px;
+    background:var(--border-soft);color:var(--ink);border:1px solid var(--border);
+    border-radius:5px;font:700 10px "JetBrains Mono",ui-monospace,monospace;letter-spacing:0;
+  }
+
+  /* Action bar above the table */
+  .fin-actions{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px;flex-wrap:wrap;}
+  .fin-actions__left{display:flex;gap:10px;align-items:center;}
+  .fin-actions__sub{font:500 13px Inter,sans-serif;color:var(--ink-mute);}
+  .fin-btn{
+    display:inline-flex;align-items:center;gap:7px;
+    padding:10px 16px;border-radius:9px;
+    font:700 13px Inter,sans-serif;letter-spacing:-.005em;
+    cursor:pointer;border:1px solid transparent;
+    text-decoration:none;
+    transition:transform .12s ease, box-shadow .14s ease, background .14s ease, color .14s ease, border-color .14s ease;
+  }
+  .fin-btn--primary{background:linear-gradient(180deg,#2563eb 0%,#1d4ed8 100%);color:#fff;
+    box-shadow:0 1px 2px rgba(15,23,42,0.10),0 6px 18px -4px rgba(59,130,246,0.40),inset 0 1px 0 rgba(255,255,255,0.18);}
+  .fin-btn--primary:hover{transform:translateY(-1px);box-shadow:0 1px 2px rgba(15,23,42,0.12),0 10px 22px -4px rgba(59,130,246,0.50),inset 0 1px 0 rgba(255,255,255,0.20);}
+  .fin-btn--ghost{background:transparent;color:var(--ink);border-color:var(--border);}
+  .fin-btn--ghost:hover{background:var(--border-soft);}
+  .fin-btn--danger{background:transparent;color:#dc2626;border-color:rgba(220,38,38,0.30);}
+  .fin-btn--danger:hover{background:rgba(220,38,38,0.06);border-color:rgba(220,38,38,0.50);}
+  .fin-btn svg{width:13px;height:13px;}
+
+  /* Table — adopts admin card shadows via universal overlay */
+  .fin-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+  .fin-table{width:100%;border-collapse:collapse;}
+  .fin-table thead th{
+    text-align:left;padding:12px 18px;
+    font:700 10.5px Inter,sans-serif;letter-spacing:.10em;text-transform:uppercase;
+    color:var(--ink-tert);background:var(--border-soft);
+    border-bottom:1px solid var(--border);white-space:nowrap;
+  }
+  .fin-table tbody td{
+    padding:14px 18px;border-bottom:1px solid var(--border-soft);
+    font:500 13.5px Inter,sans-serif;color:var(--ink);letter-spacing:-.005em;
+    vertical-align:middle;
+  }
+  .fin-table tbody tr:last-child td{border-bottom:none;}
+  .fin-table tbody tr:hover{background:rgba(59,130,246,0.03);}
+  .fin-num{font:700 13.5px "JetBrains Mono",ui-monospace,monospace;letter-spacing:0;color:var(--ink-2);}
+  .fin-amount{font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink-2);text-align:right;}
+  .fin-mute{color:var(--ink-mute);font-weight:500;}
+  .fin-row-actions{display:flex;gap:6px;justify-content:flex-end;}
+  .fin-row-actions button{
+    background:transparent;border:1px solid var(--border);color:var(--ink-mute);
+    padding:5px 10px;border-radius:6px;font:600 11px Inter,sans-serif;cursor:pointer;
+    transition:background .12s ease,color .12s ease,border-color .12s ease;
+  }
+  .fin-row-actions button:hover{background:var(--border-soft);color:var(--ink-2);border-color:var(--ink-tert);}
+  .fin-row-actions button.is-danger:hover{background:rgba(220,38,38,0.06);color:#dc2626;border-color:rgba(220,38,38,0.50);}
+
+  /* Status pills */
+  .fin-pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:9999px;
+    font:600 10.5px Inter,sans-serif;letter-spacing:.04em;text-transform:uppercase;}
+  .fin-pill--paid{background:rgba(34,197,94,0.12);color:#15803d;box-shadow:inset 0 0 0 1px rgba(34,197,94,0.30);}
+  .fin-pill--open{background:rgba(245,158,11,0.12);color:#92400e;box-shadow:inset 0 0 0 1px rgba(245,158,11,0.30);}
+  .fin-pill--void{background:rgba(148,163,184,0.16);color:var(--ink-mute);box-shadow:inset 0 0 0 1px rgba(148,163,184,0.30);text-decoration:line-through;}
+  .fin-pill--issued{background:rgba(59,130,246,0.12);color:#1d4ed8;box-shadow:inset 0 0 0 1px rgba(59,130,246,0.30);}
+
+  /* Empty / loading */
+  .fin-empty{padding:42px 24px;text-align:center;color:var(--ink-mute);font:500 13.5px Inter,sans-serif;}
+  .fin-empty strong{color:var(--ink-2);font-weight:700;display:block;margin-bottom:6px;}
+
+  /* Modal */
+  .fin-modal{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;
+    padding:20px;background:rgba(15,23,42,0.55);backdrop-filter:blur(4px);}
+  .fin-modal.is-shown{display:flex;}
+  .fin-modal__card{background:var(--card);border-radius:16px;width:100%;max-width:680px;max-height:90vh;
+    display:flex;flex-direction:column;
+    box-shadow:0 0 0 1px rgba(15,23,42,0.08),0 24px 56px -16px rgba(15,23,42,0.4);}
+  .fin-modal__head{padding:22px 26px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
+  .fin-modal__title{font:700 19px Inter,sans-serif;letter-spacing:-.018em;color:var(--ink-2);margin:0 0 4px;}
+  .fin-modal__sub{font:500 12.5px Inter,sans-serif;color:var(--ink-mute);margin:0;}
+  .fin-modal__close{background:transparent;border:1px solid var(--border);color:var(--ink-mute);
+    width:32px;height:32px;border-radius:7px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+    transition:background .12s ease, color .12s ease;}
+  .fin-modal__close:hover{background:var(--border-soft);color:var(--ink-2);}
+  .fin-modal__close svg{width:14px;height:14px;}
+  .fin-modal__body{padding:20px 26px;overflow-y:auto;flex:1;}
+  .fin-modal__foot{padding:16px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;}
+
+  /* Form fields */
+  .fin-field{margin-bottom:16px;}
+  .fin-field__label{font:700 10.5px Inter,sans-serif;letter-spacing:.10em;text-transform:uppercase;
+    color:var(--ink-mute);margin-bottom:6px;display:block;}
+  .fin-field__input, .fin-field__select, .fin-field__textarea{
+    width:100%;padding:10px 14px;background:var(--input-bg);
+    border:1px solid var(--border);border-radius:9px;
+    font:500 14px Inter,sans-serif;letter-spacing:-.005em;color:var(--ink);
+    transition:border-color .12s ease, box-shadow .12s ease;
+  }
+  .fin-field__input:focus, .fin-field__select:focus, .fin-field__textarea:focus{
+    outline:none;border-color:var(--primary);
+    box-shadow:0 0 0 4px rgba(37,99,235,0.15);
+  }
+  .fin-field__textarea{min-height:80px;resize:vertical;font-family:Inter,sans-serif;}
+  .fin-field__row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .fin-field__hint{font:500 11.5px Inter,sans-serif;color:var(--ink-tert);margin-top:5px;}
+
+  /* Line items editor */
+  .fin-lines{border:1px solid var(--border);border-radius:11px;overflow:hidden;}
+  .fin-lines__row{display:grid;grid-template-columns:1fr 80px 110px 110px 32px;gap:10px;
+    padding:10px 14px;border-bottom:1px solid var(--border);align-items:center;background:var(--card);}
+  .fin-lines__row:last-child{border-bottom:none;}
+  .fin-lines__head{background:var(--border-soft);font:700 10.5px Inter,sans-serif;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--ink-tert);}
+  .fin-lines__head > div{padding:2px 0;}
+  .fin-lines input{width:100%;padding:7px 10px;background:var(--input-bg);border:1px solid var(--border);
+    border-radius:7px;font:500 13px Inter,sans-serif;color:var(--ink);}
+  .fin-lines input:focus{outline:none;border-color:var(--primary);}
+  .fin-lines__del{background:transparent;border:none;color:var(--ink-tert);cursor:pointer;padding:6px;border-radius:5px;}
+  .fin-lines__del:hover{background:var(--border-soft);color:#dc2626;}
+  .fin-lines__add{display:block;width:100%;padding:9px;background:var(--border-soft);color:var(--primary);
+    border:1px dashed var(--border);border-top:1px solid var(--border);border-radius:0 0 11px 11px;
+    font:600 12.5px Inter,sans-serif;cursor:pointer;text-align:center;
+    transition:background .12s ease;}
+  .fin-lines__add:hover{background:rgba(59,130,246,0.06);}
+
+  /* Toggle (e.g. "Also create new contract") */
+  .fin-toggle{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;
+    background:var(--border-soft);border:1px solid var(--border);border-radius:10px;margin:14px 0;cursor:pointer;}
+  .fin-toggle input{margin-top:3px;}
+  .fin-toggle__body{flex:1;}
+  .fin-toggle__title{font:600 13.5px Inter,sans-serif;color:var(--ink-2);letter-spacing:-.005em;}
+  .fin-toggle__sub{font:500 12px Inter,sans-serif;color:var(--ink-mute);margin-top:2px;line-height:1.45;}
+
+  /* Sub-form section */
+  .fin-subform{padding:14px;background:rgba(59,130,246,0.04);
+    border:1px solid rgba(59,130,246,0.20);border-radius:10px;margin-bottom:16px;}
+  .fin-subform__title{font:700 11px Inter,sans-serif;letter-spacing:.10em;text-transform:uppercase;
+    color:var(--primary);margin-bottom:10px;}
+
+  /* Toast */
+  .fin-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--ink-2);color:#fff;padding:12px 22px;border-radius:9999px;
+    font:600 13px Inter,sans-serif;letter-spacing:-.005em;
+    box-shadow:0 16px 36px -10px rgba(15,23,42,0.55);
+    opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s ease;z-index:2000;}
+  .fin-toast.is-shown{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
+  .fin-toast--success{background:linear-gradient(135deg,#16a34a,#22c55e);}
+  .fin-toast--error{background:linear-gradient(135deg,#dc2626,#ef4444);}
+</style>
+</head>
+<body class="pm-has-sidebar">
+
+<div id="pmSidebar"></div>
+
+<header class="nx-topbar">
+  <div class="nx-search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="search" placeholder="Search invoices, receipts, paycheques…" />
+  </div>
+  <button class="dash-theme-toggle" type="button" data-pm-theme-toggle title="Toggle light / dark theme" aria-label="Toggle theme">
+    <svg class="dash-theme-toggle__moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <svg class="dash-theme-toggle__sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.05" y2="7.05"/><line x1="16.95" y1="16.95" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.05" y2="16.95"/><line x1="16.95" y1="7.05" x2="19.07" y2="4.93"/></svg>
+  </button>
+  <div class="nx-userpod">
+    <span class="nx-userpod__avatar" id="nxUserAvatar">C</span>
+    <span class="nx-userpod__name" id="nxUserName">Admin</span>
+  </div>
+</header>
+
+<main class="admin-shell">
+  <header>
+    <h1 class="admin-h1">Financials</h1>
+    <p class="admin-sub">Issue invoices, record payments, pay assistants — every document auto-numbered, every change audit-logged. CRA-ready bookkeeping for your business.</p>
+  </header>
+
+  <nav class="fin-tabs" role="tablist">
+    <button class="fin-tab is-active" data-tab="invoices" role="tab">Invoices <span class="fin-tab__count" id="cntInvoices">0</span></button>
+    <button class="fin-tab" data-tab="receipts" role="tab">Receipts <span class="fin-tab__count" id="cntReceipts">0</span></button>
+    <button class="fin-tab" data-tab="paycheques" role="tab">Paycheques <span class="fin-tab__count" id="cntPaycheques">0</span></button>
+    <button class="fin-tab" data-tab="reports" role="tab">Reports</button>
+  </nav>
+
+  <!-- INVOICES PANEL -->
+  <section data-panel="invoices">
+    <div class="fin-actions">
+      <div class="fin-actions__left">
+        <button class="fin-btn fin-btn--primary" id="btnNewInvoice">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New invoice
+        </button>
+      </div>
+      <div class="fin-actions__sub">All issued invoices · newest first</div>
+    </div>
+    <div class="fin-card">
+      <div id="invoicesList"><div class="fin-empty">Loading invoices…</div></div>
+    </div>
+  </section>
+
+  <!-- RECEIPTS PANEL -->
+  <section data-panel="receipts" hidden>
+    <div class="fin-actions">
+      <div class="fin-actions__left">
+        <button class="fin-btn fin-btn--ghost" id="btnRecordPayment">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Record payment received
+        </button>
+      </div>
+      <div class="fin-actions__sub">Receipts are also created automatically when a payment is recorded against an invoice.</div>
+    </div>
+    <div class="fin-card">
+      <div id="receiptsList"><div class="fin-empty">Loading receipts…</div></div>
+    </div>
+  </section>
+
+  <!-- PAYCHEQUES PANEL -->
+  <section data-panel="paycheques" hidden>
+    <div class="fin-actions">
+      <div class="fin-actions__left">
+        <button class="fin-btn fin-btn--primary" id="btnNewPaycheque">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New paycheque
+        </button>
+      </div>
+      <div class="fin-actions__sub">Issue a paycheque to an assistant. Auto-numbered PAY-NNNNNN.</div>
+    </div>
+    <div class="fin-card">
+      <div id="paychequesList"><div class="fin-empty">Loading paycheques…</div></div>
+    </div>
+  </section>
+
+  <!-- REPORTS PANEL (placeholder) -->
+  <section data-panel="reports" hidden>
+    <div class="fin-card">
+      <div class="fin-empty">
+        <strong>Reports tab — coming next iteration</strong>
+        Monthly revenue summary, outstanding invoices, T4A-ready paycheque export, CSV download.
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ─────────────── MODALS ─────────────── -->
+
+<!-- New invoice modal -->
+<div class="fin-modal" id="invoiceModal" aria-hidden="true">
+  <div class="fin-modal__card">
+    <div class="fin-modal__head">
+      <div>
+        <h2 class="fin-modal__title">Issue new invoice</h2>
+        <p class="fin-modal__sub">Auto-numbered when saved. Line totals computed automatically.</p>
+      </div>
+      <button class="fin-modal__close" type="button" data-close-modal="invoiceModal" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="fin-modal__body">
+      <div class="fin-field">
+        <label class="fin-field__label" for="invClient">Client</label>
+        <select class="fin-field__select" id="invClient"></select>
+      </div>
+      <div class="fin-field__row">
+        <div class="fin-field">
+          <label class="fin-field__label" for="invDate">Invoice date</label>
+          <input class="fin-field__input" type="date" id="invDate" />
+        </div>
+        <div class="fin-field">
+          <label class="fin-field__label" for="invDue">Due date</label>
+          <input class="fin-field__input" type="date" id="invDue" />
+        </div>
+      </div>
+      <div class="fin-field">
+        <label class="fin-field__label" for="invSubject">Subject (optional)</label>
+        <input class="fin-field__input" type="text" id="invSubject" placeholder="e.g. Renewal contract #18" />
+      </div>
+      <div class="fin-field">
+        <label class="fin-field__label">Line items</label>
+        <div class="fin-lines">
+          <div class="fin-lines__row fin-lines__head">
+            <div>Description</div><div>Qty</div><div>Unit price ($)</div><div>Hours</div><div></div>
+          </div>
+          <div id="invLines"></div>
+          <button class="fin-lines__add" type="button" id="invAddLine">+ Add line</button>
+        </div>
+      </div>
+      <div class="fin-field">
+        <label class="fin-field__label" for="invNotes">Customer notes (optional)</label>
+        <textarea class="fin-field__textarea" id="invNotes" placeholder="Shown on the invoice / PDF"></textarea>
+      </div>
+    </div>
+    <div class="fin-modal__foot">
+      <button class="fin-btn fin-btn--ghost" type="button" data-close-modal="invoiceModal">Cancel</button>
+      <button class="fin-btn fin-btn--primary" type="button" id="invSubmit">Issue invoice</button>
+    </div>
+  </div>
+</div>
+
+<!-- Record payment modal -->
+<div class="fin-modal" id="paymentModal" aria-hidden="true">
+  <div class="fin-modal__card">
+    <div class="fin-modal__head">
+      <div>
+        <h2 class="fin-modal__title" id="payTitle">Record payment received</h2>
+        <p class="fin-modal__sub" id="paySub">—</p>
+      </div>
+      <button class="fin-modal__close" type="button" data-close-modal="paymentModal" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="fin-modal__body">
+      <div class="fin-field">
+        <label class="fin-field__label" for="payInvoice">Invoice</label>
+        <select class="fin-field__select" id="payInvoice"></select>
+      </div>
+      <div class="fin-field__row">
+        <div class="fin-field">
+          <label class="fin-field__label" for="payAmount">Amount received ($)</label>
+          <input class="fin-field__input" type="number" id="payAmount" step="0.01" min="0" />
+          <div class="fin-field__hint" id="payBalanceHint">—</div>
+        </div>
+        <div class="fin-field">
+          <label class="fin-field__label" for="payDate">Receipt date</label>
+          <input class="fin-field__input" type="date" id="payDate" />
+        </div>
+      </div>
+      <div class="fin-field__row">
+        <div class="fin-field">
+          <label class="fin-field__label" for="payMode">Payment mode</label>
+          <select class="fin-field__select" id="payMode">
+            <option value="cash">Cash</option>
+            <option value="e-transfer">E-transfer</option>
+            <option value="cheque">Cheque</option>
+            <option value="credit_card">Credit card</option>
+            <option value="bank_transfer">Bank transfer</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="fin-field">
+          <label class="fin-field__label" for="payRef">Reference (optional)</label>
+          <input class="fin-field__input" type="text" id="payRef" placeholder="cheque #, e-transfer code…" />
+        </div>
+      </div>
+      <div class="fin-field">
+        <label class="fin-field__label" for="payNotes">Notes (optional)</label>
+        <textarea class="fin-field__textarea" id="payNotes"></textarea>
+      </div>
+
+      <label class="fin-toggle">
+        <input type="checkbox" id="payCreateContract" />
+        <span class="fin-toggle__body">
+          <span class="fin-toggle__title">Also create a new contract from this payment</span>
+          <span class="fin-toggle__sub">Use when this payment activates a new monthly/quarterly contract. Includes optional carryover hours from the previous contract.</span>
+        </span>
+      </label>
+
+      <div class="fin-subform" id="contractSubform" hidden>
+        <div class="fin-subform__title">New contract details</div>
+        <div class="fin-field__row">
+          <div class="fin-field">
+            <label class="fin-field__label" for="ctIncluded">Included hours</label>
+            <input class="fin-field__input" type="number" id="ctIncluded" step="0.5" min="0" value="24" />
+          </div>
+          <div class="fin-field">
+            <label class="fin-field__label" for="ctCarry">Carry-over hours (optional)</label>
+            <input class="fin-field__input" type="number" id="ctCarry" step="0.25" min="0" value="0" />
+          </div>
+        </div>
+        <div class="fin-field__row">
+          <div class="fin-field">
+            <label class="fin-field__label" for="ctStart">Start date</label>
+            <input class="fin-field__input" type="date" id="ctStart" />
+          </div>
+          <div class="fin-field">
+            <label class="fin-field__label" for="ctEnd">End date</label>
+            <input class="fin-field__input" type="date" id="ctEnd" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="fin-modal__foot">
+      <button class="fin-btn fin-btn--ghost" type="button" data-close-modal="paymentModal">Cancel</button>
+      <button class="fin-btn fin-btn--primary" type="button" id="paySubmit">Record payment</button>
+    </div>
+  </div>
+</div>
+
+<!-- New paycheque modal -->
+<div class="fin-modal" id="paychequeModal" aria-hidden="true">
+  <div class="fin-modal__card">
+    <div class="fin-modal__head">
+      <div>
+        <h2 class="fin-modal__title">Issue new paycheque</h2>
+        <p class="fin-modal__sub">Pay an assistant. Auto-numbered PAY-NNNNNN.</p>
+      </div>
+      <button class="fin-modal__close" type="button" data-close-modal="paychequeModal" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="fin-modal__body">
+      <div class="fin-field">
+        <label class="fin-field__label" for="payqAssistant">Assistant</label>
+        <select class="fin-field__select" id="payqAssistant"></select>
+      </div>
+      <div class="fin-field__row">
+        <div class="fin-field">
+          <label class="fin-field__label" for="payqStart">Period start</label>
+          <input class="fin-field__input" type="date" id="payqStart" />
+        </div>
+        <div class="fin-field">
+          <label class="fin-field__label" for="payqEnd">Period end</label>
+          <input class="fin-field__input" type="date" id="payqEnd" />
+        </div>
+      </div>
+      <div class="fin-field">
+        <label class="fin-field__label" for="payqDate">Pay date</label>
+        <input class="fin-field__input" type="date" id="payqDate" />
+      </div>
+      <div class="fin-field">
+        <label class="fin-field__label">Line items (per session or batch)</label>
+        <div class="fin-lines">
+          <div class="fin-lines__row fin-lines__head">
+            <div>Description</div><div>Hours</div><div>Rate ($/hr)</div><div>Line ($)</div><div></div>
+          </div>
+          <div id="payqLines"></div>
+          <button class="fin-lines__add" type="button" id="payqAddLine">+ Add line</button>
+        </div>
+      </div>
+      <div class="fin-field__row">
+        <div class="fin-field">
+          <label class="fin-field__label" for="payqMode">Payment mode</label>
+          <select class="fin-field__select" id="payqMode">
+            <option value="e-transfer">E-transfer</option>
+            <option value="cheque">Cheque</option>
+            <option value="bank_transfer">Bank transfer</option>
+            <option value="cash">Cash</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="fin-field">
+          <label class="fin-field__label" for="payqDeductions">Deductions ($, optional)</label>
+          <input class="fin-field__input" type="number" id="payqDeductions" step="0.01" min="0" value="0" />
+        </div>
+      </div>
+      <div class="fin-field">
+        <label class="fin-field__label" for="payqNotes">Notes (optional)</label>
+        <textarea class="fin-field__textarea" id="payqNotes"></textarea>
+      </div>
+    </div>
+    <div class="fin-modal__foot">
+      <button class="fin-btn fin-btn--ghost" type="button" data-close-modal="paychequeModal">Cancel</button>
+      <button class="fin-btn fin-btn--primary" type="button" id="payqSubmit">Issue paycheque</button>
+    </div>
+  </div>
+</div>
+
+<div class="fin-toast" id="finToast"><span id="finToastText">Done</span></div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/supabase-client.js?v=20260508d"></script>
+<script src="js/hiring-service.js?v=20260516s"></script>
+<script src="js/sidebar.js?v=20260515d"></script>
+<script src="js/topbar-userpod.js?v=20260516a" defer></script>
+<script src="js/master-search.js?v=20260516h" defer></script>
+<script src="js/deep-link-flash.js?v=20260516c" defer></script>
+<script>
+(async () => {
+  const $ = id => document.getElementById(id);
+  function esc(s){return (s==null?'':String(s)).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[c]));}
+  function fmtMoney(cents, ccy='CAD'){
+    const n = (Number(cents)||0) / 100;
+    return n.toLocaleString('en-CA', { style:'currency', currency: ccy, maximumFractionDigits: 2 });
+  }
+  function fmtDate(d){
+    if (!d) return '—';
+    const s = String(d);
+    const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    const dt = m ? new Date(+m[1], +m[2]-1, +m[3]) : new Date(s);
+    return dt.toLocaleDateString('en-CA', { month:'short', day:'numeric', year:'numeric' });
+  }
+  function todayIso(){
+    const d = new Date();
+    return d.toISOString().split('T')[0];
+  }
+  function plusDaysIso(iso, days){
+    const d = iso ? new Date(iso) : new Date();
+    d.setDate(d.getDate() + days);
+    return d.toISOString().split('T')[0];
+  }
+  function pillClass(status){
+    const s = String(status||'').toLowerCase();
+    if (s === 'paid') return 'fin-pill fin-pill--paid';
+    if (s === 'open') return 'fin-pill fin-pill--open';
+    if (s === 'void' || s === 'voided') return 'fin-pill fin-pill--void';
+    return 'fin-pill fin-pill--issued';
+  }
+  function toast(msg, kind='success'){
+    const t = $('finToast');
+    $('finToastText').textContent = msg;
+    t.classList.remove('fin-toast--success','fin-toast--error');
+    t.classList.add(kind === 'error' ? 'fin-toast--error' : 'fin-toast--success');
+    t.classList.add('is-shown');
+    setTimeout(() => t.classList.remove('is-shown'), 3500);
+  }
+  function showModal(id){ $(id).classList.add('is-shown'); }
+  function hideModal(id){ $(id).classList.remove('is-shown'); }
+  document.querySelectorAll('[data-close-modal]').forEach(el => {
+    el.addEventListener('click', () => hideModal(el.getAttribute('data-close-modal')));
+  });
+  document.querySelectorAll('.fin-modal').forEach(m => {
+    m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('is-shown'); });
+  });
+
+  // ─── Auth gate ─────────────────────────────────────────────
+  const user = await window.pmHiring.getCurrentUser();
+  if (!user) { window.location.href = 'signin.html'; return; }
+  const isAdmin = await window.pmHiring.isCurrentUserAdminOrOwner();
+  if (!isAdmin) { window.location.href = 'admin-dashboard.html'; return; }
+
+  // ─── Tabs ──────────────────────────────────────────────────
+  document.querySelectorAll('.fin-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.fin-tab').forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      const target = btn.dataset.tab;
+      document.querySelectorAll('[data-panel]').forEach(p => {
+        p.hidden = p.dataset.panel !== target;
+      });
+    });
+  });
+
+  // ─── Pull initial data ─────────────────────────────────────
+  const [docs, clients, assistants] = await Promise.all([
+    window.pmHiring.adminListFinancialDocuments({ limit: 500 }).catch(() => []),
+    window.pmHiring.adminListClients({ limit: 200 }).catch(() => []),
+    window.pmHiring.adminListAssistants().catch(() => []),
+  ]);
+
+  // Split into the 3 lists
+  const invoices   = docs.filter(d => d.doc_type === 'invoice');
+  const receipts   = docs.filter(d => d.doc_type === 'receipt');
+  const paycheques = docs.filter(d => d.doc_type === 'paycheque');
+
+  $('cntInvoices').textContent   = invoices.length;
+  $('cntReceipts').textContent   = receipts.length;
+  $('cntPaycheques').textContent = paycheques.length;
+
+  // ─── Render lists ──────────────────────────────────────────
+  function renderInvoices(){
+    const wrap = $('invoicesList');
+    if (!invoices.length) {
+      wrap.innerHTML = `<div class="fin-empty"><strong>No invoices yet</strong>Click "New invoice" to issue your first one.</div>`;
+      return;
+    }
+    wrap.innerHTML = `<table class="fin-table"><thead><tr>
+      <th>Number</th><th>Client</th><th>Date</th><th style="text-align:right;">Amount</th><th style="text-align:right;">Balance</th><th>Status</th><th></th>
+    </tr></thead><tbody>${invoices.map(i => `<tr>
+      <td><span class="fin-num">${esc(i.doc_number)}</span></td>
+      <td>${esc(i.party_name || '—')}</td>
+      <td class="fin-mute">${esc(fmtDate(i.doc_date))}</td>
+      <td class="fin-amount">${esc(fmtMoney(i.gross_cents, i.currency))}</td>
+      <td class="fin-amount ${i.balance_cents > 0 ? '' : 'fin-mute'}">${esc(fmtMoney(i.balance_cents, i.currency))}</td>
+      <td><span class="${pillClass(i.status)}">${esc(i.status)}</span></td>
+      <td><div class="fin-row-actions">
+        ${i.status === 'open' ? `<button data-pay="${esc(i.doc_id)}">Record payment</button>` : ''}
+        ${i.status !== 'void' ? `<button class="is-danger" data-void-inv="${esc(i.doc_id)}">Void</button>` : ''}
+      </div></td>
+    </tr>`).join('')}</tbody></table>`;
+    wrap.querySelectorAll('[data-pay]').forEach(b => b.addEventListener('click', () => openPaymentModal(b.dataset.pay)));
+    wrap.querySelectorAll('[data-void-inv]').forEach(b => b.addEventListener('click', () => onVoidInvoice(b.dataset.voidInv)));
+  }
+  function renderReceipts(){
+    const wrap = $('receiptsList');
+    if (!receipts.length) {
+      wrap.innerHTML = `<div class="fin-empty"><strong>No receipts yet</strong>Record a payment on an invoice and a receipt is created automatically.</div>`;
+      return;
+    }
+    wrap.innerHTML = `<table class="fin-table"><thead><tr>
+      <th>Number</th><th>Client</th><th>Date</th><th style="text-align:right;">Amount</th><th>Status</th><th></th>
+    </tr></thead><tbody>${receipts.map(r => `<tr>
+      <td><span class="fin-num">${esc(r.doc_number || '—')}</span></td>
+      <td>${esc(r.party_name || '—')}</td>
+      <td class="fin-mute">${esc(fmtDate(r.doc_date))}</td>
+      <td class="fin-amount">${esc(fmtMoney(r.gross_cents, r.currency))}</td>
+      <td><span class="${pillClass(r.status)}">${esc(r.status)}</span></td>
+      <td><div class="fin-row-actions">
+        ${r.status !== 'void' ? `<button class="is-danger" data-void-rcp="${esc(r.doc_id)}">Void</button>` : ''}
+      </div></td>
+    </tr>`).join('')}</tbody></table>`;
+    wrap.querySelectorAll('[data-void-rcp]').forEach(b => b.addEventListener('click', () => onVoidReceipt(b.dataset.voidRcp)));
+  }
+  function renderPaycheques(){
+    const wrap = $('paychequesList');
+    if (!paycheques.length) {
+      wrap.innerHTML = `<div class="fin-empty"><strong>No paycheques yet</strong>Click "New paycheque" to pay an assistant.</div>`;
+      return;
+    }
+    wrap.innerHTML = `<table class="fin-table"><thead><tr>
+      <th>Number</th><th>Assistant</th><th>Date</th><th style="text-align:right;">Net</th><th>Status</th><th></th>
+    </tr></thead><tbody>${paycheques.map(p => `<tr>
+      <td><span class="fin-num">${esc(p.doc_number)}</span></td>
+      <td>${esc(p.party_name || '—')}</td>
+      <td class="fin-mute">${esc(fmtDate(p.doc_date))}</td>
+      <td class="fin-amount">${esc(fmtMoney(p.gross_cents, p.currency))}</td>
+      <td><span class="${pillClass(p.status)}">${esc(p.status)}</span></td>
+      <td><div class="fin-row-actions">
+        ${p.status !== 'void' ? `<button class="is-danger" data-void-payq="${esc(p.doc_id)}">Void</button>` : ''}
+      </div></td>
+    </tr>`).join('')}</tbody></table>`;
+    wrap.querySelectorAll('[data-void-payq]').forEach(b => b.addEventListener('click', () => onVoidPaycheque(b.dataset.voidPayq)));
+  }
+  renderInvoices(); renderReceipts(); renderPaycheques();
+
+  // ─── Reload on each mutation ───────────────────────────────
+  async function refresh(){
+    const fresh = await window.pmHiring.adminListFinancialDocuments({ limit: 500 }).catch(() => []);
+    invoices.length = 0; invoices.push(...fresh.filter(d => d.doc_type === 'invoice'));
+    receipts.length = 0; receipts.push(...fresh.filter(d => d.doc_type === 'receipt'));
+    paycheques.length = 0; paycheques.push(...fresh.filter(d => d.doc_type === 'paycheque'));
+    $('cntInvoices').textContent = invoices.length;
+    $('cntReceipts').textContent = receipts.length;
+    $('cntPaycheques').textContent = paycheques.length;
+    renderInvoices(); renderReceipts(); renderPaycheques();
+  }
+
+  // ─── NEW INVOICE flow ──────────────────────────────────────
+  $('invClient').innerHTML = '<option value="">— Select client —</option>' +
+    clients.map(c => `<option value="${esc(c.id)}">${esc(c.full_name)}</option>`).join('');
+  $('invDate').value = todayIso();
+  $('invDue').value  = todayIso();
+
+  function renderInvLines(state){
+    $('invLines').innerHTML = state.map((l, i) => `
+      <div class="fin-lines__row" data-i="${i}">
+        <input data-k="description" value="${esc(l.description)}" placeholder="e.g. Standard 24-hr plan" />
+        <input data-k="quantity" type="number" min="1" value="${l.quantity}" />
+        <input data-k="unitPrice" type="number" step="0.01" min="0" value="${l.unitPrice}" />
+        <input data-k="hours" type="number" step="0.25" min="0" value="${l.hours ?? ''}" placeholder="opt" />
+        <button class="fin-lines__del" type="button" data-del="${i}" aria-label="Remove line">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>`).join('');
+    $('invLines').querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('input', () => {
+        const i = +inp.closest('.fin-lines__row').dataset.i;
+        const k = inp.dataset.k;
+        state[i][k] = (k === 'description') ? inp.value : Number(inp.value || 0);
+      });
+    });
+    $('invLines').querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
+      state.splice(+b.dataset.del, 1);
+      renderInvLines(state);
+    }));
+  }
+  const invLinesState = [{ description: '', quantity: 1, unitPrice: 0, hours: null }];
+  renderInvLines(invLinesState);
+
+  $('invAddLine').addEventListener('click', () => {
+    invLinesState.push({ description: '', quantity: 1, unitPrice: 0, hours: null });
+    renderInvLines(invLinesState);
+  });
+
+  $('btnNewInvoice').addEventListener('click', () => showModal('invoiceModal'));
+
+  $('invSubmit').addEventListener('click', async () => {
+    const clientId = $('invClient').value;
+    if (!clientId) { toast('Pick a client', 'error'); return; }
+    const lines = invLinesState
+      .filter(l => l.description && l.unitPrice > 0)
+      .map(l => ({
+        description: l.description,
+        quantity: l.quantity || 1,
+        unit_price_cents: Math.round(l.unitPrice * 100),
+        hours: l.hours || null,
+      }));
+    if (!lines.length) { toast('Add at least one line item', 'error'); return; }
+    const btn = $('invSubmit');
+    btn.disabled = true; btn.textContent = 'Issuing…';
+    try {
+      const res = await window.pmHiring.adminIssueInvoice({
+        clientId,
+        lines,
+        invoiceDate: $('invDate').value || null,
+        dueDate: $('invDue').value || null,
+        subject: $('invSubject').value || null,
+        customerNotes: $('invNotes').value || null,
+      });
+      toast(`Invoice ${res.invoice_number} issued`);
+      hideModal('invoiceModal');
+      // reset form
+      invLinesState.splice(0, invLinesState.length, { description:'', quantity:1, unitPrice:0, hours:null });
+      $('invSubject').value = ''; $('invNotes').value = '';
+      renderInvLines(invLinesState);
+      await refresh();
+    } catch (e) {
+      console.error(e);
+      toast('Failed: ' + (e.message || 'unknown'), 'error');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Issue invoice';
+    }
+  });
+
+  // ─── RECORD PAYMENT flow ───────────────────────────────────
+  // Populate the invoice picker with OPEN invoices only
+  function refreshPayInvoicePicker(){
+    const open = invoices.filter(i => i.status === 'open');
+    $('payInvoice').innerHTML = '<option value="">— Select open invoice —</option>' +
+      open.map(i => `<option value="${esc(i.doc_id)}" data-balance="${i.balance_cents}" data-currency="${esc(i.currency)}" data-name="${esc(i.party_name)}" data-num="${esc(i.doc_number)}">${esc(i.doc_number)} — ${esc(i.party_name)} (${fmtMoney(i.balance_cents, i.currency)} owing)</option>`).join('');
+  }
+  $('payInvoice').addEventListener('change', () => {
+    const opt = $('payInvoice').selectedOptions[0];
+    if (!opt || !opt.value) { $('payAmount').value = ''; $('payBalanceHint').textContent = '—'; return; }
+    const bal = +opt.dataset.balance;
+    const ccy = opt.dataset.currency;
+    $('payAmount').value = (bal / 100).toFixed(2);
+    $('payBalanceHint').textContent = `Outstanding balance: ${fmtMoney(bal, ccy)} — pre-filled with the full amount.`;
+    $('paySub').textContent = `${opt.dataset.num} — ${opt.dataset.name}`;
+  });
+  function openPaymentModal(invoiceId){
+    refreshPayInvoicePicker();
+    $('payDate').value = todayIso();
+    if (invoiceId) {
+      $('payInvoice').value = invoiceId;
+      $('payInvoice').dispatchEvent(new Event('change'));
+    } else {
+      $('payInvoice').value = ''; $('payAmount').value = ''; $('payBalanceHint').textContent = '—';
+    }
+    showModal('paymentModal');
+  }
+  $('btnRecordPayment').addEventListener('click', () => openPaymentModal(null));
+
+  $('payCreateContract').addEventListener('change', () => {
+    $('contractSubform').hidden = !$('payCreateContract').checked;
+    if (!$('contractSubform').hidden && !$('ctStart').value) {
+      $('ctStart').value = todayIso();
+      $('ctEnd').value = plusDaysIso(todayIso(), 30);
+    }
+  });
+
+  $('paySubmit').addEventListener('click', async () => {
+    const invoiceId = $('payInvoice').value;
+    if (!invoiceId) { toast('Pick an invoice', 'error'); return; }
+    const amount = parseFloat($('payAmount').value);
+    if (!amount || amount <= 0) { toast('Enter a positive amount', 'error'); return; }
+    let createContractArgs = null;
+    if ($('payCreateContract').checked) {
+      const inc = parseFloat($('ctIncluded').value) || 0;
+      if (inc <= 0) { toast('Included hours must be > 0', 'error'); return; }
+      createContractArgs = {
+        included_hours: inc,
+        start_at:       $('ctStart').value || null,
+        end_at:         $('ctEnd').value   || null,
+        carry_hours:    parseFloat($('ctCarry').value) || 0,
+      };
+    }
+    const btn = $('paySubmit');
+    btn.disabled = true; btn.textContent = 'Recording…';
+    try {
+      const res = await window.pmHiring.adminRecordPayment({
+        invoiceId,
+        amountCents: Math.round(amount * 100),
+        paymentMode: $('payMode').value,
+        reference: $('payRef').value || null,
+        notes: $('payNotes').value || null,
+        receiptDate: $('payDate').value || null,
+        createContractArgs,
+      });
+      toast(`Payment recorded · receipt ${res.receipt_number}`);
+      hideModal('paymentModal');
+      $('payNotes').value = ''; $('payRef').value = '';
+      $('payCreateContract').checked = false; $('contractSubform').hidden = true;
+      await refresh();
+    } catch (e) {
+      console.error(e);
+      toast('Failed: ' + (e.message || 'unknown'), 'error');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Record payment';
+    }
+  });
+
+  // ─── NEW PAYCHEQUE flow ────────────────────────────────────
+  $('payqAssistant').innerHTML = '<option value="">— Select assistant —</option>' +
+    assistants.map(a => `<option value="${esc(a.user_id)}">${esc(a.full_name)}</option>`).join('');
+  $('payqDate').value = todayIso();
+
+  function renderPayqLines(state){
+    $('payqLines').innerHTML = state.map((l, i) => {
+      const lineTotal = (Number(l.hours)||0) * (Number(l.rate)||0);
+      return `<div class="fin-lines__row" data-i="${i}">
+        <input data-k="description" value="${esc(l.description)}" placeholder="e.g. May 12 — Michael Yang" />
+        <input data-k="hours" type="number" step="0.25" min="0" value="${l.hours}" />
+        <input data-k="rate"  type="number" step="0.01" min="0" value="${l.rate}" />
+        <input value="$${lineTotal.toFixed(2)}" disabled style="background:var(--border-soft);" />
+        <button class="fin-lines__del" type="button" data-del="${i}" aria-label="Remove line">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>`;
+    }).join('');
+    $('payqLines').querySelectorAll('input[data-k]').forEach(inp => {
+      inp.addEventListener('input', () => {
+        const i = +inp.closest('.fin-lines__row').dataset.i;
+        const k = inp.dataset.k;
+        state[i][k] = (k === 'description') ? inp.value : Number(inp.value || 0);
+        renderPayqLines(state);
+      });
+    });
+    $('payqLines').querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
+      state.splice(+b.dataset.del, 1);
+      renderPayqLines(state);
+    }));
+  }
+  const payqLinesState = [{ description: '', hours: 0, rate: 45 }];
+  renderPayqLines(payqLinesState);
+  $('payqAddLine').addEventListener('click', () => {
+    payqLinesState.push({ description: '', hours: 0, rate: 45 });
+    renderPayqLines(payqLinesState);
+  });
+
+  $('btnNewPaycheque').addEventListener('click', () => showModal('paychequeModal'));
+
+  $('payqSubmit').addEventListener('click', async () => {
+    const assistantId = $('payqAssistant').value;
+    if (!assistantId) { toast('Pick an assistant', 'error'); return; }
+    const lines = payqLinesState
+      .filter(l => l.description && l.hours > 0 && l.rate > 0)
+      .map(l => ({
+        description: l.description,
+        hours: l.hours,
+        hourly_rate_cents: Math.round(l.rate * 100),
+      }));
+    if (!lines.length) { toast('Add at least one line', 'error'); return; }
+    const btn = $('payqSubmit');
+    btn.disabled = true; btn.textContent = 'Issuing…';
+    try {
+      const res = await window.pmHiring.adminIssuePaycheque({
+        assistantId,
+        lines,
+        payDate:     $('payqDate').value || null,
+        periodStart: $('payqStart').value || null,
+        periodEnd:   $('payqEnd').value || null,
+        paymentMode: $('payqMode').value,
+        notes:       $('payqNotes').value || null,
+        deductionsCents: Math.round(((parseFloat($('payqDeductions').value)||0)) * 100),
+      });
+      toast(`Paycheque ${res.paycheque_number} issued · ${fmtMoney(res.net_cents)} net`);
+      hideModal('paychequeModal');
+      $('payqNotes').value = ''; $('payqDeductions').value = '0';
+      payqLinesState.splice(0, payqLinesState.length, { description:'', hours:0, rate:45 });
+      renderPayqLines(payqLinesState);
+      await refresh();
+    } catch (e) {
+      console.error(e);
+      toast('Failed: ' + (e.message || 'unknown'), 'error');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Issue paycheque';
+    }
+  });
+
+  // ─── VOID actions ──────────────────────────────────────────
+  async function onVoidInvoice(id){
+    const reason = prompt('Reason for voiding this invoice? (kept on file for audit)');
+    if (reason == null) return;
+    try { await window.pmHiring.adminVoidInvoice({ invoiceId: id, reason: reason || 'Voided' });
+      toast('Invoice voided'); await refresh(); }
+    catch (e) { toast('Failed: ' + e.message, 'error'); }
+  }
+  async function onVoidReceipt(id){
+    const reason = prompt('Reason for voiding this receipt? (rolls back the linked invoice payment)');
+    if (reason == null) return;
+    try { await window.pmHiring.adminVoidReceipt({ receiptId: id, reason: reason || 'Voided' });
+      toast('Receipt voided'); await refresh(); }
+    catch (e) { toast('Failed: ' + e.message, 'error'); }
+  }
+  async function onVoidPaycheque(id){
+    const reason = prompt('Reason for voiding this paycheque? (kept on file for audit)');
+    if (reason == null) return;
+    try { await window.pmHiring.adminVoidPaycheque({ paychequeId: id, reason: reason || 'Voided' });
+      toast('Paycheque voided'); await refresh(); }
+    catch (e) { toast('Failed: ' + e.message, 'error'); }
+  }
+})();
+</script>
+</body>
+</html>
