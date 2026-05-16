@@ -150,6 +150,12 @@ GRANT EXECUTE ON FUNCTION public.assistant_activate_renewal(uuid) TO authenticat
 -- preserved (whatever trigger fires on status='expired' continues
 -- to fire). What changes: the auto-promo of drafts is GONE — that's
 -- now the human's job via assistant_activate_renewal.
+--
+-- IMPORTANT: Postgres refuses to change return type via
+-- CREATE OR REPLACE, so we DROP first. Safe because nothing else
+-- depends on the old signature.
+
+DROP FUNCTION IF EXISTS public.run_contract_lifecycle_tick();
 
 CREATE OR REPLACE FUNCTION public.run_contract_lifecycle_tick()
 RETURNS jsonb
