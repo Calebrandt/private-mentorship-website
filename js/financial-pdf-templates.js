@@ -37,11 +37,10 @@
   'use strict';
 
   // ─── Brand assets ─────────────────────────────────────────────────
-  // Square pm-logo.png lives in the website's local assets folder.
-  // Used as a background-image with positioning to crop to just the
-  // PM monogram (top half) — the wordmark is hidden so the circle
-  // shows a clean mark instead of a tiny illegible everything.
-  const LOGO_URL = 'assets/logos/pm-logo.png';
+  // pm-monogram.png is a pre-cropped 700×550 image of just the PM
+  // mark — no wordmark, no excess padding. Lets us drop the mark
+  // straight into the circle without any clip math.
+  const LOGO_URL = 'assets/logos/pm-monogram.png';
 
   const COMPANY_NAME    = 'Private Mentorship';
   const COMPANY_ADDR_1  = 'Richmond, British Columbia';
@@ -114,20 +113,20 @@
       padding: 56px 30px 56px 38px;
       display: flex; flex-direction: column;
     }
-    /* The PM logo PNG is the full lockup (mark + "PRIVATE MENTORSHIP"
-       wordmark + padding). Cropped via background-image positioning to
-       show only the PM monogram, scaled to fill the circle properly. */
+    /* Uses pre-cropped pm-monogram.png (700×550, just the PM mark, no
+       wordmark). Simple center placement at 72% size — leaves a small
+       breathing margin inside the circle ring. */
     .logo-circle {
-      width: 102px; height: 102px; border-radius: 50%;
+      width: 100px; height: 100px; border-radius: 50%;
       border: 1.5px solid #a8a8a8;
       background-color: #ffffff;
       background-image: url('${LOGO_URL}');
       background-repeat: no-repeat;
-      background-position: center 8%;   /* anchor near top so PM mark sits centered */
-      background-size: 175% auto;        /* scale up so wordmark is cropped out */
+      background-position: center center;
+      background-size: 72% auto;
       background-blend-mode: multiply;
       margin-bottom: 56px;
-      box-shadow: 0 0 0 6px #ececec;     /* subtle outer ring blends into sidebar */
+      box-shadow: 0 0 0 6px #ececec;
     }
     .meta-block { margin-bottom: 28px; }
     .meta-block.last { flex: 1; }
