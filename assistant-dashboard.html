@@ -93,100 +93,81 @@
     .ad-weekday__unit{font-size:9.5px;}
   }
 
-  /* Phase 16 v5: My Families list — clean SaaS row vocabulary (Linear/
-     Notion-style). One row per family, single white card wrapping the
-     whole list with divider lines between rows. Compact (~52px tall),
-     scannable, every row clickable. Low-key — sits quietly below the
-     calendar without competing for attention. */
-  .ad-families{margin-bottom:22px;}
-  .ad-families__head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px;}
-  .ad-families__title{font-family:"Archivo","Inter",sans-serif;font-size:14px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#475569;margin:0;}
-  .ad-families__action{font-size:12px;font-weight:600;color:#0071e3;text-decoration:none;letter-spacing:-.005em;}
-  .ad-families__action:hover{text-decoration:underline;}
-  .ad-families__list{
-    background:#fff;border:1px solid #E2E8F0;border-radius:12px;
-    overflow:hidden;
+  /* Phase 16 v6: Compact widget pair (My Families + Upcoming Renewals).
+     Both sit in a 2-col grid below the calendar at ~50% width each.
+     Visual vocabulary matches the right-sidebar widgets (Your Profile /
+     Jump to) — small uppercase eyebrow title, white card, tight rows. */
+  .ad-widget-row{
+    display:grid;grid-template-columns:1fr 1fr;gap:14px;
+    margin-bottom:22px;
   }
+  @media(max-width:900px){.ad-widget-row{grid-template-columns:1fr;}}
+  .ad-widget{
+    background:#fff;border:1px solid #E2E8F0;border-radius:12px;
+    padding:14px 16px;display:flex;flex-direction:column;gap:10px;
+  }
+  .ad-widget__head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;}
+  .ad-widget__title{
+    font-family:"Archivo","Inter",sans-serif;font-size:11px;font-weight:700;
+    letter-spacing:.1em;text-transform:uppercase;color:#475569;margin:0;
+  }
+  .ad-widget__action{font-size:11.5px;font-weight:600;color:#0071e3;text-decoration:none;letter-spacing:-.005em;}
+  .ad-widget__action:hover{text-decoration:underline;}
+  .ad-widget__sub{font-size:11px;color:#94A3B8;letter-spacing:.005em;}
+  .ad-widget__body{display:flex;flex-direction:column;}
+
+  /* My Families row (inside widget) */
   .ad-family{
-    display:grid;grid-template-columns:28px 1fr auto auto;gap:14px;align-items:center;
-    padding:11px 16px;
+    display:grid;grid-template-columns:22px 1fr auto auto;gap:10px;align-items:center;
+    padding:7px 0;
     text-decoration:none;color:inherit;cursor:pointer;
     border-top:1px solid #F1F5F9;
-    transition:background .1s ease;
   }
-  .ad-family:first-child{border-top:none;}
-  .ad-family:hover{background:#F8FAFC;}
+  .ad-family:first-child{border-top:none;padding-top:2px;}
+  .ad-family:last-child{padding-bottom:2px;}
+  .ad-family:hover .ad-family__name{color:#0071e3;}
   .ad-family__avatar{
-    width:28px;height:28px;border-radius:50%;
+    width:22px;height:22px;border-radius:50%;
     background:linear-gradient(135deg, var(--av-from, #3B82F6), var(--av-to, #1E40AF));
-    color:#fff;font:800 10.5px Inter,sans-serif;letter-spacing:-.01em;
+    color:#fff;font:800 9px Inter,sans-serif;letter-spacing:-.01em;
     display:flex;align-items:center;justify-content:center;flex-shrink:0;
   }
-  .ad-family__body{min-width:0;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
-  .ad-family__name{font:600 13.5px Inter,sans-serif;color:#0F172A;letter-spacing:-.005em;}
-  .ad-family__plan{font:500 11.5px Inter,sans-serif;color:#94A3B8;letter-spacing:.005em;}
-  .ad-family__hours{
-    font:600 13px Inter,sans-serif;color:#0F172A;letter-spacing:-.005em;
-    white-space:nowrap;
-  }
-  .ad-family__hours-label{color:#94A3B8;font-weight:500;margin-left:3px;}
+  .ad-family__body{min-width:0;display:flex;align-items:baseline;gap:6px;}
+  .ad-family__name{font:600 12.5px Inter,sans-serif;color:#0F172A;letter-spacing:-.005em;}
+  .ad-family__plan{font:500 10.5px Inter,sans-serif;color:#94A3B8;}
+  .ad-family__hours{font:600 11.5px Inter,sans-serif;color:#0F172A;white-space:nowrap;}
+  .ad-family__hours-label{color:#94A3B8;font-weight:500;margin-left:2px;}
   .ad-family__status{
-    display:inline-flex;align-items:center;gap:5px;
-    font:600 11px Inter,sans-serif;color:#64748B;letter-spacing:-.005em;
-    white-space:nowrap;
+    display:inline-flex;align-items:center;gap:4px;
+    font:600 10px Inter,sans-serif;color:#64748B;
+    text-transform:capitalize;
   }
-  .ad-family__dot{
-    width:7px;height:7px;border-radius:50%;background:#10B981;flex-shrink:0;
-  }
+  .ad-family__dot{width:6px;height:6px;border-radius:50%;background:#10B981;flex-shrink:0;}
   .ad-family__status--draft .ad-family__dot{background:#94A3B8;}
   .ad-family__status--expired .ad-family__dot{background:#EF4444;}
-  @media(max-width:680px){
-    .ad-family{grid-template-columns:28px 1fr auto;gap:10px;padding:10px 12px;}
-    .ad-family__status{grid-column:2 / -1;justify-self:start;}
-  }
 
-  /* Phase 16 v3: Upcoming renewals roll-up. Compact list, one row per
-     assigned family, sorted by renewal date. Visual language matches
-     the renewal chip on the family workspace (white default, amber
-     ≤14 days, red overdue) so the assistant gets the same color
-     vocabulary in both places. */
-  .ad-renewals{
-    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
-    padding:18px 22px;margin-bottom:22px;
-  }
-  .ad-renewals__head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap;}
-  .ad-renewals__title{font-family:"Archivo","Inter",sans-serif;font-size:17px;font-weight:800;letter-spacing:-.01em;color:#0F172A;margin:0;}
-  .ad-renewals__sub{font-size:12.5px;color:#64748B;margin:0;}
-  .ad-renewals__list{display:flex;flex-direction:column;gap:6px;}
+  /* Renewal row (inside widget) — compact version */
   .ad-renewal-row{
-    display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:center;
-    padding:11px 14px;background:#FAFBFC;border:1px solid #F1F5F9;border-radius:10px;
+    display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;
+    padding:7px 0;
     text-decoration:none;color:inherit;cursor:pointer;
-    transition:background .12s ease, border-color .12s ease;
+    border-top:1px solid #F1F5F9;
   }
-  .ad-renewal-row:hover{background:#F1F5F9;border-color:#E2E8F0;}
-  .ad-renewal-row__name{font:700 14px Inter,sans-serif;color:#0F172A;letter-spacing:-.005em;line-height:1.2;}
-  .ad-renewal-row__sub{font:500 11.5px Inter,sans-serif;color:#94A3B8;margin-top:2px;letter-spacing:.005em;}
-  .ad-renewal-row__date{font:700 13px Inter,sans-serif;color:#0F172A;letter-spacing:-.005em;text-align:right;white-space:nowrap;}
+  .ad-renewal-row:first-child{border-top:none;padding-top:2px;}
+  .ad-renewal-row:last-child{padding-bottom:2px;}
+  .ad-renewal-row:hover .ad-renewal-row__name{color:#0071e3;}
+  .ad-renewal-row__main{min-width:0;}
+  .ad-renewal-row__name{font:600 12.5px Inter,sans-serif;color:#0F172A;letter-spacing:-.005em;line-height:1.25;}
+  .ad-renewal-row__date{font:500 10.5px Inter,sans-serif;color:#94A3B8;margin-top:1px;}
   .ad-renewal-row__meta{
-    font:700 11px Inter,sans-serif;letter-spacing:.04em;text-transform:uppercase;
+    font:700 9.5px Inter,sans-serif;letter-spacing:.05em;text-transform:uppercase;
     color:#64748B;background:#F1F5F9;border:1px solid #E2E8F0;
-    padding:4px 10px;border-radius:9999px;white-space:nowrap;min-width:90px;text-align:center;
+    padding:3px 8px;border-radius:9999px;white-space:nowrap;
   }
-  .ad-renewal-row.is-soon{background:#FFFBEB;border-color:#FCD34D;}
-  .ad-renewal-row.is-soon:hover{background:#FEF3C7;border-color:#FBBF24;}
-  .ad-renewal-row.is-soon .ad-renewal-row__date{color:#78350F;}
+  .ad-renewal-row.is-soon{background:linear-gradient(to right, transparent 0, #FFFBEB 30%);margin:0 -8px;padding-left:8px;padding-right:8px;border-radius:6px;}
   .ad-renewal-row.is-soon .ad-renewal-row__meta{color:#92400E;background:#FEF3C7;border-color:#FDE68A;}
-  .ad-renewal-row.is-overdue{background:#FEF2F2;border-color:#FCA5A5;}
-  .ad-renewal-row.is-overdue:hover{background:#FEE2E2;border-color:#F87171;}
-  .ad-renewal-row.is-overdue .ad-renewal-row__date{color:#7F1D1D;}
+  .ad-renewal-row.is-overdue{background:linear-gradient(to right, transparent 0, #FEF2F2 30%);margin:0 -8px;padding-left:8px;padding-right:8px;border-radius:6px;}
   .ad-renewal-row.is-overdue .ad-renewal-row__meta{color:#991B1B;background:#FEE2E2;border-color:#FECACA;}
-  @media(max-width:680px){
-    .ad-renewals{padding:14px;}
-    .ad-renewal-row{grid-template-columns:1fr auto;gap:8px;padding:9px 11px;}
-    .ad-renewal-row__date{font-size:12px;}
-    .ad-renewal-row__meta{grid-column:1 / -1;justify-self:start;min-width:0;}
-  }
 
   /* Section card */
   .ad-section{
@@ -359,28 +340,32 @@
     <div id="adCalendar"></div>
   </section>
 
-  <!-- Phase 16 v5: My Families list (moved BELOW calendar 2026-05-16
-       per Caleb — calendar gets unobstructed center stage). Redesigned
-       as a clean SaaS-style row list (Linear/Notion vocabulary) instead
-       of a card grid. Compact, scannable, every row clickable. -->
-  <section class="ad-families" id="adFamilies" hidden>
-    <header class="ad-families__head">
-      <h3 class="ad-families__title">My Families</h3>
-      <a class="ad-families__action" href="assistant-clients.html">View all →</a>
-    </header>
-    <div class="ad-families__list" id="adFamiliesGrid"></div>
-  </section>
+  <!-- Phase 16 v6: My Families + Upcoming Renewals as a paired compact
+       widget row below the calendar. Both sit side-by-side at ~50%
+       width, matching the "Your profile" / "Jump to" widget vocabulary
+       in the right sidebar below. Low-key, scannable, doesn't compete
+       with the calendar above. -->
+  <div class="ad-widget-row">
 
-  <!-- Phase 16 v3: Upcoming renewals roll-up — moved BELOW the calendar
-       per Caleb's request 2026-05-16. Calendar is now the visual
-       centerpiece; renewals act as the action-required follow-up. -->
-  <section class="ad-renewals" id="adRenewals" hidden>
-    <header class="ad-renewals__head">
-      <h3 class="ad-renewals__title">Upcoming renewals</h3>
-      <p class="ad-renewals__sub" id="adRenewalsSub">—</p>
-    </header>
-    <div class="ad-renewals__list" id="adRenewalsList"></div>
-  </section>
+    <!-- My Families widget -->
+    <section class="ad-widget" id="adFamilies" hidden>
+      <header class="ad-widget__head">
+        <h3 class="ad-widget__title">My Families</h3>
+        <a class="ad-widget__action" href="assistant-clients.html">View all →</a>
+      </header>
+      <div class="ad-widget__body" id="adFamiliesGrid"></div>
+    </section>
+
+    <!-- Upcoming Renewals widget -->
+    <section class="ad-widget" id="adRenewals" hidden>
+      <header class="ad-widget__head">
+        <h3 class="ad-widget__title">Upcoming renewals</h3>
+        <span class="ad-widget__sub" id="adRenewalsSub">—</span>
+      </header>
+      <div class="ad-widget__body" id="adRenewalsList"></div>
+    </section>
+
+  </div>
 
   <!-- Two columns: upcoming + profile preview -->
   <div class="ad-cols">
@@ -452,7 +437,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515a"></script>
-<script src="js/hiring-service.js?v=20260516d"></script>
+<script src="js/hiring-service.js?v=20260516e"></script>
 <script src="js/session-calendar.js?v=20260515a"></script>
 <script src="js/sidebar.js?v=20260515d"></script>
 <script>
@@ -632,11 +617,13 @@ async function loadFamilies(){
     const hoursCell = remHrs != null
       ? `<span class="ad-family__hours">${remHrs}<span class="ad-family__hours-label">h left</span></span>`
       : `<span class="ad-family__hours">—</span>`;
+    // Widget-compact row: avatar · name · hours · status dot.
+    // Plan label dropped to stay narrow; surfaced again on the
+    // full assistant-clients.html roster page.
     return `<a class="ad-family" href="${href}" style="--av-from:${from};--av-to:${to};">
       <span class="ad-family__avatar">${escapeHtml(initialsFor(name))}</span>
       <span class="ad-family__body">
         <span class="ad-family__name">${escapeHtml(name)}</span>
-        ${plan ? `<span class="ad-family__plan">${escapeHtml(plan)}</span>` : ''}
       </span>
       ${hoursCell}
       <span class="ad-family__status${statusModifier}">
@@ -723,15 +710,16 @@ async function loadRenewals(){
     } else {
       metaText = `In ${r.days} days`;
     }
+    // Compact widget row: name + short date on the left, urgency chip
+    // on the right. Long-form date too verbose for widget width.
     const dateText = r.date.toLocaleDateString('en-US',
-      { month:'long', day:'numeric', year:'numeric' });
+      { month:'short', day:'numeric' });
     const href = `assistant-client.html?id=${encodeURIComponent(r.clientId)}`;
     return `<a class="ad-renewal-row ${cls}" href="${href}">
-      <div>
+      <div class="ad-renewal-row__main">
         <div class="ad-renewal-row__name">${escapeHtml(r.name)}</div>
-        <div class="ad-renewal-row__sub">${escapeHtml(r.planLabel)}${r.status === 'draft' ? ' · awaiting activation' : ''}</div>
+        <div class="ad-renewal-row__date">${dateText}</div>
       </div>
-      <div class="ad-renewal-row__date">${dateText}</div>
       <div class="ad-renewal-row__meta">${metaText}</div>
     </a>`;
   }).join('');
