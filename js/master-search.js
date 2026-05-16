@@ -813,8 +813,96 @@
     previewEl.innerHTML = html;
   }
 
+  // ── Render a single result row as a <button> (NOT an <a>) ───────
+  // Rows never auto-navigate. Click = select + preview (+ drill-in
+  // for client/assistant kinds). Navigation only happens via the
+  // explicit "Open in page" button in the preview pane, or Enter on
+  // a leaf row, or Cmd-click / middle-click for new tab.
+  function itemRowHtml(item, idx, query) {
+    const drillable = item._preview && (item._preview.kind === 'client' || item._preview.kind === 'assistant');
+    return `<button class="ms-item${drillable ? ' ms-item--drillable' : ''}" data-idx="${idx}" data-url="${escapeHtml(item.url || '')}" type="button">
+      <span class="ms-item__icon">${item.icon}</span>
+      <span class="ms-item__body">
+        <span class="ms-item__title">${highlight(item.title, query)}</span>
+        <span class="ms-item__sub">${highlight(item.subtitle || '', query)}</span>
+      </span>
+      ${drillable ? '<span class="ms-item__chev" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>' : ''}
+    </button>`;
+  }
+
+  // ── Render the DRILL-DOWN view (one entity, all their matches) ──
+  function renderDrilldown(panel, results, query, state) {
+    const item = state.drilledItem;
+    if (!item || !item._preview) { state.view = 'root'; renderDropdown(panel, results, query, state); return; }
+    const kind = item._preview.kind;
+    const name = item.title;
+    const cid  = item._preview.data?.id || item._preview.data?.client_id || null;
+    const aname = kind === 'assistant' ? (item._preview.data?.display_name || item._preview.data?.full_name || '') : null;
+
+    // Filter all categories of the original results down to this entity
+    let lessons, sessions, invoices, contracts;
+    if (kind === 'client') {
+      lessons   = results.lessonLogs.filter(l => l._preview?.data?.client_id === cid);
+      sessions  = results.sessions.filter(s => s._preview?.data?.client_id === cid);
+      invoices  = results.invoices.filter(i => i._preview?.data?.client_id === cid);
+      contracts = results.contracts.filter(c => c._preview?.data?.client_id === cid);
+    } else {
+      // Assistant: lessons taught by them
+      lessons   = results.lessonLogs.filter(l => l._preview?.data?.lesson_assistant_name && String(l._preview.data.lesson_assistant_name).toLowerCase().includes(String(aname).toLowerCase()));
+      sessions  = []; invoices = []; contracts = [];
+    }
+
+    const subSections = [
+      { key: 'lessons',   label: 'Lessons',   items: lessons },
+      { key: 'sessions',  label: 'Sessions',  items: sessions },
+      { key: 'invoices',  label: 'Invoices',  items: invoices },
+      { key: 'contracts', label: 'Contracts', items: contracts },
+    ].filter(s => s.items && s.items.length);
+
+    const totalSub = subSections.reduce((s, x) => s + x.items.length, 0);
+
+    let html = `<div class="ms-crumbs">
+      <button type="button" class="ms-crumb-back" data-back="1" aria-label="Back to all results">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        <span>All results</span>
+      </button>
+      <div class="ms-crumbs__sep">/</div>
+      <div class="ms-crumbs__here">${escapeHtml(name)}</div>
+      <div class="ms-crumbs__count">${totalSub} ${totalSub === 1 ? 'match' : 'matches'}</div>
+    </div>`;
+
+    if (!subSections.length) {
+      html += `<div class="ms-empty">Nothing matched "${escapeHtml(query)}" for ${escapeHtml(name)}.</div>`;
+    } else {
+      const flat = [item];     // index 0 = the entity itself (so preview stays on it)
+      subSections.forEach(section => {
+        const cap = state.expanded[section.key] ? section.items.length : SECTION_INITIAL_CAP;
+        const shown = section.items.slice(0, cap);
+        const hidden = section.items.length - shown.length;
+        html += `<div class="ms-section" id="ms-sec-${section.key}">
+          <div class="ms-section__head"><span>${section.label}</span><span class="ms-section__count">${section.items.length}</span></div>`;
+        shown.forEach(sub => {
+          const idx = flat.length; flat.push(sub);
+          html += itemRowHtml(sub, idx, query);
+        });
+        if (hidden > 0) {
+          html += `<button type="button" class="ms-more" data-expand="${section.key}">Show ${hidden} more in ${section.label}</button>`;
+        }
+        html += `</div>`;
+      });
+      state.flat = flat;
+    }
+
+    panel.innerHTML = html;
+    state.flat = state.flat || [item];
+  }
+
   // ── Render dropdown ─────────────────────────────────────────────
   function renderDropdown(panel, results, query, state) {
+    if (state.view === 'drilled' && state.drilledItem) {
+      renderDrilldown(panel, results, query, state);
+      return;
+    }
     const sections = [
       { key: 'pages',              label: 'Pages',               items: results.pages },
       { key: 'clients',            label: 'Clients',             items: results.clients },
@@ -858,13 +946,7 @@
       shown.forEach(item => {
         const idx = flat.length;
         flat.push(item);
-        html += `<a class="ms-item" data-idx="${idx}" href="${escapeHtml(item.url)}">
-          <span class="ms-item__icon">${item.icon}</span>
-          <span class="ms-item__body">
-            <span class="ms-item__title">${highlight(item.title, query)}</span>
-            <span class="ms-item__sub">${highlight(item.subtitle || '', query)}</span>
-          </span>
-        </a>`;
+        html += itemRowHtml(item, idx, query);
       });
       if (hiddenCount > 0) {
         html += `<button type="button" class="ms-more" data-expand="${section.key}">Show ${hiddenCount} more in ${section.label}</button>`;
@@ -873,26 +955,7 @@
     });
     panel.innerHTML = html;
     state.flat = flat;
-
-    // Wire "show more" expand
-    panel.querySelectorAll('[data-expand]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const key = btn.dataset.expand;
-        state.expanded = state.expanded || {};
-        state.expanded[key] = true;
-        renderDropdown(panel, results, query, state);
-        // Re-wire hover handlers in caller (run does this)
-      });
-    });
-    // Wire chip jumps — smooth scroll to section within the panel
-    panel.querySelectorAll('[data-jump]').forEach(chip => {
-      chip.addEventListener('click', (e) => {
-        e.preventDefault();
-        const tgt = panel.querySelector('#ms-sec-' + chip.dataset.jump);
-        if (tgt) tgt.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-    });
+    // wireRows() in the caller hooks click/hover/expand/jump/back.
   }
 
   // ── Wire up an input ────────────────────────────────────────────
@@ -919,7 +982,16 @@
     const panel       = panelWrap.querySelector('.ms-panel__results');
     const previewEl   = panelWrap.querySelector('.ms-panel__preview');
 
-    const state = { open: false, flat: [], selectedIdx: -1, query: '' };
+    const state = {
+      open: false, flat: [], selectedIdx: -1, query: '',
+      // Drill-down state — when a client/assistant is "opened" in the
+      // search panel (not navigated to), we filter the panel to show
+      // only their matches grouped by kind. Back button restores root.
+      view: 'root',          // 'root' | 'drilled'
+      drilledItem: null,     // the original result item we drilled into
+      drilledRollup: null,   // { lessons, sessions, invoices, contracts } when drilled
+      expanded: {},
+    };
 
     function close() {
       state.open = false;
@@ -960,16 +1032,13 @@
         // Bail if user typed something else while we were loading
         if (state.query !== q) return;
         const results = search(q, role, dyn);
+        // Reset drill-down on new query
+        state.view = 'root';
+        state.drilledItem = null;
+        state.expanded = {};
         open();
         renderDropdown(panel, results, q, state);
-        // Wire hover-to-preview on each item
-        panel.querySelectorAll('.ms-item').forEach((el, i) => {
-          el.addEventListener('mouseenter', () => {
-            state.selectedIdx = i;
-            panel.querySelectorAll('.ms-item').forEach((e2, j) => e2.classList.toggle('is-selected', j === i));
-            if (state.flat[i]) renderPreview(previewEl, state.flat[i], state.query);
-          });
-        });
+        wireRows(results, q);
         // Auto-select first result so the preview shows something immediately
         if (state.flat.length > 0) {
           renderPreview(previewEl, state.flat[0], state.query);
@@ -984,6 +1053,84 @@
       }
     }, 220);
 
+    // Wire click/hover/double-click on each rendered row + back button.
+    // Single click on a leaf row = preview only (NO navigation).
+    // Single click on a drillable row (client/assistant) = drill in.
+    // Double click on any row = navigate.
+    // Click on preview's "Open in page" button = navigate.
+    // Click on "Show N more" button = expand that section in place.
+    // Click on "Back" crumb = exit drill-down.
+    function wireRows(results, q) {
+      panel.querySelectorAll('.ms-item').forEach((el, i) => {
+        // Hover updates the preview
+        el.addEventListener('mouseenter', () => {
+          state.selectedIdx = i;
+          panel.querySelectorAll('.ms-item').forEach((e2, j) => e2.classList.toggle('is-selected', j === i));
+          if (state.flat[i]) renderPreview(previewEl, state.flat[i], state.query);
+        });
+        // Single click: select + (drill if applicable). NEVER auto-navigate.
+        el.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          const item = state.flat[i];
+          if (!item) return;
+          // Cmd/Ctrl/middle-click — open in new tab (power users)
+          if ((ev.metaKey || ev.ctrlKey) && item.url) {
+            window.open(item.url, '_blank', 'noopener');
+            return;
+          }
+          state.selectedIdx = i;
+          panel.querySelectorAll('.ms-item').forEach((e2, j) => e2.classList.toggle('is-selected', j === i));
+          renderPreview(previewEl, item, state.query);
+          // Drillable kinds (client/assistant) → enter drill view
+          if (item._preview && (item._preview.kind === 'client' || item._preview.kind === 'assistant')) {
+            state.view = 'drilled';
+            state.drilledItem = item;
+            state.expanded = {};
+            renderDropdown(panel, results, q, state);
+            wireRows(results, q);
+            renderPreview(previewEl, item, state.query);
+          }
+        });
+        // Double click: navigate (explicit intent shortcut)
+        el.addEventListener('dblclick', (ev) => {
+          ev.preventDefault();
+          const item = state.flat[i];
+          if (item && item.url) location.href = item.url;
+        });
+      });
+      // Back button (drill-down)
+      panel.querySelectorAll('[data-back]').forEach(btn => {
+        btn.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          state.view = 'root';
+          state.drilledItem = null;
+          state.expanded = {};
+          renderDropdown(panel, results, q, state);
+          wireRows(results, q);
+          if (state.flat.length > 0) renderPreview(previewEl, state.flat[0], state.query);
+        });
+      });
+      // "Show N more" expanders
+      panel.querySelectorAll('[data-expand]').forEach(btn => {
+        btn.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          const key = btn.dataset.expand;
+          state.expanded = state.expanded || {};
+          state.expanded[key] = true;
+          renderDropdown(panel, results, q, state);
+          wireRows(results, q);
+        });
+      });
+      // Chip jumps inside the summary strip
+      panel.querySelectorAll('[data-jump]').forEach(chip => {
+        chip.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          const tgt = panel.querySelector('#ms-sec-' + chip.dataset.jump);
+          if (tgt) tgt.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+    }
+
     input.addEventListener('input', () => run(input.value));
     input.addEventListener('focus', () => {
       if (state.query && CACHE.data && totalCount(search(state.query, role, CACHE.data)) > 0) open();
@@ -995,10 +1142,30 @@
       else if (e.key === 'Enter')  {
         if (state.selectedIdx >= 0 && state.flat[state.selectedIdx]) {
           e.preventDefault();
-          location.href = state.flat[state.selectedIdx].url;
+          const item = state.flat[state.selectedIdx];
+          // Drillable: Enter drills in (instead of navigating)
+          if (item._preview && (item._preview.kind === 'client' || item._preview.kind === 'assistant')) {
+            const fakeBtn = panel.querySelectorAll('.ms-item')[state.selectedIdx];
+            if (fakeBtn) fakeBtn.click();
+          } else if (item.url) {
+            location.href = item.url;
+          }
         }
       }
-      else if (e.key === 'Escape') { close(); input.blur(); }
+      else if (e.key === 'Escape') {
+        // Esc in drilled view goes back to root; in root view closes
+        if (state.view === 'drilled') {
+          const back = panel.querySelector('[data-back]');
+          if (back) back.click();
+        } else {
+          close(); input.blur();
+        }
+      }
+      else if (e.key === 'Backspace' && !input.value && state.view === 'drilled') {
+        e.preventDefault();
+        const back = panel.querySelector('[data-back]');
+        if (back) back.click();
+      }
     });
     document.addEventListener('click', (e) => {
       if (!wrap.contains(e.target)) close();

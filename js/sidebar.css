@@ -1306,3 +1306,75 @@ body.pm-cal-collapsed .with-right-cal{
   letter-spacing:-.003em;
   line-height:1.4;
 }
+
+/* ── Drill-down breadcrumb + drillable affordance ───────────── */
+.ms-crumbs{
+  display:flex; align-items:center; gap:8px;
+  padding:14px 20px 12px;
+  border-bottom:1px solid var(--border, var(--dash-border, #e5e7eb));
+  background:var(--card, var(--dash-card, #ffffff));
+  position:sticky; top:0; z-index:2;
+}
+.ms-crumb-back{
+  display:inline-flex; align-items:center; gap:5px;
+  padding:4px 9px 4px 6px;
+  border:1px solid var(--border, var(--dash-border, #e5e7eb));
+  background:var(--card, var(--dash-card, #ffffff));
+  border-radius:7px;
+  font:600 12px Inter,sans-serif;
+  letter-spacing:-.005em;
+  color:var(--ink-mute, var(--dash-ink-mute, #6b7280));
+  cursor:pointer;
+  transition:background .14s ease, color .14s ease, border-color .14s ease;
+}
+.ms-crumb-back:hover{
+  background:var(--border-soft, var(--dash-border-soft, #f3f4f6));
+  color:var(--ink-2, var(--dash-ink-2, #111827));
+  border-color:var(--ink-tert, var(--dash-ink-tert, #9ca3af));
+}
+.ms-crumb-back svg{ width:13px; height:13px; }
+.ms-crumbs__sep{
+  color:var(--ink-tert, var(--dash-ink-tert, #9ca3af));
+  font:400 13px Inter,sans-serif;
+}
+.ms-crumbs__here{
+  flex:1; min-width:0;
+  font:700 14px Inter,sans-serif;
+  letter-spacing:-.012em;
+  color:var(--ink-2, var(--dash-ink-2, #111827));
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.ms-crumbs__count{
+  font:600 11px Inter,sans-serif;
+  letter-spacing:-.003em;
+  color:var(--ink-mute, var(--dash-ink-mute, #6b7280));
+  background:var(--border-soft, var(--dash-border-soft, #f3f4f6));
+  border:1px solid var(--border, var(--dash-border, #e5e7eb));
+  padding:3px 8px;
+  border-radius:9999px;
+  white-space:nowrap;
+}
+
+/* "Drillable" affordance — chevron on the right edge of rows that
+   open a sub-view (client + assistant) so the user knows there's
+   something deeper to click into. */
+.ms-item{
+  background:transparent; border:none;
+  width:100%; text-align:left; font-family:inherit;
+  cursor:pointer;
+}
+.ms-item__chev{
+  flex:0 0 16px;
+  width:16px; height:16px;
+  color:var(--ink-tert, var(--dash-ink-tert, #9ca3af));
+  display:inline-flex; align-items:center; justify-content:center;
+  opacity:0;
+  transform:translateX(-3px);
+  transition:opacity .14s ease, transform .14s ease, color .14s ease;
+}
+.ms-item__chev svg{ width:14px; height:14px; }
+.ms-item--drillable .ms-item__chev{ opacity:0.55; transform:translateX(0); }
+.ms-item--drillable:hover .ms-item__chev,
+.ms-item--drillable.is-selected .ms-item__chev{
+  opacity:1; color:var(--primary, var(--dash-primary, #3b82f6));
+}
