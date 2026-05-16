@@ -1615,48 +1615,108 @@ html[data-dash-theme="light"] .nx-table tbody tr:hover{
 
 
 /* ────────────────────────────────────────────────────────────
-   GIFT PAGE — premium upgrade (light mode only)
-   The page was authored with deliberately tiny "Preline" typography
-   (h1 = 20px) and only had dark-theme tokens defined. In light mode
-   it looked like raw HTML. This block:
-     • bumps the hero typography to real headline scale (32px / 700)
-     • gives the form fields a polished light-mode treatment
-     • frames the visual preview column with a soft background
-     • adds breathing room
+   GIFT PAGE — premium upgrade
+   ────────────────────────────────────────────────────────────
+   SIZE/TYPOGRAPHY rules apply to BOTH themes (per user request:
+   "same size on everything, just different colour").
+   COLOR/BACKGROUND/SHADOW rules stay light-mode only — dark
+   mode keeps its own existing colour palette.
    ──────────────────────────────────────────────────────────── */
-html[data-dash-theme="light"] .pm-gift{
-  padding:8px 4px;
-}
-html[data-dash-theme="light"] .nx-shell > .nx-head .nx-h1,
-html[data-dash-theme="light"] body:has(.pm-gift) .nx-h1{
+
+/* ── SIZING + TYPOGRAPHY (both themes) ──────────────────────── */
+.pm-gift{ padding:8px 4px; }
+
+/* Hero typography on the gift page (bumped 20px→32px) — both themes */
+body:has(.pm-gift) .nx-h1{
   font:700 32px Inter,sans-serif !important;
   letter-spacing:-.022em !important;
-  color:#0f172a !important;
   line-height:1.1 !important;
   margin:0 0 8px !important;
 }
-html[data-dash-theme="light"] .nx-shell > .nx-head .nx-sub,
-html[data-dash-theme="light"] body:has(.pm-gift) .nx-sub{
+body:has(.pm-gift) .nx-sub{
   font:500 15px Inter,sans-serif !important;
-  color:#475569 !important;
   letter-spacing:-.005em !important;
   line-height:1.55 !important;
   max-width:620px !important;
 }
 
-/* Frame the LEFT column (the gift card preview) on a soft tinted
-   surface so the gift card itself pops more dramatically. */
-html[data-dash-theme="light"] .pm-gift__preview-col{
+/* Preview column padding + radius (the surface) — both themes */
+.pm-gift__preview-col{
   padding:32px 28px !important;
-  background:linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
   border-radius:18px !important;
+}
+
+/* Form field sizing + shape — both themes */
+.pm-gift__field,
+.pm-gift__input,
+.pm-gift input[type="text"],
+.pm-gift input[type="email"],
+.pm-gift input[type="number"],
+.pm-gift textarea,
+.pm-gift select{
+  border-radius:10px !important;
+  padding:11px 14px !important;
+  font:500 14px Inter,sans-serif !important;
+  letter-spacing:-.005em !important;
+  transition:border-color .14s ease, box-shadow .14s ease !important;
+}
+
+/* Field labels — typography + tracking — both themes */
+.pm-gift label,
+.pm-gift__label{
+  font:700 11px Inter,sans-serif !important;
+  letter-spacing:.10em !important;
+  text-transform:uppercase !important;
+  margin-bottom:8px !important;
+  display:block;
+}
+
+/* Chip lift + transitions — both themes */
+.pm-gift__chip,
+.pm-gift__swatch{
+  border:2px solid transparent !important;
+  transition:transform .14s ease, box-shadow .14s ease !important;
+}
+.pm-gift__chip:hover,
+.pm-gift__swatch:hover{
+  transform:translateY(-1px);
+}
+
+/* Submit button shape + sizing — both themes */
+.pm-gift__submit,
+.pm-gift button[type="submit"]{
+  border:0 !important;
+  font:700 14px Inter,sans-serif !important;
+  letter-spacing:-.005em !important;
+  padding:13px 22px !important;
+  border-radius:10px !important;
+  transition:transform .12s ease, box-shadow .14s ease !important;
+  cursor:pointer !important;
+}
+.pm-gift__submit:hover,
+.pm-gift button[type="submit"]:hover{
+  transform:translateY(-1px);
+}
+
+
+/* ── COLOURS + SHADOWS (light mode only) ────────────────────── */
+html[data-dash-theme="light"] body:has(.pm-gift) .nx-h1{
+  color:#0f172a !important;
+}
+html[data-dash-theme="light"] body:has(.pm-gift) .nx-sub{
+  color:#475569 !important;
+}
+
+/* Preview column — soft white card frame in light mode */
+html[data-dash-theme="light"] .pm-gift__preview-col{
+  background:linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
   box-shadow:
     0 0 0 1px rgba(15,23,42,0.06),
     0 1px 3px rgba(15,23,42,0.04),
     0 16px 40px -20px rgba(15,23,42,0.15) !important;
 }
 
-/* Form fields polished — visible borders, proper focus rings */
+/* Form fields — light-mode colour palette */
 html[data-dash-theme="light"] .pm-gift__field,
 html[data-dash-theme="light"] .pm-gift__input,
 html[data-dash-theme="light"] .pm-gift input[type="text"],
@@ -1666,13 +1726,8 @@ html[data-dash-theme="light"] .pm-gift textarea,
 html[data-dash-theme="light"] .pm-gift select{
   background:#ffffff !important;
   border:1px solid rgba(15,23,42,0.10) !important;
-  border-radius:10px !important;
-  padding:11px 14px !important;
-  font:500 14px Inter,sans-serif !important;
   color:#0f172a !important;
-  letter-spacing:-.005em !important;
   box-shadow:0 1px 2px rgba(15,23,42,0.03) !important;
-  transition:border-color .14s ease, box-shadow .14s ease !important;
 }
 html[data-dash-theme="light"] .pm-gift__field:hover,
 html[data-dash-theme="light"] .pm-gift input:hover,
@@ -1689,30 +1744,21 @@ html[data-dash-theme="light"] .pm-gift select:focus{
   box-shadow:0 0 0 4px rgba(37,99,235,0.15) !important;
 }
 
-/* Field labels — proper weight + uppercase tracking */
+/* Labels — light-mode colour */
 html[data-dash-theme="light"] .pm-gift label,
 html[data-dash-theme="light"] .pm-gift__label{
-  font:700 11px Inter,sans-serif !important;
-  letter-spacing:.10em !important;
-  text-transform:uppercase !important;
   color:#475569 !important;
-  margin-bottom:8px !important;
-  display:block;
 }
 
-/* The color/style chips for picking a card variant get visible
-   borders + lift on hover */
+/* Chip + swatch — light-mode colours */
 html[data-dash-theme="light"] .pm-gift__chip,
 html[data-dash-theme="light"] .pm-gift__swatch{
-  border:2px solid transparent !important;
   box-shadow:
     0 0 0 1px rgba(15,23,42,0.08),
     0 1px 2px rgba(15,23,42,0.04) !important;
-  transition:transform .14s ease, box-shadow .14s ease !important;
 }
 html[data-dash-theme="light"] .pm-gift__chip:hover,
 html[data-dash-theme="light"] .pm-gift__swatch:hover{
-  transform:translateY(-1px);
   box-shadow:
     0 0 0 1px rgba(15,23,42,0.12),
     0 4px 12px -2px rgba(15,23,42,0.12) !important;
@@ -1726,26 +1772,18 @@ html[data-dash-theme="light"] .pm-gift__swatch.is-active{
     0 0 0 4px rgba(37,99,235,0.15) !important;
 }
 
-/* "Purchase" / submit button — premium gradient + colored shadow */
+/* Submit button — light-mode gradient + colour */
 html[data-dash-theme="light"] .pm-gift__submit,
 html[data-dash-theme="light"] .pm-gift button[type="submit"]{
   background:linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%) !important;
   color:#ffffff !important;
-  border:0 !important;
-  font:700 14px Inter,sans-serif !important;
-  letter-spacing:-.005em !important;
-  padding:13px 22px !important;
-  border-radius:10px !important;
   box-shadow:
     0 1px 2px rgba(15,23,42,0.12),
     0 8px 22px -4px rgba(37,99,235,0.45),
     inset 0 1px 0 rgba(255,255,255,0.20) !important;
-  transition:transform .12s ease, box-shadow .14s ease !important;
-  cursor:pointer !important;
 }
 html[data-dash-theme="light"] .pm-gift__submit:hover,
 html[data-dash-theme="light"] .pm-gift button[type="submit"]:hover{
-  transform:translateY(-1px);
   box-shadow:
     0 1px 2px rgba(15,23,42,0.14),
     0 14px 28px -4px rgba(37,99,235,0.55),
