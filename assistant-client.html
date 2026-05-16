@@ -53,6 +53,11 @@
   }
   .wc-book-btn:hover{background:#005CBE;border-color:#005CBE;}
   .wc-book-btn:disabled{opacity:.5;cursor:not-allowed;}
+  /* Re-enforce the browser's default [hidden]{display:none}, which
+     our `display:inline-flex` on .wc-book-btn was overriding. Without
+     this rule, a button marked `hidden` still showed on screen (the
+     Activate button bled through pre-fix because of this). */
+  .wc-book-btn[hidden]{display:none;}
   /* Phase 19f: "Activate renewal" — green so it reads as a positive
      action (vs the blue 'Book' which is a routine action). */
   .wc-book-btn--activate{
@@ -698,7 +703,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515c"></script>
-<script src="js/hiring-service.js?v=20260515v"></script>
+<script src="js/hiring-service.js?v=20260515w"></script>
 <script src="js/messages-service.js?v=20260515c"></script>
 <script src="js/session-calendar.js?v=20260515a"></script>
 <script src="js/sidebar.js?v=20260515d"></script>
@@ -819,43 +824,43 @@ function renderAppointmentRow(a, spend){
   wcStatus.textContent = statusKey;
   wcStatus.className = 'wc-hero__status wc-hero__status--' + statusClass;
 
-  // Phase 19f: surface the green Activate button only when this contract
-  // is currently a draft (payment landed, ready to roll forward). One
-  // click flips draft → active + fires carryover via the RPC.
+  // Phase 19f: green "Activate renewal" button — only visible when this
+  // contract is currently a draft. Handler is wired UNCONDITIONALLY so
+  // the button always works even if status changes after init or if
+  // the picker re-evaluates. (First pass wired only inside the
+  // statusKey==='draft' branch — that left the button click-dead when
+  // CSS still showed it visually, which happened because .wc-book-btn
+  // overrode [hidden] with display:inline-flex. CSS fix above + this
+  // unconditional wiring are belt-and-suspenders.)
   const activateBtn = document.getElementById('wcActivateBtn');
   if (activateBtn) {
-    if (statusKey === 'draft') {
-      activateBtn.hidden = false;
-      activateBtn.onclick = async () => {
-        const ok = confirm(
-          `Activate this renewal for ${name}?\n\n` +
-          `This flips the draft to active and rolls any leftover hours ` +
-          `forward from the previous contract automatically.`
-        );
-        if (!ok) return;
-        activateBtn.disabled = true;
-        const originalText = activateBtn.innerHTML;
-        activateBtn.innerHTML = 'Activating…';
-        try {
-          const result = await window.pmHiring.activateRenewal(ws.contract.id);
-          const carryHours = result?.carryover_minutes
-            ? Math.round((result.carryover_minutes / 60) * 100) / 100
-            : 0;
-          alert(carryHours > 0
-            ? `Renewal activated. ${carryHours} h carried forward from prior contract.`
-            : `Renewal activated. No carryover hours to roll.`);
-          // Reload so KPIs / status / carryover all repaint.
-          location.reload();
-        } catch (e) {
-          console.error('activateRenewal failed:', e);
-          alert('Could not activate: ' + (e?.message || 'unknown error'));
-          activateBtn.disabled = false;
-          activateBtn.innerHTML = originalText;
-        }
-      };
-    } else {
-      activateBtn.hidden = true;
-    }
+    activateBtn.hidden = statusKey !== 'draft';
+    activateBtn.onclick = async () => {
+      const ok = confirm(
+        `Activate this renewal for ${name}?\n\n` +
+        `This flips the draft to active and rolls any leftover hours ` +
+        `forward from the previous contract automatically.`
+      );
+      if (!ok) return;
+      activateBtn.disabled = true;
+      const originalText = activateBtn.innerHTML;
+      activateBtn.innerHTML = 'Activating…';
+      try {
+        const result = await window.pmHiring.activateRenewal(ws.contract.id);
+        const carryHours = result?.carryover_minutes
+          ? Math.round((result.carryover_minutes / 60) * 100) / 100
+          : 0;
+        alert(carryHours > 0
+          ? `Renewal activated. ${carryHours} h carried forward from prior contract.`
+          : `Renewal activated. No carryover hours to roll.`);
+        location.reload();
+      } catch (e) {
+        console.error('activateRenewal failed:', e);
+        alert('Could not activate: ' + (e?.message || 'unknown error'));
+        activateBtn.disabled = false;
+        activateBtn.innerHTML = originalText;
+      }
+    };
   }
 
   // Phase 18: point the Lesson Tracker button at this client's tracker
