@@ -387,15 +387,15 @@
         const logId = btn.getAttribute('data-lesson-files');
         btn.disabled = true; btn.textContent = 'Loading files…';
         try {
-          const log = await window.pmHiring.fetchLessonLog
-            ? null  // fetchLessonLog wants appointment_id, not log_id — skip
-            : null;
-          // Files come from session_lesson_files via signed URLs.
-          // We pull them on demand to keep the initial render fast.
+          // Files come from session_lesson_files. The table supports two
+          // kinds: 'file' (binary in Supabase Storage, needs signed URL
+          // via storage_path) and 'url' (external link in external_url).
+          // Display name is in `display_name`, NOT `file_name` —
+          // earlier code had a wrong column name and threw 42703.
           const sb = window.pmSupabase;
           const { data: files, error } = await sb
             .from('session_lesson_files')
-            .select('id, file_name, storage_path, mime_type')
+            .select('id, kind, display_name, storage_path, external_url, mime_type')
             .eq('lesson_log_id', logId)
             .is('deleted_at', null);
           if (error) throw error;
@@ -404,18 +404,29 @@
               { className: 'lj-chip', textContent: 'No files attached' }));
             return;
           }
-          // Generate signed URLs and replace the button with file links
+          // Generate signed URLs for file kind, use external_url directly for url kind
           const wrap = document.createElement('div');
           wrap.className = 'lj-files';
           for (const f of files) {
             try {
-              const url = await window.pmHiring.getLessonFileSignedUrl(f.storage_path, 3600);
+              let href = null;
+              if (f.kind === 'url') {
+                href = f.external_url;
+              } else if (f.kind === 'file' && f.storage_path) {
+                href = await window.pmHiring.getLessonFileSignedUrl(f.storage_path, 3600);
+              }
+              if (!href) continue;
               const a = document.createElement('a');
               a.className = 'lj-file';
-              a.href = url; a.target = '_blank'; a.rel = 'noopener';
-              a.textContent = f.file_name || 'file';
+              a.href = href; a.target = '_blank'; a.rel = 'noopener';
+              a.textContent = f.display_name || (f.kind === 'url' ? 'link' : 'file');
               wrap.appendChild(a);
             } catch (_) {}
+          }
+          if (!wrap.children.length) {
+            btn.replaceWith(Object.assign(document.createElement('span'),
+              { className: 'lj-chip', textContent: 'Could not load files' }));
+            return;
           }
           btn.replaceWith(wrap);
         } catch (e) {
