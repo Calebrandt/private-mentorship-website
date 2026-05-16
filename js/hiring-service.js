@@ -652,8 +652,9 @@
   // KPI snapshot for the assistant dashboard hero — counts only, defensive.
   async function fetchAssistantHomeKpis() {
     const user = await getCurrentUser();
-    if (!user) return { activeEngagements: 0, hoursThisMonth: 0, upcomingSessions: 0 };
-    const out = { activeEngagements: 0, hoursThisMonth: 0, upcomingSessions: 0 };
+    const empty = { activeEngagements: 0, hoursThisMonth: 0, upcomingSessions: 0, moneyThisMonth: 0 };
+    if (!user) return empty;
+    const out = { ...empty };
 
     // Active engagements = active contracts assigned to me
     try {
@@ -666,7 +667,6 @@
     } catch (_) {}
 
     // Upcoming sessions = scheduled appointments tied to my contracts, starting in the future.
-    // Note: `reserved` is an appointments.kind, not a status. Status filter is just 'scheduled'.
     try {
       const { data: contractIds } = await sb()
         .from('contracts')
@@ -684,26 +684,51 @@
       }
     } catch (_) {}
 
-    // Hours this month — sum of |minutes_delta|/60 across hours_ledger for my contracts
-    // in this calendar month. Filter by contract_id (canonical) not client_id.
+    // Hours this month — sum duration_minutes of appointments whose
+    // STARTS_AT is in this calendar month (status completed).
+    //
+    // Previous version summed |minutes_delta| from hours_ledger where
+    // ledger.created_at >= start-of-month. That was wrong: bulk
+    // historical imports / reconciliations write fresh created_at
+    // timestamps for OLD sessions, so on import day every imported
+    // session was counted as "this month". Got 849.3h instead of the
+    // few dozen actually delivered in May.
+    //
+    // Filter by the session's start_at (when work actually happened),
+    // not the ledger row's creation timestamp.
+    const firstOfMonth = new Date();
+    firstOfMonth.setDate(1);
+    firstOfMonth.setHours(0, 0, 0, 0);
+    const firstOfNextMonth = new Date(firstOfMonth);
+    firstOfNextMonth.setMonth(firstOfNextMonth.getMonth() + 1);
     try {
-      const firstOfMonth = new Date();
-      firstOfMonth.setDate(1);
-      firstOfMonth.setHours(0, 0, 0, 0);
-      const { data: contractRows } = await sb()
-        .from('contracts')
-        .select('id')
-        .eq('assistant_id', user.id);
-      const contractIds = [...new Set((contractRows || []).map(c => c.id))];
-      if (contractIds.length) {
-        const { data: ledger } = await sb()
-          .from('hours_ledger')
-          .select('minutes_delta')
-          .in('contract_id', contractIds)
-          .gte('created_at', firstOfMonth.toISOString());
-        const totalMinutes = (ledger || []).reduce((sum, r) => sum + Math.abs(Number(r.minutes_delta) || 0), 0);
-        out.hoursThisMonth = Math.round((totalMinutes / 60) * 10) / 10;
-      }
+      const { data: monthAppts } = await sb()
+        .from('appointments')
+        .select('duration_minutes')
+        .eq('status', 'completed')
+        .gte('starts_at', firstOfMonth.toISOString())
+        .lt('starts_at', firstOfNextMonth.toISOString());
+      const totalMinutes = (monthAppts || []).reduce(
+        (s, a) => s + (Number(a.duration_minutes) || 0), 0
+      );
+      out.hoursThisMonth = Math.round((totalMinutes / 60) * 10) / 10;
+    } catch (_) {}
+
+    // Money this month — sum of invoice payments collected in this
+    // calendar month (status != void). Reflects cash collected: best
+    // single-number answer to "what did I earn so far this month".
+    // Falls back to total_cents when amount_paid_cents is missing.
+    try {
+      const { data: invoices } = await sb()
+        .from('invoices')
+        .select('status, amount_paid_cents, total_cents, paid_at')
+        .gte('paid_at', firstOfMonth.toISOString())
+        .lt('paid_at', firstOfNextMonth.toISOString())
+        .neq('status', 'void');
+      const totalCents = (invoices || []).reduce(
+        (s, i) => s + (Number(i.amount_paid_cents) || Number(i.total_cents) || 0), 0
+      );
+      out.moneyThisMonth = Math.round(totalCents / 100);
     } catch (_) {}
 
     return out;

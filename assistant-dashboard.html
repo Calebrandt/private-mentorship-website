@@ -186,9 +186,9 @@
       <p class="ad-kpi__sub">Hours marked complete this calendar month. Scheduled sessions are not included until you mark them done.</p>
     </div>
     <div class="ad-kpi">
-      <p class="ad-kpi__label">Upcoming Sessions</p>
-      <span class="ad-kpi__value" id="kpiUpcoming">—</span>
-      <p class="ad-kpi__sub">Sessions on your calendar from today forward, across every family.</p>
+      <p class="ad-kpi__label">Earned This Month</p>
+      <span class="ad-kpi__value" id="kpiMoney">—</span>
+      <p class="ad-kpi__sub">Invoice payments collected this calendar month, across every family.</p>
     </div>
   </section>
 
@@ -267,7 +267,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515a"></script>
-<script src="js/hiring-service.js?v=20260515l"></script>
+<script src="js/hiring-service.js?v=20260515m"></script>
 <script src="js/session-calendar.js?v=20260515a"></script>
 <script src="js/sidebar.js?v=20260515c"></script>
 <script>
@@ -304,24 +304,51 @@ function initialsFor(name){
   // Wait briefly for sidebar.js to settle auth
   await new Promise(r => setTimeout(r, 300));
 
-  // Greeting (best-effort name from profile)
+  // Greeting — pick a sensible first name, sanitized.
+  // Old version blindly used profile.full_name → produced "TYASSISTANT"
+  // (or similar all-caps junk) when the profile had a single-token
+  // run-on name. Now: require a properly-capitalized 2–30 char first
+  // name, otherwise fall back to email local-part (assistant@... →
+  // "Assistant") or just a plain greeting.
   try {
+    const sb = window.pmSupabase;
+    const { data: u } = sb ? await sb.auth.getUser() : { data: null };
+    const email = u?.user?.email || null;
     const profile = await window.pmHiring.fetchCurrentUserProfile();
+    let nameToShow = null;
     if (profile?.full_name) {
-      const first = profile.full_name.split(/\s+/)[0];
-      document.getElementById('adGreeting').textContent = 'Welcome back, ' + first + '.';
+      const first = String(profile.full_name).trim().split(/\s+/)[0] || '';
+      if (first.length >= 2 && first.length <= 30 && /^[A-Z][a-zA-Z'’\-]+$/.test(first)) {
+        nameToShow = first;
+      }
     }
-  } catch (_) {}
+    if (!nameToShow && email) {
+      const local = email.split('@')[0].replace(/[._-]+/g, ' ').trim();
+      if (local) {
+        nameToShow = local.charAt(0).toUpperCase() + local.slice(1).toLowerCase();
+      }
+    }
+    document.getElementById('adGreeting').textContent = nameToShow
+      ? `Welcome back, ${nameToShow}.`
+      : 'Welcome back.';
+  } catch (_) {
+    document.getElementById('adGreeting').textContent = 'Welcome back.';
+  }
 
   // KPIs
-  let kpis = { activeEngagements: 0, hoursThisMonth: 0, upcomingSessions: 0 };
+  let kpis = { activeEngagements: 0, hoursThisMonth: 0, upcomingSessions: 0, moneyThisMonth: 0 };
   try { kpis = await window.pmHiring.fetchAssistantHomeKpis(); } catch (_) {}
   document.getElementById('kpiEngagements').textContent = kpis.activeEngagements;
   document.getElementById('kpiHours').textContent = kpis.hoursThisMonth;
-  document.getElementById('kpiUpcoming').textContent = kpis.upcomingSessions;
+  const moneyEl = document.getElementById('kpiMoney');
+  if (moneyEl) {
+    moneyEl.textContent = (kpis.moneyThisMonth || 0).toLocaleString('en-CA', {
+      style: 'currency', currency: 'CAD', maximumFractionDigits: 0,
+    });
+  }
 
   // Welcome banner if assistant has nothing yet
-  if (kpis.activeEngagements === 0 && kpis.upcomingSessions === 0 && kpis.hoursThisMonth === 0) {
+  if (kpis.activeEngagements === 0 && (kpis.upcomingSessions || 0) === 0 && kpis.hoursThisMonth === 0) {
     document.getElementById('adWelcome').hidden = false;
   }
 
