@@ -361,20 +361,20 @@
     <div class="ad-families__grid" id="adFamiliesGrid"></div>
   </section>
 
-  <!-- Phase 16 v3: Upcoming renewals roll-up — every assigned family's
-       next renewal date at a glance, sorted closest-first, color-coded
-       by urgency. Click a row to open that family's workspace. -->
+  <!-- Phase 17: month calendar — all families, color-coded -->
+  <section style="margin-bottom:22px;">
+    <div id="adCalendar"></div>
+  </section>
+
+  <!-- Phase 16 v3: Upcoming renewals roll-up — moved BELOW the calendar
+       per Caleb's request 2026-05-16. Calendar is now the visual
+       centerpiece; renewals act as the action-required follow-up. -->
   <section class="ad-renewals" id="adRenewals" hidden>
     <header class="ad-renewals__head">
       <h3 class="ad-renewals__title">Upcoming renewals</h3>
       <p class="ad-renewals__sub" id="adRenewalsSub">—</p>
     </header>
     <div class="ad-renewals__list" id="adRenewalsList"></div>
-  </section>
-
-  <!-- Phase 17: month calendar — all families, color-coded -->
-  <section style="margin-bottom:22px;">
-    <div id="adCalendar"></div>
   </section>
 
   <!-- Two columns: upcoming + profile preview -->
@@ -447,7 +447,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515a"></script>
-<script src="js/hiring-service.js?v=20260516b"></script>
+<script src="js/hiring-service.js?v=20260516c"></script>
 <script src="js/session-calendar.js?v=20260515a"></script>
 <script src="js/sidebar.js?v=20260515d"></script>
 <script>
