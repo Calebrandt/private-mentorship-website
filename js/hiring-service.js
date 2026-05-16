@@ -753,20 +753,45 @@
     const user = await getCurrentUser();
     if (!user) return [];
     try {
-      const { data: contracts } = await sb()
-        .from('contracts')
-        .select('id, client_id')
-        .eq('assistant_id', user.id);
-      const contractIds = (contracts || []).map(c => c.id);
-      if (!contractIds.length) return [];
+      // Find every family this user is associated with via family_assignments
+      // (covers both ASSISTANT and OWNER roles). Then take a UNION with any
+      // contracts that name them as assistant_id directly. This handles two
+      // legacy cases that the old "WHERE assistant_id = me" query missed:
+      //   • Imported contracts where assistant_id was set to NULL or some
+      //     placeholder uuid (Michael's 2025/2026 import hit this — his
+      //     appointments were invisible on the dashboard calendar even
+      //     though Daniel's and Ryan's showed up correctly).
+      //   • Family members logged in as themselves (e.g. Linda viewing
+      //     Michael's calendar). Same code path serves them.
+      // Same shape we used to fix fetchAssistantClientWorkspace earlier.
+      const [{ data: assignments }, { data: ownedContracts }] = await Promise.all([
+        sb().from('family_assignments').select('client_id').eq('user_id', user.id),
+        sb().from('contracts').select('id, client_id').eq('assistant_id', user.id),
+      ]);
 
+      const clientIdSet = new Set();
+      (assignments || []).forEach(a => { if (a.client_id) clientIdSet.add(a.client_id); });
+      (ownedContracts || []).forEach(c => { if (c.client_id) clientIdSet.add(c.client_id); });
+      const clientIds = [...clientIdSet];
+
+      // If no families AND no owned contracts, nothing to show.
+      if (!clientIds.length && !(ownedContracts || []).length) return [];
+
+      // Query appointments by client_id (works regardless of whether the
+      // appointment's contract has assistant_id set correctly).
       let q = sb()
         .from('appointments')
         .select('id, contract_id, client_id, starts_at, ends_at, duration_minutes, status, kind, title, notes, cancelled_at, cancel_reason, is_complimentary')
-        .in('contract_id', contractIds)
         .in('status', statuses)
         .order('starts_at', { ascending: true })
         .limit(limit);
+      if (clientIds.length) {
+        q = q.in('client_id', clientIds);
+      } else if ((ownedContracts || []).length) {
+        // Fallback: no family_assignments rows, but we do own contracts —
+        // use the legacy contract_id path.
+        q = q.in('contract_id', (ownedContracts || []).map(c => c.id));
+      }
       if (fromDate) q = q.gte('starts_at', new Date(fromDate).toISOString());
       if (toDate)   q = q.lte('starts_at', new Date(toDate).toISOString());
 
@@ -776,23 +801,18 @@
         return [];
       }
 
-      // Enrich with client info via contracts → clients.
-      const contractToClient = {};
-      (contracts || []).forEach(c => { contractToClient[c.id] = c.client_id; });
-      const clientIds = [...new Set(Object.values(contractToClient))].filter(Boolean);
-      const { data: clients } = clientIds.length
-        ? await sb().from('clients').select('id, full_name').in('id', clientIds)
+      // Enrich with client info for display.
+      const enrichIds = [...new Set((appts || []).map(a => a.client_id).filter(Boolean))];
+      const { data: clients } = enrichIds.length
+        ? await sb().from('clients').select('id, full_name').in('id', enrichIds)
         : { data: [] };
       const clientsById = {};
       (clients || []).forEach(c => { clientsById[c.id] = c; });
 
-      return (appts || []).map(a => {
-        const clientId = a.client_id || contractToClient[a.contract_id] || null;
-        return {
-          ...a,
-          client: (clientId && clientsById[clientId]) || null,
-        };
-      });
+      return (appts || []).map(a => ({
+        ...a,
+        client: (a.client_id && clientsById[a.client_id]) || null,
+      }));
     } catch (e) {
       console.warn('fetchAssistantAppointmentsRange threw:', e);
       return [];
