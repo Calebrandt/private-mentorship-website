@@ -702,15 +702,25 @@
     const firstOfNextMonth = new Date(firstOfMonth);
     firstOfNextMonth.setMonth(firstOfNextMonth.getMonth() + 1);
     try {
+      // Include both 'completed' and 'scheduled' — historical imports
+      // may not have been flipped to completed, so a strict
+      // status='completed' filter undercounts. Exclude cancelled /
+      // late_cancelled / no_show because those didn't actually happen.
+      // Also fall back to (ends_at - starts_at) when duration_minutes
+      // is NULL so partial-import data still counts.
       const { data: monthAppts } = await sb()
         .from('appointments')
-        .select('duration_minutes')
-        .eq('status', 'completed')
+        .select('duration_minutes, starts_at, ends_at')
+        .in('status', ['completed', 'scheduled'])
         .gte('starts_at', firstOfMonth.toISOString())
         .lt('starts_at', firstOfNextMonth.toISOString());
-      const totalMinutes = (monthAppts || []).reduce(
-        (s, a) => s + (Number(a.duration_minutes) || 0), 0
-      );
+      const totalMinutes = (monthAppts || []).reduce((s, a) => {
+        let mins = Number(a.duration_minutes) || 0;
+        if (!mins && a.starts_at && a.ends_at) {
+          mins = Math.max(0, Math.round((new Date(a.ends_at) - new Date(a.starts_at)) / 60000));
+        }
+        return s + mins;
+      }, 0);
       out.hoursThisMonth = Math.round((totalMinutes / 60) * 10) / 10;
     } catch (_) {}
 
