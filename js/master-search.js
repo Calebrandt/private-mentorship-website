@@ -361,14 +361,24 @@
           title: a.title || 'Session',
           subtitle: `${dateStr}${a.duration_minutes ? ' · ' + (a.duration_minutes / 60) + 'h' : ''}${a.status ? ' · ' + a.status : ''}`,
           url: withQ(`${url}#appt-${a.id}`),
+          _preview: { kind: 'session', data: a },
         });
       }
     });
 
-    // Invoices (client + admin)
+    // Invoices (client + admin) — also match against formatted money so
+    // searches like "1200" or "1,200" or "$1,200" find the right ones.
     tryEach('invoices', dyn.invoices, inv => {
       const label = inv.invoice_number || ('Invoice ' + (inv.id || '').slice(0, 8));
-      const blob = `${label} ${inv.subject || ''} ${inv.customer_notes || ''} ${inv.status || ''} ${inv._clientName || ''}`.toLowerCase();
+      const cents = Number(inv.total_cents || inv.amount_paid_cents || 0);
+      const dollars = cents / 100;
+      const moneyBlob = [
+        fmtMoney(cents),                                    // "$1,200"
+        dollars.toFixed(0),                                  // "1200"
+        dollars.toLocaleString('en-CA'),                     // "1,200"
+        dollars.toString(),                                  // "1200"
+      ].join(' ').toLowerCase();
+      const blob = `${label} ${inv.subject || ''} ${inv.customer_notes || ''} ${inv.status || ''} ${inv._clientName || ''} ${moneyBlob}`.toLowerCase();
       const dateStr = fmtDate(inv.invoice_date);
       if (blob.includes(q) || dateStr.toLowerCase().includes(q)) {
         const subtitleParts = [];
@@ -457,19 +467,40 @@
       }
     });
 
-    // Clients (assistant + admin)
+    // Clients (assistant + admin) — also build per-client roll-up of
+    // matching items so the preview pane can show a mini-dossier.
     tryEach('clients', dyn.clients, c => {
+      const cid = c.id || c.client_id;
       const name = c.full_name || c.client_name || c.name || '';
       const blob = `${name} ${c.email || ''}`.toLowerCase();
       if (blob.includes(q)) {
         const isAdmin = role === 'admin';
+        // Roll up everything for this client to surface in the preview
+        const clientLessons   = (dyn.lessonLogs   || []).filter(l => l.client_id === cid);
+        const clientInvoices  = (dyn.invoices     || []).filter(i => i.client_id === cid);
+        const clientSessions  = (dyn.sessions     || []).filter(s => s.client_id === cid);
+        const clientContracts = (dyn.contracts    || []).filter(k => k.client_id === cid);
         results.clients.push({
           icon: ICONS.client,
           title: name,
           subtitle: c.contract_status ? `Contract: ${c.contract_status}` : 'Client',
           url: withQ(isAdmin
-            ? `admin-create-client.html?id=${encodeURIComponent(c.id || c.client_id || '')}`
-            : `assistant-client.html?client_id=${encodeURIComponent(c.id || c.client_id || '')}`),
+            ? `admin-create-client.html?id=${encodeURIComponent(cid || '')}`
+            : `assistant-client.html?client_id=${encodeURIComponent(cid || '')}`),
+          _preview: {
+            kind: 'client',
+            data: c,
+            rollup: {
+              lessons:   clientLessons.slice(0, 5),
+              invoices:  clientInvoices.slice(0, 5),
+              sessions:  clientSessions.slice(0, 5),
+              contracts: clientContracts.slice(0, 3),
+              counts: {
+                lessons: clientLessons.length, invoices: clientInvoices.length,
+                sessions: clientSessions.length, contracts: clientContracts.length,
+              },
+            },
+          },
         });
       }
     });
@@ -491,13 +522,14 @@
       const name = p.display_name || p.full_name || 'Assistant';
       // Defensive: languages may be null/string/array depending on source
       const langs = Array.isArray(p.languages) ? p.languages.join(' ') : String(p.languages || '');
-      const blob = `${name} ${p.city || ''} ${langs}`.toLowerCase();
+      const blob = `${name} ${p.city || ''} ${langs} ${p.bio || ''} ${p.experience_summary || ''} ${p.education_summary || ''}`.toLowerCase();
       if (blob.includes(q)) {
         results.assistantProfiles.push({
           icon: ICONS.client,
           title: name,
-          subtitle: `Assistant${p.city ? ' · ' + p.city : ''}`,
+          subtitle: `Assistant${p.city ? ' · ' + p.city : ''}${langs ? ' · ' + langs : ''}`,
           url: withQ(`admin-assistant-profiles.html?id=${encodeURIComponent(p.assistant_id || p.id || '')}`),
+          _preview: { kind: 'assistant', data: p },
         });
       }
     });
@@ -536,6 +568,11 @@
           + (r.applications?.length || 0) + (r.assistantProfiles?.length || 0)
           + (r.scheduleRequests?.length || 0) + (r.membershipRequests?.length || 0));
   }
+
+  // How many items to show per section before the "+N more" link appears.
+  // 15 is a sweet spot — enough that common queries feel useful but not
+  // overwhelming. The "+N more" reveals the rest within the same section.
+  const SECTION_INITIAL_CAP = 15;
 
   // ── Preview pane ────────────────────────────────────────────────
   // Renders the full body of a single result (lesson, invoice, session)
@@ -576,6 +613,62 @@
         ${data.customer_notes ? `<div class="ms-preview__sec"><div class="ms-preview__label">Customer note</div><div class="ms-preview__body">${h(data.customer_notes)}</div></div>` : ''}
         ${data.contract ? `<div class="ms-preview__sec"><div class="ms-preview__label">Linked contract</div><div class="ms-preview__body">${h(fmtDate(data.contract.start_at))} – ${h(fmtDate(data.contract.end_at))}</div></div>` : ''}
       `;
+    } else if (kind === 'client') {
+      const r = item._preview.rollup || { counts: {} };
+      const c = data;
+      const name = c.full_name || c.client_name || c.name || 'Client';
+      const cid  = c.id || c.client_id || '';
+      const open = (u) => `<a class="ms-preview__link" href="${escapeHtml(u)}">${h('Open ' + name + ' →')}</a>`;
+      const miniRow = (lbl, sub) => `<div class="ms-preview__minirow"><div class="ms-preview__mini-title">${h(lbl)}</div><div class="ms-preview__mini-sub">${h(sub)}</div></div>`;
+      html = `
+        <div class="ms-preview__head">
+          <div class="ms-preview__kind">Client</div>
+          <h4 class="ms-preview__title">${h(name)}</h4>
+          <div class="ms-preview__meta">${h(c.email || '')}${c.contract_status ? ' · ' + h(c.contract_status) : ''}</div>
+        </div>
+        <div class="ms-preview__stats">
+          <div class="ms-preview__stat"><strong>${r.counts.lessons || 0}</strong> lessons</div>
+          <div class="ms-preview__stat"><strong>${r.counts.invoices || 0}</strong> invoices</div>
+          <div class="ms-preview__stat"><strong>${r.counts.sessions || 0}</strong> sessions</div>
+          <div class="ms-preview__stat"><strong>${r.counts.contracts || 0}</strong> contracts</div>
+        </div>
+        ${(r.lessons || []).length ? `<div class="ms-preview__sec"><div class="ms-preview__label">Recent matching lessons</div>${
+          r.lessons.map(l => miniRow(l.appointment_title || 'Lesson', fmtDate(l.starts_at) + (l.focus_area ? ' · ' + l.focus_area : ''))).join('')
+        }</div>` : ''}
+        ${(r.invoices || []).length ? `<div class="ms-preview__sec"><div class="ms-preview__label">Recent matching invoices</div>${
+          r.invoices.map(i => miniRow(i.invoice_number || ('Invoice ' + (i.id || '').slice(0,8)), fmtDate(i.invoice_date) + ' · ' + fmtMoney(i.total_cents || i.amount_paid_cents))).join('')
+        }</div>` : ''}
+        ${(r.sessions || []).length ? `<div class="ms-preview__sec"><div class="ms-preview__label">Recent matching sessions</div>${
+          r.sessions.map(s => miniRow(s.title || 'Session', fmtDate(s.starts_at) + (s.status ? ' · ' + s.status : ''))).join('')
+        }</div>` : ''}
+        <div class="ms-preview__foot">${open(item.url)}</div>
+      `;
+    } else if (kind === 'assistant') {
+      const p = data;
+      const name = p.display_name || p.full_name || 'Assistant';
+      html = `
+        <div class="ms-preview__head">
+          <div class="ms-preview__kind">Assistant</div>
+          <h4 class="ms-preview__title">${h(name)}</h4>
+          <div class="ms-preview__meta">${p.city ? h(p.city) + ' · ' : ''}${h(Array.isArray(p.languages) ? p.languages.join(', ') : (p.languages || ''))}</div>
+        </div>
+        ${p.bio ? `<div class="ms-preview__sec"><div class="ms-preview__label">Bio</div><div class="ms-preview__body">${h(p.bio)}</div></div>` : ''}
+        ${p.experience_summary ? `<div class="ms-preview__sec"><div class="ms-preview__label">Experience</div><div class="ms-preview__body">${h(p.experience_summary)}</div></div>` : ''}
+        ${p.education_summary ? `<div class="ms-preview__sec"><div class="ms-preview__label">Education</div><div class="ms-preview__body">${h(p.education_summary)}</div></div>` : ''}
+        <div class="ms-preview__foot"><a class="ms-preview__link" href="${escapeHtml(item.url)}">${h('Open ' + name + ' →')}</a></div>
+      `;
+    } else if (kind === 'session') {
+      const s = data;
+      const dateStr = fmtDate(s.starts_at);
+      html = `
+        <div class="ms-preview__head">
+          <div class="ms-preview__kind">Session</div>
+          <h4 class="ms-preview__title">${h(s.title || 'Session')}</h4>
+          <div class="ms-preview__meta">${h(dateStr)}${s.duration_minutes ? ' · ' + (s.duration_minutes / 60) + 'h' : ''}${s.status ? ' · ' + h(s.status) : ''}</div>
+        </div>
+        ${s.notes ? `<div class="ms-preview__sec"><div class="ms-preview__label">Notes</div><div class="ms-preview__body">${h(s.notes)}</div></div>` : ''}
+        <div class="ms-preview__foot"><a class="ms-preview__link" href="${escapeHtml(item.url)}">${h('Open session →')}</a></div>
+      `;
     } else {
       // Generic fallback
       html = `
@@ -583,6 +676,7 @@
           <h4 class="ms-preview__title">${h(item.title || '')}</h4>
           <div class="ms-preview__meta">${h(item.subtitle || '')}</div>
         </div>
+        <div class="ms-preview__foot"><a class="ms-preview__link" href="${escapeHtml(item.url)}">Open →</a></div>
       `;
     }
     previewEl.innerHTML = html;
@@ -610,11 +704,27 @@
       return;
     }
 
-    let html = '';
+    // Top summary strip — total matches across all sections + per-category
+    // counts as clickable chips that scroll the panel to that section.
+    const total = sections.reduce((s, x) => s + x.items.length, 0);
+    let html = `<div class="ms-summary">
+      <div class="ms-summary__total"><strong>${total}</strong> ${total === 1 ? 'match' : 'matches'} for <em>"${escapeHtml(query)}"</em></div>
+      <div class="ms-summary__chips">
+        ${sections.map(s => `<a href="#ms-sec-${s.key}" class="ms-chip" data-jump="${s.key}">${s.label} <span class="ms-chip__n">${s.items.length}</span></a>`).join('')}
+      </div>
+    </div>`;
+
     const flat = [];
     sections.forEach(section => {
-      html += `<div class="ms-section"><div class="ms-section__head">${section.label}</div>`;
-      section.items.slice(0, 5).forEach(item => {
+      const cap = state.expanded?.[section.key] ? section.items.length : SECTION_INITIAL_CAP;
+      const shown = section.items.slice(0, cap);
+      const hiddenCount = section.items.length - shown.length;
+      html += `<div class="ms-section" id="ms-sec-${section.key}">
+        <div class="ms-section__head">
+          <span>${section.label}</span>
+          <span class="ms-section__count">${section.items.length}</span>
+        </div>`;
+      shown.forEach(item => {
         const idx = flat.length;
         flat.push(item);
         html += `<a class="ms-item" data-idx="${idx}" href="${escapeHtml(item.url)}">
@@ -625,10 +735,33 @@
           </span>
         </a>`;
       });
+      if (hiddenCount > 0) {
+        html += `<button type="button" class="ms-more" data-expand="${section.key}">Show ${hiddenCount} more in ${section.label}</button>`;
+      }
       html += `</div>`;
     });
     panel.innerHTML = html;
     state.flat = flat;
+
+    // Wire "show more" expand
+    panel.querySelectorAll('[data-expand]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const key = btn.dataset.expand;
+        state.expanded = state.expanded || {};
+        state.expanded[key] = true;
+        renderDropdown(panel, results, query, state);
+        // Re-wire hover handlers in caller (run does this)
+      });
+    });
+    // Wire chip jumps — smooth scroll to section within the panel
+    panel.querySelectorAll('[data-jump]').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        e.preventDefault();
+        const tgt = panel.querySelector('#ms-sec-' + chip.dataset.jump);
+        if (tgt) tgt.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
   }
 
   // ── Wire up an input ────────────────────────────────────────────
