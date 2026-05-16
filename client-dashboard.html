@@ -742,7 +742,11 @@
   //   • signed-in email is in DEMO_EMAILS (test/preview accounts)
   // Skips auth-backed data fetches; identity (name/email) stays real
   // so you still see your own avatar.
-  const DEMO_EMAILS = ['yangm7971@gmail.com'];
+  // DEMO_EMAILS: triggers the Jane Demo stub data path for preview /
+  // test accounts. ?demo=1 URL param also triggers it. Removed
+  // yangm7971@gmail.com 2026-05-16 — Michael is a real client now,
+  // not a preview persona, so we want him on the live data path.
+  const DEMO_EMAILS = [];
   let __demoTrigger = new URLSearchParams(location.search).get('demo') === '1';
   let __realUser = null, __realProfile = null;
   if (!__demoTrigger) {
