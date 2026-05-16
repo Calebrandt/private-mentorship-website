@@ -9,6 +9,9 @@
   function html(initials, name, email) {
     return ''
       + '<aside class="dash-cal" aria-label="Calendar">'
+      +   '<button class="dash-cal-close" id="dashCalClose" type="button" title="Hide calendar" aria-label="Hide calendar">'
+      +     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+      +   '</button>'
       +   '<div class="dash-cal-user" role="button">'
       +     '<span class="dash-cal-user__avatar" id="dashCalUserAvatar">' + initials + '</span>'
       +     '<span class="dash-cal-user__body">'
@@ -114,6 +117,40 @@
     } catch (_) {}
   }
 
+  // ── Phase 19r: collapse / show toggle ─────────────────────────────
+  // Persists across navigation via localStorage. When collapsed:
+  //   • body gets .pm-cal-collapsed → CSS hides the aside + flattens
+  //     the .dash-shell grid to 1fr so the main content fills width
+  //   • a small floating "show calendar" pill appears on the right edge
+  // Toggle live across tabs via the storage event.
+  var COLLAPSE_KEY = 'pmCalCollapsed';
+  function isCollapsed() {
+    try { return localStorage.getItem(COLLAPSE_KEY) === '1'; } catch (_) { return false; }
+  }
+  function applyCollapse(collapsed) {
+    document.body.classList.toggle('pm-cal-collapsed', !!collapsed);
+    // Reflect on the floating "show" pill if present
+    var pill = document.getElementById('dashCalShowPill');
+    if (pill) pill.hidden = !collapsed;
+  }
+  function setCollapsed(v) {
+    try { localStorage.setItem(COLLAPSE_KEY, v ? '1' : '0'); } catch (_) {}
+    applyCollapse(v);
+  }
+  function injectShowPill() {
+    if (document.getElementById('dashCalShowPill')) return;
+    var btn = document.createElement('button');
+    btn.id = 'dashCalShowPill';
+    btn.className = 'dash-cal-show-pill';
+    btn.type = 'button';
+    btn.title = 'Show calendar';
+    btn.setAttribute('aria-label', 'Show calendar');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>';
+    btn.addEventListener('click', function(){ setCollapsed(false); });
+    document.body.appendChild(btn);
+    btn.hidden = !isCollapsed();
+  }
+
   async function mount() {
     var placeholder = document.getElementById('pmCalendar');
     var markup = html('C', 'Client', '');
@@ -129,7 +166,19 @@
     wireMonth();
     wireSections();
     populateUser();
+
+    // Close button → collapse
+    var closeBtn = document.getElementById('dashCalClose');
+    if (closeBtn) closeBtn.addEventListener('click', function(){ setCollapsed(true); });
+
+    injectShowPill();
+    applyCollapse(isCollapsed());
   }
+
+  // Cross-tab sync for collapse state
+  window.addEventListener('storage', function(e){
+    if (e.key === COLLAPSE_KEY) applyCollapse(e.newValue === '1');
+  });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', mount);
