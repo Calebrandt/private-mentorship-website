@@ -102,8 +102,20 @@ function fmtDateShort(v: string | null | undefined): string {
   return `${months[Number(m[2]) - 1]} ${Number(m[3])}, ${m[1]}`;
 }
 
-// ─── Branded HTML email shell (matches the app's design) ──────────────────
-// docType drives the header title + accent colour vocabulary.
+// ─── Branded HTML email shell — 1:1 port of the React Native app ─────────
+// Mirrors src/screens/adminBilling/invoices/View/index.js::buildInvoiceEmailHtml
+// + src/helpers/salesReceiptTemplates.js::buildSalesReceiptEmailHtml so the
+// email lands identically to what Caleb already sees from the app.
+//
+// Structure (fixed, clean):
+//   1. Dark slate header card  → "INVOICE / RECEIPT / PAYCHEQUE" + #number
+//   2. "Hello [Client Name]," auto-greeting (pulled from meta.clientName)
+//   3. Short body sentence(s) from the admin composer (optional)
+//   4. Big dashed-border amount block — figure + sub-info
+//   5. "Thank you for choosing Private Mentorship." footer (border-top)
+//
+// The composer's body text replaces the fixed "Please find your invoice
+// attached as a PDF for your records." sentence. Keep it short.
 function buildBrandedEmailHtml(opts: {
   docType: DocType;
   docNumber: string | null | undefined;
@@ -111,61 +123,88 @@ function buildBrandedEmailHtml(opts: {
   filename: string;
   meta?: ReqMeta | null;
 }): string {
-  const BRAND_PRIMARY = "#0f172a";
-  const BRAND_ACCENT  = "#2563eb";
-  const BG            = "#f1f5f9";
+  const BRAND_PRIMARY = "#0f172a";   // slate-900
+  const BRAND_ACCENT  = "#2563eb";   // blue-600
+  const BG            = "#f1f5f9";   // slate-100
 
   const docLabel = String(opts.docType).toUpperCase();
   const num      = opts.docNumber ? `#${escapeHtml(opts.docNumber)}` : "";
-  const safeBody = bodyToHtml(opts.body || "");
 
   const m = opts.meta || {};
+  const clientName = (m.clientName || "").trim();
+  const firstName  = clientName ? clientName.split(/\s+/)[0] : "";
+  const greeting   = firstName
+    ? `Hello <strong>${escapeHtml(firstName)}</strong>,`
+    : `Hello,`;
+
+  // Composer body — if the admin left it empty, fall back to the app's
+  // default sentence per doc type.
+  const defaultLine =
+    opts.docType === "receipt"
+      ? "This email confirms that we have received your payment. A detailed PDF copy is attached to this email for your records."
+      : opts.docType === "paycheque"
+        ? "Your paycheque is attached as a PDF for your records."
+        : "Please find your invoice attached as a PDF for your records.";
+  const bodyToRender = (opts.body || "").trim() || defaultLine;
+  const safeBody = bodyToHtml(bodyToRender);
+
+  // Amount block label + figure + sub-info per doc type (matches app)
   const showAmountBlock = (m.totalCents != null) || (m.balanceCents != null);
   const amountLabel =
     opts.docType === "receipt"   ? "Amount Paid" :
     opts.docType === "paycheque" ? "Net Pay" :
                                    "Total Amount";
-  const headlineAmount = m.balanceCents != null && Number(m.balanceCents) > 0
-    ? fmtMoneyCents(m.balanceCents as number)
-    : (m.totalCents != null ? fmtMoneyCents(m.totalCents as number) : "");
+  // For receipts/paycheques the headline IS the total. For invoices, show
+  // total but lead the sub-info with balance + dates (matches app exactly).
+  const headlineCents = opts.docType === "invoice"
+    ? (m.totalCents != null ? Number(m.totalCents) : 0)
+    : (m.totalCents != null ? Number(m.totalCents) : 0);
+  const headlineAmount = fmtMoneyCents(headlineCents);
 
-  const balanceLine =
-    opts.docType === "invoice" && m.totalCents != null && m.balanceCents != null
-      ? `<div><strong>Balance Due:</strong> ${fmtMoneyCents(m.balanceCents as number)}</div>` : "";
-  const issuedLine = m.docDate ? `<div>Issued on ${escapeHtml(fmtDateShort(m.docDate))}</div>` : "";
-  const dueLine    = m.dueDate ? `<div>Due by ${escapeHtml(fmtDateShort(m.dueDate))}</div>` : "";
+  let subInfo = "";
+  if (opts.docType === "invoice") {
+    const balance   = m.balanceCents != null ? `<div><strong>Balance Due:</strong> ${escapeHtml(fmtMoneyCents(Number(m.balanceCents)))}</div>` : "";
+    const issuedLn  = m.docDate ? `<div>Issued on ${escapeHtml(fmtDateShort(m.docDate))}</div>` : "";
+    const dueLn     = m.dueDate ? `<div>Due by ${escapeHtml(fmtDateShort(m.dueDate))}</div>` : "";
+    subInfo = balance + issuedLn + dueLn;
+  } else if (opts.docType === "receipt") {
+    subInfo = m.docDate ? `<div>Paid on ${escapeHtml(fmtDateShort(m.docDate))}</div>` : "";
+  } else {
+    subInfo = m.docDate ? `<div>Pay date · ${escapeHtml(fmtDateShort(m.docDate))}</div>` : "";
+  }
+
+  // Bigger figure for receipts/paycheques (single headline number) to
+  // mirror the app's receipt template.
+  const figureSize = (opts.docType === "receipt") ? 36 : 32;
 
   const amountBlock = showAmountBlock ? `
-    <div style="background:#f8fafc;border:1px dashed #cbd5e1;border-radius:8px;padding:22px;text-align:center;margin:24px 0;">
-      <div style="font-size:11px;text-transform:uppercase;color:#94a3b8;letter-spacing:0.12em;font-weight:700;">${escapeHtml(amountLabel)}</div>
-      <div style="font-size:32px;color:${BRAND_PRIMARY};font-weight:700;margin:10px 0;letter-spacing:-0.01em;">${escapeHtml(headlineAmount)}</div>
-      <div style="font-size:12px;color:#64748b;line-height:1.6;">
-        ${balanceLine}
-        ${issuedLine}
-        ${dueLine}
-      </div>
-    </div>` : "";
+        <div style="background:#f8fafc;border:1px dashed #cbd5e1;border-radius:8px;padding:25px;text-align:center;margin-top:0;">
+          <div style="font-size:11px;text-transform:uppercase;color:#94a3b8;letter-spacing:0.1em;font-weight:700;">${escapeHtml(amountLabel)}</div>
+          <div style="font-size:${figureSize}px;color:${BRAND_PRIMARY};font-weight:700;margin:10px 0;">${escapeHtml(headlineAmount)}</div>
+          ${subInfo ? `<div style="font-size:12px;color:#64748b;line-height:1.6;">${subInfo}</div>` : ""}
+        </div>` : "";
 
+  // Outer email scaffolding — 1:1 with the app
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8" /></head>
-<body style="margin:0;padding:0;background:${BG};">
-  <div style="background:${BG};padding:40px 10px;font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Roboto,sans-serif;color:#334155;">
-    <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(15,23,42,0.08);">
+<body style="margin:0;padding:0;">
+  <div style="background-color:${BG};padding:40px 10px;font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Roboto,sans-serif;color:#334155;">
+    <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
 
       <div style="background:${BRAND_PRIMARY};padding:30px 40px;text-align:center;">
-        <h1 style="color:#ffffff;margin:0;font-size:24px;letter-spacing:0.05em;text-transform:uppercase;font-weight:800;">${escapeHtml(docLabel)}</h1>
-        ${num ? `<p style="color:${BRAND_ACCENT};margin:6px 0 0 0;font-size:14px;font-weight:600;letter-spacing:0.04em;">${num}</p>` : ""}
+        <h1 style="color:#ffffff;margin:0;font-size:24px;letter-spacing:0.05em;text-transform:uppercase;">${escapeHtml(docLabel)}</h1>
+        ${num ? `<p style="color:${BRAND_ACCENT};margin:5px 0 0 0;font-size:14px;font-weight:600;">${num}</p>` : ""}
       </div>
 
-      <div style="padding:36px 40px;">
-        ${safeBody}
+      <div style="padding:40px;">
+        <p style="font-size:16px;margin:0 0 20px 0;color:#334155;">${greeting}</p>
+        <div style="font-size:14px;line-height:1.6;color:#64748b;margin-bottom:24px;">${safeBody}</div>
         ${amountBlock}
-        <div style="margin-top:32px;padding:16px 18px;background:#f8fafc;border-radius:8px;font-size:12px;color:#475569;border-left:3px solid ${BRAND_ACCENT};">
-          <strong style="color:${BRAND_PRIMARY};">Attachment:</strong> ${escapeHtml(opts.filename)}
+        <div style="margin-top:30px;font-size:11px;color:#94a3b8;text-align:center;">
+          Attachment: <strong style="color:#475569;">${escapeHtml(opts.filename)}</strong>
         </div>
-        <div style="margin-top:36px;border-top:1px solid #e2e8f0;padding-top:20px;text-align:center;font-size:12px;color:#94a3b8;line-height:1.6;">
-          Thank you for choosing Private Mentorship.<br/>
-          Reply directly to this e-mail to reach us.
+        <div style="margin-top:30px;border-top:1px solid #e2e8f0;padding-top:20px;text-align:center;font-size:12px;color:#94a3b8;">
+          Thank you for choosing Private Mentorship.
         </div>
       </div>
 

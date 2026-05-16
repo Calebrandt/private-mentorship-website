@@ -1327,63 +1327,26 @@
   });
 
   // ─── Email composer ────────────────────────────────────────────────
+  // NOTE: the edge function auto-renders "Hello [Name]," at the top and
+  // "Thank you for choosing Private Mentorship." at the bottom + a big
+  // amount block from the meta payload. So these templates contain ONLY
+  // the middle sentence(s) — keep them short and clean to match the app.
   const EMAIL_TEMPLATES = {
     invoice_new: (ctx) => ({
       subject: `New invoice ${ctx.number} from Private Mentorship`,
-      body: [
-        `Hi ${ctx.firstName || 'there'},`,
-        ``,
-        `Please find attached invoice ${ctx.number} for ${ctx.amount}, due ${ctx.dueDate}.`,
-        ``,
-        `Payment instructions:`,
-        `• E-transfer to billing@private-mentorship.com (auto-deposit — no security question required)`,
-        ``,
-        `Thank you,`,
-        `Caleb Brandt`,
-        `Private Mentorship`,
-      ].join('\n'),
+      body: `Please find your invoice attached as a PDF for your records. Payment via e-transfer to billing@private-mentorship.com (auto-deposit — no security question required).`,
     }),
     invoice_reminder: (ctx) => ({
       subject: `Friendly reminder — invoice ${ctx.number}`,
-      body: [
-        `Hi ${ctx.firstName || 'there'},`,
-        ``,
-        `Just a friendly reminder that invoice ${ctx.number} for ${ctx.amount} remains outstanding (issued ${ctx.docDate}).`,
-        ``,
-        `If you've already sent payment, please disregard this note.`,
-        ``,
-        `Thank you,`,
-        `Caleb Brandt`,
-        `Private Mentorship`,
-      ].join('\n'),
+      body: `Just a friendly reminder that invoice ${ctx.number} remains outstanding. If you've already sent payment, please disregard this note.`,
     }),
     receipt_thanks: (ctx) => ({
-      subject: `Receipt ${ctx.number} — payment received, thank you!`,
-      body: [
-        `Hi ${ctx.firstName || 'there'},`,
-        ``,
-        `Thank you — we've received your payment of ${ctx.amount}. Your official receipt ${ctx.number} is attached for your records.`,
-        ``,
-        `We look forward to the continued partnership.`,
-        ``,
-        `All the best,`,
-        `Caleb Brandt`,
-        `Private Mentorship`,
-      ].join('\n'),
+      subject: `Receipt ${ctx.number} — payment received`,
+      body: `This email confirms that we have received your payment. A detailed PDF copy is attached to this email for your records.`,
     }),
     paycheque_pay: (ctx) => ({
       subject: `Paycheque ${ctx.number} — Private Mentorship`,
-      body: [
-        `Hi ${ctx.firstName || 'team'},`,
-        ``,
-        `Your paycheque ${ctx.number} is attached. Net pay: ${ctx.amount}, dated ${ctx.docDate}.`,
-        ``,
-        `Please retain for your tax records — T4A slips are issued annually in February.`,
-        ``,
-        `Thank you for your work,`,
-        `Caleb Brandt`,
-        `Private Mentorship`,
-      ].join('\n'),
+      body: `Your paycheque is attached as a PDF for your records. Please retain for tax purposes — T4A slips are issued annually in February.`,
     }),
   };
 
