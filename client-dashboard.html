@@ -563,6 +563,13 @@
     </div>
   </section>
 
+  <!-- Phase 19m: Month calendar — same widget the assistant dashboard
+       uses, scoped to this family's sessions. Mounted right under the
+       KPIs so the family can see their schedule at a glance. -->
+  <section style="margin-bottom:22px;">
+    <div id="clientCalendar"></div>
+  </section>
+
   <!-- Phase 12 — banked-hours promo strip (auto-shown when balance > 0) -->
   <section class="nx-bank-strip" id="bankStrip" hidden>
     <div class="nx-bank-strip__icon">
@@ -727,8 +734,9 @@
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260508c"></script>
-<script src="js/hiring-service.js?v=20260508d"></script>
-<script src="js/sidebar.js?v=20260512a"></script>
+<script src="js/hiring-service.js?v=20260516i"></script>
+<script src="js/session-calendar.js?v=20260516a"></script>
+<script src="js/sidebar.js?v=20260515d"></script>
 <script src="js/right-calendar.js?v=20260512a"></script>
 <script src="js/incoming-call-ring.js?v=20260509a" defer></script>
 <script>
@@ -901,7 +909,12 @@
     window.pmHiring.fetchMyAttendanceSummary().catch(()=>({attended:0,cancelled:0,no_show:0,rescheduled:0,monthly:[]})),
     window.pmHiring.fetchMyConversations(5).catch(()=>[]),
     window.pmHiring.fetchMyContracts().catch(()=>[]),
-    window.pmHiring.fetchMyInvoices(12).catch(()=>[]),
+    // Use the unified lifetime payment-history fetcher (same one the
+     // assistant view's Payment History card uses). Was fetchMyInvoices(12)
+     // which capped at 12 months — Michael's first invoice is Mar 2024
+     // (26 mo ago), so 8 invoices fell off → total read $12,000 instead
+     // of $21,600. Now we get every invoice ever.
+    window.pmHiring.fetchMyPaymentHistory().catch(()=>[]),
     window.pmHiring.fetchMyAppointments({ statuses:['scheduled'], fromDate: new Date().toISOString(), limit: 5, ascending: true }).catch(()=>[]),
     window.pmHiring.fetchMyTasksSummary({ openLimit: 5, doneLimit: 5 }).catch(()=>({openCount:0,completedThisMonthCount:0,openTasks:[],recentDone:[]})),
     window.pmHiring.fetchMyHomeworkSummary({ assignedLimit: 6, doneLimit: 6 }).catch(()=>({assignedCount:0,lateCount:0,completedThisMonthCount:0,assigned:[],late:[],recentDone:[]})),
@@ -919,6 +932,16 @@
       if (strip) strip.hidden = false;
     }
   } catch (_) {}
+
+  // Phase 19m: Mount the month calendar widget (same shared component
+  // the assistant dashboard uses), scoped to THIS family's sessions
+  // via clientId. Family sees their full month at a glance.
+  if (window.pmCalendar?.mount && client?.id && document.getElementById('clientCalendar')) {
+    window.pmCalendar.mount('clientCalendar', {
+      clientId: client.id,
+      subtitle: 'Your sessions this month',
+    }).catch(e => console.warn('clientCalendar mount failed:', e));
+  }
 
   // ─── KPIs ────────────────────────────────────────────────────
   // Hours remaining: use the SAME workspace fetcher the assistant view

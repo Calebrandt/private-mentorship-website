@@ -2470,6 +2470,16 @@
   }
 
   // Invoices for monthly payment chart.
+  // Phase 19m: Self-service lifetime payment history for the signed-in
+  // family member. Same shape as fetchClientPaymentHistory (used by the
+  // assistant view) so the two screens render identical totals. Wraps
+  // _myClientId so callers don't have to resolve the client_id first.
+  async function fetchMyPaymentHistory() {
+    const myId = await _myClientId();
+    if (!myId) return [];
+    return fetchClientPaymentHistory(myId);
+  }
+
   async function fetchMyInvoices(monthsBack = 12) {
     const myId = await _myClientId();
     if (!myId) return [];
@@ -3233,7 +3243,7 @@
     // admin: clients
     adminCreateClientAccount, adminListClients, adminFetchHomeKpis, adminFetchMonthlyStats,
     // client (self)
-    fetchMyClientRecord, fetchMyConversations, fetchMyContracts, fetchMyInvoices,
+    fetchMyClientRecord, fetchMyConversations, fetchMyContracts, fetchMyInvoices, fetchMyPaymentHistory,
     fetchClientPaymentHistory, activateRenewal,
     fetchMyAppointments, fetchMyAttendanceSummary, fetchAssistantNamesByIds,
     fetchMyTasksSummary, fetchMyHomeworkSummary,
