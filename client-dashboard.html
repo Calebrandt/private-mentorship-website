@@ -135,9 +135,10 @@
   /* KPI cards row */
   .nx-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:14px;}
 
-  /* Phase 19m: Hours Remaining tile color states — green when
-     comfortable, amber when ≤5h or ≤25% of plan, red when depleted.
-     Same urgency vocabulary as the assistant workspace KPI tiles. */
+  /* Phase 19m: Hours Remaining tile color states.
+     Light mode: warm cream/red surfaces (default below).
+     Dark mode: translucent tint over the card so the warning hue
+     stays legible without breaking the calm dark aesthetic. */
   #kpiRemainingTile.is-low{background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border-color:#FCD34D;}
   #kpiRemainingTile.is-low #kpiHours{color:#78350F;}
   #kpiRemainingTile.is-low #kpiHoursLabel{color:#92400E;}
@@ -145,16 +146,30 @@
   #kpiRemainingTile.is-empty #kpiHours{color:#7F1D1D;}
   #kpiRemainingTile.is-empty #kpiHoursLabel{color:#991B1B;}
 
-  /* Phase 19m: Wide usage progress bar — visual readout of how much
-     of the purchased plan has been burned. Same color rhythm as the
-     Remaining tile (green default, amber when low). */
+  [data-dash-theme="dark"] #kpiRemainingTile.is-low{
+    background:linear-gradient(135deg, rgba(245,158,11,.08), rgba(245,158,11,.14));
+    border-color:rgba(245,158,11,.35);
+  }
+  [data-dash-theme="dark"] #kpiRemainingTile.is-low #kpiHours{color:#FBBF24;}
+  [data-dash-theme="dark"] #kpiRemainingTile.is-low #kpiHoursLabel{color:#FCD34D;}
+  [data-dash-theme="dark"] #kpiRemainingTile.is-empty{
+    background:linear-gradient(135deg, rgba(239,68,68,.08), rgba(239,68,68,.14));
+    border-color:rgba(239,68,68,.35);
+  }
+  [data-dash-theme="dark"] #kpiRemainingTile.is-empty #kpiHours{color:#FCA5A5;}
+  [data-dash-theme="dark"] #kpiRemainingTile.is-empty #kpiHoursLabel{color:#FECACA;}
+
+  /* Phase 19m: Wide usage progress bar — uses CSS vars so the card
+     surface, text colors, and track all adapt to dark mode without
+     hardcoded fallbacks looking out of place. */
   .nx-usage{
-    background:#fff;border:1px solid #E2E8F0;border-radius:12px;
-    padding:14px 18px;margin-bottom:24px;
+    background:var(--card, #fff);border:1px solid var(--border, #E2E8F0);
+    border-radius:12px;padding:14px 18px;margin-bottom:24px;
+    transition:background .2s ease, border-color .2s ease;
   }
   .nx-usage__top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:8px;}
-  .nx-usage__lead{font:700 14px Inter,sans-serif;color:#0F172A;letter-spacing:-.005em;}
-  .nx-usage__meta{font:500 12.5px Inter,sans-serif;color:#64748B;letter-spacing:-.005em;}
+  .nx-usage__lead{font:700 14px Inter,sans-serif;color:var(--ink, #0F172A);letter-spacing:-.005em;}
+  .nx-usage__meta{font:500 12.5px Inter,sans-serif;color:var(--ink-mute, #64748B);letter-spacing:-.005em;}
   .nx-usage__bar{height:8px;background:#F1F5F9;border-radius:9999px;overflow:hidden;}
   .nx-usage__bar-fill{
     height:100%;background:linear-gradient(90deg,#10B981 0%,#059669 100%);
@@ -162,6 +177,13 @@
   }
   .nx-usage.is-low .nx-usage__bar-fill{background:linear-gradient(90deg,#F59E0B 0%,#D97706 100%);}
   .nx-usage.is-empty .nx-usage__bar-fill{background:linear-gradient(90deg,#EF4444 0%,#DC2626 100%);}
+
+  /* Dark mode: translucent track that reads as recessed-into-card;
+     fills brighten one notch so they still pop against the dark. */
+  [data-dash-theme="dark"] .nx-usage__bar{background:rgba(255,255,255,.06);}
+  [data-dash-theme="dark"] .nx-usage__bar-fill{background:linear-gradient(90deg,#34D399 0%,#10B981 100%);}
+  [data-dash-theme="dark"] .nx-usage.is-low .nx-usage__bar-fill{background:linear-gradient(90deg,#FBBF24 0%,#F59E0B 100%);}
+  [data-dash-theme="dark"] .nx-usage.is-empty .nx-usage__bar-fill{background:linear-gradient(90deg,#F87171 0%,#EF4444 100%);}
 
   /* Phase 12 — banked-hours promo strip (only visible when banked > 0) */
   .nx-bank-strip{
