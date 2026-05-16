@@ -701,12 +701,14 @@
     firstOfMonth.setHours(0, 0, 0, 0);
     const firstOfNextMonth = new Date(firstOfMonth);
     firstOfNextMonth.setMonth(firstOfNextMonth.getMonth() + 1);
-    // Cap the window at RIGHT NOW so only sessions that have actually
-    // happened count. Including future-dated sessions inflated the
-    // mid-month numbers — e.g. on May 15 with Daniel/Ryan booked
-    // through end-of-month, the count would show full-month projection
-    // ($1,764) instead of what's been delivered so far ($882-ish).
-    const nowIso = new Date().toISOString();
+    // Window = the whole calendar month (delivered + booked).
+    // Caleb's call (2026-05-16): the dashboard reflects the ASSISTANT'S
+    // calendar — what they're working this month — so the total covers
+    // every session that exists on the schedule, not just ones whose
+    // starts_at has already passed. Earlier we capped at NOW to avoid
+    // inflating mid-month numbers, but on reflection that's not how the
+    // assistant thinks about their book: they want the full-month
+    // expected take so they can plan / compare across months.
     try {
       // Include both 'completed' and 'scheduled' — historical imports
       // may not have been flipped to completed, so a strict
@@ -719,7 +721,7 @@
         .select('duration_minutes, starts_at, ends_at')
         .in('status', ['completed', 'scheduled'])
         .gte('starts_at', firstOfMonth.toISOString())
-        .lt('starts_at', nowIso);
+        .lt('starts_at', firstOfNextMonth.toISOString());
       const totalMinutes = (monthAppts || []).reduce((s, a) => {
         let mins = Number(a.duration_minutes) || 0;
         if (!mins && a.starts_at && a.ends_at) {
@@ -752,7 +754,7 @@
         .select('contract_id, duration_minutes, starts_at, ends_at, status')
         .in('status', ['completed', 'scheduled'])
         .gte('starts_at', firstOfMonth.toISOString())
-        .lt('starts_at', nowIso);
+        .lt('starts_at', firstOfNextMonth.toISOString());
 
       const contractIds = [...new Set(
         (monthAppts || []).map(a => a.contract_id).filter(Boolean)
