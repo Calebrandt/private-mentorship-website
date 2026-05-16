@@ -93,51 +93,56 @@
     .ad-weekday__unit{font-size:9.5px;}
   }
 
-  /* Phase 16 v4: My Families quick-access card grid. One card per
-     assigned family — avatar, name, plan size, hours remaining,
-     status. Whole card is a clickable <a> → workspace. Premium feel
-     matching the KPI tiles (white surface, thin border, gentle hover). */
+  /* Phase 16 v5: My Families list — clean SaaS row vocabulary (Linear/
+     Notion-style). One row per family, single white card wrapping the
+     whole list with divider lines between rows. Compact (~52px tall),
+     scannable, every row clickable. Low-key — sits quietly below the
+     calendar without competing for attention. */
   .ad-families{margin-bottom:22px;}
-  .ad-families__head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px;}
-  .ad-families__title{font-family:"Archivo","Inter",sans-serif;font-size:17px;font-weight:800;letter-spacing:-.01em;color:#0F172A;margin:0;}
-  .ad-families__action{font-size:12.5px;font-weight:600;color:#0071e3;text-decoration:none;}
+  .ad-families__head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px;}
+  .ad-families__title{font-family:"Archivo","Inter",sans-serif;font-size:14px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#475569;margin:0;}
+  .ad-families__action{font-size:12px;font-weight:600;color:#0071e3;text-decoration:none;letter-spacing:-.005em;}
   .ad-families__action:hover{text-decoration:underline;}
-  .ad-families__grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+  .ad-families__list{
+    background:#fff;border:1px solid #E2E8F0;border-radius:12px;
+    overflow:hidden;
+  }
   .ad-family{
-    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
-    padding:16px 18px;text-decoration:none;color:inherit;cursor:pointer;
-    display:flex;flex-direction:column;gap:10px;
-    transition:transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+    display:grid;grid-template-columns:28px 1fr auto auto;gap:14px;align-items:center;
+    padding:11px 16px;
+    text-decoration:none;color:inherit;cursor:pointer;
+    border-top:1px solid #F1F5F9;
+    transition:background .1s ease;
   }
-  .ad-family:hover{
-    border-color:#BFDBFE;transform:translateY(-1px);
-    box-shadow:0 4px 12px -2px rgba(15,23,42,.08);
-  }
-  .ad-family__head{display:flex;align-items:center;gap:11px;}
+  .ad-family:first-child{border-top:none;}
+  .ad-family:hover{background:#F8FAFC;}
   .ad-family__avatar{
-    flex:0 0 38px;width:38px;height:38px;border-radius:50%;
+    width:28px;height:28px;border-radius:50%;
     background:linear-gradient(135deg, var(--av-from, #3B82F6), var(--av-to, #1E40AF));
-    color:#fff;font:800 13px Inter,sans-serif;letter-spacing:-.01em;
-    display:flex;align-items:center;justify-content:center;
+    color:#fff;font:800 10.5px Inter,sans-serif;letter-spacing:-.01em;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
   }
-  .ad-family__name{font:700 14px Inter,sans-serif;color:#0F172A;letter-spacing:-.005em;line-height:1.2;}
-  .ad-family__plan{font:500 11.5px Inter,sans-serif;color:#94A3B8;letter-spacing:.005em;margin-top:2px;}
-  .ad-family__metrics{
-    display:flex;align-items:flex-end;justify-content:space-between;gap:10px;
-    border-top:1px solid #F1F5F9;padding-top:10px;
+  .ad-family__body{min-width:0;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .ad-family__name{font:600 13.5px Inter,sans-serif;color:#0F172A;letter-spacing:-.005em;}
+  .ad-family__plan{font:500 11.5px Inter,sans-serif;color:#94A3B8;letter-spacing:.005em;}
+  .ad-family__hours{
+    font:600 13px Inter,sans-serif;color:#0F172A;letter-spacing:-.005em;
+    white-space:nowrap;
   }
-  .ad-family__hours{font-family:"Archivo","Inter",sans-serif;font-size:22px;font-weight:800;color:#0F172A;letter-spacing:-.018em;line-height:1;}
-  .ad-family__hours-label{font:600 10.5px Inter,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:#94A3B8;margin-top:3px;}
+  .ad-family__hours-label{color:#94A3B8;font-weight:500;margin-left:3px;}
   .ad-family__status{
-    font:700 10px Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;
-    padding:4px 9px;border-radius:9999px;white-space:nowrap;flex-shrink:0;
-    background:#DCFCE7;color:#166534;border:1px solid #BBF7D0;
+    display:inline-flex;align-items:center;gap:5px;
+    font:600 11px Inter,sans-serif;color:#64748B;letter-spacing:-.005em;
+    white-space:nowrap;
   }
-  .ad-family__status--draft{background:#F1F5F9;color:#475569;border-color:#E2E8F0;}
-  .ad-family__status--expired{background:#FEF2F2;color:#991B1B;border-color:#FECACA;}
+  .ad-family__dot{
+    width:7px;height:7px;border-radius:50%;background:#10B981;flex-shrink:0;
+  }
+  .ad-family__status--draft .ad-family__dot{background:#94A3B8;}
+  .ad-family__status--expired .ad-family__dot{background:#EF4444;}
   @media(max-width:680px){
-    .ad-families__grid{grid-template-columns:1fr;}
-    .ad-family{padding:14px;}
+    .ad-family{grid-template-columns:28px 1fr auto;gap:10px;padding:10px 12px;}
+    .ad-family__status{grid-column:2 / -1;justify-self:start;}
   }
 
   /* Phase 16 v3: Upcoming renewals roll-up. Compact list, one row per
@@ -349,21 +354,21 @@
     </div>
   </section>
 
-  <!-- Phase 16 v4: My Families quick-access roster. Compact card grid,
-       one card per assigned family, click to open the workspace. Lives
-       above the Upcoming Renewals panel so the broader "people I work
-       with" context comes before the action-required dates. -->
-  <section class="ad-families" id="adFamilies" hidden>
-    <header class="ad-families__head">
-      <h3 class="ad-families__title">My Families</h3>
-      <a class="ad-families__action" href="assistant-clients.html">Open My Families →</a>
-    </header>
-    <div class="ad-families__grid" id="adFamiliesGrid"></div>
-  </section>
-
   <!-- Phase 17: month calendar — all families, color-coded -->
   <section style="margin-bottom:22px;">
     <div id="adCalendar"></div>
+  </section>
+
+  <!-- Phase 16 v5: My Families list (moved BELOW calendar 2026-05-16
+       per Caleb — calendar gets unobstructed center stage). Redesigned
+       as a clean SaaS-style row list (Linear/Notion vocabulary) instead
+       of a card grid. Compact, scannable, every row clickable. -->
+  <section class="ad-families" id="adFamilies" hidden>
+    <header class="ad-families__head">
+      <h3 class="ad-families__title">My Families</h3>
+      <a class="ad-families__action" href="assistant-clients.html">View all →</a>
+    </header>
+    <div class="ad-families__list" id="adFamiliesGrid"></div>
   </section>
 
   <!-- Phase 16 v3: Upcoming renewals roll-up — moved BELOW the calendar
@@ -447,7 +452,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515a"></script>
-<script src="js/hiring-service.js?v=20260516c"></script>
+<script src="js/hiring-service.js?v=20260516d"></script>
 <script src="js/session-calendar.js?v=20260515a"></script>
 <script src="js/sidebar.js?v=20260515d"></script>
 <script>
@@ -614,31 +619,29 @@ async function loadFamilies(){
     const name = f.client?.full_name || 'Family';
     const clientId = f.client?.id || c.client_id;
     const plan = c.included_minutes
-      ? `${Math.round(c.included_minutes / 60)}-hour plan`
-      : 'Plan';
+      ? `${Math.round(c.included_minutes / 60)}h plan`
+      : '';
     const remHrs = (typeof f.remainingMinutes === 'number')
       ? Math.round((f.remainingMinutes / 60) * 100) / 100
       : null;
     const [from, to] = colorFor(clientId);
-    const statusCls = status === 'active' ? '' :
-                      status === 'draft' ? ' ad-family__status--draft' :
-                      ' ad-family__status--expired';
+    const statusModifier = status === 'active' ? '' :
+                           status === 'draft' ? ' ad-family__status--draft' :
+                           ' ad-family__status--expired';
     const href = `assistant-client.html?id=${encodeURIComponent(clientId)}`;
+    const hoursCell = remHrs != null
+      ? `<span class="ad-family__hours">${remHrs}<span class="ad-family__hours-label">h left</span></span>`
+      : `<span class="ad-family__hours">—</span>`;
     return `<a class="ad-family" href="${href}" style="--av-from:${from};--av-to:${to};">
-      <div class="ad-family__head">
-        <div class="ad-family__avatar">${escapeHtml(initialsFor(name))}</div>
-        <div>
-          <div class="ad-family__name">${escapeHtml(name)}</div>
-          <div class="ad-family__plan">${escapeHtml(plan)}</div>
-        </div>
-      </div>
-      <div class="ad-family__metrics">
-        <div>
-          <div class="ad-family__hours">${remHrs != null ? remHrs : '—'}</div>
-          <div class="ad-family__hours-label">hours left</div>
-        </div>
-        <div class="ad-family__status${statusCls}">${escapeHtml(status)}</div>
-      </div>
+      <span class="ad-family__avatar">${escapeHtml(initialsFor(name))}</span>
+      <span class="ad-family__body">
+        <span class="ad-family__name">${escapeHtml(name)}</span>
+        ${plan ? `<span class="ad-family__plan">${escapeHtml(plan)}</span>` : ''}
+      </span>
+      ${hoursCell}
+      <span class="ad-family__status${statusModifier}">
+        <span class="ad-family__dot"></span>${escapeHtml(status)}
+      </span>
     </a>`;
   }).join('');
 
