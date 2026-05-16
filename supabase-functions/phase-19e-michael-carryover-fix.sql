@@ -142,20 +142,19 @@ BEGIN
   -- (b) Drop a positive ledger entry on the new contract.
   --     reason_code 'admin_adjustment' is the safe enum value that
   --     allows non-zero positive deltas (matches Phase 12 pattern).
+  --     IMPORTANT: hours_ledger.client_id is NOT NULL. Always pull
+  --     it from the contract so the row never falls afoul of the
+  --     constraint. (Hit on first attempt 2026-05-16.)
   INSERT INTO public.hours_ledger (
+    client_id,
     contract_id,
     minutes_delta,
-    reason_code,
-    appointment_id,
-    notes,
-    created_at
+    reason_code
   ) VALUES (
+    v_client_id,
     v_new_contract,
     v_residual_min,
-    'admin_adjustment',
-    NULL,
-    'Carryover from prior contract ' || v_old_contract || ' (Phase 19e reconciliation)',
-    now()
+    'admin_adjustment'
   );
 
   -- (c) Audit row in contract_carryover_events for full traceability.
@@ -215,3 +214,28 @@ LEFT JOIN public.hours_ledger hl ON hl.contract_id = c.id
 WHERE c.client_id = (SELECT id FROM michael)
 GROUP BY c.id
 ORDER BY c.start_at DESC;
+
+
+-- ─── QUICK RECIPE (what we actually ran for Michael) ──────
+-- One-shot SQL to roll a known residual from an expired
+-- contract into a known active contract. Use this whenever
+-- the auto-carryover trigger doesn't fire on a renewal.
+-- Replace the destination contract_id and minutes_delta with
+-- the values from your Step 1 inspect query.
+--
+-- Pulls client_id from the contract itself so the NOT NULL
+-- constraint on hours_ledger.client_id can't bite (it will).
+--
+--   INSERT INTO public.hours_ledger (client_id, contract_id, minutes_delta, reason_code)
+--   SELECT client_id, id, <residual_minutes>, 'admin_adjustment'
+--   FROM public.contracts
+--   WHERE id = '<destination_contract_uuid>';
+--
+-- Example actually used for Michael 2026-05-16 (6.75 h = 405 min):
+--   INSERT INTO public.hours_ledger (client_id, contract_id, minutes_delta, reason_code)
+--   SELECT client_id, id, 405, 'admin_adjustment'
+--   FROM public.contracts
+--   WHERE id = '5af622ec-5ef7-4329-b22a-2a4b3d4e7648';
+--
+-- After running, re-run the Step 1 inspect query to verify
+-- topped_up_h and remaining_h on the destination contract.
