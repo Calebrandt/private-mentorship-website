@@ -753,45 +753,36 @@
     const user = await getCurrentUser();
     if (!user) return [];
     try {
-      // Find every family this user is associated with via family_assignments
-      // (covers both ASSISTANT and OWNER roles). Then take a UNION with any
-      // contracts that name them as assistant_id directly. This handles two
-      // legacy cases that the old "WHERE assistant_id = me" query missed:
-      //   • Imported contracts where assistant_id was set to NULL or some
-      //     placeholder uuid (Michael's 2025/2026 import hit this — his
-      //     appointments were invisible on the dashboard calendar even
-      //     though Daniel's and Ryan's showed up correctly).
-      //   • Family members logged in as themselves (e.g. Linda viewing
-      //     Michael's calendar). Same code path serves them.
-      // Same shape we used to fix fetchAssistantClientWorkspace earlier.
-      const [{ data: assignments }, { data: ownedContracts }] = await Promise.all([
-        sb().from('family_assignments').select('client_id').eq('user_id', user.id),
-        sb().from('contracts').select('id, client_id').eq('assistant_id', user.id),
-      ]);
+      // Strategy: just trust RLS. Query every contract.client_id the
+      // current user is allowed to SEE — that union is the family set
+      // we want. This works even when assistant_id is NULL or wrong on
+      // the contract (legacy imports — Michael's 2025/2026 contracts
+      // came in like this), because Postgres-level RLS already decides
+      // what's visible. Appointments has its own RLS, so over-fetching
+      // here is fine — the second query will gate any unrelated rows.
+      //
+      // Previous attempts:
+      //   v1: filter by contracts.assistant_id = me  → missed Michael
+      //       (his assistant_id was NULL from the import)
+      //   v2: union family_assignments.client_id + owned contracts →
+      //       still missed Michael because Caleb wasn't in
+      //       family_assignments for him AND assistant_id was NULL
+      //   v3 (this one): bare select on contracts, let RLS decide.
+      const { data: visibleContracts } = await sb()
+        .from('contracts').select('client_id');
+      const clientIds = [...new Set(
+        (visibleContracts || []).map(c => c.client_id).filter(Boolean)
+      )];
+      if (!clientIds.length) return [];
 
-      const clientIdSet = new Set();
-      (assignments || []).forEach(a => { if (a.client_id) clientIdSet.add(a.client_id); });
-      (ownedContracts || []).forEach(c => { if (c.client_id) clientIdSet.add(c.client_id); });
-      const clientIds = [...clientIdSet];
-
-      // If no families AND no owned contracts, nothing to show.
-      if (!clientIds.length && !(ownedContracts || []).length) return [];
-
-      // Query appointments by client_id (works regardless of whether the
-      // appointment's contract has assistant_id set correctly).
+      // Query appointments by client_id (no assistant_id dependency).
       let q = sb()
         .from('appointments')
         .select('id, contract_id, client_id, starts_at, ends_at, duration_minutes, status, kind, title, notes, cancelled_at, cancel_reason, is_complimentary')
+        .in('client_id', clientIds)
         .in('status', statuses)
         .order('starts_at', { ascending: true })
         .limit(limit);
-      if (clientIds.length) {
-        q = q.in('client_id', clientIds);
-      } else if ((ownedContracts || []).length) {
-        // Fallback: no family_assignments rows, but we do own contracts —
-        // use the legacy contract_id path.
-        q = q.in('contract_id', (ownedContracts || []).map(c => c.id));
-      }
       if (fromDate) q = q.gte('starts_at', new Date(fromDate).toISOString());
       if (toDate)   q = q.lte('starts_at', new Date(toDate).toISOString());
 
