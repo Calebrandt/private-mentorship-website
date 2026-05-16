@@ -529,45 +529,86 @@
       }
     } catch (_) {}
 
-    // Clients (assistant + admin) — also build per-client roll-up of
-    // matching items so the preview pane can show a mini-dossier.
+    // Clients — for admin/assistant, the Clients section acts as a
+    // "browse by family" view. We include every client who has either
+    // (a) a direct name/email/status match OR (b) any matching item
+    // under them (lessons, invoices, sessions, contracts). Each row
+    // exposes a dossier in the preview pane.
+    // For clients (single-user role) this just shows themselves.
     tryEach('clients', dyn.clients, c => {
       const cid = c.id || c.client_id;
       const name = c.full_name || c.client_name || c.name || '';
-      // Broader blob — include id (short), email, contract status, every
-      // text field we have. Even partial matches on UUIDs work.
       const blob = `${name} ${c.email || ''} ${c.contract_status || ''} ${(cid || '').slice(0,8)}`.toLowerCase();
-      if (blob.includes(q)) {
-        const isAdmin = role === 'admin';
-        // Roll up everything for this client to surface in the preview
-        const clientLessons   = (dyn.lessonLogs   || []).filter(l => l.client_id === cid);
-        const clientInvoices  = (dyn.invoices     || []).filter(i => i.client_id === cid);
-        const clientSessions  = (dyn.sessions     || []).filter(s => s.client_id === cid);
-        const clientContracts = (dyn.contracts    || []).filter(k => k.client_id === cid);
-        results.clients.push({
-          icon: ICONS.client,
-          title: name,
-          subtitle: c.contract_status ? `Contract: ${c.contract_status}` : 'Client',
-          url: withQ(isAdmin
-            ? `admin-create-client.html?id=${encodeURIComponent(cid || '')}`
-            : `assistant-client.html?client_id=${encodeURIComponent(cid || '')}`),
-          _preview: {
-            kind: 'client',
-            data: c,
-            rollup: {
-              lessons:   clientLessons.slice(0, 5),
-              invoices:  clientInvoices.slice(0, 5),
-              sessions:  clientSessions.slice(0, 5),
-              contracts: clientContracts.slice(0, 3),
-              counts: {
-                lessons: clientLessons.length, invoices: clientInvoices.length,
-                sessions: clientSessions.length, contracts: clientContracts.length,
-              },
+      const directMatch = blob.includes(q);
+
+      // Rollup — what matched FOR this client across other sections
+      const clientLessons   = (dyn.lessonLogs   || []).filter(l => {
+        if (l.client_id !== cid) return false;
+        const lblob = `${l.appointment_title || ''} ${l.focus_area || ''} ${l.key_concepts || ''} ${l.next_session_notes || ''} ${l.feedback || ''}`.toLowerCase();
+        return lblob.includes(q) || fmtDate(l.starts_at).toLowerCase().includes(q);
+      });
+      const clientInvoices  = (dyn.invoices     || []).filter(i => {
+        if (i.client_id !== cid) return false;
+        const cents = Number(i.total_cents || i.amount_paid_cents || 0);
+        const moneyBlob = [fmtMoney(cents), (cents/100).toString(), (cents/100).toLocaleString('en-CA')].join(' ').toLowerCase();
+        const iblob = `${i.invoice_number || ''} ${i.subject || ''} ${i.customer_notes || ''} ${i.status || ''} ${moneyBlob}`.toLowerCase();
+        return iblob.includes(q) || fmtDate(i.invoice_date).toLowerCase().includes(q);
+      });
+      const clientSessions  = (dyn.sessions     || []).filter(s => {
+        if (s.client_id !== cid) return false;
+        const hrs = s.duration_minutes ? (s.duration_minutes / 60) : 0;
+        const sblob = `${s.title || ''} ${s.notes || ''} ${s.kind || ''} ${s.status || ''} ${hrs}h`.toLowerCase();
+        return sblob.includes(q) || fmtDate(s.starts_at).toLowerCase().includes(q);
+      });
+      const clientContracts = (dyn.contracts    || []).filter(k => {
+        if (k.client_id !== cid) return false;
+        const hrs = k.included_hours || (k.included_minutes ? k.included_minutes / 60 : 0);
+        const kblob = `${k._label || ''} ${k.status || ''} ${k.assistant_name || ''} ${hrs}h`.toLowerCase();
+        return kblob.includes(q) || fmtDate(k.start_at).toLowerCase().includes(q) || fmtDate(k.end_at).toLowerCase().includes(q);
+      });
+      const rollupCount = clientLessons.length + clientInvoices.length + clientSessions.length + clientContracts.length;
+
+      if (!directMatch && rollupCount === 0) return;     // nothing relevant for this client
+
+      const isAdmin = role === 'admin';
+      // Subtitle reflects WHY they're in the list — match count breakdown
+      // when it's a rollup-only hit, or "Client" when it's a direct match.
+      const subtitleParts = [];
+      if (clientLessons.length)   subtitleParts.push(`${clientLessons.length} lesson${clientLessons.length === 1 ? '' : 's'}`);
+      if (clientSessions.length)  subtitleParts.push(`${clientSessions.length} session${clientSessions.length === 1 ? '' : 's'}`);
+      if (clientInvoices.length)  subtitleParts.push(`${clientInvoices.length} invoice${clientInvoices.length === 1 ? '' : 's'}`);
+      if (clientContracts.length) subtitleParts.push(`${clientContracts.length} contract${clientContracts.length === 1 ? '' : 's'}`);
+      const subtitle = subtitleParts.length
+        ? subtitleParts.join(' · ')
+        : (c.contract_status ? `Contract: ${c.contract_status}` : 'Client');
+
+      results.clients.push({
+        icon: ICONS.client,
+        title: name,
+        subtitle,
+        // Hidden field used to sort the section by relevance
+        _rank: rollupCount + (directMatch ? 1 : 0),
+        url: withQ(isAdmin
+          ? `admin-create-client.html?id=${encodeURIComponent(cid || '')}`
+          : `assistant-client.html?client_id=${encodeURIComponent(cid || '')}`),
+        _preview: {
+          kind: 'client',
+          data: c,
+          rollup: {
+            lessons:   clientLessons.slice(0, 5),
+            invoices:  clientInvoices.slice(0, 5),
+            sessions:  clientSessions.slice(0, 5),
+            contracts: clientContracts.slice(0, 3),
+            counts: {
+              lessons: clientLessons.length, invoices: clientInvoices.length,
+              sessions: clientSessions.length, contracts: clientContracts.length,
             },
           },
-        });
-      }
+        },
+      });
     });
+    // Sort Clients section by relevance (most matches first)
+    results.clients.sort((a, b) => (b._rank || 0) - (a._rank || 0));
 
     // Admin-only: applications, assistant profiles, schedule requests, membership requests
     tryEach('applications', dyn.applications, a => {
@@ -584,19 +625,36 @@
     });
     tryEach('assistantProfiles', dyn.assistantProfiles, p => {
       const name = p.display_name || p.full_name || 'Assistant';
-      // Defensive: languages may be null/string/array depending on source
       const langs = Array.isArray(p.languages) ? p.languages.join(' ') : String(p.languages || '');
       const blob = `${name} ${p.city || ''} ${langs} ${p.bio || ''} ${p.experience_summary || ''} ${p.education_summary || ''}`.toLowerCase();
-      if (blob.includes(q)) {
-        results.assistantProfiles.push({
-          icon: ICONS.client,
-          title: name,
-          subtitle: `Assistant${p.city ? ' · ' + p.city : ''}${langs ? ' · ' + langs : ''}`,
-          url: withQ(`admin-assistant-profiles.html?id=${encodeURIComponent(p.assistant_id || p.id || '')}`),
-          _preview: { kind: 'assistant', data: p },
-        });
-      }
+      const directMatch = blob.includes(q);
+      // Rollup: lessons taught by this assistant (matched via name)
+      const taughtLessons = (dyn.lessonLogs || []).filter(l => {
+        if (!l.lesson_assistant_name) return false;
+        if (!String(l.lesson_assistant_name).toLowerCase().includes(name.toLowerCase())) return false;
+        const lblob = `${l.appointment_title || ''} ${l.focus_area || ''} ${l.key_concepts || ''} ${l.next_session_notes || ''} ${l.feedback || ''}`.toLowerCase();
+        return lblob.includes(q) || fmtDate(l.starts_at).toLowerCase().includes(q);
+      });
+      if (!directMatch && taughtLessons.length === 0) return;
+      const subtitleParts = [];
+      if (p.city) subtitleParts.push(p.city);
+      if (langs) subtitleParts.push(langs);
+      if (taughtLessons.length) subtitleParts.push(`${taughtLessons.length} matching lesson${taughtLessons.length === 1 ? '' : 's'}`);
+      results.assistantProfiles.push({
+        icon: ICONS.client,
+        title: name,
+        subtitle: subtitleParts.length ? subtitleParts.join(' · ') : 'Assistant',
+        _rank: taughtLessons.length + (directMatch ? 1 : 0),
+        url: withQ(`admin-assistant-profiles.html?id=${encodeURIComponent(p.assistant_id || p.id || '')}`),
+        _preview: {
+          kind: 'assistant',
+          data: p,
+          taughtLessons: taughtLessons.slice(0, 5),
+          taughtCount: taughtLessons.length,
+        },
+      });
     });
+    results.assistantProfiles.sort((a, b) => (b._rank || 0) - (a._rank || 0));
     tryEach('scheduleRequests', dyn.scheduleRequests, r => {
       const title = r.request_type ? `${r.request_type} request` : 'Schedule request';
       const blob = `${title} ${r.status || ''} ${r.client_name || ''}`.toLowerCase();
@@ -710,12 +768,21 @@
     } else if (kind === 'assistant') {
       const p = data;
       const name = p.display_name || p.full_name || 'Assistant';
+      const taught = item._preview.taughtLessons || [];
+      const taughtCount = item._preview.taughtCount || 0;
+      const miniRow = (lbl, sub) => `<div class="ms-preview__minirow"><div class="ms-preview__mini-title">${h(lbl)}</div><div class="ms-preview__mini-sub">${h(sub)}</div></div>`;
       html = `
         <div class="ms-preview__head">
           <div class="ms-preview__kind">Assistant</div>
           <h4 class="ms-preview__title">${h(name)}</h4>
           <div class="ms-preview__meta">${p.city ? h(p.city) + ' · ' : ''}${h(Array.isArray(p.languages) ? p.languages.join(', ') : (p.languages || ''))}</div>
         </div>
+        ${taughtCount ? `<div class="ms-preview__stats">
+          <div class="ms-preview__stat"><strong>${taughtCount}</strong> matching lessons</div>
+        </div>` : ''}
+        ${taught.length ? `<div class="ms-preview__sec"><div class="ms-preview__label">Recent matching lessons</div>${
+          taught.map(l => miniRow(l.appointment_title || 'Lesson', fmtDate(l.starts_at) + (l.focus_area ? ' · ' + l.focus_area : ''))).join('')
+        }</div>` : ''}
         ${p.bio ? `<div class="ms-preview__sec"><div class="ms-preview__label">Bio</div><div class="ms-preview__body">${h(p.bio)}</div></div>` : ''}
         ${p.experience_summary ? `<div class="ms-preview__sec"><div class="ms-preview__label">Experience</div><div class="ms-preview__body">${h(p.experience_summary)}</div></div>` : ''}
         ${p.education_summary ? `<div class="ms-preview__sec"><div class="ms-preview__label">Education</div><div class="ms-preview__body">${h(p.education_summary)}</div></div>` : ''}
