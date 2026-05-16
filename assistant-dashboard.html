@@ -192,6 +192,11 @@
     </div>
   </section>
 
+  <!-- Phase 17: month calendar — all families, color-coded -->
+  <section style="margin-bottom:22px;">
+    <div id="adCalendar"></div>
+  </section>
+
   <!-- Two columns: upcoming + profile preview -->
   <div class="ad-cols">
 
@@ -262,7 +267,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515a"></script>
-<script src="js/hiring-service.js?v=20260515b"></script>
+<script src="js/hiring-service.js?v=20260515i"></script>
+<script src="js/session-calendar.js?v=20260515a"></script>
 <script src="js/sidebar.js?v=20260515c"></script>
 <script>
 /* ============================================================================
@@ -324,6 +330,14 @@ function initialsFor(name){
 
   // Profile preview
   loadProfile();
+
+  // Phase 17 — month calendar, all families color-coded per client_id
+  if (window.pmCalendar?.mount && document.getElementById('adCalendar')) {
+    window.pmCalendar.mount('adCalendar', {
+      colorByClient: true,
+      subtitle: 'All your sessions this month, color-coded by family',
+    }).catch(e => console.warn('pmCalendar mount failed:', e));
+  }
 })();
 
 async function loadUpcoming(){

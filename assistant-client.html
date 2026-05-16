@@ -467,6 +467,11 @@
       </div>
     </section>
 
+    <!-- Phase 17: month calendar (this family's sessions) -->
+    <section class="wc-section" style="margin-bottom:18px;padding:0;border:none;">
+      <div id="wcCalendar"></div>
+    </section>
+
     <!-- Two columns: upcoming + recent -->
     <div class="wc-cols">
       <section class="wc-section">
@@ -678,8 +683,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515c"></script>
-<script src="js/hiring-service.js?v=20260515i"></script>
+<script src="js/hiring-service.js?v=20260515j"></script>
 <script src="js/messages-service.js?v=20260515c"></script>
+<script src="js/session-calendar.js?v=20260515a"></script>
 <script src="js/sidebar.js?v=20260515c"></script>
 <script>
 function escapeHtml(s){return (s||'').toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[c]));}
@@ -868,6 +874,16 @@ function renderAppointmentRow(a, spend){
       wireBankNudge({ clientId, bankHrs: Math.round(bankHrs) });
     }
   } catch (_) {}
+
+  // Phase 17 — Mount the month calendar (this family's sessions only).
+  // Reuses the shared widget. clientId scopes the data; we deliberately
+  // skip colorByClient because every block here is the same family.
+  if (window.pmCalendar?.mount && document.getElementById('wcCalendar')) {
+    window.pmCalendar.mount('wcCalendar', {
+      clientId: clientId,
+      subtitle: `${name}'s sessions this month`,
+    }).catch(e => console.warn('pmCalendar mount failed:', e));
+  }
 
   // Phase 19b — Payment History (lifetime invoices for this family)
   (async () => {
