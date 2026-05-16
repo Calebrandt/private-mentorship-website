@@ -28,7 +28,7 @@
   }
 
   /* KPI tiles */
-  .ad-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;}
+  .ad-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
   @media(max-width:780px){.ad-kpis{grid-template-columns:1fr;}}
   .ad-kpi{
     background:#fff;border:1px solid #E2E8F0;border-radius:14px;
@@ -38,39 +38,59 @@
   .ad-kpi__value{font-family:"Archivo","Inter",sans-serif;font-size:36px;font-weight:800;letter-spacing:-.02em;color:#0F172A;line-height:1;}
   .ad-kpi__sub{font-size:12.5px;color:#64748B;margin:6px 0 0;}
 
-  /* Phase 17.5: Weekly breakdown strip — the "look how little you work" pitch.
-     Mon-Sun day boxes. Free days show "free" in muted color so it visually
-     reinforces the small footprint of a typical week. Today is highlighted. */
-  .ad-weekly{background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:20px 22px;margin-bottom:22px;}
-  .ad-weekly__head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px;flex-wrap:wrap;}
-  .ad-weekly__title{font-family:"Archivo","Inter",sans-serif;font-size:17px;font-weight:800;letter-spacing:-.01em;color:#0F172A;margin:0 0 2px;}
-  .ad-weekly__sub{font-size:12.5px;color:#64748B;margin:0;}
+  /* Phase 17.5: Weekly breakdown strip — compact, hangs neatly off
+     the KPI tiles above. Smaller numbers + tighter padding so it
+     reads as supporting reference data, not a primary tile. */
+  .ad-weekly{
+    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    padding:14px 18px;
+    /* Sits tight under the KPI strip — KPIs margin-bottom is reduced
+       below so the two cards feel connected. */
+    margin-top:-14px;
+    margin-bottom:22px;
+    position:relative;
+  }
+  .ad-weekly__head{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:12px;margin-bottom:10px;flex-wrap:wrap;
+  }
+  .ad-weekly__title{
+    font-family:"Archivo","Inter",sans-serif;
+    font-size:13px;font-weight:700;letter-spacing:.04em;
+    text-transform:uppercase;color:#475569;margin:0;
+  }
   .ad-weekly__summary{
-    font-size:12.5px;color:#475569;font-weight:600;
-    background:#F8FAFC;border:1px solid #E2E8F0;border-radius:9999px;
-    padding:6px 14px;white-space:nowrap;
+    font-size:12.5px;color:#0F172A;font-weight:600;letter-spacing:-.005em;
+    background:transparent;border:none;padding:0;white-space:nowrap;
   }
-  .ad-weekly__grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;}
+  .ad-weekly__grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
   .ad-weekday{
-    background:#F8FAFC;border:1px solid #F1F5F9;border-radius:10px;
-    padding:14px 8px;text-align:center;
-    display:flex;flex-direction:column;gap:4px;align-items:center;
+    background:#F8FAFC;border:1px solid #F1F5F9;border-radius:8px;
+    padding:8px 4px;text-align:center;
+    display:flex;flex-direction:column;gap:2px;align-items:center;
   }
-  .ad-weekday__name{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94A3B8;}
-  .ad-weekday__hours{font-family:"Archivo","Inter",sans-serif;font-size:24px;font-weight:800;color:#0F172A;line-height:1;}
-  .ad-weekday__unit{font-size:11px;color:#64748B;font-weight:600;}
+  .ad-weekday__name{
+    font-size:9.5px;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;color:#94A3B8;
+  }
+  .ad-weekday__hours{
+    font-family:"Archivo","Inter",sans-serif;
+    font-size:17px;font-weight:800;color:#0F172A;line-height:1;
+  }
+  .ad-weekday__unit{font-size:10px;color:#64748B;font-weight:600;}
   .ad-weekday.is-today{background:#EFF6FF;border-color:#BFDBFE;}
   .ad-weekday.is-today .ad-weekday__hours{color:#1E40AF;}
   .ad-weekday.is-today .ad-weekday__name{color:#1E40AF;}
   .ad-weekday.is-free{background:#FAFBFC;}
-  .ad-weekday.is-free .ad-weekday__hours{color:#CBD5E1;font-size:18px;font-weight:700;}
+  .ad-weekday.is-free .ad-weekday__hours{color:#CBD5E1;font-size:14px;font-weight:700;}
   .ad-weekday.is-free .ad-weekday__unit{color:#94A3B8;}
   @media(max-width:680px){
-    .ad-weekly__grid{gap:5px;}
-    .ad-weekday{padding:10px 4px;}
-    .ad-weekday__hours{font-size:20px;}
-    .ad-weekday__name{font-size:9.5px;letter-spacing:.06em;}
-    .ad-weekday__unit{font-size:10px;}
+    .ad-weekly{margin-top:0;padding:12px;}
+    .ad-weekly__grid{gap:4px;}
+    .ad-weekday{padding:7px 3px;}
+    .ad-weekday__hours{font-size:15px;}
+    .ad-weekday__name{font-size:9px;letter-spacing:.04em;}
+    .ad-weekday__unit{font-size:9.5px;}
   }
 
   /* Section card */
@@ -227,13 +247,11 @@
     </div>
   </section>
 
-  <!-- Phase 17.5: weekly hours breakdown (the "look how free your week is" pitch) -->
+  <!-- Phase 17.5: weekly hours breakdown — compact reference strip that
+       hangs neatly off the KPI tiles above. No marketing copy, just data. -->
   <section class="ad-weekly" id="adWeekly">
     <header class="ad-weekly__head">
-      <div>
-        <h3 class="ad-weekly__title">Your week</h3>
-        <p class="ad-weekly__sub" id="adWeeklySub">This week's schedule — most days you barely work.</p>
-      </div>
+      <h3 class="ad-weekly__title">Your week</h3>
       <div class="ad-weekly__summary" id="adWeeklySummary"></div>
     </header>
     <div class="ad-weekly__grid" id="adWeeklyGrid">
@@ -316,7 +334,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515a"></script>
-<script src="js/hiring-service.js?v=20260515r"></script>
+<script src="js/hiring-service.js?v=20260515s"></script>
 <script src="js/session-calendar.js?v=20260515a"></script>
 <script src="js/sidebar.js?v=20260515c"></script>
 <script>
@@ -485,15 +503,14 @@ async function loadWeekly(){
   }).join('');
   grid.innerHTML = cells;
 
-  // Summary pill ("18 h · 5 working days · 2 free")
+  // Summary line — plain, prose-y. Per Caleb: "Working 17 hours a week"
+  // reads cleaner than "17 h · 5 working days · 2 free".
   const totalH = Math.round((minutesByDay.reduce((s, m) => s + m, 0) / 60) * 10) / 10;
-  const workingDays = minutesByDay.filter(m => m > 0).length;
-  const freeDays = 7 - workingDays;
   if (summaryEl) {
     if (totalH === 0) {
-      summaryEl.textContent = 'No sessions booked this week — a clean week off.';
+      summaryEl.textContent = 'Nothing booked this week.';
     } else {
-      summaryEl.textContent = `${totalH} h · ${workingDays} working day${workingDays === 1 ? '' : 's'} · ${freeDays} free`;
+      summaryEl.textContent = `Working ${totalH} hours this week`;
     }
   }
 }
