@@ -394,6 +394,24 @@
      • Typography is the hero.
      ════════════════════════════════════════════════════════════ */
   .nx-contracts{display:flex;flex-direction:column;gap:0;}
+  /* Toggle pill sits under the contracts list — collapses long histories
+     (Michael has 18) down to 3 by default, expands on click. */
+  .nx-contracts__toggle{
+    display:block;width:100%;
+    margin:14px 0 0;padding:10px 12px;
+    background:transparent;
+    border:1px solid var(--border);
+    border-radius:9px;
+    color:var(--ink-mute);
+    font:600 12.5px Inter,sans-serif;letter-spacing:-.005em;
+    cursor:pointer;text-align:center;
+    transition:background .14s ease, color .14s ease, border-color .14s ease;
+  }
+  .nx-contracts__toggle:hover{
+    background:var(--border-soft);
+    color:var(--ink-2);
+    border-color:var(--ink-tert);
+  }
   .nx-contract{
     position:relative;
     padding:18px 4px;
@@ -1266,18 +1284,26 @@
       const d = m ? new Date(+m[1], +m[2]-1, +m[3]) : new Date(s);
       return d.toLocaleDateString('en-CA', { month:'short', day:'numeric', year:'numeric' });
     };
-    cWrap.innerHTML = `<div class="nx-contracts">${contracts.map(c => {
+    // Show first N contracts by default. Long histories (Michael has 18)
+    // were dragging the dashboard down. Users can expand if they want
+    // to see all, then collapse back. Active/draft contracts are pulled
+    // to the top so the current one is always visible.
+    const CONTRACTS_DEFAULT = 3;
+    const sortedContracts = [...contracts].sort((a, b) => {
+      const aActive = (a.status === 'active' || a.status === 'draft') ? 1 : 0;
+      const bActive = (b.status === 'active' || b.status === 'draft') ? 1 : 0;
+      if (aActive !== bActive) return bActive - aActive;
+      // Then by start_at desc (newest first)
+      return new Date(b.start_at || 0).getTime() - new Date(a.start_at || 0).getTime();
+    });
+    const renderContractCard = (c) => {
       const used = Number(c.used_hours || 0);
       const total = Number(c.included_hours || 0);
       const toppedUp = Number(c.topped_up_hours || 0);
-      // Progress bar reflects sessions against the purchased plan only
-      // (mental model: carryover bonus is consumed first as freebie).
       const pct = total > 0 ? Math.min(100, (used / total) * 100) : 0;
       const status = String(c.status || '').toLowerCase();
       const start = c.start_at ? _fmtLocal(c.start_at) : '—';
       const end = c.end_at ? _fmtLocal(c.end_at) : 'Ongoing';
-      // Subline shows carryover when present, so the math reads honest:
-      //   "33.25 of 40 hrs used (+2.75 carried in)  ·  6.75 remaining"
       const carryNote = toppedUp > 0 ? ` <span style="color:var(--ink-mute,#94A3B8);font-weight:500;">+${toppedUp.toFixed(2)} carried in</span>` : '';
       return `<div class="nx-contract">
         <div class="nx-contract__head">
@@ -1293,7 +1319,22 @@
         </div>
         <div class="nx-contract__bar"><div class="nx-contract__bar-fill" style="width:${pct.toFixed(1)}%"></div></div>
       </div>`;
-    }).join('')}</div>`;
+    };
+    const drawContracts = (expanded) => {
+      const list = expanded ? sortedContracts : sortedContracts.slice(0, CONTRACTS_DEFAULT);
+      const hiddenCount = sortedContracts.length - list.length;
+      const toggle = sortedContracts.length > CONTRACTS_DEFAULT
+        ? `<button type="button" class="nx-contracts__toggle" id="contractsToggle">${
+            expanded
+              ? `Show ${CONTRACTS_DEFAULT} most recent`
+              : `Show all ${sortedContracts.length} contracts`
+          }</button>`
+        : '';
+      cWrap.innerHTML = `<div class="nx-contracts">${list.map(renderContractCard).join('')}</div>${toggle}`;
+      const tBtn = document.getElementById('contractsToggle');
+      if (tBtn) tBtn.addEventListener('click', () => drawContracts(!expanded));
+    };
+    drawContracts(false);
   }
 
   // ─── Homework panel ───────────────────────────────────────────
