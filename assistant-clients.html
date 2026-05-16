@@ -53,24 +53,24 @@
   @media(max-width:780px){.nx-search{display:none;}.nx-topbar{padding:12px 16px;}}
 
   *,*::before,*::after{box-sizing:border-box;}
-  html,body{margin:0;padding:0;background:#F4F5F7;color:#0F172A;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink-2);font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
   .ac-shell{padding:36px 32px 80px;max-width:1240px;margin:0 auto;}
 
   .ac-head{margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;}
   .ac-head__body{flex:1;min-width:260px;}
   .ac-eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#0071e3;margin:0 0 8px;}
-  .ac-h1{font-family:"Archivo","Inter",sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0 0 6px;color:#0F172A;}
-  .ac-sub{font-size:14px;color:#64748B;margin:0;line-height:1.55;max-width:620px;}
+  .ac-h1{font-family:"Archivo","Inter",sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0 0 6px;color:var(--ink-2);}
+  .ac-sub{font-size:14px;color:var(--ink-mute);margin:0;line-height:1.55;max-width:620px;}
   .ac-count{
-    font-size:11.5px;font-weight:600;letter-spacing:.06em;color:#64748B;
-    background:#fff;border:1px solid #E2E8F0;border-radius:9999px;padding:7px 14px;
+    font-size:11.5px;font-weight:600;letter-spacing:.06em;color:var(--ink-mute);
+    background:var(--card);border:1px solid var(--border);border-radius:9999px;padding:7px 14px;
   }
-  .ac-count strong{color:#0F172A;}
+  .ac-count strong{color:var(--ink-2);}
 
   /* Card list */
   .ac-list{display:flex;flex-direction:column;gap:12px;}
   .ac-card{
-    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
     padding:18px 22px;display:grid;grid-template-columns:48px 1fr auto auto;gap:18px;align-items:center;
     text-decoration:none;color:inherit;
     transition:border-color .18s ease, box-shadow .18s ease, transform .15s ease;
@@ -83,9 +83,9 @@
     color:#fff;font-weight:800;font-size:15px;
   }
   .ac-card__body{min-width:0;}
-  .ac-card__name{font-family:"Archivo","Inter",sans-serif;font-size:16px;font-weight:800;letter-spacing:-.01em;color:#0F172A;margin:0 0 3px;}
-  .ac-card__meta{font-size:12.5px;color:#64748B;margin:0;line-height:1.5;}
-  .ac-card__meta strong{color:#475569;}
+  .ac-card__name{font-family:"Archivo","Inter",sans-serif;font-size:16px;font-weight:800;letter-spacing:-.01em;color:var(--ink-2);margin:0 0 3px;}
+  .ac-card__meta{font-size:12.5px;color:var(--ink-mute);margin:0;line-height:1.5;}
+  .ac-card__meta strong{color:var(--ink-mute);}
   .ac-card__status{
     font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
     padding:4px 10px;border-radius:9999px;white-space:nowrap;
@@ -93,15 +93,15 @@
   .ac-card__status--active{background:#D1FAE5;color:#047857;}
   .ac-card__status--paused{background:#FEF3C7;color:#92400E;}
   .ac-card__status--pending{background:#DBEAFE;color:#1E3A8A;}
-  .ac-card__status--draft{background:#F1F5F9;color:#64748B;}
-  .ac-card__chev{color:#94A3B8;}
+  .ac-card__status--draft{background:#F1F5F9;color:var(--ink-mute);}
+  .ac-card__chev{color:var(--ink-tert);}
 
   /* Empty / loading */
   .ac-empty,.ac-loading{
-    background:#fff;border:1px dashed #CBD5E1;border-radius:14px;
-    padding:60px 32px;text-align:center;color:#64748B;
+    background:var(--card);border:1px dashed #CBD5E1;border-radius:14px;
+    padding:60px 32px;text-align:center;color:var(--ink-mute);
   }
-  .ac-empty__title,.ac-loading__title{font-family:"Archivo","Inter",sans-serif;font-size:17px;font-weight:700;color:#0F172A;margin:0 0 6px;}
+  .ac-empty__title,.ac-loading__title{font-family:"Archivo","Inter",sans-serif;font-size:17px;font-weight:700;color:var(--ink-2);margin:0 0 6px;}
   .ac-empty__sub,.ac-loading__sub{font-size:13.5px;margin:0;line-height:1.65;max-width:480px;margin-left:auto;margin-right:auto;}
   .ac-spinner{
     width:18px;height:18px;border-radius:50%;

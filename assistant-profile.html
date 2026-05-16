@@ -53,46 +53,46 @@
   @media(max-width:780px){.nx-search{display:none;}.nx-topbar{padding:12px 16px;}}
 
   *,*::before,*::after{box-sizing:border-box;}
-  html,body{margin:0;padding:0;background:#F4F5F7;color:#0F172A;font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink-2);font-family:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
   .ap-shell{padding:36px 32px 80px;max-width:880px;margin:0 auto;}
 
   .ap-head{margin-bottom:24px;}
   .ap-eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#0071e3;margin:0 0 8px;}
-  .ap-h1{font-family:"Archivo","Inter",sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0 0 6px;color:#0F172A;}
-  .ap-sub{font-size:14px;color:#64748B;margin:0;line-height:1.55;max-width:560px;}
+  .ap-h1{font-family:"Archivo","Inter",sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:0 0 6px;color:var(--ink-2);}
+  .ap-sub{font-size:14px;color:var(--ink-mute);margin:0;line-height:1.55;max-width:560px;}
 
   /* Status pill */
   .ap-pubstate{
-    background:#fff;border:1px solid #E2E8F0;border-radius:14px;
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
     padding:16px 22px;margin-bottom:18px;
     display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
   }
-  .ap-pubstate__label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94A3B8;margin:0 0 4px;}
-  .ap-pubstate__value{font-family:"Archivo","Inter",sans-serif;font-size:18px;font-weight:800;color:#0F172A;margin:0;}
+  .ap-pubstate__label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-tert);margin:0 0 4px;}
+  .ap-pubstate__value{font-family:"Archivo","Inter",sans-serif;font-size:18px;font-weight:800;color:var(--ink-2);margin:0;}
   .ap-pubpill{
     display:inline-flex;align-items:center;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
     padding:5px 12px;border-radius:9999px;
   }
   .ap-pubpill--published{background:#ECFDF5;color:#047857;}
-  .ap-pubpill--draft{background:#F1F5F9;color:#64748B;}
+  .ap-pubpill--draft{background:#F1F5F9;color:var(--ink-mute);}
   .ap-pubpill--missing{background:#FEF3C7;color:#92400E;}
-  .ap-pubstate__note{font-size:12.5px;color:#64748B;max-width:480px;}
+  .ap-pubstate__note{font-size:12.5px;color:var(--ink-mute);max-width:480px;}
 
   /* Form card */
-  .ap-card{background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:26px 28px;margin-bottom:18px;}
-  .ap-card__title{font-family:"Archivo","Inter",sans-serif;font-size:16px;font-weight:800;color:#0F172A;letter-spacing:-.01em;margin:0 0 4px;}
-  .ap-card__sub{font-size:12.5px;color:#64748B;margin:0 0 18px;line-height:1.5;}
+  .ap-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:26px 28px;margin-bottom:18px;}
+  .ap-card__title{font-family:"Archivo","Inter",sans-serif;font-size:16px;font-weight:800;color:var(--ink-2);letter-spacing:-.01em;margin:0 0 4px;}
+  .ap-card__sub{font-size:12.5px;color:var(--ink-mute);margin:0 0 18px;line-height:1.5;}
 
   .ap-field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
-  .ap-field__label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748B;}
+  .ap-field__label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-mute);}
   .ap-field__input,.ap-field__textarea{
     width:100%;padding:11px 14px;border:1px solid #CBD5E1;border-radius:10px;
-    font-family:inherit;font-size:14px;color:#0F172A;background:#fff;
+    font-family:inherit;font-size:14px;color:var(--ink-2);background:var(--card);
     transition:border-color .15s ease, box-shadow .15s ease;
   }
   .ap-field__input:focus,.ap-field__textarea:focus{outline:none;border-color:#0071e3;box-shadow:0 0 0 3px rgba(0,113,227,0.12);}
   .ap-field__textarea{min-height:96px;resize:vertical;line-height:1.5;}
-  .ap-field__hint{font-size:11.5px;color:#94A3B8;margin:0;}
+  .ap-field__hint{font-size:11.5px;color:var(--ink-tert);margin:0;}
 
   .ap-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
   @media(max-width:560px){.ap-row{grid-template-columns:1fr;}}
@@ -104,10 +104,10 @@
     padding:11px 22px;border-radius:9999px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;
     border:1px solid transparent;transition:background .15s ease, border-color .15s ease;
   }
-  .ap-btn--primary{background:#0F172A;color:#fff;border-color:#0F172A;}
+  .ap-btn--primary{background:#0F172A;color:#fff;border-color:var(--ink-2);}
   .ap-btn--primary:hover{background:#1E293B;}
-  .ap-btn--ghost{background:transparent;color:#0F172A;border-color:#CBD5E1;}
-  .ap-btn--ghost:hover{background:#F8FAFC;}
+  .ap-btn--ghost{background:transparent;color:var(--ink-2);border-color:#CBD5E1;}
+  .ap-btn--ghost:hover{background:var(--border-soft);}
   .ap-btn:disabled{opacity:.5;cursor:not-allowed;}
 
   .ap-msg{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none;line-height:1.5;}
@@ -115,7 +115,7 @@
   .ap-msg--err{background:#FEE2E2;border:1px solid #FCA5A5;color:#991B1B;}
   .ap-msg--ok{background:#ECFDF5;border:1px solid #86EFAC;color:#047857;}
 
-  .ap-loading{padding:48px 20px;text-align:center;color:#64748B;font-size:13px;}
+  .ap-loading{padding:48px 20px;text-align:center;color:var(--ink-mute);font-size:13px;}
   .ap-spinner{
     width:16px;height:16px;border-radius:50%;
     border:2px solid #E2E8F0;border-top-color:#0071e3;
@@ -127,10 +127,10 @@
   .ap-preview{
     background:linear-gradient(135deg,#EFF6FF,#F0FDF4);
     border:1px solid #BAE6FD;border-radius:12px;
-    padding:14px 18px;font-size:13px;color:#0F172A;line-height:1.55;
+    padding:14px 18px;font-size:13px;color:var(--ink-2);line-height:1.55;
     margin-bottom:18px;
   }
-  .ap-preview strong{color:#0F172A;}
+  .ap-preview strong{color:var(--ink-2);}
 </style>
 <!-- Phase 19n: theme.js applies the saved light/dark mode BEFORE paint -->
 <script src="js/theme.js?v=20260512a"></script>
