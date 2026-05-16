@@ -981,6 +981,12 @@
     wrap.appendChild(panelWrap);
     const panel       = panelWrap.querySelector('.ms-panel__results');
     const previewEl   = panelWrap.querySelector('.ms-panel__preview');
+    // Clicks inside the panel must not bubble to the document "click-
+    // outside = close" handler. Important because click handlers
+    // RE-RENDER the panel (panel.innerHTML = …) which detaches the
+    // originally-clicked button from the DOM, so wrap.contains(target)
+    // returns false by the time the document handler runs.
+    panelWrap.addEventListener('click', (e) => e.stopPropagation());
 
     const state = {
       open: false, flat: [], selectedIdx: -1, query: '',
