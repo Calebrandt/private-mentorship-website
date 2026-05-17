@@ -111,14 +111,16 @@
     /* Overflow menu — Email me / Show resolved tucked away */
     .pm-assist-head__menu-wrap { position: relative; }
     .pm-assist-head__menu {
+      display: none;
       position: absolute; top: calc(100% + 6px); right: 0; z-index: 1000;
       min-width: 200px;
       background: #fff; border: 1px solid #e5e7eb;
       border-radius: 9px;
       box-shadow: 0 6px 20px -4px rgba(15,23,42,0.18);
       padding: 4px;
-      display: flex; flex-direction: column;
+      flex-direction: column;
     }
+    .pm-assist-head__menu[data-open="true"] { display: flex; }
     .pm-assist-head__menu-item {
       text-align: left; padding: 9px 12px;
       background: transparent; border: none; border-radius: 7px;
@@ -454,7 +456,7 @@
             <button class="pm-assist-head__btn is-icon" id="pmAssistMoreBtn" aria-label="More" title="More">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
             </button>
-            <div class="pm-assist-head__menu" id="pmAssistMore" hidden>
+            <div class="pm-assist-head__menu" id="pmAssistMore" data-open="false">
               <button class="pm-assist-head__menu-item" id="pmAssistResolvedToggle">Show resolved threads</button>
               <button class="pm-assist-head__menu-item" id="pmAssistEmail">Email me a digest now</button>
             </div>
@@ -550,7 +552,7 @@
     $('pmAssistEmail').addEventListener('click', async () => {
       const btn = $('pmAssistEmail');
       const originalLabel = btn.textContent;
-      $('pmAssistMore').hidden = true;  // close menu immediately
+      $('pmAssistMore').dataset.open = 'false';  // close menu immediately
       btn.disabled = true; btn.textContent = 'Sending…';
       try {
         const r = await window.pmHiring.oracleNotifyNow();
@@ -568,26 +570,34 @@
       }
     });
 
-    // Phase 19c.12 polish — overflow menu wire-up. Closes on outside click.
+    // Phase 19c.12 polish — overflow menu. Uses data-open + a single
+    // document listener with a capture-phase guard so it doesn't trip
+    // on its own opening click.
+    function closeMore() {
+      const m = $('pmAssistMore');
+      if (m) m.dataset.open = 'false';
+    }
+    function openMore() {
+      const m = $('pmAssistMore');
+      if (m) m.dataset.open = 'true';
+    }
     $('pmAssistMoreBtn').addEventListener('click', (e) => {
       e.stopPropagation();
-      const menu = $('pmAssistMore');
-      menu.hidden = !menu.hidden;
+      const m = $('pmAssistMore');
+      if (!m) return;
+      m.dataset.open = m.dataset.open === 'true' ? 'false' : 'true';
     });
-    document.addEventListener('click', (e) => {
-      const menu = $('pmAssistMore');
-      const btn  = $('pmAssistMoreBtn');
-      if (menu && !menu.hidden && !menu.contains(e.target) && e.target !== btn && !btn?.contains(e.target)) {
-        menu.hidden = true;
-      }
-    });
+    // Click inside the menu itself shouldn't bubble + close it
+    $('pmAssistMore').addEventListener('click', (e) => e.stopPropagation());
+    // Any click anywhere else closes the menu
+    document.addEventListener('click', () => closeMore());
 
     // Phase 19c.10a — toggle resolved threads in the list view.
     $('pmAssistResolvedToggle').addEventListener('click', async () => {
       const btn = $('pmAssistResolvedToggle');
       showResolved = !showResolved;
       btn.textContent = showResolved ? 'Hide resolved threads' : 'Show resolved threads';
-      $('pmAssistMore').hidden = true;
+      closeMore();
       await loadThreads();
     });
 
