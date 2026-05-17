@@ -225,6 +225,29 @@
     .pm-assist-action-btn--ghost:hover { background: #f9fafb; }
     .pm-assist-action-btn:disabled { opacity: 0.5; cursor: wait; }
 
+    /* Quick-action chips above the input — context-aware shortcuts */
+    .pm-assist-quickchips {
+      flex-shrink: 0;
+      padding: 10px 20px 0 20px;
+      background: #fff;
+      display: flex; flex-wrap: wrap; gap: 6px;
+      border-top: 1px solid #f1f5f9;
+    }
+    .pm-assist-quickchip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 7px 14px;
+      background: #f0fdf4; color: #166534;
+      border: 1px solid #bbf7d0;
+      border-radius: 9999px;
+      font: 600 12px Inter, sans-serif;
+      cursor: pointer;
+      transition: background .12s ease, border-color .12s ease, transform .08s ease;
+    }
+    .pm-assist-quickchip:hover {
+      background: #dcfce7; border-color: #86efac;
+    }
+    .pm-assist-quickchip:active { transform: translateY(1px); }
+
     /* Input bar */
     .pm-assist-input {
       flex-shrink: 0; padding: 14px 20px;
@@ -545,6 +568,26 @@
     async function openThread(threadId) {
       currentThreadId = threadId;
       const thread = threads.find(t => t.id === threadId);
+
+      // Build the "mark paid" quick-chip if the thread is invoice-scoped.
+      // Parses the dollar amount from subtitle ("$1,200.00 from …") so we
+      // can show the user exactly how much they'd be marking paid. The
+      // server-side action uses the LIVE balance from invoices, so this
+      // display is for visual confirmation only — accurate to detect-time.
+      let quickChips = '';
+      if (thread?.invoice_id) {
+        const m = (thread.subtitle || '').match(/\$[\d,]+\.\d{2}/);
+        const amt = m ? m[0] : '';
+        quickChips = `
+          <div class="pm-assist-quickchips" id="pmAssistQuickChips">
+            <button class="pm-assist-quickchip" data-quickaction="mark_paid_full"
+                    data-confirm-amt="${esc(amt)}"
+                    data-confirm-inv="${esc(thread.title || 'this invoice')}">
+              💵 Mark paid in full${amt ? ' (' + amt + ')' : ''}
+            </button>
+          </div>`;
+      }
+
       const body = $('pmAssistBody');
       body.innerHTML = `
         <div class="pm-assist-convo-head">
@@ -552,6 +595,7 @@
           <div class="pm-assist-convo-title">${esc((thread?.scenario_icon || '💬') + '  ' + (thread?.title || ''))}</div>
         </div>
         <div class="pm-assist-messages" id="pmAssistMsgs"><div class="pm-assist-empty" style="padding:40px 20px;">Loading…</div></div>
+        ${quickChips}
         <div class="pm-assist-input">
           <textarea id="pmAssistInputText" rows="1" placeholder="Reply to assistant…"></textarea>
           <button id="pmAssistInputSend">Send</button>
@@ -561,6 +605,23 @@
       $('pmAssistInputSend').addEventListener('click', sendUserMessage);
       $('pmAssistInputText').addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendUserMessage(); }
+      });
+
+      // Wire quick-chips with a confirm dialog so a stray tap doesn't
+      // accidentally mark something paid.
+      body.querySelectorAll('[data-quickaction]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const action = btn.dataset.quickaction;
+          const amt = btn.dataset.confirmAmt || '';
+          const inv = btn.dataset.confirmInv || 'this invoice';
+          if (action === 'mark_paid_full') {
+            const msg = amt
+              ? `Mark ${inv} paid in full for ${amt}?`
+              : `Mark ${inv} paid in full?`;
+            if (!confirm(msg)) return;
+          }
+          handleAction(threadId, action);
+        });
       });
 
       await renderMessages(threadId);
