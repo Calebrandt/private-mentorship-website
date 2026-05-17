@@ -1433,11 +1433,15 @@
   async function fetchLessonHistory(clientId, { year = null, limit = 200 } = {}) {
     if (!clientId) return [];
     try {
+      // Returns ALL completed appointments (with OR without a lesson log).
+      // Unlogged completed sessions appear as cards too — clicking one opens
+      // the modal in create mode. Otherwise there's no way to write the
+      // FIRST log for a session.
       let q = sb()
         .from('v_appointment_with_lesson')
         .select('appointment_id, client_id, starts_at, ends_at, duration_minutes, appointment_status, appointment_title, is_complimentary, lesson_log_id, lesson_assistant_id, lesson_assistant_name, focus_area, key_concepts, status_label, type_label, next_session_notes, feedback, rating, lesson_logged_at, active_file_count, taught_by_substitute')
         .eq('client_id', clientId)
-        .not('lesson_log_id', 'is', null)
+        .eq('appointment_status', 'completed')
         .order('starts_at', { ascending: false })
         .limit(limit);
       if (year) {
