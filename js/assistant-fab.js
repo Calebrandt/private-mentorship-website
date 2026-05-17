@@ -844,21 +844,26 @@
       });
       msgsEl.innerHTML = grouped.map(m => renderOneMessage(m)).join('');
 
-      // Phase 19c.12 polish — if the thread is closed (resolved/dismissed),
-      // disable all in-chat action buttons. They served their purpose
-      // when the thread was live; now they're history. The persistent
-      // chip above the input is the only path for further action (e.g.
-      // mark-paid on a resolved 'send invoice' thread).
+      // Phase 19c.12 + 19c.13 polish — when to disable in-chat action
+      // buttons:
+      //  • Thread is resolved/dismissed → all buttons are history, disable.
+      //  • Thread is invoice-scoped → the green chip above the input is the
+      //    canonical action (Mark Paid + Send Receipt). In-chat buttons
+      //    are stale conversation context; disable to avoid competing.
+      // Non-invoice threads (e.g. contract_expiring_soon, contract_waiting_payment)
+      // keep their buttons active because the chip isn't present.
       const thread = threads.find(t => t.id === threadId);
-      const isClosed = thread && ['resolved', 'dismissed'].includes(thread.status);
-      if (isClosed) {
+      const isClosed     = thread && ['resolved', 'dismissed'].includes(thread.status);
+      const isInvoiceScoped = !!(thread?.invoice_id);
+      if (isClosed || isInvoiceScoped) {
         msgsEl.querySelectorAll('[data-action]').forEach(btn => {
           btn.disabled = true;
           btn.classList.add('is-archived');
-          btn.title = 'Past action — thread is ' + thread.status;
+          btn.title = isClosed
+            ? 'Past action — thread is ' + thread.status
+            : 'Use the green button below to mark this paid + send a receipt';
         });
       } else {
-        // Live thread — wire action buttons as normal
         msgsEl.querySelectorAll('[data-action]').forEach(btn => {
           btn.addEventListener('click', () => handleAction(threadId, btn.dataset.action));
         });
