@@ -367,14 +367,14 @@
                   ? 'Guardian: ' + escapeHtml(client.billing_contact_name)
                   : escapeHtml(clientName)
                 }<br/>
+                ${client.billing_contact_name
+                  ? `<span style="color:#a0a0a0;font-style:italic;">For: ${escapeHtml(clientName)}</span><br/>`
+                  : (inv.subject ? `<span style="color:#a0a0a0;font-style:italic;">For: ${escapeHtml(inv.subject)}</span><br/>` : '')
+                }
                 ${client.billing_address ? escapeHtml(client.billing_address) + '<br/>' : ''}
                 ${client.phone ? escapeHtml(client.phone) + '<br/>' : ''}
                 ${clientEmail ? escapeHtml(clientEmail) + '<br/>' : ''}
                 ${client.billing_email_secondary ? escapeHtml(client.billing_email_secondary) + '<br/>' : ''}
-                ${client.billing_contact_name
-                  ? `<span style="color:#a0a0a0;font-style:italic;">For: ${escapeHtml(clientName)}</span>`
-                  : (inv.subject ? `<span style="color:#a0a0a0;font-style:italic;">For: ${escapeHtml(inv.subject)}</span>` : '')
-                }
               </div>
             </div>
           </div>
@@ -473,14 +473,14 @@
                   ? 'Guardian: ' + escapeHtml(client.billing_contact_name)
                   : escapeHtml(client.full_name || '—')
                 }<br/>
+                ${client.billing_contact_name && client.full_name
+                  ? `<span style="color:#a0a0a0;font-style:italic;">For: ${escapeHtml(client.full_name)}</span><br/>`
+                  : ''
+                }
                 ${client.billing_address ? escapeHtml(client.billing_address) + '<br/>' : ''}
                 ${client.phone ? escapeHtml(client.phone) + '<br/>' : ''}
                 ${client.email ? escapeHtml(client.email) + '<br/>' : ''}
                 ${client.billing_email_secondary ? escapeHtml(client.billing_email_secondary) + '<br/>' : ''}
-                ${client.billing_contact_name && client.full_name
-                  ? `<span style="color:#a0a0a0;font-style:italic;">For: ${escapeHtml(client.full_name)}</span>`
-                  : ''
-                }
               </div>
             </div>
           </div>
