@@ -22,6 +22,7 @@
           { href: 'admin-create-client.html', label: 'Create Client', icon: 'user-plus' },
           { href: 'admin-family-management.html', label: 'Family Management', icon: 'users' },
           { href: 'admin-education.html', label: 'Education / Homework', icon: 'book' },
+          { href: 'assistant-lesson-tracker.html', label: 'Lesson Tracker', icon: 'book' },
           { href: 'admin-tasks.html', label: 'Tasks', icon: 'check' },
           { href: 'admin-notifications.html', label: 'Notifications', icon: 'bell' },
           { href: 'admin-assistant-profiles.html', label: 'Assistant Profiles', icon: 'user-circle' },

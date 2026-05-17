@@ -835,10 +835,47 @@ const state = {
   await new Promise(r => setTimeout(r, 200));
   const params = new URLSearchParams(window.location.search);
   state.clientId = params.get('clientId');
+
+  // Phase 19c.10 — no-clientId path: show a client picker for admins.
+  // Assistants land here from their own client workspace so they always
+  // have a clientId. Admin lands here from the sidebar with no param —
+  // we let them pick any client.
   if (!state.clientId) {
+    // Tiny inline escape helper since the rest of this file doesn't use one.
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g,
+      c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+
+    let isAdmin = false;
+    try { isAdmin = await window.pmHiring.isCurrentUserAdminOrOwner(); } catch (_) {}
+
     $('ltLoading').hidden = true;
+
+    if (!isAdmin) {
+      $('ltEmpty').hidden = false;
+      $('ltEmpty').innerHTML = '<p class="lt-empty__title">No family selected</p><p class="lt-empty__sub">Open this page from a family workspace.</p>';
+      return;
+    }
+
+    // Admin: render a client picker. On change, deep-link with ?clientId=X
+    // so the page reloads in normal scoped mode (same code path as assistants).
+    let clients = [];
+    try { clients = await window.pmHiring.adminListClients({ limit: 500 }); } catch (_) {}
+    clients = (clients || []).slice().sort((a, b) => (a.full_name || '').localeCompare(b.full_name || ''));
+
+    $('ltTitle').textContent = 'Lesson tracker · Pick a family';
     $('ltEmpty').hidden = false;
-    $('ltEmpty').innerHTML = '<p class="lt-empty__title">No family selected</p><p class="lt-empty__sub">Open this page from a family workspace.</p>';
+    $('ltEmpty').innerHTML = `
+      <p class="lt-empty__title">Pick a family to view their lesson tracker</p>
+      <p class="lt-empty__sub" style="margin-bottom:16px;">As admin you can see + edit any client's lesson history.</p>
+      <select id="ltClientPicker" style="padding:10px 14px;border:1px solid #d1d5db;border-radius:9px;font:500 13.5px Inter,sans-serif;min-width:280px;">
+        <option value="">— Select a family —</option>
+        ${clients.map(c => `<option value="${esc(c.id)}">${esc(c.full_name || 'Unnamed')}${c.billing_contact_name ? ' (' + esc(c.billing_contact_name) + ')' : ''}</option>`).join('')}
+      </select>
+    `;
+    document.getElementById('ltClientPicker')?.addEventListener('change', (e) => {
+      const id = e.target.value;
+      if (id) window.location.search = '?clientId=' + encodeURIComponent(id);
+    });
     return;
   }
 
