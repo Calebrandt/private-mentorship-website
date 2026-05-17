@@ -445,7 +445,7 @@
   if (!window.__pmAssistFabLoaded) {
     window.__pmAssistFabLoaded = true;
     const s = document.createElement('script');
-    s.src = 'js/assistant-fab.js?v=20260517o';
+    s.src = 'js/assistant-fab.js?v=20260517p';
     s.async = true;
     document.head.appendChild(s);
   }

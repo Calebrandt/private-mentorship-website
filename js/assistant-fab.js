@@ -648,15 +648,20 @@
       // can show the user exactly how much they'd be marking paid. The
       // server-side action uses the LIVE balance from invoices, so this
       // display is for visual confirmation only — accurate to detect-time.
+      // Extract just the INV-XXX number from the title for the confirm
+      // dialog so it reads "Mark INV-YAN-019 paid…" instead of the awkward
+      // "Mark Send INV-YAN-019 to Daniel Yang paid…"
       let quickChips = '';
       if (thread?.invoice_id) {
         const m = (thread.subtitle || '').match(/\$[\d,]+\.\d{2}/);
         const amt = m ? m[0] : '';
+        const invMatch = (thread.title || '').match(/INV-[A-Z]{1,8}-\d{1,5}/i);
+        const invLabel = invMatch ? invMatch[0] : 'this invoice';
         quickChips = `
           <div class="pm-assist-quickchips" id="pmAssistQuickChips">
             <button class="pm-assist-quickchip" data-quickaction="mark_paid_full"
                     data-confirm-amt="${esc(amt)}"
-                    data-confirm-inv="${esc(thread.title || 'this invoice')}">
+                    data-confirm-inv="${esc(invLabel)}">
               💵 Mark paid in full${amt ? ' (' + amt + ')' : ''}
             </button>
           </div>`;
