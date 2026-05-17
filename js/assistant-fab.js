@@ -255,8 +255,36 @@
       box-shadow: 0 8px 24px -6px rgba(15,23,42,0.45);
       pointer-events: none;
       transition: opacity .2s ease, transform .2s ease;
+      user-select: text; -webkit-user-select: text;
     }
-    .pm-assist-toast.is-shown { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .pm-assist-toast.is-shown { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+
+    /* Error variant — copyable, stays much longer */
+    .pm-assist-error-card {
+      align-self: stretch; max-width: 100%;
+      background: #fef2f2; border: 1px solid #fecaca;
+      border-radius: 12px; padding: 14px 16px;
+      color: #991b1b;
+    }
+    .pm-assist-error-card__title {
+      font: 700 11px Inter, sans-serif; letter-spacing: 0.05em;
+      text-transform: uppercase; margin-bottom: 6px;
+    }
+    .pm-assist-error-card__body {
+      font: 500 12.5px ui-monospace, SFMono-Regular, Menlo, monospace;
+      line-height: 1.5; user-select: text; -webkit-user-select: text;
+      cursor: text; word-break: break-word; white-space: pre-wrap;
+      background: rgba(255,255,255,0.6); padding: 8px 10px;
+      border-radius: 6px; margin-bottom: 8px;
+    }
+    .pm-assist-error-card__copy {
+      background: #fff; border: 1px solid #fca5a5; color: #991b1b;
+      font: 600 11px Inter, sans-serif; padding: 5px 10px;
+      border-radius: 6px; cursor: pointer;
+      transition: background .1s ease;
+    }
+    .pm-assist-error-card__copy:hover { background: #fef2f2; }
+    .pm-assist-error-card__copy.is-copied { background: #d1fae5; border-color: #6ee7b7; color: #065f46; }
 
     @media (max-width: 540px) {
       .pm-assist-panel { width: 100vw; }
@@ -323,6 +351,38 @@
       t.textContent = msg;
       t.classList.add('is-shown');
       setTimeout(() => t.classList.remove('is-shown'), 2400);
+    }
+    // Renders an error directly into the conversation as a copyable card.
+    // Used for action failures so the user can copy the full message back.
+    function showErrorInChat(title, errMsg) {
+      const msgsEl = $('pmAssistMsgs');
+      if (!msgsEl) { toastMsg(title + ': ' + errMsg); return; }
+      const safe = esc(errMsg || 'unknown error');
+      msgsEl.insertAdjacentHTML('beforeend', `
+        <div class="pm-assist-error-card">
+          <div class="pm-assist-error-card__title">⚠ ${esc(title)}</div>
+          <div class="pm-assist-error-card__body" data-err-body>${safe}</div>
+          <button class="pm-assist-error-card__copy" data-err-copy>Copy error</button>
+        </div>
+      `);
+      const card = msgsEl.lastElementChild;
+      const btn = card.querySelector('[data-err-copy]');
+      const body = card.querySelector('[data-err-body]');
+      btn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(body.innerText);
+          btn.textContent = 'Copied ✓';
+          btn.classList.add('is-copied');
+          setTimeout(() => { btn.textContent = 'Copy error'; btn.classList.remove('is-copied'); }, 2000);
+        } catch (_) {
+          // Fallback: select the text so the user can Cmd-C manually
+          const range = document.createRange();
+          range.selectNodeContents(body);
+          const sel = window.getSelection();
+          sel.removeAllRanges(); sel.addRange(range);
+        }
+      });
+      $('pmAssistBody').scrollTop = $('pmAssistBody').scrollHeight;
     }
     function esc(s) {
       return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -582,25 +642,34 @@
           toastMsg('Sent ✓');
           await loadThreads();
         } catch (e) {
-          console.error(e);
-          toastMsg('Send failed: ' + (e.message || 'unknown'));
+          console.error('[oracle send]', e);
+          showErrorInChat('Send failed', (e?.message || String(e)) + (e?.details ? '\n\n' + e.details : ''));
         }
         return;
       }
 
-      // Server-side actions: snooze, resolve, dismiss, reopen
+      // Server-side actions: snooze, resolve, dismiss, reopen, activate_contract
       try {
         await window.pmHiring.assistantAction(threadId, actionKey);
         toastMsg(actionKey === 'resolve' ? 'Marked handled ✓' :
                  actionKey.startsWith('snooze') ? 'Snoozed' :
+                 actionKey === 'activate_contract' ? 'Contract activated ✓' :
                  'Done');
-        if (actionKey === 'resolve' || actionKey === 'dismiss' || actionKey.startsWith('snooze')) {
-          await loadThreads();  // bounce back to list
+        // These actions close the thread → bounce back to list
+        if (['resolve', 'dismiss', 'activate_contract'].includes(actionKey)
+            || actionKey.startsWith('snooze')) {
+          await loadThreads();
         } else {
           await renderMessages(threadId);
         }
       } catch (e) {
-        toastMsg('Action failed: ' + e.message);
+        console.error('[oracle action]', actionKey, e);
+        // Show as copyable card in the chat so user can paste the
+        // exact SQL error back for debugging
+        showErrorInChat(
+          'Action "' + actionKey + '" failed',
+          (e?.message || String(e)) + (e?.details ? '\n\n' + e.details : '')
+        );
       }
     }
 
