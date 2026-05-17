@@ -2151,14 +2151,31 @@
         out.upcomingAppointments = upcoming || [];
       } catch (_) {}
       try {
-        const { data: recent } = await sb()
-          .from('appointments')
-          .select('id, starts_at, ends_at, duration_minutes, status, kind, title, notes')
-          .eq('contract_id', out.contract.id)
-          .lt('starts_at', now)
-          .order('starts_at', { ascending: false })
-          .limit(60);
-        out.recentAppointments = recent || [];
+        // Recent sessions are scoped to ALL of this family's contracts —
+        // not just the currently-picked one — so the panel keeps showing
+        // continuity right after a renewal flips over (Phase 19c.14d).
+        // Without this, the moment a new contract activates, the previous
+        // contract's sessions vanish from "Recent" and the panel looks
+        // empty even though the family had sessions yesterday. Upcoming
+        // stays scoped to the active contract above because future
+        // sessions only get booked onto the live contract anyway.
+        const { data: allClientContracts } = await sb()
+          .from('contracts')
+          .select('id')
+          .eq('client_id', clientId);
+        const allContractIds = (allClientContracts || []).map(c => c.id);
+        if (allContractIds.length) {
+          const { data: recent } = await sb()
+            .from('appointments')
+            .select('id, starts_at, ends_at, duration_minutes, status, kind, title, notes')
+            .in('contract_id', allContractIds)
+            .lt('starts_at', now)
+            .order('starts_at', { ascending: false })
+            .limit(60);
+          out.recentAppointments = recent || [];
+        } else {
+          out.recentAppointments = [];
+        }
       } catch (_) {}
       // Hours used = sum of negative minutes_delta (consumption) on this contract's ledger.
       // Hours topped up = sum of positive minutes_delta (carryovers INTO this contract,

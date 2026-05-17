@@ -470,6 +470,30 @@
   }
   @keyframes wc-spin{to{transform:rotate(360deg);}}
 
+  /* Recent sessions — month dividers + show-more toggle.
+     The Recent panel can run long (full family history across contracts),
+     so by default we cap at 10 rows and offer an inline expander. Once
+     expanded, sessions get grouped under month headers for legibility. */
+  .wc-month-divider{
+    padding:10px 20px 6px;
+    font-family:"Archivo","Inter",sans-serif;
+    font-size:11px;font-weight:800;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--ink-mute);
+    background:var(--surface-soft, #F8FAFC);
+    border-top:1px solid var(--border-soft);
+    border-bottom:1px solid var(--border-soft);
+  }
+  .wc-show-more{
+    display:block;width:100%;
+    padding:14px 20px;
+    background:transparent;border:0;border-top:1px solid var(--border-soft);
+    font-family:inherit;font-size:12.5px;font-weight:700;
+    color:var(--ink-2);cursor:pointer;text-align:center;
+    transition:background .15s ease;
+  }
+  .wc-show-more:hover{background:var(--surface-soft, #F8FAFC);}
+  .wc-show-more:focus-visible{outline:2px solid #0071e3;outline-offset:-2px;}
+
   /* Contract details card */
   .wc-contract{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:18px;}
   .wc-contract__title{font-family:"Archivo","Inter",sans-serif;font-size:15px;font-weight:800;color:var(--ink-2);margin:0 0 12px;letter-spacing:-.01em;}
@@ -670,7 +694,7 @@
         <header class="wc-section__head">
           <div>
             <h2 class="wc-section__title">Recent sessions</h2>
-            <p class="wc-section__sub">Last 8 completed or past sessions.</p>
+            <p class="wc-section__sub">Past sessions for this family (across all contracts).</p>
           </div>
         </header>
         <div class="wc-list" id="recentList"></div>
@@ -875,7 +899,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515c"></script>
-<script src="js/hiring-service.js?v=20260517j"></script>
+<script src="js/hiring-service.js?v=20260517k"></script>
 <script src="js/messages-service.js?v=20260515c"></script>
 <script src="js/session-calendar.js?v=20260518a"></script>
 <script src="js/sidebar.js?v=20260515d"></script>
@@ -1340,18 +1364,62 @@ function renderAppointmentRow(a, spend){
   // Recent — render first without spend data, then enrich completed rows
   // with the bank/contract spend chip (Phase 12.1). Two-pass keeps the UI
   // snappy: initial paint shows immediately, chips appear ~100ms later.
+  //
+  // Phase 19c.14d: cap initial display at 10 rows. Long-standing families
+  // (e.g. Yang has 2 years of history) were blowing out the panel with 60+
+  // rows of straight scroll. Click "Show N more" to expand the rest, which
+  // then gets grouped under month dividers for legibility. State (expanded
+  // + spendMap) is kept in closure so the spend-enrich repaint preserves
+  // the user's expansion choice and doesn't blow away the "Show more" or
+  // collapse it back.
   const recentList = document.getElementById('recentList');
-  if ((ws.recentAppointments || []).length) {
-    recentList.innerHTML = ws.recentAppointments.map(a => renderAppointmentRow(a)).join('');
-    // Fire-and-forget: fetch spend breakdown for completed rows, then redraw.
+  const recentAppts = ws.recentAppointments || [];
+  if (recentAppts.length) {
+    const INITIAL_COUNT = 10;
+    let expanded = false;
+    let spendMap = null;
+
+    const monthLabel = (iso) => {
+      try {
+        const d = new Date(iso);
+        return d.toLocaleString(undefined, { month: 'long', year: 'numeric' });
+      } catch (_) { return ''; }
+    };
+
+    const renderList = () => {
+      const showAll = expanded || recentAppts.length <= INITIAL_COUNT;
+      const shown = showAll ? recentAppts : recentAppts.slice(0, INITIAL_COUNT);
+      // Seed lastMonth to the month of the last "flat" row so the first
+      // expanded row only gets a divider if it crosses into a new month.
+      let lastMonth = null;
+      if (expanded && recentAppts.length > INITIAL_COUNT && INITIAL_COUNT > 0) {
+        lastMonth = monthLabel(recentAppts[INITIAL_COUNT - 1].starts_at);
+      }
+      let html = '';
+      shown.forEach((a, i) => {
+        if (expanded && i >= INITIAL_COUNT) {
+          const m = monthLabel(a.starts_at);
+          if (m && m !== lastMonth) {
+            html += `<div class="wc-month-divider">${m}</div>`;
+            lastMonth = m;
+          }
+        }
+        html += renderAppointmentRow(a, spendMap ? spendMap.get(a.id) : undefined);
+      });
+      if (!expanded && recentAppts.length > INITIAL_COUNT) {
+        const remaining = recentAppts.length - INITIAL_COUNT;
+        html += `<button type="button" class="wc-show-more" data-action="expand-recent">Show ${remaining} more</button>`;
+      }
+      recentList.innerHTML = html;
+      const btn = recentList.querySelector('[data-action="expand-recent"]');
+      if (btn) btn.addEventListener('click', () => { expanded = true; renderList(); });
+    };
+
+    renderList(); // initial paint
     (async () => {
       try {
-        const spendMap = await window.pmHiring.fetchAppointmentSpendBatch(ws.recentAppointments);
-        if (spendMap && spendMap.size) {
-          recentList.innerHTML = ws.recentAppointments
-            .map(a => renderAppointmentRow(a, spendMap.get(a.id)))
-            .join('');
-        }
+        const map = await window.pmHiring.fetchAppointmentSpendBatch(recentAppts);
+        if (map && map.size) { spendMap = map; renderList(); }
       } catch (_) {}
     })();
   } else {
