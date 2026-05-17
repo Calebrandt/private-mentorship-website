@@ -135,11 +135,15 @@
       if (s.client_id) clientIds.add(s.client_id);
     });
 
-    // Bucket renewals by local date key (contract.end_at → that day)
+    // Bucket renewals by date key (contract.end_at → that day).
+    // Use the YYYY-MM-DD portion of the timestamptz string directly so a
+    // UTC-midnight end_at like '2026-06-14T00:00:00+00:00' keys to
+    // 2026-06-14 in any timezone — not 2026-06-13 in Pacific where
+    // new Date() would parse it as 'yesterday evening'.
     const renewByDate = {};
     (renewals || []).forEach(r => {
-      const d = new Date(r.end_at);
-      const key = dateKey(d);
+      const key = String(r.end_at || '').slice(0, 10);  // YYYY-MM-DD
+      if (!key.match(/^\d{4}-\d{2}-\d{2}$/)) return;
       if (!renewByDate[key]) renewByDate[key] = [];
       renewByDate[key].push(r);
       if (r.client_id) clientIds.add(r.client_id);

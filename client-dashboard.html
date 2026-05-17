@@ -911,7 +911,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260508c"></script>
 <script src="js/hiring-service.js?v=20260516m"></script>
-<script src="js/session-calendar.js?v=20260517j"></script>
+<script src="js/session-calendar.js?v=20260518a"></script>
 <script src="js/sidebar.js?v=20260515d"></script>
 <script src="js/right-calendar.js?v=20260516c"></script>
 <script src="js/incoming-call-ring.js?v=20260509a" defer></script>
@@ -1488,6 +1488,13 @@
     }).join('')}</div>`;
   }
 })();
+
+// Phase 19c.13 — auto-refresh when a payment is recorded (e.g. via the
+// Oracle FAB chip on a different page that broadcasts the event).
+// Hours balance + payment history update without a manual reload.
+window.addEventListener('pm-payment-recorded', () => {
+  setTimeout(() => window.location.reload(), 800);
+});
 </script>
 <script src="js/master-search.js?v=20260516k" defer></script>
 <script src="js/deep-link-flash.js?v=20260516c" defer></script>
