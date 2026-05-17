@@ -235,6 +235,22 @@
       align-self: flex-start; display: flex; flex-wrap: wrap; gap: 6px;
       background: transparent; padding: 0;
     }
+    /* Phase 19c.12 polish — bot message with paired action buttons.
+       Text on top, divider, buttons grouped below — all in one bubble
+       so the user reads it as one Oracle question + options unit. */
+    .pm-assist-msg--with-actions {
+      padding: 0;
+      overflow: hidden;
+    }
+    .pm-assist-msg--with-actions .pm-assist-msg__text {
+      padding: 11px 14px 12px;
+    }
+    .pm-assist-msg--with-actions .pm-assist-msg__actions-inline {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      padding: 10px 12px;
+      background: #fafbfc;
+      border-top: 1px solid #f1f5f9;
+    }
     .pm-assist-action-btn {
       padding: 9px 14px; border-radius: 9px; border: 1px solid;
       font: 600 12px Inter, sans-serif; cursor: pointer; letter-spacing: -0.003em;
@@ -729,7 +745,22 @@
         msgsEl.innerHTML = `<div class="pm-assist-empty" style="padding:40px 20px;color:#dc2626;">${esc(e.message)}</div>`;
         return;
       }
-      msgsEl.innerHTML = msgs.map(m => renderOneMessage(m)).join('');
+      // Phase 19c.12 polish — pair each bot text message with the
+      // immediately-following actions message into a single visual bubble.
+      // The actions ARE part of Oracle's question; they shouldn't float
+      // separately from the message that asks them.
+      const grouped = [];
+      msgs.forEach(m => {
+        if (m.content_type === 'actions' && grouped.length > 0) {
+          const prev = grouped[grouped.length - 1];
+          if (prev.role === 'bot' && prev.content_type === 'text' && !prev._actions) {
+            prev._actions = m.metadata?.actions || [];
+            return;
+          }
+        }
+        grouped.push({ ...m });
+      });
+      msgsEl.innerHTML = grouped.map(m => renderOneMessage(m)).join('');
 
       // Phase 19c.12 polish — if the thread is closed (resolved/dismissed),
       // disable all in-chat action buttons. They served their purpose
@@ -758,6 +789,9 @@
     }
 
     function renderOneMessage(m) {
+      // Standalone actions message — only happens if it WASN'T paired with
+      // a preceding bot text in the grouping step. Rare but keep handler
+      // for backward compatibility.
       if (m.content_type === 'actions') {
         const actions = m.metadata?.actions || [];
         return `<div class="pm-assist-msg pm-assist-msg--actions">${
@@ -773,6 +807,18 @@
         </div>`;
       }
       const cls = m.role === 'user' ? 'pm-assist-msg--user' : 'pm-assist-msg--bot';
+      // Phase 19c.12 polish — bot text + paired actions render as one
+      // bubble (text on top, divider, buttons grouped at the bottom).
+      // Reads as a single Oracle "question + options" unit.
+      if (m._actions && m._actions.length) {
+        const actionsHtml = m._actions.map(a =>
+          `<button class="pm-assist-action-btn pm-assist-action-btn--${esc(a.style || 'ghost')}" data-action="${esc(a.key)}">${esc(a.label)}</button>`
+        ).join('');
+        return `<div class="pm-assist-msg ${cls} pm-assist-msg--with-actions">
+          <div class="pm-assist-msg__text">${esc(m.content || '')}</div>
+          <div class="pm-assist-msg__actions-inline">${actionsHtml}</div>
+        </div>`;
+      }
       return `<div class="pm-assist-msg ${cls}">${esc(m.content || '')}</div>`;
     }
 
