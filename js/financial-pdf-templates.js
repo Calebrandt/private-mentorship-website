@@ -363,13 +363,22 @@
             <div class="party-col">
               <div class="party-label">Billed To</div>
               <div class="party-name">
-                ${escapeHtml(clientName)}<br/>
-                ${client.billing_contact_name ? 'Guardian: ' + escapeHtml(client.billing_contact_name) + '<br/>' : ''}
+                ${client.billing_contact_name
+                  ? '<strong style="font-weight:500;color:#4a4a4a;">Guardian:</strong> ' + escapeHtml(client.billing_contact_name)
+                  : escapeHtml(clientName)
+                }<br/>
                 ${client.billing_address ? escapeHtml(client.billing_address) + '<br/>' : ''}
                 ${client.phone ? escapeHtml(client.phone) + '<br/>' : ''}
                 ${clientEmail ? escapeHtml(clientEmail) + '<br/>' : ''}
                 ${client.billing_email_secondary ? escapeHtml(client.billing_email_secondary) + '<br/>' : ''}
-                ${inv.subject ? '<span style="color:#a0a0a0;font-style:italic;">For: ' + escapeHtml(inv.subject) + '</span>' : ''}
+                ${(() => {
+                  const studentLine = client.billing_contact_name ? escapeHtml(clientName) : null;
+                  const subjectLine = inv.subject ? escapeHtml(inv.subject) : null;
+                  const both = [studentLine, subjectLine].filter(Boolean).join(' — ');
+                  return both
+                    ? `<span style="color:#a0a0a0;font-style:italic;">For: ${both}</span>`
+                    : '';
+                })()}
               </div>
             </div>
           </div>
@@ -464,12 +473,18 @@
             <div class="party-col">
               <div class="party-label">Received From</div>
               <div class="party-name">
-                ${escapeHtml(client.full_name || '—')}<br/>
-                ${client.billing_contact_name ? 'Guardian: ' + escapeHtml(client.billing_contact_name) + '<br/>' : ''}
+                ${client.billing_contact_name
+                  ? '<strong style="font-weight:500;color:#4a4a4a;">Guardian:</strong> ' + escapeHtml(client.billing_contact_name)
+                  : escapeHtml(client.full_name || '—')
+                }<br/>
                 ${client.billing_address ? escapeHtml(client.billing_address) + '<br/>' : ''}
                 ${client.phone ? escapeHtml(client.phone) + '<br/>' : ''}
                 ${client.email ? escapeHtml(client.email) + '<br/>' : ''}
                 ${client.billing_email_secondary ? escapeHtml(client.billing_email_secondary) + '<br/>' : ''}
+                ${client.billing_contact_name && client.full_name
+                  ? `<span style="color:#a0a0a0;font-style:italic;">For: ${escapeHtml(client.full_name)}</span>`
+                  : ''
+                }
               </div>
             </div>
           </div>
