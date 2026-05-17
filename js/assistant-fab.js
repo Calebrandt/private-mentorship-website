@@ -258,7 +258,7 @@
     const fab = document.createElement('button');
     fab.className = 'pm-assist-fab';
     fab.id = 'pmAssistFab';
-    fab.title = 'PM Assistant';
+    fab.title = 'Oracle — your bookkeeper';
     fab.innerHTML = `
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
@@ -275,12 +275,13 @@
     const panel = document.createElement('aside');
     panel.className = 'pm-assist-panel';
     panel.id = 'pmAssistPanel';
-    panel.setAttribute('aria-label', 'PM Assistant chat panel');
+    panel.setAttribute('aria-label', 'Oracle chat panel');
     panel.innerHTML = `
       <header class="pm-assist-head">
         <div class="pm-assist-head__title">
           <span class="pm-assist-head__title-dot"></span>
-          PM Assistant
+          Oracle
+          <span style="font-weight:400;color:#9ca3af;font-size:11.5px;font-style:italic;margin-left:6px;">your bookkeeper</span>
         </div>
         <div class="pm-assist-head__actions">
           <button class="pm-assist-head__btn" id="pmAssistScan" title="Scan for new work now">Scan</button>

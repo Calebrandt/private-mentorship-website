@@ -224,11 +224,11 @@ BEGIN
     )
     RETURNING id INTO v_thread_id;
 
-    -- Greeting bot message
+    -- Greeting bot message (signed: Oracle)
     INSERT INTO public.assistant_messages (thread_id, role, content_type, content)
     VALUES (
       v_thread_id, 'bot', 'text',
-      'Good morning. Invoice ' || v_inv.invoice_number || ' for $' ||
+      'Good morning — Oracle here. Invoice ' || v_inv.invoice_number || ' for $' ||
         to_char(v_inv.total_cents / 100.0, 'FM999,990.00') ||
         ' is ready to send to ' || COALESCE(v_inv.recipient_label, 'the parent') ||
         '. Want me to preview and send it?'
