@@ -721,9 +721,20 @@
     </div>
     <div class="fin-modal__body">
       <div class="fin-field">
-        <label class="fin-field__label" for="emailTo">To</label>
-        <input class="fin-field__input" type="email" id="emailTo" placeholder="client@example.com" />
-        <div class="fin-field__hint" id="emailToHint">Auto-filled from the client record when available.</div>
+        <label class="fin-field__label" for="emailTo">To <span style="text-transform:none;letter-spacing:0;font-weight:500;color:var(--ink-tert);">(multiple — separate with commas)</span></label>
+        <input class="fin-field__input" type="text" id="emailTo" placeholder="parent1@example.com, parent2@example.com" />
+        <div class="fin-field__hint" id="emailToHint">Auto-filled from the client record when available. Add more by separating with commas.</div>
+      </div>
+      <div class="fin-field" id="emailCcRow" hidden>
+        <label class="fin-field__label" for="emailCc">CC <span style="text-transform:none;letter-spacing:0;font-weight:500;color:var(--ink-tert);">(visible to all)</span></label>
+        <input class="fin-field__input" type="text" id="emailCc" placeholder="other.guardian@example.com" />
+      </div>
+      <div class="fin-field" id="emailBccRow" hidden>
+        <label class="fin-field__label" for="emailBcc">BCC <span style="text-transform:none;letter-spacing:0;font-weight:500;color:var(--ink-tert);">(hidden — for your records)</span></label>
+        <input class="fin-field__input" type="text" id="emailBcc" placeholder="caleb@private-mentorship.com" />
+      </div>
+      <div class="fin-field" id="emailCcBccToggleRow">
+        <a href="#" id="emailCcBccToggle" style="font:600 11.5px Inter,sans-serif;color:var(--primary);text-decoration:none;letter-spacing:0;">+ Add CC / BCC</a>
       </div>
       <div class="fin-field">
         <label class="fin-field__label" for="emailSubject">Subject</label>
@@ -1396,16 +1407,40 @@
               : currentDoc.docType === 'receipt' ? 'receipt_thanks'
               : 'paycheque_pay';
     const filled = EMAIL_TEMPLATES[tpl](ctx);
-    $('emailTo').value = ctx.email || '';
-    $('emailToHint').textContent = ctx.email
-      ? `From the ${currentDoc.docType === 'paycheque' ? 'assistant' : 'client'} profile · ${ctx.fullName}`
-      : `No email on file for ${ctx.fullName || 'this party'} — enter one above.`;
+
+    // Auto-fill TO with the primary email; if a secondary guardian email
+    // exists on the client, append it too (separated by comma) so both
+    // parents are included by default.
+    const primary   = ctx.email || '';
+    const secondary = currentDoc.payload?.clients?.billing_email_secondary || '';
+    const combined = [primary, secondary].filter(Boolean).join(', ');
+    $('emailTo').value = combined;
+    $('emailToHint').textContent = combined
+      ? `Auto-filled from the ${currentDoc.docType === 'paycheque' ? 'assistant' : 'client'} profile · ${ctx.fullName}`
+      : `No email on file for ${ctx.fullName || 'this party'} — enter one or more emails (comma-separated).`;
+
+    // Reset CC / BCC + collapse them again for each open
+    $('emailCc').value = '';
+    $('emailBcc').value = '';
+    $('emailCcRow').hidden = true;
+    $('emailBccRow').hidden = true;
+    $('emailCcBccToggleRow').hidden = false;
+
     $('emailSubject').value = filled.subject;
     $('emailBody').value = filled.body;
     $('emailAttachmentName').textContent = currentDoc.filename;
     $('emailComposerSub').textContent = `Send ${currentDoc.filename} to your ${currentDoc.docType === 'paycheque' ? 'assistant' : 'client'}.`;
     showModal('emailComposerModal');
   }
+
+  // CC / BCC toggle — expands the optional fields on first click
+  $('emailCcBccToggle')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    $('emailCcRow').hidden = false;
+    $('emailBccRow').hidden = false;
+    $('emailCcBccToggleRow').hidden = true;
+    setTimeout(() => $('emailCc').focus(), 50);
+  });
 
   // Quick body templates
   document.querySelectorAll('#emailQuickBodies button').forEach(b => {
@@ -1425,6 +1460,8 @@
   $('emailSendBtn')?.addEventListener('click', async () => {
     if (!currentDoc?.blob || !currentDoc?.payload) { toast('No document loaded', 'error'); return; }
     const to      = $('emailTo').value.trim();
+    const cc      = $('emailCc').value.trim();
+    const bcc     = $('emailBcc').value.trim();
     const subject = $('emailSubject').value.trim();
     const body    = $('emailBody').value;
     if (!to)      { toast('Recipient email required', 'error'); return; }
@@ -1517,12 +1554,14 @@
         docType: currentDoc.docType,
         docId: currentDoc.docId,
         docNumber,
-        to, subject, body,
+        to, cc: cc || null, bcc: bcc || null,
+        subject, body,
         filename: currentDoc.filename,
         pdfBase64,
         meta,
       });
-      toast('Email sent ✓');
+      const recipientCount = [to, cc, bcc].filter(Boolean).join(',').split(/[,;]/).filter(s => s.trim()).length;
+      toast(`Email sent to ${recipientCount} recipient${recipientCount === 1 ? '' : 's'} ✓`);
       hideModal('emailComposerModal');
     } catch (e) {
       console.error(e);
