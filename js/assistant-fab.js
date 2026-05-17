@@ -108,6 +108,26 @@
       background: #111827; color: #fff; border-color: #111827;
     }
     .pm-assist-head__btn.is-active:hover { background: #1f2937; color: #fff; }
+    /* Overflow menu — Email me / Show resolved tucked away */
+    .pm-assist-head__menu-wrap { position: relative; }
+    .pm-assist-head__menu {
+      position: absolute; top: calc(100% + 6px); right: 0; z-index: 1000;
+      min-width: 200px;
+      background: #fff; border: 1px solid #e5e7eb;
+      border-radius: 9px;
+      box-shadow: 0 6px 20px -4px rgba(15,23,42,0.18);
+      padding: 4px;
+      display: flex; flex-direction: column;
+    }
+    .pm-assist-head__menu-item {
+      text-align: left; padding: 9px 12px;
+      background: transparent; border: none; border-radius: 7px;
+      font: 500 12.5px Inter, sans-serif; color: #374151;
+      cursor: pointer;
+      transition: background .12s ease, color .12s ease;
+    }
+    .pm-assist-head__menu-item:hover { background: #f3f4f6; color: #0f172a; }
+    .pm-assist-head__menu-item:disabled { opacity: 0.5; cursor: wait; }
 
     .pm-assist-body {
       flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
@@ -241,15 +261,39 @@
     .pm-assist-msg--with-actions {
       padding: 0;
       overflow: hidden;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 2px rgba(15,23,42,0.04);
     }
     .pm-assist-msg--with-actions .pm-assist-msg__text {
-      padding: 11px 14px 12px;
+      padding: 14px 16px 12px;
+      color: #1f2937;
+      line-height: 1.55;
     }
     .pm-assist-msg--with-actions .pm-assist-msg__actions-inline {
       display: flex; flex-wrap: wrap; gap: 6px;
-      padding: 10px 12px;
-      background: #fafbfc;
-      border-top: 1px solid #f1f5f9;
+      padding: 10px 14px 14px;
+      background: transparent;
+      border-top: none;
+    }
+    /* Tighter, more refined button look inside the bubble */
+    .pm-assist-msg--with-actions .pm-assist-action-btn {
+      padding: 7px 13px;
+      font: 600 12px Inter, sans-serif;
+      letter-spacing: 0.005em;
+      border-radius: 8px;
+    }
+    .pm-assist-msg--with-actions .pm-assist-action-btn--primary {
+      background: #0f172a; border-color: #0f172a; color: #fff;
+    }
+    .pm-assist-msg--with-actions .pm-assist-action-btn--primary:hover {
+      background: #1f2937; border-color: #1f2937;
+    }
+    .pm-assist-msg--with-actions .pm-assist-action-btn--ghost {
+      background: #fff; border: 1px solid #cbd5e1; color: #475569;
+    }
+    .pm-assist-msg--with-actions .pm-assist-action-btn--ghost:hover {
+      background: #f1f5f9; color: #0f172a; border-color: #94a3b8;
     }
     .pm-assist-action-btn {
       padding: 9px 14px; border-radius: 9px; border: 1px solid;
@@ -405,9 +449,16 @@
           <span style="font-weight:400;color:#9ca3af;font-size:11.5px;font-style:italic;margin-left:6px;">your bookkeeper</span>
         </div>
         <div class="pm-assist-head__actions">
-          <button class="pm-assist-head__btn" id="pmAssistEmail" title="Email me the current open threads">📧 Email me</button>
           <button class="pm-assist-head__btn" id="pmAssistScan" title="Scan for new work now">Scan</button>
-          <button class="pm-assist-head__btn" id="pmAssistResolvedToggle" title="Show / hide resolved threads — re-open one to mark paid retroactively">Resolved</button>
+          <div class="pm-assist-head__menu-wrap">
+            <button class="pm-assist-head__btn is-icon" id="pmAssistMoreBtn" aria-label="More" title="More">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+            </button>
+            <div class="pm-assist-head__menu" id="pmAssistMore" hidden>
+              <button class="pm-assist-head__menu-item" id="pmAssistResolvedToggle">Show resolved threads</button>
+              <button class="pm-assist-head__menu-item" id="pmAssistEmail">Email me a digest now</button>
+            </div>
+          </div>
           <button class="pm-assist-head__btn is-icon" id="pmAssistClose" aria-label="Close" title="Close">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
@@ -498,6 +549,8 @@
     $('pmAssistClose').addEventListener('click', closePanel);
     $('pmAssistEmail').addEventListener('click', async () => {
       const btn = $('pmAssistEmail');
+      const originalLabel = btn.textContent;
+      $('pmAssistMore').hidden = true;  // close menu immediately
       btn.disabled = true; btn.textContent = 'Sending…';
       try {
         const r = await window.pmHiring.oracleNotifyNow();
@@ -511,22 +564,30 @@
       } catch (e) {
         toastMsg('Send failed: ' + e.message);
       } finally {
-        btn.disabled = false; btn.textContent = '📧 Email me';
+        btn.disabled = false; btn.textContent = originalLabel;
       }
     });
 
-    // Phase 19c.10a — toggle resolved threads in the list view. Lets Caleb
-    // find a resolved thread (e.g. an invoice he sent earlier today) and
-    // tap the green chip on it to mark paid retroactively — without
-    // bouncing to admin-financials.
+    // Phase 19c.12 polish — overflow menu wire-up. Closes on outside click.
+    $('pmAssistMoreBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const menu = $('pmAssistMore');
+      menu.hidden = !menu.hidden;
+    });
+    document.addEventListener('click', (e) => {
+      const menu = $('pmAssistMore');
+      const btn  = $('pmAssistMoreBtn');
+      if (menu && !menu.hidden && !menu.contains(e.target) && e.target !== btn && !btn?.contains(e.target)) {
+        menu.hidden = true;
+      }
+    });
+
+    // Phase 19c.10a — toggle resolved threads in the list view.
     $('pmAssistResolvedToggle').addEventListener('click', async () => {
       const btn = $('pmAssistResolvedToggle');
       showResolved = !showResolved;
-      btn.classList.toggle('is-active', showResolved);
-      btn.textContent = showResolved ? 'Open only' : 'Resolved';
-      btn.title = showResolved
-        ? 'Showing resolved + open. Click to hide resolved.'
-        : 'Show / hide resolved threads — re-open one to mark paid retroactively';
+      btn.textContent = showResolved ? 'Hide resolved threads' : 'Show resolved threads';
+      $('pmAssistMore').hidden = true;
       await loadThreads();
     });
 
