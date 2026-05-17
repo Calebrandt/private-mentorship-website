@@ -920,6 +920,22 @@
     return data;
   }
 
+  // Phase 19c.12 — Bank-funded completion. Deducts from client_bank_balance
+  // via contract_carryover_events (negative delta), does NOT touch the
+  // contract's hours_ledger. Requires a non-empty justification.
+  async function completeAppointmentFromBank(appointmentId, note) {
+    if (!appointmentId) throw new Error('appointmentId required');
+    if (!note || !String(note).trim()) {
+      throw new Error('Bank-funded sessions require a justification note.');
+    }
+    const { data, error } = await sb().rpc('complete_appointment_from_bank', {
+      p_appointment_id: appointmentId,
+      p_note: String(note).trim(),
+    });
+    if (error) throw error;
+    return data;
+  }
+
   // ─── Phase 3: Assistant-side schedule change requests ───────────────────
   // These mirror the client-side submit* functions but resolve client_id
   // from the appointment (assistants don't have a clients row of their own)
@@ -3547,6 +3563,7 @@
     fetchAssistantAppointmentsRange,
     // scheduler Phase 2 — appointment status writes
     assistantMarkAppointmentComplete, assistantMarkAppointmentNoShow,
+    completeAppointmentFromBank,
     // scheduler Phase 3 — schedule change requests (assistant)
     assistantSubmitCancelRequest, assistantSubmitRescheduleRequest,
     assistantSubmitExtraAppointmentRequest, fetchAssistantPendingScheduleRequests,

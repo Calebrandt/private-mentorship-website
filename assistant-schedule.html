@@ -219,6 +219,11 @@
   .as-btn--complete{background:#16A34A;color:#fff;border-color:#15803D;}
   .as-btn--complete:hover{background:#15803D;}
   .as-btn--complete:disabled{background:#94A3B8;border-color:var(--ink-tert);cursor:wait;}
+  /* Phase 19c.12 — Bank-fund button. Amber to match the bank-hours theme
+     and to visually flag it as "different from the default contract flow." */
+  .as-btn--bank{background:#f59e0b;color:#fff;border-color:#d97706;}
+  .as-btn--bank:hover{background:#d97706;}
+  .as-btn--bank:disabled{background:#94A3B8;border-color:var(--ink-tert);cursor:wait;}
   .as-btn--no-show{background:var(--card);color:#B91C1C;border-color:#FECACA;}
   .as-btn--no-show:hover{background:#FEF2F2;border-color:#FCA5A5;}
   .as-btn--no-show:disabled{opacity:.5;cursor:wait;}
@@ -515,7 +520,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515c"></script>
-<script src="js/hiring-service.js?v=20260516m"></script>
+<script src="js/hiring-service.js?v=20260517j"></script>
 <script src="js/sidebar.js?v=20260515d"></script>
 <script>
 function escapeHtml(s){return (s||'').toString().replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[c]));}
@@ -782,6 +787,9 @@ function renderNeedsAttention(){
         <button type="button" class="as-btn as-btn--complete" data-action="complete" data-appt-id="${escapeHtml(a.id)}">
           ✓ Mark complete
         </button>
+        <button type="button" class="as-btn as-btn--bank" data-action="bank" data-appt-id="${escapeHtml(a.id)}" title="Mark complete + deduct from family bank instead of contract">
+          ⏱ From bank
+        </button>
         <button type="button" class="as-btn as-btn--no-show" data-action="no-show" data-appt-id="${escapeHtml(a.id)}">
           No-show
         </button>
@@ -815,17 +823,31 @@ function openConfirm(kind, apptId){
   const details = document.getElementById('asModalDetails');
   const confirm = document.getElementById('asModalConfirm');
 
+  // Remove any bank-justification textarea left over from a prior open
+  const existingBank = document.getElementById('asModalBankNote');
+  if (existingBank) existingBank.remove();
+
   if (kind === 'complete') {
     title.textContent = 'Mark session complete?';
     body.innerHTML = `This will record the session as <strong>completed</strong> and deduct <strong>${escapeHtml(hoursLabel(min))}</strong> from this family's contract.`;
     confirm.className = 'as-modal__confirm as-modal__confirm--complete';
     confirm.textContent = 'Mark complete';
+  } else if (kind === 'bank') {
+    title.textContent = 'Complete from family bank?';
+    body.innerHTML = `This deducts <strong>${escapeHtml(hoursLabel(min))}</strong> from the <strong>family bank</strong> — NOT the contract. Use this for extra sessions outside the recurring schedule or for sessions that ran long.<br/><br/><b>Required:</b> explain why you're using bank instead of contract. This shows in the family's audit trail.`;
+    confirm.className = 'as-modal__confirm as-modal__confirm--complete';
+    confirm.textContent = 'Complete from bank';
+    confirm.style.background = '#f59e0b';
   } else {
     title.textContent = 'Mark as no-show?';
     body.innerHTML = `This will record a <strong>no-show</strong> for this session and forfeit <strong>${escapeHtml(hoursLabel(min))}</strong> from this family's contract. Use this only when the family did not show up or cancelled inside the policy window — not for your own cancellations.`;
     confirm.className = 'as-modal__confirm as-modal__confirm--no-show';
     confirm.textContent = 'Mark no-show';
+    confirm.style.background = '';
   }
+
+  // Reset confirm bg if not bank
+  if (kind !== 'bank') confirm.style.background = '';
 
   details.innerHTML = `
     <span><b>Family:</b> ${escapeHtml(clientName)}</span>
@@ -833,6 +855,21 @@ function openConfirm(kind, apptId){
     <span><b>Duration:</b> ${escapeHtml(hoursLabel(min))}</span>
     <span><b>Session:</b> ${escapeHtml(appt.title || appt.notes || '—')}</span>
   `;
+
+  // Bank-only: inject justification textarea below details
+  if (kind === 'bank') {
+    const noteHtml = `
+      <div id="asModalBankNote" style="margin-top:14px;">
+        <label style="display:block;font:600 11px Inter,sans-serif;text-transform:uppercase;letter-spacing:0.08em;color:#92400e;margin-bottom:6px;">
+          Why bank? (required)
+        </label>
+        <textarea id="asModalBankNoteInput"
+          placeholder="e.g. Extended Sat session by 2 hours to finish lab report"
+          style="width:100%;min-height:64px;padding:10px 12px;border:1px solid #fed7aa;border-radius:8px;background:#fffbeb;font:400 13px Inter,sans-serif;color:#0f172a;resize:vertical;"></textarea>
+      </div>`;
+    details.insertAdjacentHTML('afterend', noteHtml);
+  }
+
   modal.dataset.open = 'true';
 }
 
@@ -848,11 +885,27 @@ async function executeConfirm(){
   if (!pendingAction) return;
   const { kind, apptId } = pendingAction;
   const confirm = document.getElementById('asModalConfirm');
+
+  // Bank flow needs a non-empty justification — pull from the textarea
+  let bankNote = '';
+  if (kind === 'bank') {
+    const noteEl = document.getElementById('asModalBankNoteInput');
+    bankNote = (noteEl?.value || '').trim();
+    if (!bankNote) {
+      toast('Justification required for bank-funded sessions.', /* isError */ true);
+      noteEl?.focus();
+      return;
+    }
+  }
+
   confirm.disabled = true;
   try {
     if (kind === 'complete') {
       await window.pmHiring.assistantMarkAppointmentComplete(apptId);
       toast('Session marked complete.');
+    } else if (kind === 'bank') {
+      await window.pmHiring.completeAppointmentFromBank(apptId, bankNote);
+      toast('Session marked complete from bank.');
     } else {
       await window.pmHiring.assistantMarkAppointmentNoShow(apptId);
       toast('Session marked as no-show.');
