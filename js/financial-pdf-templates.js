@@ -112,15 +112,23 @@
       padding: 56px 30px 56px 38px;
       display: flex; flex-direction: column;
     }
-    /* Logo: full lockup (PM mark + "PRIVATE MENTORSHIP" wordmark),
-       1024×1536 source so a bit taller than wide. Sized at 130px wide
-       (= ~195px tall after aspect scaling). Plain — no frame, no clip,
-       no chrome. Slight negative margin trims source's white padding. */
+    /* Logo wrapped in a thin circle outline (the logo itself is
+       untouched — just framed). Circle is sized so the rectangular
+       logo (1024×1536 aspect 0.67) fits cleanly inside it without
+       clipping at the corners. */
+    .brand-circle {
+      width: 162px; height: 162px;
+      border: 1.5px solid #9a9a9a;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 44px auto;   /* center within sidebar, spacing below */
+      box-sizing: border-box;
+      flex-shrink: 0;
+    }
     .brand-logo {
       display: block;
-      width: 140px;
-      height: auto;
-      margin: -8px -8px 38px -8px;
+      height: 132px;   /* fits inside the inscribed rectangle of the circle */
+      width: auto;
     }
     .meta-block { margin-bottom: 28px; }
     .meta-block.last { flex: 1; }
@@ -286,7 +294,9 @@
 
     return `
     <aside class="sidebar">
-      <img class="brand-logo" src="${LOGO_URL}" alt="${escapeHtml(COMPANY_NAME)}" />
+      <div class="brand-circle">
+        <img class="brand-logo" src="${LOGO_URL}" alt="${escapeHtml(COMPANY_NAME)}" />
+      </div>
       ${metaHtml}
       ${paymentRows && paymentRows.length ? `
         <div class="meta-block payment last">
