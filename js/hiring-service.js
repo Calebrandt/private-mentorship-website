@@ -3281,7 +3281,7 @@
   // ─── Single-doc reads (with lines) ───────────────────────────
   async function adminGetInvoice(invoiceId) {
     const [{ data: inv, error: ie }, { data: lines, error: le }, { data: receipts }] = await Promise.all([
-      sb().from('invoices').select('*, clients(id, full_name, email)').eq('id', invoiceId).maybeSingle(),
+      sb().from('invoices').select('*, clients(id, full_name, email, phone, billing_contact_name, billing_email_secondary, billing_address)').eq('id', invoiceId).maybeSingle(),
       sb().from('invoice_lines').select('*').eq('invoice_id', invoiceId).order('position'),
       sb().from('sales_receipts').select('id, receipt_number, receipt_date, total_amount, payment_mode, reference, voided_at')
         .eq('invoice_id', invoiceId).order('receipt_date', { ascending: false }),
@@ -3293,7 +3293,7 @@
 
   async function adminGetReceipt(receiptId) {
     const [{ data: r, error: re }, { data: lines, error: le }] = await Promise.all([
-      sb().from('sales_receipts').select('*, clients(id, full_name, email), invoices(id, invoice_number)').eq('id', receiptId).maybeSingle(),
+      sb().from('sales_receipts').select('*, clients(id, full_name, email, phone, billing_contact_name, billing_email_secondary, billing_address), invoices(id, invoice_number)').eq('id', receiptId).maybeSingle(),
       sb().from('sales_receipt_lines').select('*').eq('receipt_id', receiptId).order('line_index'),
     ]);
     if (re) console.warn('adminGetReceipt header:', re);

@@ -364,8 +364,12 @@
               <div class="party-label">Billed To</div>
               <div class="party-name">
                 ${escapeHtml(clientName)}<br/>
+                ${client.billing_contact_name ? 'c/o ' + escapeHtml(client.billing_contact_name) + '<br/>' : ''}
+                ${client.billing_address ? escapeHtml(client.billing_address) + '<br/>' : ''}
+                ${client.phone ? escapeHtml(client.phone) + '<br/>' : ''}
                 ${clientEmail ? escapeHtml(clientEmail) + '<br/>' : ''}
-                ${inv.subject ? '<span style="color:#6e6e6e;">For: ' + escapeHtml(inv.subject) + '</span>' : ''}
+                ${client.billing_email_secondary ? escapeHtml(client.billing_email_secondary) + '<br/>' : ''}
+                ${inv.subject ? '<span style="color:#a0a0a0;font-style:italic;">For: ' + escapeHtml(inv.subject) + '</span>' : ''}
               </div>
             </div>
           </div>
@@ -461,7 +465,11 @@
               <div class="party-label">Received From</div>
               <div class="party-name">
                 ${escapeHtml(client.full_name || '—')}<br/>
+                ${client.billing_contact_name ? 'c/o ' + escapeHtml(client.billing_contact_name) + '<br/>' : ''}
+                ${client.billing_address ? escapeHtml(client.billing_address) + '<br/>' : ''}
+                ${client.phone ? escapeHtml(client.phone) + '<br/>' : ''}
                 ${client.email ? escapeHtml(client.email) + '<br/>' : ''}
+                ${client.billing_email_secondary ? escapeHtml(client.billing_email_secondary) + '<br/>' : ''}
               </div>
             </div>
           </div>
