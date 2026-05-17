@@ -3360,6 +3360,35 @@
     return data;
   }
 
+  // ─── PM Assistant (Phase 19c.8a) ──────────────────────────────
+  // Chat-based bookkeeping bot. Daily scan creates threads → user
+  // opens chat → preview-then-confirm action flow.
+  async function assistantScanNow() {
+    const { data, error } = await sb().rpc('assistant_scan_now');
+    if (error) throw new Error(error.message || 'assistant_scan_now failed');
+    return data;
+  }
+  async function assistantListThreads({ includeResolved = false } = {}) {
+    const { data, error } = await sb().rpc('assistant_list_threads', { p_include_resolved: includeResolved });
+    if (error) { console.warn('assistantListThreads:', error); return []; }
+    return data || [];
+  }
+  async function assistantThreadMessages(threadId) {
+    const { data, error } = await sb().rpc('assistant_thread_messages', { p_thread_id: threadId });
+    if (error) throw new Error(error.message || 'assistant_thread_messages failed');
+    return data || [];
+  }
+  async function assistantPostMessage(threadId, content) {
+    const { data, error } = await sb().rpc('assistant_post_message', { p_thread_id: threadId, p_content: content });
+    if (error) throw new Error(error.message || 'assistant_post_message failed');
+    return data;
+  }
+  async function assistantAction(threadId, action, payload = {}) {
+    const { data, error } = await sb().rpc('assistant_action', { p_thread_id: threadId, p_action: action, p_payload: payload });
+    if (error) throw new Error(error.message || 'assistant_action failed');
+    return data;
+  }
+
   // ─── Email a financial document (Phase 19c.4) ────────────────
   // Calls the email-financial-document edge function. Server-side it
   // verifies the caller is an admin, stamps an audit_logs row, and
@@ -3488,5 +3517,8 @@
     adminListRecurringInvoices, adminCreateRecurringInvoice,
     adminUpdateRecurringInvoice, adminDeleteRecurringInvoice,
     adminRunRecurringNow,
+    // Phase 19c.8a — PM Assistant
+    assistantScanNow, assistantListThreads, assistantThreadMessages,
+    assistantPostMessage, assistantAction,
   };
 })();

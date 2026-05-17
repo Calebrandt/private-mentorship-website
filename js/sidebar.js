@@ -436,4 +436,16 @@
   } else {
     mount();
   }
+
+  // ─── Phase 19c.8a — auto-load the PM Assistant FAB on every admin page ──
+  // assistant-fab.js is self-contained: it checks the user's role and only
+  // injects the floating chat button + drawer if the user is admin/owner.
+  // Cheap to load on non-admin pages (early return on role check).
+  if (!window.__pmAssistFabLoaded) {
+    window.__pmAssistFabLoaded = true;
+    const s = document.createElement('script');
+    s.src = 'js/assistant-fab.js?v=20260517a';
+    s.async = true;
+    document.head.appendChild(s);
+  }
 })();
