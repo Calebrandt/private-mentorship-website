@@ -147,6 +147,19 @@
     .pm-assist-thread__time {
       font-size: 10.5px; color: #9ca3af; margin-top: 4px; padding-left: 26px;
     }
+    /* History section divider — separates active work from resolved/dismissed history */
+    .pm-assist-section-divider {
+      display: flex; align-items: center; gap: 10px;
+      padding: 18px 20px 8px;
+      font: 600 10px Inter, sans-serif;
+      text-transform: uppercase; letter-spacing: 0.14em;
+      color: #94a3b8;
+    }
+    .pm-assist-section-divider span { display: inline-block; padding: 0; }
+    .pm-assist-section-divider::before,
+    .pm-assist-section-divider::after {
+      content: ''; flex: 1; height: 1px; background: #e5e7eb;
+    }
     /* Closed (resolved/dismissed) threads — muted so open work pops */
     .pm-assist-thread.is-closed { background: #fafbfc; }
     .pm-assist-thread.is-closed .pm-assist-thread__title { color: #9ca3af; font-weight: 500; }
@@ -571,7 +584,13 @@
     function renderThreadList() {
       currentThreadId = null;
       const body = $('pmAssistBody');
-      if (!threads.length) {
+      // Split into active + history so resolved threads sit BELOW a clear
+      // divider, never interleaved with the work-to-do list.
+      const isClosedThread = (t) => ['resolved', 'dismissed'].includes(t.status);
+      const activeThreads  = threads.filter(t => !isClosedThread(t));
+      const historyThreads = threads.filter(t =>  isClosedThread(t));
+
+      if (!activeThreads.length && !historyThreads.length) {
         body.innerHTML = `<div class="pm-assist-empty">
           <strong>All clear.</strong>
           No threads need your attention right now.
@@ -579,8 +598,9 @@
         </div>`;
         return;
       }
-      body.innerHTML = threads.map(t => {
-        const isClosed = ['resolved', 'dismissed'].includes(t.status);
+
+      const renderRow = (t) => {
+        const isClosed = isClosedThread(t);
         const statusBadge = isClosed
           ? `<span class="pm-assist-thread__badge">${t.status === 'dismissed' ? 'Dismissed' : 'Resolved'}</span>`
           : '';
@@ -595,7 +615,24 @@
           ${t.subtitle ? `<div class="pm-assist-thread__sub">${esc(t.subtitle)}</div>` : ''}
           <div class="pm-assist-thread__time">${esc(timeAgo(t.last_message_at || t.updated_at))}</div>
         </div>`;
-      }).join('');
+      };
+
+      let html = '';
+      if (activeThreads.length) {
+        html += activeThreads.map(renderRow).join('');
+      } else if (showResolved && historyThreads.length) {
+        html += `<div class="pm-assist-empty" style="padding:30px 20px;">
+          <strong>All caught up.</strong>
+          <div class="pm-assist-empty__sub">No active threads. History below.</div>
+        </div>`;
+      }
+      if (historyThreads.length) {
+        html += `<div class="pm-assist-section-divider">
+          <span>History · ${historyThreads.length}</span>
+        </div>`;
+        html += historyThreads.map(renderRow).join('');
+      }
+      body.innerHTML = html;
       body.querySelectorAll('[data-tid]').forEach(el => {
         el.addEventListener('click', () => openThread(el.dataset.tid));
       });
