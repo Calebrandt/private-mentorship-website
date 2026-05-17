@@ -68,8 +68,10 @@ BEGIN
   v_uid := auth.uid();
 
   IF v_uid IS NULL THEN
+    -- Cast to text so the user_role enum doesn't reject the IN-list
+    -- before the comparison can run (enum only contains lowercase values).
     SELECT user_id INTO v_owner_id FROM public.profiles
-    WHERE role IN ('OWNER','SUPERADMIN','SuperAdmin','Owner')
+    WHERE lower(role::text) IN ('owner','superadmin')
     ORDER BY created_at LIMIT 1;
   ELSE
     v_owner_id := v_uid;
