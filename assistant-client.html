@@ -1316,6 +1316,19 @@ function renderAppointmentRow(a, spend){
     } catch (e) { console.warn('payment history failed:', e); }
   })();
 
+  // Phase 19c.12 #7 — auto-refresh the whole workspace when a payment
+  // fires anywhere on the page (e.g. Oracle FAB chip). Only triggers a
+  // reload when the payment is for THIS client (matches by client_id).
+  window.addEventListener('pm-payment-recorded', (e) => {
+    const paidClientId = e?.detail?.client_id;
+    if (!paidClientId || paidClientId === clientId) {
+      // Minimum-viable: reload to pick up new hours_balance, contract
+      // status (if a draft just auto-activated), payment history row,
+      // calendar pins, etc. Smoother in-place refresh can come later.
+      setTimeout(() => window.location.reload(), 800);
+    }
+  });
+
   // Upcoming
   const upcomingList = document.getElementById('upcomingList');
   if ((ws.upcomingAppointments || []).length) {

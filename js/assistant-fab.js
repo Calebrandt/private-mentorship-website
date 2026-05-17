@@ -847,6 +847,22 @@
           });
         }
 
+        // Phase 19c.12 #7 — broadcast a payment event so any open page
+        // (admin-financials KPI counts, per-client payment history widget,
+        // etc.) can refresh itself without a page reload. Pages listen via
+        //   window.addEventListener('pm-payment-recorded', handler)
+        if (actionKey === 'mark_paid_full' && actionResult?.invoice_id) {
+          try {
+            window.dispatchEvent(new CustomEvent('pm-payment-recorded', {
+              detail: {
+                invoice_id: actionResult.invoice_id,
+                receipt_id: actionResult.receipt_id,
+                client_id:  actionResult.client_id,
+              },
+            }));
+          } catch (_) { /* CustomEvent missing somehow — harmless */ }
+        }
+
         // These actions close the thread → bounce back to list
         if (['resolve', 'dismiss', 'activate_contract', 'mark_paid_full',
              'create_renewal_invoice'].includes(actionKey)

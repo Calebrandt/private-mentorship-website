@@ -1297,6 +1297,12 @@
     renderReports();
   }
 
+  // Phase 19c.12 #7 — auto-refresh when a payment is recorded elsewhere on
+  // the page (e.g. via the Oracle FAB chip). No page reload needed.
+  window.addEventListener('pm-payment-recorded', () => {
+    refresh().catch(err => console.warn('[admin-financials auto-refresh]', err));
+  });
+
   // ═══════════════════════════════════════════════════════════
   // REPORTS — KPIs + monthly chart + outstanding + top clients
   // + CSV exports. All compute client-side from the docs already
