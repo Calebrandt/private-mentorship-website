@@ -151,8 +151,8 @@
 
     .doc-headline {
       font-family: 'Outfit', 'Montserrat', sans-serif;
-      font-weight: 300; font-size: 84px; line-height: 0.95;
-      letter-spacing: 0.22em; color: #8a8a8a;
+      font-weight: 200; font-size: 84px; line-height: 0.95;
+      letter-spacing: 0.13em; color: #6a6a6a;
       text-transform: uppercase;
       margin: 0 0 60px -2px;
     }
@@ -164,7 +164,7 @@
     .party-label {
       font-size: 10px; font-weight: 500;
       letter-spacing: 0.28em;
-      text-transform: uppercase; color: #6a6a6a;
+      text-transform: uppercase; color: #4a4a4a;
       margin-bottom: 10px;
     }
     .party-name {
@@ -180,8 +180,8 @@
       text-align: left;
       font-size: 10px; font-weight: 500;
       letter-spacing: 0.24em;
-      text-transform: uppercase; color: #6a6a6a;
-      padding: 14px 4px; border-bottom: 1px solid #d8d8d8;
+      text-transform: uppercase; color: #4a4a4a;
+      padding: 14px 4px; border-bottom: 1px solid #c8c8c8;
     }
     .items thead th.center { text-align: center; }
     .items thead th.right { text-align: right; }
@@ -218,7 +218,7 @@
     }
     .totals .t-line.is-amount-due .label,
     .totals .t-line.is-amount-due .val {
-      font-weight: 600; color: #4a4a4a; font-size: 11.5px;
+      font-weight: 600; color: #2e2e2e; font-size: 11.5px;
     }
 
     /* ── Thank you ─────────────────────────────────────────────── */
