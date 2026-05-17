@@ -200,6 +200,15 @@
     const filename = `${pay.paycheque_number || 'paycheque'}.pdf`;
     return renderHtmlToPdf(html, filename);
   }
+  async function renderStatement(stmt) {
+    if (!stmt) throw new Error('renderStatement: missing statement');
+    if (!window.pmPDFTemplates) throw new Error('pmPDFTemplates not loaded — include js/financial-pdf-templates.js');
+    const html = window.pmPDFTemplates.buildStatementHtml(stmt);
+    const safeName = (stmt.client?.full_name || 'client').replace(/[^a-z0-9]+/gi, '_').toLowerCase();
+    const dateStr = (stmt.generated_at || new Date().toISOString()).slice(0, 10);
+    const filename = `statement_${safeName}_${dateStr}.pdf`;
+    return renderHtmlToPdf(html, filename);
+  }
 
   // ─── Convenience: fetch + build + return blob/payload ─────────────
   async function buildDoc(desc) {
@@ -211,6 +220,7 @@
       if (docType === 'invoice')        payload = await window.pmHiring.adminGetInvoice(docId);
       else if (docType === 'receipt')   payload = await window.pmHiring.adminGetReceipt(docId);
       else if (docType === 'paycheque') payload = await window.pmHiring.adminGetPaycheque(docId);
+      else if (docType === 'statement') payload = await window.pmHiring.adminGetClientStatement(docId, desc.statementOpts || {});
       else throw new Error('buildDoc: unknown docType ' + docType);
     }
     if (!payload) throw new Error('buildDoc: document not found');
@@ -218,6 +228,7 @@
     let out;
     if (docType === 'invoice')        out = await renderInvoice(payload);
     else if (docType === 'receipt')   out = await renderReceipt(payload);
+    else if (docType === 'statement') out = await renderStatement(payload);
     else                              out = await renderPaycheque(payload);
     return { ...out, payload };
   }
@@ -240,7 +251,7 @@
 
   // ─── Export ───────────────────────────────────────────────────────
   window.pmPDF = {
-    renderInvoice, renderReceipt, renderPaycheque,
+    renderInvoice, renderReceipt, renderPaycheque, renderStatement,
     buildDoc, downloadDoc, openDoc,
     // For backwards-compatibility with the previous version's BIZ export
     BIZ: {

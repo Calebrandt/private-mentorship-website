@@ -601,9 +601,142 @@
     </body></html>`;
   }
 
+  // ─── STATEMENT OF ACCOUNT (Phase 19c.8e) ──────────────────────────
+  // Per-client activity history: invoices + receipts in chronological order,
+  // with running balance, and totals (billed / received / outstanding).
+  // Visual language matches invoice/receipt — sidebar + two-column main.
+  function buildStatementHtml(stmt) {
+    if (!stmt) throw new Error('buildStatementHtml: missing statement payload');
+
+    const ccy = 'CAD';
+    const client        = stmt.client || {};
+    const accountHolder = client.billing_contact_name || client.full_name || 'Client';
+    const studentName   = client.full_name || '';
+    const invoices      = Array.isArray(stmt.invoices) ? stmt.invoices : [];
+    const receipts      = Array.isArray(stmt.receipts) ? stmt.receipts : [];
+    const totals        = stmt.totals || { billed: 0, paid: 0, outstanding: 0 };
+
+    // Combined activity feed: invoices (debit) + receipts (credit), sorted by date
+    const activity = [];
+    invoices.forEach(i => activity.push({
+      date:   i.invoice_date,
+      kind:   'invoice',
+      number: i.invoice_number || '—',
+      desc:   i.subject || 'Mentorship services',
+      amount: Number(i.total_cents) || 0,
+      isVoid: i.status === 'void',
+    }));
+    receipts.forEach(r => activity.push({
+      date:   r.receipt_date,
+      kind:   'receipt',
+      number: r.receipt_number || '—',
+      desc:   'Payment received' + (r.payment_mode ? ' (' + r.payment_mode + ')' : ''),
+      amount: -(Number(r.total_amount) || 0),  // negative = credit
+    }));
+    activity.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+
+    let runningBalance = 0;
+    const activityRows = activity.length ? activity.map(a => {
+      if (a.isVoid) {
+        return `<tr style="color:#9a9a9a;">
+          <td>${fmtDateSlash(a.date)}</td>
+          <td>${escapeHtml(a.number)}</td>
+          <td><span style="text-decoration:line-through;">${escapeHtml(a.desc)}</span> <span style="font-size:9px;color:#c0c0c0;">VOID</span></td>
+          <td class="right">—</td>
+          <td class="right">—</td>
+        </tr>`;
+      }
+      runningBalance += a.amount;
+      const isCredit = a.amount < 0;
+      return `<tr>
+        <td>${fmtDateSlash(a.date)}</td>
+        <td>${escapeHtml(a.number)}</td>
+        <td class="it-desc">${escapeHtml(a.desc)}</td>
+        <td class="right" style="${isCredit ? 'color:#16a34a;' : ''}">${isCredit ? '−' : ''}${fmtMoney(Math.abs(a.amount), ccy)}</td>
+        <td class="right" style="font-weight:600;">${fmtMoney(runningBalance, ccy)}</td>
+      </tr>`;
+    }).join('') : `<tr><td colspan="5" style="padding:24px;text-align:center;color:#9a9a9a;">No activity in this period.</td></tr>`;
+
+    const periodLabel = (stmt.period?.from || stmt.period?.to)
+      ? `${stmt.period.from ? fmtDateSlash(stmt.period.from) : 'Start'} – ${stmt.period.to ? fmtDateSlash(stmt.period.to) : 'Today'}`
+      : 'All-time';
+
+    const sidebar = renderSidebar(
+      [
+        { label: 'Statement Date', value: fmtDateSlash(stmt.generated_at) },
+        { label: 'Account Holder', value: accountHolder },
+        { label: 'Period',         value: periodLabel },
+        { label: 'Outstanding',    value: fmtMoney(totals.outstanding, ccy) },
+      ],
+      [{ subLabel: 'E-Transfer', value: PAYMENT_HANDLE }]
+    );
+
+    return `<!DOCTYPE html><html><head><meta charset="utf-8" /><title>Statement of Account — ${escapeHtml(accountHolder)}</title>
+    ${fontsLink()}
+    <style>${sharedCss()}</style></head><body>
+      <div class="page">
+        ${sidebar}
+        <main class="main">
+          <h1 class="doc-headline">Statement</h1>
+
+          <div class="parties">
+            <div class="party-col">
+              <div class="party-label">Your Business</div>
+              <div class="party-name">
+                ${escapeHtml(COMPANY_NAME)}<br/>
+                ${escapeHtml(COMPANY_ADDR_1)}<br/>
+                ${escapeHtml(COMPANY_ADDR_2)}<br/>
+                ${escapeHtml(COMPANY_EMAIL)}<br/>
+                ${escapeHtml(COMPANY_WEB)}
+              </div>
+            </div>
+            <div class="party-col">
+              <div class="party-label">Account Holder</div>
+              <div class="party-name">
+                ${client.billing_contact_name
+                  ? 'Guardian: ' + escapeHtml(accountHolder)
+                  : escapeHtml(accountHolder)}<br/>
+                ${client.billing_contact_name && studentName && studentName !== accountHolder
+                  ? `<span style="color:#a0a0a0;font-style:italic;">For: ${escapeHtml(studentName)}</span><br/>`
+                  : ''}
+                ${client.billing_address ? escapeHtml(client.billing_address) + '<br/>' : ''}
+                ${client.phone ? escapeHtml(client.phone) + '<br/>' : ''}
+                ${client.email ? escapeHtml(client.email) + '<br/>' : ''}
+                ${client.billing_email_secondary ? escapeHtml(client.billing_email_secondary) + '<br/>' : ''}
+              </div>
+            </div>
+          </div>
+
+          <table class="items">
+            <thead><tr>
+              <th style="width:14%;">Date</th>
+              <th style="width:14%;">Reference</th>
+              <th>Description</th>
+              <th class="right" style="width:18%;">Amount</th>
+              <th class="right" style="width:18%;">Balance</th>
+            </tr></thead>
+            <tbody>${activityRows}</tbody>
+          </table>
+
+          <div class="totals-row">
+            <div class="totals">
+              <div class="t-line"><span class="label">Total Invoiced</span><span class="val">${fmtMoney(totals.billed, ccy)}</span></div>
+              <div class="t-line"><span class="label">Total Received</span><span class="val">${fmtMoney(totals.paid, ccy)}</span></div>
+              <div class="t-line is-amount-due"><span class="label">Outstanding Balance</span><span class="val">${fmtMoney(totals.outstanding, ccy)}</span></div>
+              ${totals.outstanding <= 0 ? `<div class="paid-note">Account in good standing<span class="dot">·</span>${escapeHtml(fmtDateLong(stmt.generated_at))}</div>` : ''}
+            </div>
+          </div>
+
+          <div class="thank-you">Thank You</div>
+        </main>
+      </div>
+    </body></html>`;
+  }
+
+
   // ─── Export ───────────────────────────────────────────────────────
   window.pmPDFTemplates = {
-    buildInvoiceHtml, buildReceiptHtml, buildPaychequeHtml,
+    buildInvoiceHtml, buildReceiptHtml, buildPaychequeHtml, buildStatementHtml,
     LOGO_URL, COMPANY_NAME, COMPANY_EMAIL, COMPANY_WEB,
   };
 })();

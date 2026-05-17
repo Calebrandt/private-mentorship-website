@@ -3317,6 +3317,61 @@
     return { ...p, assistant_name: assistantName, lines: lines || [] };
   }
 
+  // ─── Per-client statement of account (Phase 19c.8e) ─────────
+  // Pulls everything needed to render a client's full activity history:
+  // header, all invoices (excluding void from totals), all receipts (excluding
+  // voided), computed totals. Optional date filters for tax-year / quarterly
+  // statements. Returns shape consumable by pmPDF.buildDoc({docType:'statement'}).
+  async function adminGetClientStatement(clientId, opts = {}) {
+    if (!clientId) throw new Error('adminGetClientStatement: clientId required');
+    const fromDate = opts.fromDate || null;  // ISO date or null
+    const toDate   = opts.toDate   || null;
+
+    let invQ = sb().from('invoices')
+      .select('id, invoice_number, invoice_date, due_date, status, total_cents, amount_paid_cents, balance_due_cents, subject, currency')
+      .eq('client_id', clientId);
+    if (fromDate) invQ = invQ.gte('invoice_date', fromDate);
+    if (toDate)   invQ = invQ.lte('invoice_date', toDate);
+    invQ = invQ.order('invoice_date', { ascending: true });
+
+    const [{ data: client, error: ce }, { data: invoices, error: ie }] = await Promise.all([
+      sb().from('clients').select('id, full_name, email, phone, billing_contact_name, billing_email_secondary, billing_address').eq('id', clientId).maybeSingle(),
+      invQ,
+    ]);
+    if (ce) throw new Error('client fetch: ' + ce.message);
+    if (ie) throw new Error('invoices fetch: ' + ie.message);
+    if (!client) throw new Error('Client not found');
+
+    // Receipts for THIS client's invoices in the period
+    const invIds = (invoices || []).map(i => i.id);
+    let receipts = [];
+    if (invIds.length) {
+      const { data: recs, error: rerr } = await sb().from('sales_receipts')
+        .select('id, receipt_number, receipt_date, total_amount, payment_mode, reference, invoice_id, voided_at')
+        .in('invoice_id', invIds)
+        .order('receipt_date', { ascending: true });
+      if (rerr) console.warn('adminGetClientStatement receipts:', rerr);
+      receipts = (recs || []).filter(r => !r.voided_at);
+    }
+
+    // Totals — void invoices excluded from billed total but kept in the
+    // activity table for visibility (struck through).
+    const liveInvoices = (invoices || []).filter(i => i.status !== 'void');
+    const totalBilled  = liveInvoices.reduce((s, i) => s + (Number(i.total_cents)        || 0), 0);
+    const totalPaid    = liveInvoices.reduce((s, i) => s + (Number(i.amount_paid_cents)  || 0), 0);
+    const outstanding  = liveInvoices.reduce((s, i) => s + (Number(i.balance_due_cents)  || 0), 0);
+
+    return {
+      client,
+      invoices: invoices || [],
+      receipts,
+      period: { from: fromDate, to: toDate },
+      totals: { billed: totalBilled, paid: totalPaid, outstanding },
+      generated_at: new Date().toISOString(),
+    };
+  }
+
+
   // ─── Recurring invoices (Phase 19c.7a) ──────────────────────
   // Admin-managed billing schedules. The pg_cron job auto-creates
   // invoices from rows in client_recurring_invoices where
@@ -3519,6 +3574,7 @@
     adminIssueInvoice, adminRecordPayment, adminIssuePaycheque,
     adminVoidInvoice, adminVoidReceipt, adminVoidPaycheque, adminReissueInvoice,
     adminListFinancialDocuments, adminGetInvoice, adminGetReceipt, adminGetPaycheque,
+    adminGetClientStatement,
     adminListAssistants,
     // Phase 19c.4 — branded email send
     sendFinancialEmail,

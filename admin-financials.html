@@ -982,13 +982,13 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260508d"></script>
-<script src="js/hiring-service.js?v=20260516s"></script>
+<script src="js/hiring-service.js?v=20260517j"></script>
 <script src="js/sidebar.js?v=20260517a"></script>
 <script src="js/topbar-userpod.js?v=20260516a" defer></script>
 <script src="js/master-search.js?v=20260516h" defer></script>
 <script src="js/deep-link-flash.js?v=20260516c" defer></script>
-<script src="js/financial-pdf-templates.js?v=20260517b" defer></script>
-<script src="js/financial-pdf.js?v=20260517a" defer></script>
+<script src="js/financial-pdf-templates.js?v=20260517j" defer></script>
+<script src="js/financial-pdf.js?v=20260517j" defer></script>
 <!-- v=20260517c on admin-financials inline JS: meta payload now carries lines + billing for inline receipt -->
 <script>
 (async () => {
@@ -1199,6 +1199,7 @@
           </label>
         </div>
         <div class="fin-row-actions">
+          <button data-rec-statement="${esc(client.id)}" title="Preview client's statement of account">Statement</button>
           <button class="is-danger" data-rec-delete="${esc(r.id)}">Delete</button>
         </div>
         ${r.last_error ? `<div class="rec-error" style="grid-column:1 / -1;">⚠ ${esc(r.last_error)}</div>` : ''}
@@ -1236,6 +1237,22 @@
           toast('Schedule deleted');
           await loadRecurring();
         } catch (e) { toast('Delete failed: ' + e.message, 'error'); }
+      });
+    });
+    // Statement of account — preview the client's full activity history (Phase 19c.8e)
+    wrap.querySelectorAll('[data-rec-statement]').forEach(b => {
+      b.addEventListener('click', async () => {
+        const clientId = b.dataset.recStatement;
+        const originalLabel = b.textContent;
+        b.disabled = true; b.textContent = 'Building…';
+        try {
+          await window.pmPDF.openDoc({ docType: 'statement', docId: clientId });
+        } catch (e) {
+          console.error('[statement]', e);
+          toast('Statement failed: ' + (e.message || e), 'error');
+        } finally {
+          b.disabled = false; b.textContent = originalLabel;
+        }
       });
     });
   }
