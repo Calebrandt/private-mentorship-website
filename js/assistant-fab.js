@@ -787,16 +787,18 @@
       }
 
       // Server-side actions: snooze, resolve, dismiss, reopen,
-      // activate_contract, mark_paid_full
+      // activate_contract, mark_paid_full, create_renewal_invoice
       try {
         await window.pmHiring.assistantAction(threadId, actionKey);
         toastMsg(actionKey === 'resolve' ? 'Marked handled ✓' :
                  actionKey.startsWith('snooze') ? 'Snoozed' :
                  actionKey === 'activate_contract' ? 'Contract activated ✓' :
                  actionKey === 'mark_paid_full' ? 'Marked paid ✓' :
+                 actionKey === 'create_renewal_invoice' ? 'Renewal invoice created ✓' :
                  'Done');
         // These actions close the thread → bounce back to list
-        if (['resolve', 'dismiss', 'activate_contract', 'mark_paid_full'].includes(actionKey)
+        if (['resolve', 'dismiss', 'activate_contract', 'mark_paid_full',
+             'create_renewal_invoice'].includes(actionKey)
             || actionKey.startsWith('snooze')) {
           await loadThreads();
         } else {
