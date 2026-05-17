@@ -882,18 +882,17 @@
         if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendUserMessage(); }
       });
 
-      // Wire quick-chips with a confirm dialog so a stray tap doesn't
-      // accidentally mark something paid.
+      // Phase 19c.13 redesign — chip tap now opens a modal IMMEDIATELY
+      // with 3 explicit options. No silent path. No confirm() dialog.
+      // No race between server action + UI rendering.
       body.querySelectorAll('[data-quickaction]').forEach(btn => {
         btn.addEventListener('click', () => {
           const action = btn.dataset.quickaction;
           const amt = btn.dataset.confirmAmt || '';
           const inv = btn.dataset.confirmInv || 'this invoice';
           if (action === 'mark_paid_full') {
-            const msg = amt
-              ? `Mark ${inv} paid in full for ${amt}?`
-              : `Mark ${inv} paid in full?`;
-            if (!confirm(msg)) return;
+            openPaymentConfirmModal({ threadId, inv, amt });
+            return;
           }
           handleAction(threadId, action);
         });
@@ -1122,18 +1121,10 @@
                  actionKey === 'create_renewal_invoice' ? 'Renewal invoice created ✓' :
                  'Done');
 
-        // Phase 19c.10a + preview — after mark_paid_full succeeds, build the
-        // receipt PDF and show a preview in the chat with Send / Skip buttons.
-        // Caleb wanted to confirm exactly what the family receives before
-        // it goes out. Payment itself is already recorded server-side, so
-        // skipping the receipt is a safe escape hatch.
-        if (actionKey === 'mark_paid_full' && actionResult?.receipt_id) {
-          previewReceiptThenSend(actionResult.receipt_id, threadId).catch(err => {
-            console.warn('[oracle receipt preview]', err);
-            showErrorInChat('Receipt preview failed (payment still recorded)',
-              (err?.message || String(err)));
-          });
-        }
+        // Phase 19c.13 — auto-preview removed from this code path.
+        // The new openPaymentConfirmModal handles preview + send BEFORE
+        // calling assistant_action, so by the time we get here the user
+        // has already chosen Send-or-Skip. Don't double-fire.
 
         // Phase 19c.12 #7 — broadcast a payment event so any open page
         // (admin-financials KPI counts, per-client payment history widget,
@@ -1170,7 +1161,152 @@
       }
     }
 
-    // ─── Receipt preview modal (Phase 19c.13 polish) ────────────
+    // ─── Phase 19c.13 redesign: payment confirmation modal ─────
+    // Opens BEFORE the database action. Caleb sees the invoice PDF
+    // preview + the recipient email + 3 explicit choices:
+    //   • Cancel — close, do nothing
+    //   • Mark paid (no email) — record payment, don't email the family
+    //   • Mark paid + send receipt — record payment AND email the receipt
+    // The chosen action fires only on explicit click. No silent path,
+    // no race condition, no surprise auto-sends.
+    async function openPaymentConfirmModal({ threadId, inv, amt }) {
+      const thread = threads.find(t => t.id === threadId);
+      if (!thread?.invoice_id) {
+        toastMsg('No invoice on this thread');
+        return;
+      }
+
+      // Build invoice preview (proxy for what the receipt will look like —
+      // same template, same data, just a different headline).
+      let previewBlobUrl = '';
+      let recipient = '';
+      try {
+        await ensureFinancialPipelineLoaded();
+        const out = await window.pmPDF.buildDoc({
+          docType: 'invoice', docId: thread.invoice_id,
+        });
+        previewBlobUrl = URL.createObjectURL(out.blob);
+        const p = out.payload || {};
+        const client = p.clients || {};
+        const primary = client.email || '';
+        const secondary = client.billing_email_secondary || '';
+        recipient = [primary, secondary].filter(Boolean).join(', ');
+      } catch (e) {
+        toastMsg('Couldn\'t load preview: ' + (e?.message || String(e)));
+        return;
+      }
+
+      // Remove any stale prior modal
+      document.getElementById('pmReceiptModal')?.remove();
+
+      const recipientHtml = recipient
+        ? recipient.split(', ').map(e =>
+            `<code style="background:#f1f5f9;padding:3px 8px;border-radius:5px;font-size:12px;color:#0f172a;">${esc(e)}</code>`
+          ).join(' ')
+        : '<span style="color:#b91c1c;font-weight:600;">No email on file</span>';
+
+      const sendDisabled = recipient ? '' : 'disabled';
+
+      const modal = document.createElement('div');
+      modal.id = 'pmReceiptModal';
+      modal.className = 'pm-receipt-modal';
+      modal.innerHTML = `
+        <div class="pm-receipt-modal__backdrop"></div>
+        <div class="pm-receipt-modal__card" role="dialog" aria-modal="true" aria-labelledby="pmReceiptTitle">
+          <header class="pm-receipt-modal__head">
+            <div>
+              <h3 id="pmReceiptTitle" class="pm-receipt-modal__title">Record payment for ${esc(inv)}</h3>
+              <p class="pm-receipt-modal__sub">Amount: <strong>${esc(amt || '$0.00')}</strong> · review the invoice + choose what to do next.</p>
+            </div>
+            <button class="pm-receipt-modal__close" aria-label="Close" data-pay-action="cancel">×</button>
+          </header>
+          <div class="pm-receipt-modal__recipient">
+            <span class="pm-receipt-modal__recipient-label">Receipt would send to</span>
+            ${recipientHtml}
+          </div>
+          <div class="pm-receipt-modal__iframe-wrap">
+            <iframe src="${previewBlobUrl}#toolbar=0&navpanes=0" title="Invoice preview"></iframe>
+          </div>
+          <footer class="pm-receipt-modal__foot">
+            <button class="pm-receipt-modal__btn pm-receipt-modal__btn--ghost" data-pay-action="cancel">
+              Cancel
+            </button>
+            <button class="pm-receipt-modal__btn pm-receipt-modal__btn--ghost" data-pay-action="paid-only" style="margin-left:auto;">
+              Mark paid — don't email
+            </button>
+            <button class="pm-receipt-modal__btn pm-receipt-modal__btn--primary" data-pay-action="paid-and-send" ${sendDisabled}>
+              Mark paid + send receipt
+            </button>
+          </footer>
+        </div>`;
+      document.body.appendChild(modal);
+
+      function closeModal() {
+        document.getElementById('pmReceiptModal')?.remove();
+        try { URL.revokeObjectURL(previewBlobUrl); } catch (_) {}
+      }
+
+      modal.querySelector('.pm-receipt-modal__backdrop').addEventListener('click', closeModal);
+      modal.querySelectorAll('[data-pay-action="cancel"]').forEach(b =>
+        b.addEventListener('click', closeModal));
+
+      async function runMarkPaid(alsoSendEmail) {
+        const sendBtn = modal.querySelector('[data-pay-action="paid-and-send"]');
+        const onlyBtn = modal.querySelector('[data-pay-action="paid-only"]');
+        sendBtn.disabled = true; onlyBtn.disabled = true;
+        const activeBtn = alsoSendEmail ? sendBtn : onlyBtn;
+        const originalText = activeBtn.textContent;
+        activeBtn.textContent = 'Working…';
+
+        try {
+          // Step 1 — record the payment (server side)
+          const actionResult = await window.pmHiring.assistantAction(threadId, 'mark_paid_full');
+          toastMsg('Marked paid ✓');
+
+          // Step 2 — email if asked
+          if (alsoSendEmail && actionResult?.receipt_id) {
+            await fireReceiptEmail(actionResult.receipt_id);
+            modal.querySelector('.pm-receipt-modal__foot').innerHTML =
+              `<div style="font:600 13px Inter,sans-serif;color:#166534;padding:8px 4px;">
+                 ✓ Receipt emailed to ${recipientHtml}
+               </div>`;
+          } else {
+            modal.querySelector('.pm-receipt-modal__foot').innerHTML =
+              `<div style="font:600 13px Inter,sans-serif;color:#475569;padding:8px 4px;">
+                 ✓ Payment recorded. No email sent (you can email later from admin-financials → Receipts).
+               </div>`;
+          }
+          setTimeout(() => {
+            closeModal();
+            loadThreads().catch(() => {});  // refresh thread list once we're done
+          }, 1800);
+        } catch (err) {
+          sendBtn.disabled = !!sendDisabled; onlyBtn.disabled = false;
+          activeBtn.textContent = originalText;
+          modal.querySelector('.pm-receipt-modal__foot').insertAdjacentHTML('afterbegin',
+            `<div style="font:500 12px Inter,sans-serif;color:#b91c1c;padding:6px 8px;background:#fef2f2;border-radius:6px;margin-right:auto;">
+               ${esc(err?.message || String(err))}
+             </div>`);
+        }
+      }
+
+      modal.querySelector('[data-pay-action="paid-only"]')
+        .addEventListener('click', () => runMarkPaid(false));
+      modal.querySelector('[data-pay-action="paid-and-send"]')
+        .addEventListener('click', () => runMarkPaid(true));
+
+      // ESC cancels
+      const escHandler = (e) => {
+        if (e.key === 'Escape') {
+          closeModal();
+          document.removeEventListener('keydown', escHandler);
+        }
+      };
+      document.addEventListener('keydown', escHandler);
+    }
+
+
+    // ─── Legacy: post-action receipt preview modal (Phase 19c.13 polish) ─────────
     // After mark_paid_full succeeds, build the receipt PDF and show a
     // centered modal overlay (not in-chat) so it works regardless of
     // whether the chat conversation view is still mounted. Avoids the
