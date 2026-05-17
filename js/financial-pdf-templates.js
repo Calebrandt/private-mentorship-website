@@ -96,7 +96,7 @@
     * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
     body { margin: 0; padding: 0;
            font-family: 'Outfit', 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
-           background: #ffffff; color: #14181f; font-size: 10.5px; line-height: 1.5;
+           background: #ffffff; color: #14181f; font-size: 12px; line-height: 1.5;
            font-weight: 400;
     }
 
@@ -122,20 +122,20 @@
     .meta-block { margin-bottom: 28px; }
     .meta-block.last { flex: 1; }
     .meta-label {
-      font-size: 8.5px; font-weight: 600;
+      font-size: 9.5px; font-weight: 600;
       letter-spacing: 0.28em;
       text-transform: uppercase; color: #14181f;
       margin-bottom: 7px;
     }
     .meta-value {
-      font-size: 10.5px; color: #4b4b4b; font-weight: 300;
+      font-size: 12px; color: #4b4b4b; font-weight: 400;
       letter-spacing: 0.04em; line-height: 1.55; word-break: break-word;
     }
     .meta-block.payment .meta-value-row {
       margin-bottom: 14px;
     }
     .meta-sub-label {
-      font-size: 8.5px; font-weight: 600; letter-spacing: 0.28em;
+      font-size: 9.5px; font-weight: 600; letter-spacing: 0.28em;
       text-transform: uppercase; color: #14181f; margin-bottom: 4px;
     }
 
@@ -148,8 +148,8 @@
 
     .doc-headline {
       font-family: 'Outfit', 'Montserrat', sans-serif;
-      font-weight: 500; font-size: 76px; line-height: 0.95;
-      letter-spacing: 0.18em; color: #14181f;
+      font-weight: 400; font-size: 80px; line-height: 0.95;
+      letter-spacing: 0.18em; color: #4a4a4a;
       text-transform: uppercase;
       margin: 0 0 44px -2px;
     }
@@ -159,13 +159,13 @@
     }
     .party-col { flex: 1; }
     .party-label {
-      font-size: 9px; font-weight: 600;
+      font-size: 10px; font-weight: 600;
       letter-spacing: 0.28em;
       text-transform: uppercase; color: #14181f;
       margin-bottom: 8px;
     }
     .party-name {
-      font-size: 10.5px; color: #4b4b4b; font-weight: 300;
+      font-size: 12px; color: #4b4b4b; font-weight: 400;
       letter-spacing: 0.04em; line-height: 1.6; word-break: break-word;
     }
 
@@ -175,38 +175,38 @@
     }
     .items thead th {
       text-align: left;
-      font-size: 9px; font-weight: 600;
+      font-size: 10px; font-weight: 600;
       letter-spacing: 0.24em;
       text-transform: uppercase; color: #14181f;
-      padding: 12px 4px; border-bottom: 1px solid #1f1f1f;
+      padding: 12px 4px; border-bottom: 1px solid #14181f;
     }
     .items thead th.center { text-align: center; }
     .items thead th.right { text-align: right; }
     .items tbody td {
       padding: 18px 4px;
       border-bottom: 1px solid #e2e2e2;
-      vertical-align: top; font-size: 10.5px; color: #4b4b4b;
-      font-weight: 300; letter-spacing: 0.02em;
+      vertical-align: top; font-size: 12px; color: #4b4b4b;
+      font-weight: 400; letter-spacing: 0.02em;
     }
     .items td.center { text-align: center; }
     .items td.right { text-align: right;
-      font-variant-numeric: tabular-nums; font-weight: 300;
+      font-variant-numeric: tabular-nums; font-weight: 400;
     }
-    .items .it-desc { font-weight: 400; color: #14181f; }
+    .items .it-desc { font-weight: 500; color: #14181f; }
 
     /* ── Totals stack — right-aligned with grey highlight on Amount Due */
-    .totals-row { display: flex; justify-content: flex-end; margin-top: 6px; }
-    .totals { min-width: 290px; }
+    .totals-row { display: flex; justify-content: flex-end; margin-top: 8px; }
+    .totals { min-width: 320px; }
     .totals .t-line {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 9px 14px; font-size: 10.5px; color: #14181f;
+      padding: 10px 14px; font-size: 12px; color: #14181f;
     }
     .totals .t-line .label {
       font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase;
-      font-size: 9.5px; color: #4b4b4b;
+      font-size: 10.5px; color: #4b4b4b;
     }
     .totals .t-line .val {
-      font-weight: 300; font-variant-numeric: tabular-nums;
+      font-weight: 400; font-variant-numeric: tabular-nums;
       letter-spacing: 0.02em; color: #14181f;
     }
     .totals .t-line.is-amount-due {
@@ -215,7 +215,7 @@
     }
     .totals .t-line.is-amount-due .label,
     .totals .t-line.is-amount-due .val {
-      font-weight: 700; color: #14181f; font-size: 10.5px;
+      font-weight: 700; color: #14181f; font-size: 12px;
     }
 
     /* ── Thank you ─────────────────────────────────────────────── */
