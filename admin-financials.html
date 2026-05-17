@@ -766,6 +766,7 @@
 <script src="js/deep-link-flash.js?v=20260516c" defer></script>
 <script src="js/financial-pdf-templates.js?v=20260517b" defer></script>
 <script src="js/financial-pdf.js?v=20260517a" defer></script>
+<!-- v=20260517c on admin-financials inline JS: meta payload now carries lines + billing for inline receipt -->
 <script>
 (async () => {
   const $ = id => document.getElementById(id);
@@ -1445,33 +1446,70 @@
         || currentDoc.payload?.paycheque_number
         || null;
 
-      // Build the `meta` block so the edge function can render the
-      // branded amount card in the email body (header card + big total).
+      // Build the `meta` block so the edge function can render the full
+      // inline receipt/invoice in the email body (Stripe-style — line items,
+      // totals, billing block, all in HTML). The PDF stays attached as a
+      // backup but the email body IS the document.
       const p = currentDoc.payload || {};
+      const client = p.clients || {};
       let meta = null;
       if (currentDoc.docType === 'invoice') {
         meta = {
           totalCents:   Number(p.total_cents)        || 0,
+          paidCents:    Number(p.amount_paid_cents)  || 0,
           balanceCents: Number(p.balance_due_cents)  || 0,
           docDate:      p.invoice_date || null,
           dueDate:      p.due_date || null,
-          clientName:   p.clients?.full_name || null,
+          clientName:   client.full_name || null,
+          guardianName: client.billing_contact_name || null,
+          studentName:  client.full_name || null,
+          billingAddress:        client.billing_address || null,
+          billingPhone:          client.phone || null,
+          billingEmail:          client.email || null,
+          billingEmailSecondary: client.billing_email_secondary || null,
+          subject:      p.subject || null,
+          terms:        p.terms || null,
+          customerNotes: p.customer_notes || null,
+          currency:     (p.currency || 'CAD').toUpperCase(),
+          lines:        Array.isArray(p.lines) ? p.lines : [],
         };
       } else if (currentDoc.docType === 'receipt') {
         meta = {
           totalCents:   Math.round(Number(p.total_amount || 0) * 100),
-          balanceCents: null,
+          paidCents:    Math.round(Number(p.total_amount || 0) * 100),
+          balanceCents: 0,
           docDate:      p.receipt_date || null,
           dueDate:      null,
-          clientName:   p.clients?.full_name || null,
+          clientName:   client.full_name || null,
+          guardianName: client.billing_contact_name || null,
+          studentName:  client.full_name || null,
+          billingAddress:        client.billing_address || null,
+          billingPhone:          client.phone || null,
+          billingEmail:          client.email || null,
+          billingEmailSecondary: client.billing_email_secondary || null,
+          subject:      null,
+          customerNotes: p.customer_notes || null,
+          currency:     'CAD',
+          lines:        Array.isArray(p.lines) ? p.lines : [],
         };
       } else if (currentDoc.docType === 'paycheque') {
         meta = {
           totalCents:   Number(p.net_cents) || 0,
-          balanceCents: null,
+          paidCents:    Number(p.net_cents) || 0,
+          balanceCents: 0,
           docDate:      p.pay_date || null,
           dueDate:      null,
           clientName:   p.assistant_name || null,
+          guardianName: null,
+          studentName:  null,
+          billingAddress: null,
+          billingPhone:   null,
+          billingEmail:   null,
+          billingEmailSecondary: null,
+          subject:      null,
+          customerNotes: p.notes || null,
+          currency:     (p.currency || 'CAD').toUpperCase(),
+          lines:        Array.isArray(p.lines) ? p.lines : [],
         };
       }
 

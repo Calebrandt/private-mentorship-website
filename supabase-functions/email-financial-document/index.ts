@@ -45,12 +45,37 @@ const MAX_PDF_BYTES = 10 * 1024 * 1024; // 10 MB — Resend tops out around 40 M
 
 type DocType = "invoice" | "receipt" | "paycheque";
 
+interface ReqLine {
+  description?: string | null;
+  quantity?: number | null;
+  unit_price_cents?: number | null;   // invoices
+  line_total_cents?: number | null;   // invoices + paycheques
+  unit_price?: number | null;         // receipts (dollars)
+  line_total?: number | null;         // receipts (dollars)
+  hours?: number | null;              // paycheques
+  hourly_rate_cents?: number | null;  // paycheques
+}
 interface ReqMeta {
   totalCents?: number | null;
+  paidCents?: number | null;
   balanceCents?: number | null;
   docDate?: string | null;
   dueDate?: string | null;
   clientName?: string | null;
+  // Rich BILLED TO block
+  guardianName?: string | null;
+  studentName?: string | null;
+  billingAddress?: string | null;
+  billingPhone?: string | null;
+  billingEmail?: string | null;
+  billingEmailSecondary?: string | null;
+  // Document context
+  subject?: string | null;
+  terms?: string | null;
+  customerNotes?: string | null;
+  currency?: string | null;
+  // Inline line items table
+  lines?: ReqLine[] | null;
 }
 interface ReqBody {
   docType: DocType;
@@ -102,20 +127,18 @@ function fmtDateShort(v: string | null | undefined): string {
   return `${months[Number(m[2]) - 1]} ${Number(m[3])}, ${m[1]}`;
 }
 
-// ─── Branded HTML email shell — 1:1 port of the React Native app ─────────
-// Mirrors src/screens/adminBilling/invoices/View/index.js::buildInvoiceEmailHtml
-// + src/helpers/salesReceiptTemplates.js::buildSalesReceiptEmailHtml so the
-// email lands identically to what Caleb already sees from the app.
+// ─── Branded HTML email shell — Stripe/Square-style inline receipt ───────
+// The email body IS the document. Same visual language as the PDF, rendered
+// in HTML so the recipient sees the full invoice/receipt without having to
+// open the PDF attachment. The PDF is still attached for their records.
 //
-// Structure (fixed, clean):
-//   1. Dark slate header card  → "INVOICE / RECEIPT / PAYCHEQUE" + #number
-//   2. "Hello [Client Name]," auto-greeting (pulled from meta.clientName)
-//   3. Short body sentence(s) from the admin composer (optional)
-//   4. Big dashed-border amount block — figure + sub-info
-//   5. "Thank you for choosing Private Mentorship." footer (border-top)
-//
-// The composer's body text replaces the fixed "Please find your invoice
-// attached as a PDF for your records." sentence. Keep it short.
+// Email-client compatibility notes:
+//   • All styles inline (most clients strip <style> blocks)
+//   • Table-based layout where it matters (Outlook desktop)
+//   • Single 600px-wide card centered on a soft background
+//   • Web-safe fonts only (Outfit/Inter ignored by most clients,
+//     fallback chain hits Helvetica → system sans)
+//   • Logos hosted on Supabase storage (public bucket, served with CORS)
 function buildBrandedEmailHtml(opts: {
   docType: DocType;
   docNumber: string | null | undefined;
@@ -123,93 +146,267 @@ function buildBrandedEmailHtml(opts: {
   filename: string;
   meta?: ReqMeta | null;
 }): string {
-  const BRAND_PRIMARY = "#0f172a";   // slate-900
-  const BRAND_ACCENT  = "#2563eb";   // blue-600
-  const BG            = "#f1f5f9";   // slate-100
+  // ─── Palette — matches the PDF's airy luxury-minimal feel ──────────
+  const INK        = "#1f1f1f";
+  const INK_SOFT   = "#4a4a4a";
+  const INK_MUTE   = "#6a6a6a";
+  const INK_TERT   = "#8a8a8a";
+  const HAIRLINE   = "#e2e2e2";
+  const ROW_LINE   = "#ededed";
+  const HIGHLIGHT  = "#e5e5e5";
+  const SIDEBAR_BG = "#efefef";
+  const BG         = "#f4f4f4";
+  const CARD_BG    = "#ffffff";
+
+  const LOGO_URL = "https://llkicgphkvciumfzhbkk.supabase.co/storage/v1/object/public/branding/RecLogo.png";
+
+  const COMPANY_NAME  = "Private Mentorship";
+  const COMPANY_EMAIL = "billing@private-mentorship.com";
+  const COMPANY_WEB   = "privatementorship.ca";
+
+  const FONT = `'Outfit','Montserrat','Helvetica Neue',Helvetica,Arial,sans-serif`;
 
   const docLabel = String(opts.docType).toUpperCase();
   const num      = opts.docNumber ? `#${escapeHtml(opts.docNumber)}` : "";
+  const m        = opts.meta || {};
+  const ccy      = (m.currency || "CAD").toUpperCase();
 
-  const m = opts.meta || {};
-  const clientName = (m.clientName || "").trim();
-  const firstName  = clientName ? clientName.split(/\s+/)[0] : "";
-  const greeting   = firstName
-    ? `Hello <strong>${escapeHtml(firstName)}</strong>,`
-    : `Hello,`;
+  // ─── Greeting ──────────────────────────────────────────────────────
+  const greetName = (m.guardianName || m.clientName || "").trim();
+  const firstName = greetName ? greetName.split(/\s+/)[0] : "";
+  const greeting  = firstName ? `Hello ${escapeHtml(firstName)},` : `Hello,`;
 
-  // Composer body — if the admin left it empty, fall back to the app's
-  // default sentence per doc type.
-  const defaultLine =
+  // ─── Intro line ────────────────────────────────────────────────────
+  const defaultIntro =
     opts.docType === "receipt"
-      ? "This email confirms that we have received your payment. A detailed PDF copy is attached to this email for your records."
+      ? "This email confirms your payment. The full receipt is below — a PDF copy is also attached for your records."
       : opts.docType === "paycheque"
-        ? "Your paycheque is attached as a PDF for your records."
-        : "Please find your invoice attached as a PDF for your records.";
-  const bodyToRender = (opts.body || "").trim() || defaultLine;
-  const safeBody = bodyToHtml(bodyToRender);
+        ? "Your paycheque is below — a PDF copy is also attached for your records."
+        : "Your invoice is below — a PDF copy is also attached for your records.";
+  const intro = (opts.body || "").trim() || defaultIntro;
 
-  // Amount block label + figure + sub-info per doc type (matches app)
-  const showAmountBlock = (m.totalCents != null) || (m.balanceCents != null);
-  const amountLabel =
-    opts.docType === "receipt"   ? "Amount Paid" :
+  // ─── BILLED TO / RECEIVED FROM / PAID TO block ─────────────────────
+  const partyLabel =
+    opts.docType === "invoice"   ? "Billed To" :
+    opts.docType === "receipt"   ? "Received From" :
+                                   "Paid To";
+  const partyHeadline = m.guardianName
+    ? `Guardian: ${escapeHtml(m.guardianName)}`
+    : escapeHtml(m.clientName || "—");
+  const partyForLine = (m.guardianName && m.clientName)
+    ? `<div style="margin-top:2px;color:${INK_TERT};font-style:italic;">For: ${escapeHtml(m.clientName)}</div>`
+    : "";
+  const partyAddress = m.billingAddress ? `<div>${escapeHtml(m.billingAddress)}</div>` : "";
+  const partyPhone   = m.billingPhone   ? `<div>${escapeHtml(m.billingPhone)}</div>` : "";
+  const partyEmail   = m.billingEmail   ? `<div>${escapeHtml(m.billingEmail)}</div>` : "";
+  const partyEmail2  = m.billingEmailSecondary ? `<div>${escapeHtml(m.billingEmailSecondary)}</div>` : "";
+
+  // ─── Document details (right-side mini-table) ──────────────────────
+  const dateLabelLeft  = opts.docType === "receipt" ? "Received" : opts.docType === "paycheque" ? "Pay Date" : "Issued";
+  const dateValueLeft  = m.docDate ? fmtDateShort(m.docDate) : "";
+  const dueRow = (opts.docType === "invoice" && m.dueDate)
+    ? `<tr><td style="padding:4px 0;color:${INK_TERT};font-style:italic;">Due</td><td style="padding:4px 0;text-align:right;color:${INK};font-weight:500;">${escapeHtml(fmtDateShort(m.dueDate))}</td></tr>`
+    : "";
+  const subjectRow = (opts.docType === "invoice" && m.subject)
+    ? `<tr><td style="padding:4px 0;color:${INK_TERT};font-style:italic;">Subject</td><td style="padding:4px 0;text-align:right;color:${INK};font-weight:500;">${escapeHtml(m.subject)}</td></tr>`
+    : "";
+
+  // ─── Line items table ──────────────────────────────────────────────
+  const lines = Array.isArray(m.lines) ? m.lines : [];
+  const isPaycheque = opts.docType === "paycheque";
+  const isReceipt   = opts.docType === "receipt";
+
+  // Normalize each line into cents
+  const itemRows = lines.map((l, idx) => {
+    let qty = Number(l.quantity ?? l.hours ?? 0) || 0;
+    let unitCents = 0;
+    let totalCents = 0;
+    if (isPaycheque) {
+      qty = Number(l.hours ?? 0) || 0;
+      unitCents = Number(l.hourly_rate_cents ?? 0) || 0;
+      totalCents = Number(l.line_total_cents ?? Math.round(qty * unitCents)) || 0;
+    } else if (isReceipt) {
+      // sales_receipt_lines stores dollars
+      const qDollars = Number(l.quantity ?? 1) || 1;
+      const unitDollars = Number(l.unit_price ?? 0) || 0;
+      const totalDollars = Number(l.line_total ?? qDollars * unitDollars) || 0;
+      qty = qDollars;
+      unitCents = Math.round(unitDollars * 100);
+      totalCents = Math.round(totalDollars * 100);
+    } else {
+      qty = Number(l.quantity ?? 0) || 0;
+      unitCents = Number(l.unit_price_cents ?? 0) || 0;
+      totalCents = Number(l.line_total_cents ?? Math.round(qty * unitCents)) || 0;
+    }
+    const qtyDisplay = isPaycheque ? qty.toFixed(2) : String(qty);
+    return `
+      <tr>
+        <td style="padding:14px 8px 14px 0;border-bottom:1px solid ${ROW_LINE};color:${INK};font-weight:400;font-size:13px;vertical-align:top;">
+          ${escapeHtml(l.description || "—")}
+        </td>
+        <td style="padding:14px 8px;border-bottom:1px solid ${ROW_LINE};color:${INK_MUTE};font-size:13px;text-align:center;vertical-align:top;">
+          ${escapeHtml(qtyDisplay)}
+        </td>
+        <td style="padding:14px 8px;border-bottom:1px solid ${ROW_LINE};color:${INK_MUTE};font-size:13px;text-align:right;vertical-align:top;font-variant-numeric:tabular-nums;">
+          ${escapeHtml(fmtMoneyCents(unitCents))}
+        </td>
+        <td style="padding:14px 0 14px 8px;border-bottom:1px solid ${ROW_LINE};color:${INK};font-weight:500;font-size:13px;text-align:right;vertical-align:top;font-variant-numeric:tabular-nums;">
+          ${escapeHtml(fmtMoneyCents(totalCents))}
+        </td>
+      </tr>`;
+  }).join("");
+
+  const qtyHeader  = isPaycheque ? "Hours" : "Qty";
+  const rateHeader = isPaycheque ? "Rate"  : "Unit Price";
+  const itemsTable = lines.length ? `
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:24px 0 18px 0;border-collapse:collapse;">
+      <thead>
+        <tr>
+          <th style="text-align:left;padding:10px 8px 10px 0;border-bottom:1px solid ${HAIRLINE};color:${INK_SOFT};font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;">Description</th>
+          <th style="text-align:center;padding:10px 8px;border-bottom:1px solid ${HAIRLINE};color:${INK_SOFT};font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;width:60px;">${qtyHeader}</th>
+          <th style="text-align:right;padding:10px 8px;border-bottom:1px solid ${HAIRLINE};color:${INK_SOFT};font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;width:96px;">${rateHeader}</th>
+          <th style="text-align:right;padding:10px 0 10px 8px;border-bottom:1px solid ${HAIRLINE};color:${INK_SOFT};font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;width:96px;">Total</th>
+        </tr>
+      </thead>
+      <tbody>${itemRows}</tbody>
+    </table>` : "";
+
+  // ─── Totals stack ──────────────────────────────────────────────────
+  const sub  = Number(m.totalCents) || 0;
+  const paid = Number(m.paidCents)  || 0;
+  const bal  = Number(m.balanceCents != null ? m.balanceCents : (sub - paid));
+
+  const totalLabel =
+    opts.docType === "receipt"   ? "Amount Received" :
     opts.docType === "paycheque" ? "Net Pay" :
-                                   "Total Amount";
-  // For receipts/paycheques the headline IS the total. For invoices, show
-  // total but lead the sub-info with balance + dates (matches app exactly).
-  const headlineCents = opts.docType === "invoice"
-    ? (m.totalCents != null ? Number(m.totalCents) : 0)
-    : (m.totalCents != null ? Number(m.totalCents) : 0);
-  const headlineAmount = fmtMoneyCents(headlineCents);
+                                   "Amount Due";
 
-  let subInfo = "";
-  if (opts.docType === "invoice") {
-    const balance   = m.balanceCents != null ? `<div><strong>Balance Due:</strong> ${escapeHtml(fmtMoneyCents(Number(m.balanceCents)))}</div>` : "";
-    const issuedLn  = m.docDate ? `<div>Issued on ${escapeHtml(fmtDateShort(m.docDate))}</div>` : "";
-    const dueLn     = m.dueDate ? `<div>Due by ${escapeHtml(fmtDateShort(m.dueDate))}</div>` : "";
-    subInfo = balance + issuedLn + dueLn;
-  } else if (opts.docType === "receipt") {
-    subInfo = m.docDate ? `<div>Paid on ${escapeHtml(fmtDateShort(m.docDate))}</div>` : "";
-  } else {
-    subInfo = m.docDate ? `<div>Pay date · ${escapeHtml(fmtDateShort(m.docDate))}</div>` : "";
-  }
+  const totalsStack = `
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:18px 0 0 0;border-collapse:collapse;">
+      <tr><td style="width:55%;"></td><td style="padding:0;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">
+          ${opts.docType === "invoice" ? `
+          <tr>
+            <td style="padding:8px 14px;color:${INK_MUTE};font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;">Subtotal</td>
+            <td style="padding:8px 14px;text-align:right;color:${INK};font-size:13px;font-variant-numeric:tabular-nums;">${escapeHtml(fmtMoneyCents(sub))}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 14px;color:${INK_MUTE};font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;">Amount Paid</td>
+            <td style="padding:8px 14px;text-align:right;color:${INK};font-size:13px;font-variant-numeric:tabular-nums;">${escapeHtml(fmtMoneyCents(paid))}</td>
+          </tr>` : ""}
+          <tr>
+            <td style="padding:12px 14px;background-color:${HIGHLIGHT};color:${INK};font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;">${totalLabel}</td>
+            <td style="padding:12px 14px;background-color:${HIGHLIGHT};text-align:right;color:${INK};font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;">${escapeHtml(fmtMoneyCents(opts.docType === "invoice" ? bal : sub))}</td>
+          </tr>
+        </table>
+      </td></tr>
+    </table>`;
 
-  // Bigger figure for receipts/paycheques (single headline number) to
-  // mirror the app's receipt template.
-  const figureSize = (opts.docType === "receipt") ? 36 : 32;
+  // ─── Payment instructions (invoices only, when there's a balance) ──
+  const showPaymentBlock = opts.docType === "invoice" && bal > 0;
+  const paymentBlock = showPaymentBlock ? `
+    <div style="margin:28px 0 0 0;padding:18px 22px;background-color:${SIDEBAR_BG};border-radius:8px;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:${INK_SOFT};margin-bottom:8px;">How to Pay</div>
+      <div style="font-size:13px;color:${INK_MUTE};line-height:1.6;">
+        E-transfer to <strong style="color:${INK};font-weight:500;">${escapeHtml(COMPANY_EMAIL)}</strong><br/>
+        Auto-deposit enabled — no security question required.
+      </div>
+    </div>` : "";
 
-  const amountBlock = showAmountBlock ? `
-        <div style="background:#f8fafc;border:1px dashed #cbd5e1;border-radius:8px;padding:25px;text-align:center;margin-top:0;">
-          <div style="font-size:11px;text-transform:uppercase;color:#94a3b8;letter-spacing:0.1em;font-weight:700;">${escapeHtml(amountLabel)}</div>
-          <div style="font-size:${figureSize}px;color:${BRAND_PRIMARY};font-weight:700;margin:10px 0;">${escapeHtml(headlineAmount)}</div>
-          ${subInfo ? `<div style="font-size:12px;color:#64748b;line-height:1.6;">${subInfo}</div>` : ""}
-        </div>` : "";
+  // ─── Customer notes ────────────────────────────────────────────────
+  const notesBlock = m.customerNotes ? `
+    <div style="margin:24px 0 0 0;font-size:12px;color:${INK_MUTE};line-height:1.6;font-style:italic;">
+      <div style="font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:${INK_SOFT};margin-bottom:6px;font-style:normal;">Notes</div>
+      ${escapeHtml(m.customerNotes)}
+    </div>` : "";
 
-  // Outer email scaffolding — 1:1 with the app
+  // ─── Final assembled email ─────────────────────────────────────────
   return `<!DOCTYPE html>
-<html><head><meta charset="utf-8" /></head>
-<body style="margin:0;padding:0;">
-  <div style="background-color:${BG};padding:40px 10px;font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Roboto,sans-serif;color:#334155;">
-    <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+<html><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1.0" /></head>
+<body style="margin:0;padding:0;background-color:${BG};">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:${BG};padding:40px 12px;">
+    <tr><td align="center">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px;width:100%;background-color:${CARD_BG};border-radius:8px;overflow:hidden;font-family:${FONT};">
 
-      <div style="background:${BRAND_PRIMARY};padding:30px 40px;text-align:center;">
-        <h1 style="color:#ffffff;margin:0;font-size:24px;letter-spacing:0.05em;text-transform:uppercase;">${escapeHtml(docLabel)}</h1>
-        ${num ? `<p style="color:${BRAND_ACCENT};margin:5px 0 0 0;font-size:14px;font-weight:600;">${num}</p>` : ""}
-      </div>
+        <!-- HEADER: logo left, doc type + number right -->
+        <tr><td style="background-color:${SIDEBAR_BG};padding:28px 36px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+            <tr>
+              <td style="vertical-align:middle;width:100px;">
+                <img src="${LOGO_URL}" alt="${escapeHtml(COMPANY_NAME)}" width="84" style="display:block;border:0;width:84px;height:auto;" />
+              </td>
+              <td style="vertical-align:middle;text-align:right;">
+                <div style="font-size:11px;font-weight:600;letter-spacing:0.28em;text-transform:uppercase;color:${INK_SOFT};">${escapeHtml(docLabel)}</div>
+                ${num ? `<div style="font-size:18px;font-weight:300;color:${INK};letter-spacing:0.06em;margin-top:4px;">${num}</div>` : ""}
+              </td>
+            </tr>
+          </table>
+        </td></tr>
 
-      <div style="padding:40px;">
-        <p style="font-size:16px;margin:0 0 20px 0;color:#334155;">${greeting}</p>
-        <div style="font-size:14px;line-height:1.6;color:#64748b;margin-bottom:24px;">${safeBody}</div>
-        ${amountBlock}
-        <div style="margin-top:30px;font-size:11px;color:#94a3b8;text-align:center;">
-          Attachment: <strong style="color:#475569;">${escapeHtml(opts.filename)}</strong>
-        </div>
-        <div style="margin-top:30px;border-top:1px solid #e2e8f0;padding-top:20px;text-align:center;font-size:12px;color:#94a3b8;">
-          Thank you for choosing Private Mentorship.
-        </div>
-      </div>
+        <!-- BODY -->
+        <tr><td style="padding:36px 36px 28px 36px;">
 
-    </div>
-  </div>
+          <!-- Greeting + intro -->
+          <div style="font-size:15px;color:${INK};margin-bottom:14px;">${greeting}</div>
+          <div style="font-size:13px;color:${INK_MUTE};line-height:1.65;margin-bottom:28px;">${escapeHtml(intro)}</div>
+
+          <!-- Parties: BILLED TO (left) / DETAILS (right) -->
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:24px;">
+            <tr>
+              <td style="vertical-align:top;width:55%;padding-right:20px;">
+                <div style="font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:${INK_SOFT};margin-bottom:8px;">${partyLabel}</div>
+                <div style="font-size:13px;color:${INK_MUTE};line-height:1.6;">
+                  <div style="color:${INK};">${partyHeadline}</div>
+                  ${partyForLine}
+                  ${partyAddress}
+                  ${partyPhone}
+                  ${partyEmail}
+                  ${partyEmail2}
+                </div>
+              </td>
+              <td style="vertical-align:top;width:45%;">
+                <div style="font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:${INK_SOFT};margin-bottom:8px;">Details</div>
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="font-size:13px;">
+                  ${dateValueLeft ? `<tr><td style="padding:4px 0;color:${INK_TERT};font-style:italic;">${escapeHtml(dateLabelLeft)}</td><td style="padding:4px 0;text-align:right;color:${INK};font-weight:500;">${escapeHtml(dateValueLeft)}</td></tr>` : ""}
+                  ${dueRow}
+                  ${subjectRow}
+                </table>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Line items table -->
+          ${itemsTable}
+
+          <!-- Totals stack -->
+          ${totalsStack}
+
+          <!-- Payment instructions -->
+          ${paymentBlock}
+
+          <!-- Customer notes -->
+          ${notesBlock}
+
+          <!-- Attachment chip -->
+          <div style="margin:30px 0 0 0;padding:14px 18px;background-color:#fafafa;border:1px solid ${HAIRLINE};border-radius:6px;font-size:12px;color:${INK_MUTE};">
+            <span style="font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:${INK_SOFT};margin-right:8px;">Attached</span>
+            <span style="color:${INK};">${escapeHtml(opts.filename)}</span>
+          </div>
+
+        </td></tr>
+
+        <!-- FOOTER -->
+        <tr><td style="padding:0 36px 32px 36px;">
+          <div style="border-top:1px solid ${HAIRLINE};padding-top:20px;font-size:11px;color:${INK_TERT};text-align:center;line-height:1.8;">
+            Thank you for choosing ${escapeHtml(COMPANY_NAME)}<br/>
+            <span style="color:${INK_MUTE};">${escapeHtml(COMPANY_EMAIL)}  ·  ${escapeHtml(COMPANY_WEB)}</span><br/>
+            <span style="color:${INK_TERT};font-style:italic;">Reply directly to this email to reach us.</span>
+          </div>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
 </body></html>`;
 }
 
