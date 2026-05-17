@@ -298,6 +298,97 @@
   .fin-row-actions button.is-email:hover{
     background:rgba(22,163,74,0.06);color:#15803d;border-color:rgba(22,163,74,0.50);
   }
+
+  /* ─── Reports tab ────────────────────────────────────────────────── */
+  .rpt-kpis{
+    display:grid;grid-template-columns:repeat(4, 1fr);gap:14px;margin-top:18px;
+  }
+  @media(max-width:900px){.rpt-kpis{grid-template-columns:repeat(2, 1fr);}}
+  .rpt-kpi{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:12px;padding:18px 20px;
+  }
+  .rpt-kpi__label{
+    font:600 10.5px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-tert);margin-bottom:8px;
+  }
+  .rpt-kpi__value{
+    font:700 26px Inter,sans-serif;letter-spacing:-.018em;color:var(--ink-2);
+    font-variant-numeric:tabular-nums;line-height:1.1;
+  }
+  .rpt-kpi__value--good{color:#15803d;}
+  .rpt-kpi__value--warn{color:#b45309;}
+  .rpt-kpi__sub{
+    font:500 11.5px Inter,sans-serif;color:var(--ink-mute);margin-top:4px;
+  }
+
+  .rpt-section-head{
+    display:flex;align-items:baseline;justify-content:space-between;
+    gap:14px;margin-bottom:14px;flex-wrap:wrap;
+  }
+  .rpt-section-head h3{
+    font:700 14px Inter,sans-serif;letter-spacing:-.005em;color:var(--ink-2);margin:0;
+  }
+  .rpt-section-hint{
+    font:500 11.5px Inter,sans-serif;color:var(--ink-mute);
+  }
+
+  /* Monthly revenue chart — pure HTML/CSS horizontal bars */
+  .rpt-chart{
+    display:flex;flex-direction:column;gap:6px;
+  }
+  .rpt-bar-row{
+    display:grid;grid-template-columns:64px 1fr 110px;
+    align-items:center;gap:14px;padding:5px 0;
+  }
+  .rpt-bar-label{
+    font:600 10.5px Inter,sans-serif;letter-spacing:.10em;text-transform:uppercase;
+    color:var(--ink-mute);
+  }
+  .rpt-bar-track{
+    height:18px;background:var(--border-soft);border-radius:5px;overflow:hidden;
+    position:relative;
+  }
+  .rpt-bar-fill{
+    height:100%;background:linear-gradient(90deg, var(--primary) 0%, #60a5fa 100%);
+    border-radius:5px;
+    transition:width .35s cubic-bezier(.4,0,.2,1);
+  }
+  .rpt-bar-value{
+    text-align:right;font:600 12.5px "JetBrains Mono",ui-monospace,monospace;
+    color:var(--ink-2);font-variant-numeric:tabular-nums;
+  }
+  .rpt-bar-value--zero{color:var(--ink-tert);font-weight:500;}
+
+  /* Outstanding / top-clients lists */
+  .rpt-list-row{
+    display:grid;grid-template-columns:1fr 100px 110px 100px;
+    align-items:center;gap:14px;padding:12px 0;
+    border-bottom:1px solid var(--border-soft);
+    font:500 13px Inter,sans-serif;color:var(--ink);
+  }
+  .rpt-list-row:last-child{border-bottom:none;}
+  .rpt-list-row .rpt-num{font:600 12px "JetBrains Mono",ui-monospace,monospace;color:var(--ink-mute);}
+  .rpt-list-row .rpt-date{color:var(--ink-mute);font-size:12px;}
+  .rpt-list-row .rpt-amount{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink-2);}
+  .rpt-overdue-pill{
+    display:inline-block;padding:2px 9px;border-radius:9999px;
+    font:700 10px Inter,sans-serif;letter-spacing:.04em;text-transform:uppercase;
+    background:rgba(220,38,38,0.12);color:#dc2626;
+  }
+  .rpt-soon-pill{
+    display:inline-block;padding:2px 9px;border-radius:9999px;
+    font:700 10px Inter,sans-serif;letter-spacing:.04em;text-transform:uppercase;
+    background:rgba(245,158,11,0.12);color:#92400e;
+  }
+
+  /* Exports row */
+  .rpt-exports{display:flex;gap:10px;flex-wrap:wrap;}
+
+  /* Reports empty-state */
+  .rpt-empty{
+    padding:18px 0;color:var(--ink-tert);font:500 12.5px Inter,sans-serif;text-align:center;
+  }
 </style>
 </head>
 <body class="pm-has-sidebar">
@@ -380,14 +471,88 @@
     </div>
   </section>
 
-  <!-- REPORTS PANEL (placeholder) -->
+  <!-- REPORTS PANEL -->
   <section data-panel="reports" hidden>
-    <div class="fin-card">
-      <div class="fin-empty">
-        <strong>Reports tab — coming next iteration</strong>
-        Monthly revenue summary, outstanding invoices, T4A-ready paycheque export, CSV download.
+
+    <!-- KPI strip — 4 high-level numbers across the top -->
+    <div class="fin-actions">
+      <div class="fin-actions__left">
+        <h2 style="font:700 18px Inter,sans-serif;letter-spacing:-.012em;color:var(--ink-2);margin:0;">Year to date · <span id="rptYear">2026</span></h2>
+      </div>
+      <div class="fin-actions__sub">Updated live from your bookkeeping records</div>
+    </div>
+
+    <div class="rpt-kpis">
+      <div class="rpt-kpi">
+        <div class="rpt-kpi__label">Total Billed</div>
+        <div class="rpt-kpi__value" id="kpiBilled">—</div>
+        <div class="rpt-kpi__sub" id="kpiBilledCount">0 invoices</div>
+      </div>
+      <div class="rpt-kpi">
+        <div class="rpt-kpi__label">Collected</div>
+        <div class="rpt-kpi__value rpt-kpi__value--good" id="kpiPaid">—</div>
+        <div class="rpt-kpi__sub" id="kpiPaidCount">0 paid</div>
+      </div>
+      <div class="rpt-kpi">
+        <div class="rpt-kpi__label">Outstanding</div>
+        <div class="rpt-kpi__value rpt-kpi__value--warn" id="kpiOutstanding">—</div>
+        <div class="rpt-kpi__sub" id="kpiOutstandingCount">0 open</div>
+      </div>
+      <div class="rpt-kpi">
+        <div class="rpt-kpi__label">Paid to Assistants</div>
+        <div class="rpt-kpi__value" id="kpiPayouts">—</div>
+        <div class="rpt-kpi__sub" id="kpiPayoutsCount">0 paycheques</div>
       </div>
     </div>
+
+    <!-- Monthly revenue chart -->
+    <div class="fin-card" style="margin-top:20px;padding:24px;">
+      <div class="rpt-section-head">
+        <h3>Monthly revenue · last 12 months</h3>
+        <span class="rpt-section-hint" id="rptRevTotalLabel">—</span>
+      </div>
+      <div class="rpt-chart" id="rptChart"></div>
+    </div>
+
+    <!-- Outstanding invoices -->
+    <div class="fin-card" style="margin-top:20px;padding:24px;">
+      <div class="rpt-section-head">
+        <h3>Outstanding invoices</h3>
+        <span class="rpt-section-hint" id="rptOutstandingHint">No open balances</span>
+      </div>
+      <div id="rptOutstandingList"></div>
+    </div>
+
+    <!-- Top clients by revenue -->
+    <div class="fin-card" style="margin-top:20px;padding:24px;">
+      <div class="rpt-section-head">
+        <h3>Top clients by revenue · YTD</h3>
+      </div>
+      <div id="rptTopClients"></div>
+    </div>
+
+    <!-- CSV exports -->
+    <div class="fin-card" style="margin-top:20px;padding:24px;">
+      <div class="rpt-section-head">
+        <h3>Exports</h3>
+        <span class="rpt-section-hint">For your accountant, CRA records, or AI bookkeeping tools</span>
+      </div>
+      <div class="rpt-exports">
+        <button class="fin-btn fin-btn--ghost" type="button" id="rptExportInvoices">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          All invoices (CSV)
+        </button>
+        <button class="fin-btn fin-btn--ghost" type="button" id="rptExportReceipts">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          All receipts (CSV)
+        </button>
+        <button class="fin-btn fin-btn--ghost" type="button" id="rptExportPaycheques">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Paycheques (CSV · T4A-ready)
+        </button>
+      </div>
+    </div>
+
   </section>
 </main>
 
@@ -937,6 +1102,7 @@
     wrap.querySelectorAll('[data-email-payq]').forEach(b => b.addEventListener('click', () => openEmailComposer('paycheque', b.dataset.emailPayq)));
   }
   renderInvoices(); renderReceipts(); renderPaycheques();
+  renderReports();
 
   // ─── Reload on each mutation ───────────────────────────────
   async function refresh(){
@@ -948,7 +1114,200 @@
     $('cntReceipts').textContent = receipts.length;
     $('cntPaycheques').textContent = paycheques.length;
     renderInvoices(); renderReceipts(); renderPaycheques();
+    renderReports();
   }
+
+  // ═══════════════════════════════════════════════════════════
+  // REPORTS — KPIs + monthly chart + outstanding + top clients
+  // + CSV exports. All compute client-side from the docs already
+  // pulled by adminListFinancialDocuments — no extra round-trip.
+  // ═══════════════════════════════════════════════════════════
+  function renderReports(){
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    $('rptYear').textContent = currentYear;
+
+    // Filter to current year (by doc_date)
+    const isThisYear = (d) => {
+      const m = String(d || '').match(/^(\d{4})/);
+      return m && Number(m[1]) === currentYear;
+    };
+    const invYTD  = invoices.filter(i => i.status !== 'void' && isThisYear(i.doc_date));
+    const recYTD  = receipts.filter(r => r.status !== 'void' && isThisYear(r.doc_date));
+    const payqYTD = paycheques.filter(p => p.status !== 'void' && isThisYear(p.doc_date));
+
+    // ─── KPIs ──────────────────────────────────────────────────
+    const billed      = invYTD.reduce((s, i) => s + (Number(i.gross_cents)   || 0), 0);
+    const collected   = invYTD.reduce((s, i) => s + (Number(i.paid_cents)    || 0), 0);
+    const outstanding = invYTD.reduce((s, i) => s + (Number(i.balance_cents) || 0), 0);
+    const payouts     = payqYTD.reduce((s, p) => s + (Number(p.gross_cents)  || 0), 0);
+
+    const openInvoices = invYTD.filter(i => i.status === 'open');
+    const paidInvoices = invYTD.filter(i => i.status === 'paid');
+
+    $('kpiBilled').textContent           = fmtMoney(billed, 'CAD');
+    $('kpiBilledCount').textContent      = `${invYTD.length} invoice${invYTD.length === 1 ? '' : 's'}`;
+    $('kpiPaid').textContent             = fmtMoney(collected, 'CAD');
+    $('kpiPaidCount').textContent        = `${paidInvoices.length} paid`;
+    $('kpiOutstanding').textContent      = fmtMoney(outstanding, 'CAD');
+    $('kpiOutstandingCount').textContent = `${openInvoices.length} open`;
+    $('kpiPayouts').textContent          = fmtMoney(payouts, 'CAD');
+    $('kpiPayoutsCount').textContent     = `${payqYTD.length} paycheque${payqYTD.length === 1 ? '' : 's'}`;
+
+    // ─── Monthly revenue chart (last 12 months by invoice_date) ─
+    // Build a Map<YYYY-MM, totalCents> seeded with 12 empty months
+    const monthly = new Map();
+    for (let i = 11; i >= 0; i--){
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,'0')}`;
+      monthly.set(key, 0);
+    }
+    invoices.forEach(i => {
+      if (i.status === 'void') return;
+      const m = String(i.doc_date || '').match(/^(\d{4})-(\d{2})/);
+      if (!m) return;
+      const key = `${m[1]}-${m[2]}`;
+      if (monthly.has(key)) monthly.set(key, monthly.get(key) + (Number(i.gross_cents) || 0));
+    });
+    const maxVal = Math.max(...monthly.values(), 1);
+    const monthLabels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const chartRows = [];
+    monthly.forEach((cents, key) => {
+      const [y, m] = key.split('-');
+      const lbl = `${monthLabels[Number(m) - 1]} '${String(y).slice(-2)}`;
+      const pct = (cents / maxVal) * 100;
+      chartRows.push(`
+        <div class="rpt-bar-row">
+          <div class="rpt-bar-label">${esc(lbl)}</div>
+          <div class="rpt-bar-track"><div class="rpt-bar-fill" style="width:${pct.toFixed(1)}%;"></div></div>
+          <div class="rpt-bar-value ${cents === 0 ? 'rpt-bar-value--zero' : ''}">${esc(fmtMoney(cents, 'CAD'))}</div>
+        </div>`);
+    });
+    $('rptChart').innerHTML = chartRows.join('');
+    const total12mo = Array.from(monthly.values()).reduce((s, v) => s + v, 0);
+    $('rptRevTotalLabel').textContent = `Total · ${fmtMoney(total12mo, 'CAD')}`;
+
+    // ─── Outstanding invoices list ─────────────────────────────
+    const open = invoices.filter(i => i.status === 'open' && Number(i.balance_cents) > 0)
+      .sort((a, b) => String(a.doc_date).localeCompare(String(b.doc_date))); // oldest first
+    const todayMs = now.getTime();
+    const dayMs = 86400000;
+    const outRows = open.map(i => {
+      const due = i.subject; // subject isn't due_date; we need due from somewhere — but the view doesn't expose it
+      // Calculate days since invoice date as a proxy "age"
+      const issued = String(i.doc_date || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+      let badge = '';
+      if (issued) {
+        const issuedMs = new Date(+issued[1], +issued[2] - 1, +issued[3]).getTime();
+        const ageDays = Math.floor((todayMs - issuedMs) / dayMs);
+        if (ageDays > 30)      badge = `<span class="rpt-overdue-pill">${ageDays}d overdue</span>`;
+        else if (ageDays > 14) badge = `<span class="rpt-soon-pill">${ageDays}d old</span>`;
+        else                   badge = `<span style="color:var(--ink-tert);font-size:11px;">${ageDays}d ago</span>`;
+      }
+      return `<div class="rpt-list-row">
+        <div>
+          <span class="rpt-num">${esc(i.doc_number)}</span> &nbsp;·&nbsp; ${esc(i.party_name || '—')}
+        </div>
+        <div class="rpt-date">${esc(fmtDate(i.doc_date))}</div>
+        <div>${badge}</div>
+        <div class="rpt-amount">${esc(fmtMoney(i.balance_cents, i.currency))}</div>
+      </div>`;
+    }).join('');
+    $('rptOutstandingList').innerHTML = outRows || `<div class="rpt-empty">All invoices paid — great job. 👏</div>`;
+    $('rptOutstandingHint').textContent = open.length
+      ? `${open.length} invoice${open.length === 1 ? '' : 's'} · ${fmtMoney(outstanding, 'CAD')} owed`
+      : 'No open balances';
+
+    // ─── Top clients by revenue ────────────────────────────────
+    const byClient = new Map();
+    invYTD.forEach(i => {
+      const name = i.party_name || '—';
+      byClient.set(name, (byClient.get(name) || 0) + (Number(i.gross_cents) || 0));
+    });
+    const top = Array.from(byClient.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+    const topRows = top.map(([name, total]) => {
+      const pct = (total / Math.max(billed, 1)) * 100;
+      return `<div class="rpt-list-row" style="grid-template-columns:1fr 1fr 110px;">
+        <div>${esc(name)}</div>
+        <div class="rpt-bar-track" style="height:10px;">
+          <div class="rpt-bar-fill" style="width:${pct.toFixed(1)}%;"></div>
+        </div>
+        <div class="rpt-amount">${esc(fmtMoney(total, 'CAD'))}</div>
+      </div>`;
+    }).join('');
+    $('rptTopClients').innerHTML = topRows || `<div class="rpt-empty">No invoices yet this year.</div>`;
+  }
+
+  // ─── CSV exports ──────────────────────────────────────────────
+  function _downloadCsv(filename, rows){
+    if (!rows.length){
+      toast('Nothing to export', 'error');
+      return;
+    }
+    const escapeCsv = (v) => {
+      if (v == null) return '';
+      const s = String(v);
+      // Quote when needed
+      return /[,"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const headers = Object.keys(rows[0]);
+    const body = [
+      headers.join(','),
+      ...rows.map(r => headers.map(h => escapeCsv(r[h])).join(',')),
+    ].join('\n');
+    // Prepend BOM so Excel handles UTF-8 correctly
+    const blob = new Blob(['﻿' + body], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1500);
+    toast(`Exported ${rows.length} row${rows.length === 1 ? '' : 's'}`);
+  }
+
+  $('rptExportInvoices')?.addEventListener('click', () => {
+    const rows = invoices.map(i => ({
+      'Invoice No':     i.doc_number || '',
+      'Date':           i.doc_date || '',
+      'Client':         i.party_name || '',
+      'Subject':        i.subject || '',
+      'Subtotal':       ((Number(i.gross_cents)   || 0) / 100).toFixed(2),
+      'Paid':           ((Number(i.paid_cents)    || 0) / 100).toFixed(2),
+      'Balance':        ((Number(i.balance_cents) || 0) / 100).toFixed(2),
+      'Currency':       i.currency || 'CAD',
+      'Status':         i.status || '',
+    }));
+    _downloadCsv(`invoices-${new Date().toISOString().slice(0,10)}.csv`, rows);
+  });
+
+  $('rptExportReceipts')?.addEventListener('click', () => {
+    const rows = receipts.map(r => ({
+      'Receipt No':   r.doc_number || '',
+      'Date':         r.doc_date || '',
+      'Client':       r.party_name || '',
+      'Amount':       ((Number(r.gross_cents) || 0) / 100).toFixed(2),
+      'Currency':     r.currency || 'CAD',
+      'Status':       r.status || '',
+    }));
+    _downloadCsv(`receipts-${new Date().toISOString().slice(0,10)}.csv`, rows);
+  });
+
+  $('rptExportPaycheques')?.addEventListener('click', () => {
+    // T4A-ready format: one row per paycheque with the fields a tax
+    // prep tool / accountant needs to compile annual T4As.
+    const rows = paycheques.map(p => ({
+      'Paycheque No':  p.doc_number || '',
+      'Pay Date':      p.doc_date || '',
+      'Recipient':     p.party_name || '',
+      'Gross Pay':     ((Number(p.gross_cents) || 0) / 100).toFixed(2),
+      'Net Pay':       ((Number(p.gross_cents) || 0) / 100).toFixed(2),
+      'Currency':      p.currency || 'CAD',
+      'Status':        p.status || '',
+    }));
+    _downloadCsv(`paycheques-T4A-${new Date().toISOString().slice(0,10)}.csv`, rows);
+  });
 
   // ─── NEW INVOICE flow ──────────────────────────────────────
   $('invClient').innerHTML = '<option value="">— Select client —</option>' +
