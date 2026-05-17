@@ -862,7 +862,7 @@
       // Query appointments by client_id (no assistant_id dependency).
       let q = sb()
         .from('appointments')
-        .select('id, contract_id, client_id, starts_at, ends_at, duration_minutes, status, kind, title, notes, cancelled_at, cancel_reason, is_complimentary')
+        .select('id, contract_id, client_id, starts_at, ends_at, duration_minutes, status, kind, title, notes, cancelled_at, cancel_reason, is_complimentary, funding_source, funding_note')
         .in('client_id', clientIds)
         .in('status', statuses)
         .order('starts_at', { ascending: true })

@@ -193,23 +193,27 @@
           const cName = clientNames[s.client_id] || '';
           const firstName = cName.split(' ')[0];
           const cancelled = ['cancelled', 'late_cancelled', 'no_show'].includes(s.status);
+          // Phase 19c.12 — bank-funded sessions get an amber visual flag
+          // (border + small ⏱ glyph) so they're distinguishable from
+          // contract-funded sessions at a glance. Cancelled state still wins.
+          const isBank = s.funding_source === 'bank';
           const tooltipParts = [time];
           if (firstName) tooltipParts.push(firstName);
           if (s.title) tooltipParts.push(s.title);
+          if (isBank) tooltipParts.push(`⏱ Bank-funded${s.funding_note ? ': ' + s.funding_note : ''}`);
           if (cancelled) tooltipParts.push(`(${s.status.replace('_', ' ')})`);
           if (!cancelled) tooltipParts.push('Click to preview');
           const tooltip = tooltipParts.join(' · ');
           const labelParts = [time];
+          if (isBank) labelParts.push('⏱');
           if (opts.colorByClient && firstName) labelParts.push(firstName);
-          // Build a deep-link URL via the host page's eventUrl callback.
-          // Returns null when the host doesn't want the event clickable.
           const url = typeof opts.eventUrl === 'function' ? opts.eventUrl(s) : null;
           const clickable = !!url && !cancelled;
-          const cls = `pmcal-event${cancelled ? ' is-cancelled' : ''}${clickable ? ' is-link' : ''}`;
-          // Note: NOT an <a> anymore — we now open a confirmation/preview
-          // modal first instead of navigating directly. The URL is stashed
-          // as data-url and consumed by the modal's "Open" button.
-          html += `<button type="button" class="${cls}" style="background:${colors[0]};" title="${escapeHtml(tooltip)}" data-appt-id="${escapeHtml(s.id)}"${url ? ` data-url="${escapeHtml(url)}"` : ''}${cancelled ? ' disabled' : ''}>${escapeHtml(labelParts.join(' '))}</button>`;
+          const cls = `pmcal-event${cancelled ? ' is-cancelled' : ''}${clickable ? ' is-link' : ''}${isBank ? ' is-bank' : ''}`;
+          const style = isBank
+            ? `background:${colors[0]};box-shadow:inset 0 0 0 2px #f59e0b;`
+            : `background:${colors[0]};`;
+          html += `<button type="button" class="${cls}" style="${style}" title="${escapeHtml(tooltip)}" data-appt-id="${escapeHtml(s.id)}"${url ? ` data-url="${escapeHtml(url)}"` : ''}${cancelled ? ' disabled' : ''}>${escapeHtml(labelParts.join(' '))}</button>`;
         });
         if (daySessions.length > 3) {
           html += `<div class="pmcal-event-more">+${daySessions.length - 3} more</div>`;
