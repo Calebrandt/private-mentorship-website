@@ -382,6 +382,90 @@
     .pm-assist-input button:hover { background: #1d4ed8; }
     .pm-assist-input button:disabled { background: #93c5fd; cursor: wait; }
 
+    /* Receipt preview modal — centered overlay, body-level, decoupled from drawer */
+    .pm-receipt-modal {
+      position: fixed; inset: 0; z-index: 10001;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      animation: pmReceiptFadeIn 160ms ease;
+    }
+    @keyframes pmReceiptFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .pm-receipt-modal__backdrop {
+      position: absolute; inset: 0;
+      background: rgba(15,23,42,0.55);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    .pm-receipt-modal__card {
+      position: relative;
+      width: 100%; max-width: 600px; max-height: 88vh;
+      background: #fff; border-radius: 14px;
+      display: flex; flex-direction: column;
+      box-shadow: 0 24px 60px -12px rgba(15,23,42,0.4), 0 6px 16px -6px rgba(15,23,42,0.2);
+      overflow: hidden;
+    }
+    .pm-receipt-modal__head {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      padding: 20px 22px 14px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .pm-receipt-modal__title {
+      margin: 0; font: 700 16px Inter, sans-serif; color: #0f172a; letter-spacing: -0.01em;
+    }
+    .pm-receipt-modal__sub {
+      margin: 4px 0 0; font: 400 12.5px Inter, sans-serif; color: #64748b;
+    }
+    .pm-receipt-modal__close {
+      background: transparent; border: none; cursor: pointer;
+      font: 300 22px Inter, sans-serif; color: #94a3b8; line-height: 1;
+      padding: 4px 8px; border-radius: 6px;
+      transition: background .12s ease, color .12s ease;
+    }
+    .pm-receipt-modal__close:hover { background: #f1f5f9; color: #0f172a; }
+    .pm-receipt-modal__recipient {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      padding: 12px 22px;
+      background: #fafbfc; border-bottom: 1px solid #f1f5f9;
+    }
+    .pm-receipt-modal__recipient-label {
+      font: 600 10.5px Inter, sans-serif; text-transform: uppercase;
+      letter-spacing: 0.12em; color: #64748b;
+    }
+    .pm-receipt-modal__iframe-wrap {
+      flex: 1; min-height: 320px; max-height: 60vh; overflow: auto;
+      background: #f1f5f9;
+    }
+    .pm-receipt-modal__iframe-wrap iframe {
+      width: 100%; height: 480px; border: 0; display: block; background: #fff;
+    }
+    .pm-receipt-modal__foot {
+      display: flex; gap: 8px; align-items: center;
+      padding: 14px 22px;
+      border-top: 1px solid #f1f5f9;
+      background: #fff;
+    }
+    .pm-receipt-modal__btn {
+      padding: 9px 16px; border-radius: 9px;
+      font: 600 12.5px Inter, sans-serif; letter-spacing: -0.003em;
+      cursor: pointer; border: none;
+      transition: background .12s ease, transform .08s ease;
+    }
+    .pm-receipt-modal__btn:disabled { opacity: 0.6; cursor: wait; }
+    .pm-receipt-modal__btn--primary {
+      background: #0f172a; color: #fff;
+      margin-left: auto;
+      box-shadow: 0 1px 2px rgba(15,23,42,0.18);
+    }
+    .pm-receipt-modal__btn--primary:hover { background: #1f2937; transform: translateY(-1px); }
+    .pm-receipt-modal__btn--ghost {
+      background: #fff; color: #475569; border: 1px solid #cbd5e1;
+    }
+    .pm-receipt-modal__btn--ghost:hover { background: #f1f5f9; color: #0f172a; border-color: #94a3b8; }
+    @media (max-width: 640px) {
+      .pm-receipt-modal { padding: 12px; }
+      .pm-receipt-modal__iframe-wrap iframe { height: 380px; }
+    }
+
     .pm-assist-toast {
       position: fixed; bottom: 96px; left: 50%; z-index: 10000;
       transform: translateX(-50%) translateY(20px); opacity: 0;
@@ -1086,11 +1170,11 @@
       }
     }
 
-    // ─── Receipt preview-and-confirm flow ───────────────────────
-    // After mark_paid_full succeeds, build the receipt PDF and inject an
-    // inline preview card in the chat with [Send] / [Skip] buttons. Send
-    // fires fireReceiptEmail. Skip leaves the payment recorded but doesn't
-    // email (Caleb can re-send later from admin-financials → Receipts).
+    // ─── Receipt preview modal (Phase 19c.13 polish) ────────────
+    // After mark_paid_full succeeds, build the receipt PDF and show a
+    // centered modal overlay (not in-chat) so it works regardless of
+    // whether the chat conversation view is still mounted. Avoids the
+    // "opens in a new tab" fallback that surprises assistants.
     async function previewReceiptThenSend(receiptId, threadId) {
       if (!receiptId) return;
       await ensureFinancialPipelineLoaded();
@@ -1101,71 +1185,85 @@
       const secondary = client.billing_email_secondary || '';
       const to = [primary, secondary].filter(Boolean).join(', ');
       if (!to) {
-        showErrorInChat('Receipt built but no email on file',
-          'Payment was recorded. To email the receipt later, add an email to the client and re-send from admin-financials → Receipts.');
+        toastMsg('Payment recorded · No email on file for receipt');
         return;
       }
-
-      // Inject preview card into the open thread (if still open) or
-      // somewhere visible on the page.
       const blobUrl = URL.createObjectURL(out.blob);
-      const previewId = 'pmReceiptPreview-' + Date.now();
-      const recipientHtml = to.split(', ').map(e => `<code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:11px;">${e}</code>`).join(' ');
-      const msgsEl = document.getElementById('pmAssistMsgs');
-      const previewHtml = `
-        <div class="pm-assist-msg pm-assist-msg--preview" id="${previewId}" style="background:#fffbeb;border:1px solid #fde68a;padding:12px;border-radius:10px;">
-          <div style="font:600 12px Inter,sans-serif;color:#92400e;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">
-            📄 Receipt preview — confirm before sending
-          </div>
-          <div style="font:400 12.5px Inter,sans-serif;color:#475569;margin-bottom:10px;">
-            Will send to: ${recipientHtml}
-          </div>
-          <iframe src="${blobUrl}#toolbar=0&navpanes=0" title="Receipt preview" style="width:100%;height:300px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;"></iframe>
-          <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end;">
-            <button class="pm-assist-action-btn pm-assist-action-btn--ghost" data-receipt-action="skip" data-preview-id="${previewId}">Skip — don't email</button>
-            <button class="pm-assist-action-btn pm-assist-action-btn--ghost" data-receipt-action="open" data-preview-url="${blobUrl}">Open in tab</button>
-            <button class="pm-assist-action-btn pm-assist-action-btn--primary" data-receipt-action="send" data-preview-id="${previewId}" data-receipt-id="${receiptId}">Send receipt</button>
-          </div>
-        </div>`;
-      if (msgsEl) {
-        msgsEl.insertAdjacentHTML('beforeend', previewHtml);
-        const bodyEl = document.getElementById('pmAssistBody');
-        if (bodyEl) bodyEl.scrollTop = bodyEl.scrollHeight;
-      } else {
-        // Drawer's closed — pop the preview in a new tab as a fallback
-        window.open(blobUrl, '_blank', 'noopener');
-        toastMsg('Open Oracle drawer to confirm + send receipt');
-        return;
-      }
+      const recipientHtml = to.split(', ').map(e =>
+        `<code style="background:#f1f5f9;padding:3px 8px;border-radius:5px;font-size:12px;color:#0f172a;">${esc(e)}</code>`
+      ).join(' ');
 
-      // Wire the buttons
-      const previewCard = document.getElementById(previewId);
-      previewCard?.querySelector('[data-receipt-action="open"]')?.addEventListener('click', (e) => {
-        const url = e.currentTarget.dataset.previewUrl;
-        if (url) window.open(url, '_blank', 'noopener');
-      });
-      previewCard?.querySelector('[data-receipt-action="skip"]')?.addEventListener('click', () => {
-        previewCard.innerHTML = `<div style="font:400 12px Inter,sans-serif;color:#64748b;">
-          Receipt not emailed. Payment is still recorded. To send later, go to admin-financials → Receipts.
+      // Remove any stale prior modal (just in case)
+      document.getElementById('pmReceiptModal')?.remove();
+
+      // Build + inject the modal at body level (not inside the drawer)
+      const modal = document.createElement('div');
+      modal.id = 'pmReceiptModal';
+      modal.className = 'pm-receipt-modal';
+      modal.innerHTML = `
+        <div class="pm-receipt-modal__backdrop"></div>
+        <div class="pm-receipt-modal__card" role="dialog" aria-modal="true" aria-labelledby="pmReceiptTitle">
+          <header class="pm-receipt-modal__head">
+            <div>
+              <h3 id="pmReceiptTitle" class="pm-receipt-modal__title">Receipt ready</h3>
+              <p class="pm-receipt-modal__sub">Review before sending to the family.</p>
+            </div>
+            <button class="pm-receipt-modal__close" aria-label="Close" data-receipt-action="skip">×</button>
+          </header>
+          <div class="pm-receipt-modal__recipient">
+            <span class="pm-receipt-modal__recipient-label">Will send to</span>
+            ${recipientHtml}
+          </div>
+          <div class="pm-receipt-modal__iframe-wrap">
+            <iframe src="${blobUrl}#toolbar=0&navpanes=0" title="Receipt preview"></iframe>
+          </div>
+          <footer class="pm-receipt-modal__foot">
+            <button class="pm-receipt-modal__btn pm-receipt-modal__btn--ghost" data-receipt-action="skip">
+              Skip — don't email
+            </button>
+            <button class="pm-receipt-modal__btn pm-receipt-modal__btn--primary" data-receipt-action="send" data-receipt-id="${esc(receiptId)}">
+              Send receipt
+            </button>
+          </footer>
         </div>`;
-        previewCard.style.background = '#f8fafc';
-        previewCard.style.borderColor = '#e2e8f0';
-      });
-      previewCard?.querySelector('[data-receipt-action="send"]')?.addEventListener('click', async (e) => {
+      document.body.appendChild(modal);
+
+      function closeModal() {
+        document.getElementById('pmReceiptModal')?.remove();
+        try { URL.revokeObjectURL(blobUrl); } catch (_) {}
+      }
+      // Click backdrop OR close button = skip
+      modal.querySelector('.pm-receipt-modal__backdrop').addEventListener('click', closeModal);
+      modal.querySelectorAll('[data-receipt-action="skip"]').forEach(b =>
+        b.addEventListener('click', closeModal));
+      // Send
+      modal.querySelector('[data-receipt-action="send"]').addEventListener('click', async (e) => {
         const btn = e.currentTarget;
         btn.disabled = true; btn.textContent = 'Sending…';
         try {
           await fireReceiptEmail(receiptId);
-          previewCard.innerHTML = `<div style="font:600 12.5px Inter,sans-serif;color:#166534;">
-            ✓ Receipt emailed to ${recipientHtml}
-          </div>`;
-          previewCard.style.background = '#f0fdf4';
-          previewCard.style.borderColor = '#bbf7d0';
+          // Flash a success state inside the modal briefly, then close
+          modal.querySelector('.pm-receipt-modal__foot').innerHTML =
+            `<div style="font:600 13px Inter,sans-serif;color:#166534;padding:8px 4px;">
+               ✓ Receipt emailed to ${recipientHtml}
+             </div>`;
+          setTimeout(closeModal, 1800);
         } catch (err) {
           btn.disabled = false; btn.textContent = 'Send receipt';
-          showErrorInChat('Receipt email failed', err?.message || String(err));
+          modal.querySelector('.pm-receipt-modal__foot').insertAdjacentHTML('afterbegin',
+            `<div style="font:500 12px Inter,sans-serif;color:#b91c1c;padding:6px 8px;background:#fef2f2;border-radius:6px;margin-right:auto;">
+               ${esc(err?.message || String(err))}
+             </div>`);
         }
       });
+      // ESC closes
+      const escHandler = (e) => {
+        if (e.key === 'Escape') {
+          closeModal();
+          document.removeEventListener('keydown', escHandler);
+        }
+      };
+      document.addEventListener('keydown', escHandler);
     }
 
     // ─── Auto-receipt email (Phase 19c.10a) ─────────────────────
