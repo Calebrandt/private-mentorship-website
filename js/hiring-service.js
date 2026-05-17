@@ -3317,6 +3317,49 @@
     return { ...p, assistant_name: assistantName, lines: lines || [] };
   }
 
+  // ─── Recurring invoices (Phase 19c.7a) ──────────────────────
+  // Admin-managed billing schedules. The pg_cron job auto-creates
+  // invoices from rows in client_recurring_invoices where
+  // enabled=true AND next_invoice_date <= today.
+  async function adminListRecurringInvoices() {
+    const { data, error } = await sb()
+      .from('client_recurring_invoices')
+      .select('*, clients(id, full_name, billing_contact_name)')
+      .order('next_invoice_date', { ascending: true });
+    if (error) { console.warn('adminListRecurringInvoices:', error); return []; }
+    return data || [];
+  }
+  async function adminCreateRecurringInvoice(payload) {
+    const { data, error } = await sb()
+      .from('client_recurring_invoices')
+      .insert(payload)
+      .select('*')
+      .single();
+    if (error) throw new Error(error.message || 'Failed to create recurring schedule');
+    return data;
+  }
+  async function adminUpdateRecurringInvoice(id, patch) {
+    const { data, error } = await sb()
+      .from('client_recurring_invoices')
+      .update({ ...patch, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select('*')
+      .single();
+    if (error) throw new Error(error.message || 'Failed to update recurring schedule');
+    return data;
+  }
+  async function adminDeleteRecurringInvoice(id) {
+    const { error } = await sb().from('client_recurring_invoices').delete().eq('id', id);
+    if (error) throw new Error(error.message || 'Failed to delete recurring schedule');
+    return { ok: true };
+  }
+  async function adminRunRecurringNow() {
+    // Manual fire of the cron RPC — useful for testing without waiting for 17:00 UTC
+    const { data, error } = await sb().rpc('create_recurring_invoices_due');
+    if (error) throw new Error(error.message || 'create_recurring_invoices_due failed');
+    return data;
+  }
+
   // ─── Email a financial document (Phase 19c.4) ────────────────
   // Calls the email-financial-document edge function. Server-side it
   // verifies the caller is an admin, stamps an audit_logs row, and
@@ -3441,5 +3484,9 @@
     adminListAssistants,
     // Phase 19c.4 — branded email send
     sendFinancialEmail,
+    // Phase 19c.7a — recurring invoices
+    adminListRecurringInvoices, adminCreateRecurringInvoice,
+    adminUpdateRecurringInvoice, adminDeleteRecurringInvoice,
+    adminRunRecurringNow,
   };
 })();

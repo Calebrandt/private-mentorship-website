@@ -389,6 +389,36 @@
   .rpt-empty{
     padding:18px 0;color:var(--ink-tert);font:500 12.5px Inter,sans-serif;text-align:center;
   }
+
+  /* ─── Recurring tab ───────────────────────────────────────────────── */
+  .rec-row{
+    display:grid;grid-template-columns:1fr 110px 130px 100px 80px 130px;
+    align-items:center;gap:14px;
+    padding:16px 18px;border-bottom:1px solid var(--border-soft);
+  }
+  .rec-row:last-child{border-bottom:none;}
+  .rec-row:first-child{
+    background:var(--border-soft);
+    font:700 10px Inter,sans-serif;letter-spacing:.10em;text-transform:uppercase;
+    color:var(--ink-tert);padding:11px 18px;
+  }
+  .rec-client{font:600 13.5px Inter,sans-serif;color:var(--ink-2);letter-spacing:-.005em;}
+  .rec-client__sub{font:500 11.5px Inter,sans-serif;color:var(--ink-mute);margin-top:2px;}
+  .rec-meta{font:500 12px Inter,sans-serif;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .rec-meta__sub{font:500 11px Inter,sans-serif;color:var(--ink-mute);margin-top:2px;}
+  .rec-amount{font:700 13px "JetBrains Mono",ui-monospace,monospace;color:var(--ink-2);text-align:right;font-variant-numeric:tabular-nums;}
+  .rec-toggle{
+    display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+    font:600 11.5px Inter,sans-serif;
+  }
+  .rec-toggle input{margin:0;}
+  .rec-toggle--on{color:#15803d;}
+  .rec-toggle--off{color:var(--ink-tert);}
+  .rec-error{
+    margin-top:8px;padding:8px 12px;background:rgba(220,38,38,0.06);
+    border-left:3px solid #dc2626;border-radius:4px;
+    font:500 11.5px Inter,sans-serif;color:#dc2626;
+  }
 </style>
 </head>
 <body class="pm-has-sidebar">
@@ -420,6 +450,7 @@
     <button class="fin-tab is-active" data-tab="invoices" role="tab">Invoices <span class="fin-tab__count" id="cntInvoices">0</span></button>
     <button class="fin-tab" data-tab="receipts" role="tab">Receipts <span class="fin-tab__count" id="cntReceipts">0</span></button>
     <button class="fin-tab" data-tab="paycheques" role="tab">Paycheques <span class="fin-tab__count" id="cntPaycheques">0</span></button>
+    <button class="fin-tab" data-tab="recurring" role="tab">Recurring <span class="fin-tab__count" id="cntRecurring">0</span></button>
     <button class="fin-tab" data-tab="reports" role="tab">Reports</button>
   </nav>
 
@@ -468,6 +499,22 @@
     </div>
     <div class="fin-card">
       <div id="paychequesList"><div class="fin-empty">Loading paycheques…</div></div>
+    </div>
+  </section>
+
+  <!-- RECURRING PANEL -->
+  <section data-panel="recurring" hidden>
+    <div class="fin-actions">
+      <div class="fin-actions__left">
+        <button class="fin-btn fin-btn--ghost" id="btnRunRecurringNow" title="Manually trigger the cron right now — for testing">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Run cron now
+        </button>
+      </div>
+      <div class="fin-actions__sub">Cron fires daily at 09:00 PT · auto-creates invoices when next date hits</div>
+    </div>
+    <div class="fin-card">
+      <div id="recurringList"><div class="fin-empty">Loading…</div></div>
     </div>
   </section>
 
@@ -1103,6 +1150,110 @@
   }
   renderInvoices(); renderReceipts(); renderPaycheques();
   renderReports();
+
+  // ─── Recurring invoice schedules ─────────────────────────────
+  let recurringList = [];
+  async function loadRecurring(){
+    try {
+      recurringList = await window.pmHiring.adminListRecurringInvoices();
+    } catch (e) {
+      console.warn('loadRecurring failed', e);
+      recurringList = [];
+    }
+    $('cntRecurring').textContent = recurringList.length;
+    renderRecurring();
+  }
+  function renderRecurring(){
+    const wrap = $('recurringList');
+    if (!recurringList.length){
+      wrap.innerHTML = `<div class="fin-empty">
+        <strong>No recurring schedules yet</strong>
+        Run the phase-19c7a SQL to seed the 3 active families, or insert manually.
+      </div>`;
+      return;
+    }
+    const today = new Date().toISOString().slice(0,10);
+    const rows = recurringList.map(r => {
+      const isDue = r.next_invoice_date && r.next_invoice_date <= today;
+      const dueBadge = isDue && r.enabled
+        ? `<span class="rpt-overdue-pill">Due now</span>`
+        : '';
+      const client = r.clients || {};
+      const guardian = client.billing_contact_name ? `· ${esc(client.billing_contact_name)}` : '';
+      const planTotal = (Number(r.quantity)||0) * (Number(r.unit_price_cents)||0);
+      return `<div class="rec-row" data-rid="${esc(r.id)}">
+        <div>
+          <div class="rec-client">${esc(client.full_name || '—')}</div>
+          <div class="rec-client__sub">${esc(r.description || '—')} ${guardian}</div>
+        </div>
+        <div class="rec-meta">
+          ${esc(fmtDate(r.next_invoice_date))}
+          <div class="rec-meta__sub">every ${r.cycle_months} mo</div>
+        </div>
+        <div class="rec-meta">${dueBadge || (r.total_invoices_created + ' issued')}</div>
+        <div class="rec-amount">${esc(fmtMoney(planTotal, r.currency))}</div>
+        <div>
+          <label class="rec-toggle ${r.enabled ? 'rec-toggle--on' : 'rec-toggle--off'}">
+            <input type="checkbox" data-rec-toggle="${esc(r.id)}" ${r.enabled ? 'checked' : ''} />
+            ${r.enabled ? 'On' : 'Off'}
+          </label>
+        </div>
+        <div class="fin-row-actions">
+          <button class="is-danger" data-rec-delete="${esc(r.id)}">Delete</button>
+        </div>
+        ${r.last_error ? `<div class="rec-error" style="grid-column:1 / -1;">⚠ ${esc(r.last_error)}</div>` : ''}
+      </div>`;
+    }).join('');
+    wrap.innerHTML = `
+      <div class="rec-row">
+        <div>Client · Plan</div>
+        <div>Next invoice</div>
+        <div>Status</div>
+        <div style="text-align:right;">Amount</div>
+        <div>Enabled</div>
+        <div></div>
+      </div>
+      ${rows}`;
+    wrap.querySelectorAll('[data-rec-toggle]').forEach(cb => {
+      cb.addEventListener('change', async () => {
+        const id = cb.dataset.recToggle;
+        const enabled = cb.checked;
+        try {
+          await window.pmHiring.adminUpdateRecurringInvoice(id, { enabled });
+          toast(`Schedule ${enabled ? 'enabled' : 'paused'} ✓`);
+          await loadRecurring();
+        } catch (e) {
+          toast('Update failed: ' + e.message, 'error');
+          cb.checked = !enabled;
+        }
+      });
+    });
+    wrap.querySelectorAll('[data-rec-delete]').forEach(b => {
+      b.addEventListener('click', async () => {
+        if (!confirm('Delete this recurring schedule? This won\'t affect already-issued invoices.')) return;
+        try {
+          await window.pmHiring.adminDeleteRecurringInvoice(b.dataset.recDelete);
+          toast('Schedule deleted');
+          await loadRecurring();
+        } catch (e) { toast('Delete failed: ' + e.message, 'error'); }
+      });
+    });
+  }
+  loadRecurring();
+
+  $('btnRunRecurringNow')?.addEventListener('click', async () => {
+    if (!confirm('Run the recurring-invoice cron right now? Will create any invoices whose next_invoice_date is today or earlier.')) return;
+    try {
+      const result = await window.pmHiring.adminRunRecurringNow();
+      const created = result?.created_count || 0;
+      const failed  = result?.failed_count  || 0;
+      toast(`Cron ran: ${created} created${failed ? ', ' + failed + ' failed' : ''}`);
+      await loadRecurring();
+      await refresh();
+    } catch (e) {
+      toast('Cron failed: ' + e.message, 'error');
+    }
+  });
 
   // ─── Reload on each mutation ───────────────────────────────
   async function refresh(){
