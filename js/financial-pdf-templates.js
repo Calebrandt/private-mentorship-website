@@ -45,7 +45,7 @@
   const COMPANY_ADDR_1  = 'Richmond, British Columbia';
   const COMPANY_ADDR_2  = 'Canada';
   const COMPANY_EMAIL   = 'billing@private-mentorship.com';
-  const COMPANY_WEB     = 'private-mentorship.com';
+  const COMPANY_WEB     = 'privatementorship.ca';
   const PAYMENT_HANDLE  = 'billing@private-mentorship.com';
 
   // ─── Helpers ──────────────────────────────────────────────────────

@@ -246,7 +246,7 @@
     BIZ: {
       name:    'Private Mentorship',
       email:   'billing@private-mentorship.com',
-      web:     'private-mentorship.com',
+      web:     'privatementorship.ca',
     },
   };
 })();
