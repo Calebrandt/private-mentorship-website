@@ -111,13 +111,20 @@
     // Loading state while fetching
     container.querySelectorAll('.pmcal-grid').forEach(g => g.classList.add('is-loading'));
 
-    const sessions = await fetchSessions({
-      clientId: opts.clientId || null,
-      fromIso: gridStart.toISOString(),
-      toIso: new Date(gridEnd.getTime() + 86400000 - 1).toISOString(),
-    });
+    const fromIso = gridStart.toISOString();
+    const toIso   = new Date(gridEnd.getTime() + 86400000 - 1).toISOString();
 
-    // Bucket by local date key
+    // Phase 19c.10 — fetch sessions + contract renewals in parallel so
+    // each day cell can render both session pills AND a "Renewal" marker
+    // on contract.end_at days.
+    const [sessions, renewals] = await Promise.all([
+      fetchSessions({ clientId: opts.clientId || null, fromIso, toIso }),
+      (window.pmHiring?.fetchContractRenewalsRange
+        ? window.pmHiring.fetchContractRenewalsRange({ clientId: opts.clientId || null, fromIso, toIso })
+        : Promise.resolve([])),
+    ]);
+
+    // Bucket sessions by local date key
     const byDate = {};
     const clientIds = new Set();
     (sessions || []).forEach(s => {
@@ -126,6 +133,16 @@
       if (!byDate[key]) byDate[key] = [];
       byDate[key].push(s);
       if (s.client_id) clientIds.add(s.client_id);
+    });
+
+    // Bucket renewals by local date key (contract.end_at → that day)
+    const renewByDate = {};
+    (renewals || []).forEach(r => {
+      const d = new Date(r.end_at);
+      const key = dateKey(d);
+      if (!renewByDate[key]) renewByDate[key] = [];
+      renewByDate[key].push(r);
+      if (r.client_id) clientIds.add(r.client_id);
     });
     // Sort each bucket by start time
     Object.values(byDate).forEach(arr =>
@@ -146,8 +163,25 @@
       const isToday = dateKey(cellDate) === todayKey;
       const daySessions = byDate[dateKey(cellDate)] || [];
 
-      let html = `<div class="pmcal-cell${inMonth ? '' : ' is-out'}${isToday ? ' is-today' : ''}" data-date="${dateKey(cellDate)}">`;
+      const dayRenewals = renewByDate[dateKey(cellDate)] || [];
+      const hasRenewal = dayRenewals.length > 0;
+
+      let html = `<div class="pmcal-cell${inMonth ? '' : ' is-out'}${isToday ? ' is-today' : ''}${hasRenewal ? ' has-renewal' : ''}" data-date="${dateKey(cellDate)}">`;
       html += `<span class="pmcal-day">${cellDate.getDate()}</span>`;
+
+      // Renewal banner sits at the top of the cell, above session pills.
+      if (hasRenewal) {
+        const r = dayRenewals[0];
+        const fam = r.clients?.billing_contact_name || r.clients?.full_name || 'Client';
+        const label = dayRenewals.length === 1
+          ? `${fam.split(' ')[0]} · Renewal`
+          : `${dayRenewals.length} renewals`;
+        const tip = dayRenewals.map(x => {
+          const n = x.clients?.billing_contact_name || x.clients?.full_name || 'Client';
+          return `${n} — contract ends ${new Date(x.end_at).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' })}`;
+        }).join('\n');
+        html += `<div class="pmcal-renewal" title="${escapeHtml(tip)}"><span class="pmcal-renewal__dot"></span>${escapeHtml(label)}</div>`;
+      }
 
       if (daySessions.length) {
         html += '<div class="pmcal-events">';
@@ -402,6 +436,36 @@
       .pmcal-event.is-cancelled{opacity:0.45;text-decoration:line-through;}
       .pmcal-event.is-cancelled.is-link:hover{filter:none;transform:none;box-shadow:none;cursor:default;}
       .pmcal-event-more{font-size:10px;color:#64748B;font-weight:700;padding:1px 4px;}
+
+      /* Phase 19c.10 — Renewal banner on contract.end_at days */
+      .pmcal-cell.has-renewal{
+        background:#fff7ed;border-color:#fed7aa;
+      }
+      .pmcal-cell.has-renewal:hover{background:#ffedd5;}
+      .pmcal-cell.is-today.has-renewal{
+        background:linear-gradient(135deg,#eff6ff 0%,#fff7ed 100%);
+        border-color:#fdba74;
+      }
+      .pmcal-renewal{
+        display:inline-flex;align-items:center;gap:5px;
+        background:#f97316;color:#fff;
+        font-size:9.5px;font-weight:700;letter-spacing:0.04em;
+        padding:2px 7px;border-radius:9999px;
+        white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+        max-width:100%;
+        text-transform:uppercase;
+        box-shadow:0 1px 2px rgba(249,115,22,0.30);
+      }
+      .pmcal-renewal__dot{
+        width:5px;height:5px;border-radius:50%;
+        background:#fff;flex-shrink:0;
+        animation:pmcal-pulse 1.8s ease-in-out infinite;
+      }
+      @keyframes pmcal-pulse{
+        0%,100%{opacity:1;}
+        50%{opacity:0.35;}
+      }
+
       @media(max-width:680px){
         .pmcal{padding:14px;}
         .pmcal-cell{min-height:58px;padding:4px 5px;}
@@ -409,6 +473,7 @@
         .pmcal-day{font-size:11.5px;}
         .pmcal-weekdays>div{font-size:9.5px;letter-spacing:.06em;}
         .pmcal-nav button{padding:5px 9px;font-size:12px;}
+        .pmcal-renewal{font-size:8.5px;padding:1px 5px;}
       }
       /* ── Session-preview modal ───────────────────────────── */
       .pmcal-modal{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .18s ease;}

@@ -3321,6 +3321,27 @@
     return { ...p, assistant_name: assistantName, lines: lines || [] };
   }
 
+  // ─── Contract renewal pins for the calendar (Phase 19c.10) ──
+  // Returns contracts whose end_at falls inside [fromIso, toIso]. Used by
+  // session-calendar.js to overlay a 'Renewal' marker on each end-of-contract
+  // day. RLS gates visibility — assistant sees their own family's contracts,
+  // admin sees every active contract.
+  async function fetchContractRenewalsRange({ clientId = null, fromIso, toIso } = {}) {
+    if (!fromIso || !toIso) return [];
+    try {
+      let q = sb().from('contracts')
+        .select('id, client_id, end_at, status, included_minutes, clients(full_name, billing_contact_name)')
+        .in('status', ['active', 'draft'])
+        .gte('end_at', fromIso)
+        .lte('end_at', toIso);
+      if (clientId) q = q.eq('client_id', clientId);
+      const { data, error } = await q;
+      if (error) { console.warn('fetchContractRenewalsRange:', error); return []; }
+      return data || [];
+    } catch (e) { console.warn('fetchContractRenewalsRange:', e); return []; }
+  }
+
+
   // ─── Per-client statement of account (Phase 19c.8e) ─────────
   // Pulls everything needed to render a client's full activity history:
   // header, all invoices (excluding void from totals), all receipts (excluding
@@ -3578,7 +3599,7 @@
     adminIssueInvoice, adminRecordPayment, adminIssuePaycheque,
     adminVoidInvoice, adminVoidReceipt, adminVoidPaycheque, adminReissueInvoice,
     adminListFinancialDocuments, adminGetInvoice, adminGetReceipt, adminGetPaycheque,
-    adminGetClientStatement,
+    adminGetClientStatement, fetchContractRenewalsRange,
     adminListAssistants,
     // Phase 19c.4 — branded email send
     sendFinancialEmail,
