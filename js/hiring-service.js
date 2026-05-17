@@ -2109,6 +2109,11 @@
     if (out.contract?.id) {
       const now = new Date().toISOString();
       try {
+        // Limit raised from 8 → 60 so the count + list reflect the whole
+        // contract period. A 40-hr / 1-month / 3-sessions-a-week plan is
+        // ~13 sessions; cap of 8 was undercounting on the 'Upcoming' KPI
+        // and hiding the back half of the month. 60 is enough for any
+        // realistic monthly/quarterly plan.
         const { data: upcoming } = await sb()
           .from('appointments')
           .select('id, starts_at, ends_at, duration_minutes, status, kind, title, notes')
@@ -2116,7 +2121,7 @@
           .gte('starts_at', now)
           .eq('status', 'scheduled')
           .order('starts_at', { ascending: true })
-          .limit(8);
+          .limit(60);
         out.upcomingAppointments = upcoming || [];
       } catch (_) {}
       try {
@@ -2126,7 +2131,7 @@
           .eq('contract_id', out.contract.id)
           .lt('starts_at', now)
           .order('starts_at', { ascending: false })
-          .limit(8);
+          .limit(60);
         out.recentAppointments = recent || [];
       } catch (_) {}
       // Hours used = sum of negative minutes_delta (consumption) on this contract's ledger.
