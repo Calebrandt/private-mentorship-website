@@ -364,7 +364,7 @@
               <div class="party-label">Billed To</div>
               <div class="party-name">
                 ${escapeHtml(clientName)}<br/>
-                ${client.billing_contact_name ? 'c/o ' + escapeHtml(client.billing_contact_name) + '<br/>' : ''}
+                ${client.billing_contact_name ? 'Guardian: ' + escapeHtml(client.billing_contact_name) + '<br/>' : ''}
                 ${client.billing_address ? escapeHtml(client.billing_address) + '<br/>' : ''}
                 ${client.phone ? escapeHtml(client.phone) + '<br/>' : ''}
                 ${clientEmail ? escapeHtml(clientEmail) + '<br/>' : ''}
@@ -465,7 +465,7 @@
               <div class="party-label">Received From</div>
               <div class="party-name">
                 ${escapeHtml(client.full_name || '—')}<br/>
-                ${client.billing_contact_name ? 'c/o ' + escapeHtml(client.billing_contact_name) + '<br/>' : ''}
+                ${client.billing_contact_name ? 'Guardian: ' + escapeHtml(client.billing_contact_name) + '<br/>' : ''}
                 ${client.billing_address ? escapeHtml(client.billing_address) + '<br/>' : ''}
                 ${client.phone ? escapeHtml(client.phone) + '<br/>' : ''}
                 ${client.email ? escapeHtml(client.email) + '<br/>' : ''}
