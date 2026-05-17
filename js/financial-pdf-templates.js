@@ -223,13 +223,12 @@
 
     /* ── Thank you ─────────────────────────────────────────────── */
     .thank-you {
-      margin-top: auto; padding-top: 90px; padding-bottom: 16px;
-      text-align: center;
+      margin-top: auto; padding-top: 60px; padding-bottom: 18px;
+      text-align: center; white-space: nowrap;
       font-family: 'Outfit', 'Montserrat', sans-serif;
-      font-weight: 300; font-size: 46px;
-      letter-spacing: 0.42em;
+      font-weight: 300; font-size: 30px;
+      letter-spacing: 0.32em;
       text-transform: uppercase; color: #9a9a9a;
-      padding-left: 0.42em;  /* compensate visually for the trailing track */
     }
 
     /* ── Stamp (only used for VOID / REISSUED) ─────────────────────
