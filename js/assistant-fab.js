@@ -251,6 +251,17 @@
     }
     .pm-assist-action-btn--ghost:hover { background: #f9fafb; }
     .pm-assist-action-btn:disabled { opacity: 0.5; cursor: wait; }
+    /* Archived state — in-chat action buttons on closed threads.
+       Visually neutralised so the user knows they're history, not action. */
+    .pm-assist-action-btn.is-archived {
+      opacity: 0.4;
+      background: #f1f5f9 !important;
+      color: #94a3b8 !important;
+      border: 1px solid #e2e8f0 !important;
+      cursor: default !important;
+      text-decoration: line-through;
+    }
+    .pm-assist-action-btn.is-archived:hover { transform: none; background: #f1f5f9 !important; }
 
     /* Quick-action chips above the input — context-aware shortcuts */
     .pm-assist-quickchips {
@@ -261,19 +272,22 @@
       border-top: 1px solid #f1f5f9;
     }
     .pm-assist-quickchip {
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 7px 14px;
-      background: #f0fdf4; color: #166534;
-      border: 1px solid #bbf7d0;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 18px;
+      background: #16a34a; color: #fff;
+      border: 1px solid #15803d;
       border-radius: 9999px;
-      font: 600 12px Inter, sans-serif;
+      font: 700 13px Inter, sans-serif;
       cursor: pointer;
-      transition: background .12s ease, border-color .12s ease, transform .08s ease;
+      box-shadow: 0 2px 6px rgba(22,163,74,0.25);
+      transition: background .12s ease, transform .08s ease, box-shadow .12s ease;
     }
     .pm-assist-quickchip:hover {
-      background: #dcfce7; border-color: #86efac;
+      background: #15803d;
+      box-shadow: 0 4px 12px rgba(22,163,74,0.35);
+      transform: translateY(-1px);
     }
-    .pm-assist-quickchip:active { transform: translateY(1px); }
+    .pm-assist-quickchip:active { transform: translateY(1px); box-shadow: 0 1px 3px rgba(22,163,74,0.25); }
 
     /* Input bar */
     .pm-assist-input {
@@ -717,10 +731,25 @@
       }
       msgsEl.innerHTML = msgs.map(m => renderOneMessage(m)).join('');
 
-      // Wire action buttons
-      msgsEl.querySelectorAll('[data-action]').forEach(btn => {
-        btn.addEventListener('click', () => handleAction(threadId, btn.dataset.action));
-      });
+      // Phase 19c.12 polish — if the thread is closed (resolved/dismissed),
+      // disable all in-chat action buttons. They served their purpose
+      // when the thread was live; now they're history. The persistent
+      // chip above the input is the only path for further action (e.g.
+      // mark-paid on a resolved 'send invoice' thread).
+      const thread = threads.find(t => t.id === threadId);
+      const isClosed = thread && ['resolved', 'dismissed'].includes(thread.status);
+      if (isClosed) {
+        msgsEl.querySelectorAll('[data-action]').forEach(btn => {
+          btn.disabled = true;
+          btn.classList.add('is-archived');
+          btn.title = 'Past action — thread is ' + thread.status;
+        });
+      } else {
+        // Live thread — wire action buttons as normal
+        msgsEl.querySelectorAll('[data-action]').forEach(btn => {
+          btn.addEventListener('click', () => handleAction(threadId, btn.dataset.action));
+        });
+      }
 
       // Scroll to bottom
       msgsEl.scrollIntoView({ block: 'end', behavior: 'instant' });
