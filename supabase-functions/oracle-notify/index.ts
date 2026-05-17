@@ -151,8 +151,18 @@ serve(async (req) => {
   const fullName = ((userData.user.user_metadata as any)?.full_name as string) || callerEmail;
   const firstName = fullName.split(/\s+|@/)[0] || "there";
 
-  // ── Build email HTML
-  const subject = `Oracle: ${threads.length} thing${threads.length === 1 ? "" : "s"} to handle`;
+  // ── Subject: include date so daily digests group cleanly + time-of-day
+  // so repeated same-day sends (testing) don't get collapsed by Gmail's
+  // identical-content threading. In production this means one Oracle
+  // email per cron run shows up as its own conversation.
+  const now = new Date();
+  const niceDate = now.toLocaleString("en-CA", {
+    month: "short", day: "numeric",
+    hour: "numeric", minute: "2-digit",
+    hour12: true,
+    timeZone: "America/Los_Angeles",
+  });
+  const subject = `Oracle: ${threads.length} thing${threads.length === 1 ? "" : "s"} to handle · ${niceDate}`;
   const html = buildEmailHtml({
     firstName,
     threads,
