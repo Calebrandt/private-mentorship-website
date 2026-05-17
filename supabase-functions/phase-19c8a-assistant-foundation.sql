@@ -357,6 +357,10 @@ GRANT EXECUTE ON FUNCTION public.assistant_list_threads(boolean) TO authenticate
 
 
 -- ─── 9. Get all messages for one thread (and mark it read) ──────────────
+-- Note: must qualify `id` with table alias because the RETURN TABLE
+-- has an `id` output column that shadows table column names without
+-- explicit aliasing (Postgres throws "column reference id is ambiguous").
+-- ────────────────────────────────────────────────────────────────────────
 CREATE OR REPLACE FUNCTION public.assistant_thread_messages(p_thread_id uuid)
 RETURNS TABLE (
   id           uuid,
@@ -372,14 +376,18 @@ BEGIN
   IF NOT public.is_admin() THEN
     RAISE EXCEPTION 'Admin only';
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM public.assistant_threads WHERE id = p_thread_id AND owner_user_id = auth.uid()) THEN
+
+  IF NOT EXISTS (
+    SELECT 1 FROM public.assistant_threads t
+    WHERE t.id = p_thread_id AND t.owner_user_id = auth.uid()
+  ) THEN
     RAISE EXCEPTION 'Thread not found / not yours';
   END IF;
 
   -- Mark thread as read on open
-  UPDATE public.assistant_threads
+  UPDATE public.assistant_threads AS t
   SET unread_for_user = false, updated_at = now()
-  WHERE id = p_thread_id;
+  WHERE t.id = p_thread_id;
 
   RETURN QUERY
   SELECT m.id, m.role, m.content_type, m.content, m.metadata, m.created_at
