@@ -987,7 +987,7 @@
 <script src="js/topbar-userpod.js?v=20260516a" defer></script>
 <script src="js/master-search.js?v=20260516h" defer></script>
 <script src="js/deep-link-flash.js?v=20260516c" defer></script>
-<script src="js/financial-pdf-templates.js?v=20260517j" defer></script>
+<script src="js/financial-pdf-templates.js?v=20260517k" defer></script>
 <script src="js/financial-pdf.js?v=20260517j" defer></script>
 <!-- v=20260517c on admin-financials inline JS: meta payload now carries lines + billing for inline receipt -->
 <script>
@@ -1239,14 +1239,26 @@
         } catch (e) { toast('Delete failed: ' + e.message, 'error'); }
       });
     });
-    // Statement of account — preview the client's full activity history (Phase 19c.8e)
+    // Statement of account — build once, open preview tab AND save a copy
+    // with the properly-named filename. (Browser tabs over blob: URLs default
+    // to the blob UUID in Save-As — downloading via <a download> sets the name.)
     wrap.querySelectorAll('[data-rec-statement]').forEach(b => {
       b.addEventListener('click', async () => {
         const clientId = b.dataset.recStatement;
         const originalLabel = b.textContent;
         b.disabled = true; b.textContent = 'Building…';
         try {
-          await window.pmPDF.openDoc({ docType: 'statement', docId: clientId });
+          const out = await window.pmPDF.buildDoc({ docType: 'statement', docId: clientId });
+          // Save a properly-named copy to Downloads
+          const a = document.createElement('a');
+          const dlUrl = URL.createObjectURL(out.blob);
+          a.href = dlUrl; a.download = out.filename;
+          document.body.appendChild(a); a.click();
+          setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(dlUrl); }, 1500);
+          // Also open preview tab so you can eyeball it before sharing
+          const previewUrl = URL.createObjectURL(out.blob);
+          window.open(previewUrl, '_blank', 'noopener');
+          toast('Statement saved & previewed ✓');
         } catch (e) {
           console.error('[statement]', e);
           toast('Statement failed: ' + (e.message || e), 'error');

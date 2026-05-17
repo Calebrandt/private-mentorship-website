@@ -156,6 +156,12 @@
       text-transform: uppercase;
       margin: 0 0 60px -2px;
     }
+    /* Smaller variant for longer doc titles (e.g. "STATEMENT" overflows
+       at 84px in the available main-column width). */
+    .doc-headline--sm {
+      font-size: 56px; letter-spacing: 0.18em;
+      margin-bottom: 50px;
+    }
 
     .parties {
       display: flex; gap: 56px; margin-bottom: 56px;
@@ -191,6 +197,9 @@
       vertical-align: top; font-size: 11.5px; color: #8a8a8a;
       font-weight: 300; letter-spacing: 0.02em;
     }
+    /* Compact rows for documents with many entries (statements). */
+    .items--compact tbody td { padding: 13px 4px; }
+    .items--compact thead th { padding: 10px 4px; }
     .items td.center { text-align: center; }
     .items td.right { text-align: right;
       font-variant-numeric: tabular-nums; font-weight: 300;
@@ -635,13 +644,17 @@
     }));
     activity.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
 
+    // 4-col layout (Date | Description w/ ref inline | Amount | Balance) —
+    // 5 columns overflow the main-col width in A4 portrait.
     let runningBalance = 0;
     const activityRows = activity.length ? activity.map(a => {
+      const refLabel = a.number && a.number !== '—'
+        ? `<span style="color:#a0a0a0;font-size:10px;letter-spacing:0.04em;">${escapeHtml(a.number)}</span> · `
+        : '';
       if (a.isVoid) {
         return `<tr style="color:#9a9a9a;">
           <td>${fmtDateSlash(a.date)}</td>
-          <td>${escapeHtml(a.number)}</td>
-          <td><span style="text-decoration:line-through;">${escapeHtml(a.desc)}</span> <span style="font-size:9px;color:#c0c0c0;">VOID</span></td>
+          <td>${refLabel}<span style="text-decoration:line-through;">${escapeHtml(a.desc)}</span> <span style="font-size:9px;color:#c0c0c0;">VOID</span></td>
           <td class="right">—</td>
           <td class="right">—</td>
         </tr>`;
@@ -650,12 +663,11 @@
       const isCredit = a.amount < 0;
       return `<tr>
         <td>${fmtDateSlash(a.date)}</td>
-        <td>${escapeHtml(a.number)}</td>
-        <td class="it-desc">${escapeHtml(a.desc)}</td>
+        <td class="it-desc">${refLabel}${escapeHtml(a.desc)}</td>
         <td class="right" style="${isCredit ? 'color:#16a34a;' : ''}">${isCredit ? '−' : ''}${fmtMoney(Math.abs(a.amount), ccy)}</td>
         <td class="right" style="font-weight:600;">${fmtMoney(runningBalance, ccy)}</td>
       </tr>`;
-    }).join('') : `<tr><td colspan="5" style="padding:24px;text-align:center;color:#9a9a9a;">No activity in this period.</td></tr>`;
+    }).join('') : `<tr><td colspan="4" style="padding:24px;text-align:center;color:#9a9a9a;">No activity in this period.</td></tr>`;
 
     const periodLabel = (stmt.period?.from || stmt.period?.to)
       ? `${stmt.period.from ? fmtDateSlash(stmt.period.from) : 'Start'} – ${stmt.period.to ? fmtDateSlash(stmt.period.to) : 'Today'}`
@@ -677,7 +689,7 @@
       <div class="page">
         ${sidebar}
         <main class="main">
-          <h1 class="doc-headline">Statement</h1>
+          <h1 class="doc-headline doc-headline--sm">Statement</h1>
 
           <div class="parties">
             <div class="party-col">
@@ -707,13 +719,12 @@
             </div>
           </div>
 
-          <table class="items">
+          <table class="items items--compact">
             <thead><tr>
-              <th style="width:14%;">Date</th>
-              <th style="width:14%;">Reference</th>
+              <th style="width:18%;">Date</th>
               <th>Description</th>
-              <th class="right" style="width:18%;">Amount</th>
-              <th class="right" style="width:18%;">Balance</th>
+              <th class="right" style="width:20%;">Amount</th>
+              <th class="right" style="width:20%;">Balance</th>
             </tr></thead>
             <tbody>${activityRows}</tbody>
           </table>
