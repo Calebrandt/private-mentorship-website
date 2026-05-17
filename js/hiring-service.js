@@ -3329,9 +3329,13 @@
   async function fetchContractRenewalsRange({ clientId = null, fromIso, toIso } = {}) {
     if (!fromIso || !toIso) return [];
     try {
+      // Active contracts only — draft contracts are next-next-term scaffolding
+      // built by the lifecycle tick. Pinning them too would put two renewal
+      // markers per family on the calendar. Caleb only wants the immediate
+      // next renewal visible.
       let q = sb().from('contracts')
         .select('id, client_id, end_at, status, included_minutes, clients(full_name, billing_contact_name)')
-        .in('status', ['active', 'draft'])
+        .eq('status', 'active')
         .gte('end_at', fromIso)
         .lte('end_at', toIso);
       if (clientId) q = q.eq('client_id', clientId);
