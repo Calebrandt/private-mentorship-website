@@ -4,26 +4,34 @@
 // list of their open chat threads + "Open in chat" deep-links straight
 // into each one.
 //
+// Phase 19c.8c.1 — adds cron-bypass auth path so Postgres can call this
+// directly via pg_net using a shared secret header (no JWT available
+// from inside the database). User-initiated calls (FAB button) still
+// use JWT exactly as before.
+//
 // Triggered from:
-//   • the browser FAB right after a successful Scan (so the user gets an
-//     inbox notification of what Oracle found)
-//   • [future] the daily cron at 16:00 UTC via pg_net
+//   • the browser FAB right after a successful Scan (JWT path)
+//   • the daily cron at 16:00 UTC via pg_net (shared-secret path)
 //
 // REQUEST BODY (optional)
-//   threadIds?: string[]   — explicit list to summarize. If omitted,
-//                             the function pulls the caller's 10 most
-//                             recent open/awaiting_user threads.
+//   threadIds?: string[]      — explicit list to summarize. If omitted,
+//                                pulls the 10 most recent open/awaiting_user
+//                                threads for the resolved owner.
+//   owner_user_id?: string    — REQUIRED for cron path (no JWT to derive
+//                                the owner from). Ignored for JWT path.
+//   source?: 'cron' | 'fab'   — informational, written to audit_logs.
 //
-// RESPONSE
-//   { ok, thread_count, sent_to, message_id }    on success
-//   { ok, skipped: true, reason }                if there's nothing to send
-//   { ok: false, error }                         on failure
+// AUTH PATHS
+//   1. Cron:  header  x-oracle-cron-secret: <ORACLE_CRON_SECRET>
+//             body    owner_user_id, source: 'cron'
+//   2. User:  header  Authorization: Bearer <JWT>
 //
 // REQUIRED ENV VARS (Supabase Functions → oracle-notify → Secrets):
 //   RESEND_API_KEY        — reuse the same key the other functions use
 //   NOTIFY_FROM_EMAIL     — verified Resend From: header
 //   ORACLE_SITE_URL       — (optional) base URL for deep-links.
 //                            Defaults to https://privatementorship.ca
+//   ORACLE_CRON_SECRET    — shared secret matching public.oracle_config.cron_secret
 // ─────────────────────────────────────────────────────────────────────────
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
@@ -63,46 +71,73 @@ serve(async (req) => {
   if (req.method !== "POST")
     return jsonResponse(405, { ok: false, error: "Method not allowed" });
 
-  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") || "";
-  const NOTIFY_FROM    = Deno.env.get("NOTIFY_FROM_EMAIL") || "Private Mentorship <billing@privatementorship.ca>";
-  const SITE_URL       = (Deno.env.get("ORACLE_SITE_URL") || "https://privatementorship.ca").replace(/\/+$/, "");
+  const RESEND_API_KEY      = Deno.env.get("RESEND_API_KEY") || "";
+  const NOTIFY_FROM         = Deno.env.get("NOTIFY_FROM_EMAIL") || "Private Mentorship <billing@privatementorship.ca>";
+  const SITE_URL            = (Deno.env.get("ORACLE_SITE_URL") || "https://privatementorship.ca").replace(/\/+$/, "");
+  const ORACLE_CRON_SECRET  = Deno.env.get("ORACLE_CRON_SECRET") || "";
 
   if (!RESEND_API_KEY)
     return jsonResponse(500, { ok: false, error: "RESEND_API_KEY not configured" });
 
-  // ── Caller auth (JWT)
-  const authHeader = req.headers.get("Authorization") || "";
-  const token = authHeader.replace(/^Bearer\s+/i, "");
-  if (!token) return jsonResponse(401, { ok: false, error: "Missing Authorization header" });
-
   const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
   const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-  const sbUser = createClient(SUPABASE_URL, SERVICE_ROLE, {
-    global: { headers: { Authorization: `Bearer ${token}` } },
-  });
-  const { data: userData, error: userErr } = await sbUser.auth.getUser(token);
-  if (userErr || !userData?.user)
-    return jsonResponse(401, { ok: false, error: "Invalid session" });
-
-  const callerId = userData.user.id;
-  const callerEmail = userData.user.email || "";
-
-  // Admin gate
-  const { data: isAdmin, error: adminErr } = await sbUser.rpc("is_admin");
-  if (adminErr || !isAdmin)
-    return jsonResponse(403, { ok: false, error: "Admin only" });
-
-  if (!callerEmail)
-    return jsonResponse(400, { ok: false, error: "Caller has no email on file" });
-
-  // ── Body (optional)
+  // ── Body (parsed up-front; cron path needs owner_user_id from it)
   let body: any = {};
   try { body = await req.json(); } catch (_) {}
   const explicit: string[] | null = Array.isArray(body?.threadIds) ? body.threadIds : null;
+  const source: string = (body?.source as string) || "fab";
 
   // ── Service-role client for the queries
   const sb = createClient(SUPABASE_URL, SERVICE_ROLE);
+
+  // ── Resolve caller via one of two auth paths:
+  //    1. Cron:  shared-secret header → owner_user_id from body
+  //    2. User:  JWT in Authorization header → owner = JWT user
+  let callerId    = "";
+  let callerEmail = "";
+  let callerName  = "";
+
+  const cronHeaderSecret = req.headers.get("x-oracle-cron-secret") || "";
+  const isCron = !!(cronHeaderSecret && ORACLE_CRON_SECRET && cronHeaderSecret === ORACLE_CRON_SECRET);
+
+  if (isCron) {
+    const ownerId = (body?.owner_user_id as string) || "";
+    if (!ownerId)
+      return jsonResponse(400, { ok: false, error: "cron path requires owner_user_id in body" });
+
+    const { data: u, error: uErr } = await sb.auth.admin.getUserById(ownerId);
+    if (uErr || !u?.user)
+      return jsonResponse(404, { ok: false, error: "owner_user_id not found in auth.users" });
+
+    callerId    = u.user.id;
+    callerEmail = u.user.email || "";
+    callerName  = ((u.user.user_metadata as any)?.full_name as string) || callerEmail;
+  } else {
+    // JWT path (browser FAB)
+    const authHeader = req.headers.get("Authorization") || "";
+    const token = authHeader.replace(/^Bearer\s+/i, "");
+    if (!token) return jsonResponse(401, { ok: false, error: "Missing Authorization header" });
+
+    const sbUser = createClient(SUPABASE_URL, SERVICE_ROLE, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+    });
+    const { data: userData, error: userErr } = await sbUser.auth.getUser(token);
+    if (userErr || !userData?.user)
+      return jsonResponse(401, { ok: false, error: "Invalid session" });
+
+    // Admin gate (JWT path only — cron is its own trust boundary)
+    const { data: isAdmin, error: adminErr } = await sbUser.rpc("is_admin");
+    if (adminErr || !isAdmin)
+      return jsonResponse(403, { ok: false, error: "Admin only" });
+
+    callerId    = userData.user.id;
+    callerEmail = userData.user.email || "";
+    callerName  = ((userData.user.user_metadata as any)?.full_name as string) || callerEmail;
+  }
+
+  if (!callerEmail)
+    return jsonResponse(400, { ok: false, error: "Caller has no email on file" });
 
   let threads: ThreadRow[] = [];
   {
@@ -148,8 +183,7 @@ serve(async (req) => {
   });
 
   // ── First name for the greeting
-  const fullName = ((userData.user.user_metadata as any)?.full_name as string) || callerEmail;
-  const firstName = fullName.split(/\s+|@/)[0] || "there";
+  const firstName = (callerName || callerEmail).split(/\s+|@/)[0] || "there";
 
   // ── Subject: include date so daily digests group cleanly + time-of-day
   // so repeated same-day sends (testing) don't get collapsed by Gmail's
@@ -207,6 +241,7 @@ serve(async (req) => {
         thread_ids: threads.map(t => t.id),
         sent_to: callerEmail,
         resend_message_id: resendParsed?.id || null,
+        source,
       },
     });
   } catch (e) {
