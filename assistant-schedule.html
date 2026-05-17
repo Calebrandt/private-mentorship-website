@@ -914,7 +914,15 @@ async function executeConfirm(){
     await loadAll(); // re-fetch so the row moves to Recent history
   } catch (err) {
     console.warn('Action failed:', err);
-    const msg = err?.message || 'Something went wrong. Try again.';
+    let msg = err?.message || 'Something went wrong. Try again.';
+    // Phase 19c.12 #3: helpful nudge when the lesson-log gate trips.
+    // Server error includes 'lesson log with a Focus area is required' —
+    // surface a direct link to the lesson tracker for the right family.
+    const appt = state.needsAttention.find(a => a.id === apptId);
+    if (msg.toLowerCase().includes('lesson log') && appt?.client_id) {
+      const url = 'assistant-lesson-tracker.html?clientId=' + encodeURIComponent(appt.client_id);
+      msg = msg + ' Click here to open: ' + url;
+    }
     toast(msg, /* isError */ true);
     confirm.disabled = false;
   }
