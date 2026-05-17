@@ -95,9 +95,9 @@
     return `
     * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
     body { margin: 0; padding: 0;
-           font-family: 'Montserrat', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-           background: #ffffff; color: #1f1f1f; font-size: 10.5px; line-height: 1.5;
-           font-weight: 300;
+           font-family: 'Outfit', 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+           background: #ffffff; color: #14181f; font-size: 10.5px; line-height: 1.5;
+           font-weight: 400;
     }
 
     .page {
@@ -124,7 +124,7 @@
     .meta-label {
       font-size: 8.5px; font-weight: 600;
       letter-spacing: 0.28em;
-      text-transform: uppercase; color: #1f1f1f;
+      text-transform: uppercase; color: #14181f;
       margin-bottom: 7px;
     }
     .meta-value {
@@ -136,7 +136,7 @@
     }
     .meta-sub-label {
       font-size: 8.5px; font-weight: 600; letter-spacing: 0.28em;
-      text-transform: uppercase; color: #1f1f1f; margin-bottom: 4px;
+      text-transform: uppercase; color: #14181f; margin-bottom: 4px;
     }
 
     /* ── Main right column ──────────────────────────────────────── */
@@ -147,9 +147,9 @@
     }
 
     .doc-headline {
-      font-family: 'Montserrat', 'Inter', sans-serif;
-      font-weight: 200; font-size: 78px; line-height: 0.95;
-      letter-spacing: 0.16em; color: #1f1f1f;
+      font-family: 'Outfit', 'Montserrat', sans-serif;
+      font-weight: 500; font-size: 76px; line-height: 0.95;
+      letter-spacing: 0.18em; color: #14181f;
       text-transform: uppercase;
       margin: 0 0 44px -2px;
     }
@@ -161,7 +161,7 @@
     .party-label {
       font-size: 9px; font-weight: 600;
       letter-spacing: 0.28em;
-      text-transform: uppercase; color: #1f1f1f;
+      text-transform: uppercase; color: #14181f;
       margin-bottom: 8px;
     }
     .party-name {
@@ -177,7 +177,7 @@
       text-align: left;
       font-size: 9px; font-weight: 600;
       letter-spacing: 0.24em;
-      text-transform: uppercase; color: #1f1f1f;
+      text-transform: uppercase; color: #14181f;
       padding: 12px 4px; border-bottom: 1px solid #1f1f1f;
     }
     .items thead th.center { text-align: center; }
@@ -192,14 +192,14 @@
     .items td.right { text-align: right;
       font-variant-numeric: tabular-nums; font-weight: 300;
     }
-    .items .it-desc { font-weight: 400; color: #1f1f1f; }
+    .items .it-desc { font-weight: 400; color: #14181f; }
 
     /* ── Totals stack — right-aligned with grey highlight on Amount Due */
     .totals-row { display: flex; justify-content: flex-end; margin-top: 6px; }
     .totals { min-width: 290px; }
     .totals .t-line {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 9px 14px; font-size: 10.5px; color: #1f1f1f;
+      padding: 9px 14px; font-size: 10.5px; color: #14181f;
     }
     .totals .t-line .label {
       font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase;
@@ -207,7 +207,7 @@
     }
     .totals .t-line .val {
       font-weight: 300; font-variant-numeric: tabular-nums;
-      letter-spacing: 0.02em; color: #1f1f1f;
+      letter-spacing: 0.02em; color: #14181f;
     }
     .totals .t-line.is-amount-due {
       background: #d8d8d8;
@@ -215,17 +215,17 @@
     }
     .totals .t-line.is-amount-due .label,
     .totals .t-line.is-amount-due .val {
-      font-weight: 700; color: #1f1f1f; font-size: 10.5px;
+      font-weight: 700; color: #14181f; font-size: 10.5px;
     }
 
     /* ── Thank you ─────────────────────────────────────────────── */
     .thank-you {
       margin-top: auto; padding-top: 72px; padding-bottom: 12px;
       text-align: center;
-      font-family: 'Montserrat', 'Inter', sans-serif;
-      font-weight: 200; font-size: 46px;
+      font-family: 'Outfit', 'Montserrat', sans-serif;
+      font-weight: 400; font-size: 44px;
       letter-spacing: 0.42em;
-      text-transform: uppercase; color: #1f1f1f;
+      text-transform: uppercase; color: #14181f;
       padding-left: 0.42em;  /* compensate visually for the trailing track */
     }
 
@@ -238,7 +238,7 @@
       transform: rotate(-9deg);
       border: 4px double currentColor;
       padding: 14px 30px 10px 30px;
-      font-family: 'Montserrat', sans-serif; font-weight: 700;
+      font-family: 'Outfit', 'Montserrat', sans-serif; font-weight: 700;
       font-size: 34px; letter-spacing: 0.22em;
       text-align: center; line-height: 1;
       opacity: 0.82;
@@ -252,9 +252,9 @@
     /* ── Subtle "Paid in full" line under totals (invoice when paid) */
     .paid-note {
       margin-top: 10px; text-align: right;
-      font-family: 'Montserrat', sans-serif; font-weight: 500;
+      font-family: 'Outfit', 'Montserrat', sans-serif; font-weight: 600;
       font-size: 9px; letter-spacing: 0.28em;
-      text-transform: uppercase; color: #1f1f1f;
+      text-transform: uppercase; color: #14181f;
       padding-right: 14px;
     }
     .paid-note .dot { color: #b4b4b4; padding: 0 6px; }
@@ -263,7 +263,7 @@
 
   function fontsLink() {
     return `<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />`;
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />`;
   }
 
   // ─── Sidebar builder (varies by doc type) ─────────────────────────
