@@ -325,6 +325,7 @@
           <span style="font-weight:400;color:#9ca3af;font-size:11.5px;font-style:italic;margin-left:6px;">your bookkeeper</span>
         </div>
         <div class="pm-assist-head__actions">
+          <button class="pm-assist-head__btn" id="pmAssistEmail" title="Email me the current open threads">📧 Email me</button>
           <button class="pm-assist-head__btn" id="pmAssistScan" title="Scan for new work now">Scan</button>
           <button class="pm-assist-head__btn is-icon" id="pmAssistClose" aria-label="Close" title="Close">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -413,6 +414,25 @@
     fab.addEventListener('click', () => panel.classList.contains('is-shown') ? closePanel() : openPanel());
     backdrop.addEventListener('click', closePanel);
     $('pmAssistClose').addEventListener('click', closePanel);
+    $('pmAssistEmail').addEventListener('click', async () => {
+      const btn = $('pmAssistEmail');
+      btn.disabled = true; btn.textContent = 'Sending…';
+      try {
+        const r = await window.pmHiring.oracleNotifyNow();
+        if (r?.skipped) {
+          toastMsg('No open threads to send');
+        } else if (r?.ok) {
+          toastMsg(`📧 Sent to ${r.sent_to || 'your inbox'}`);
+        } else {
+          toastMsg('Send failed: ' + (r?.error || 'unknown'));
+        }
+      } catch (e) {
+        toastMsg('Send failed: ' + e.message);
+      } finally {
+        btn.disabled = false; btn.textContent = '📧 Email me';
+      }
+    });
+
     $('pmAssistScan').addEventListener('click', async () => {
       const btn = $('pmAssistScan');
       btn.disabled = true; btn.textContent = 'Scanning…';
