@@ -625,8 +625,13 @@
       const thread = threads.find(t => t.id === threadId);
       if (!thread) return;
 
-      // ─── send_now: client-side PDF render + email send via existing pipeline
-      if (actionKey === 'send_now' || actionKey === 'preview_pdf') {
+      // ─── send_now / send_reminder / send_followup / preview_pdf:
+      //     client-side PDF render + email send via existing pipeline.
+      //     Subject prefix and post-send action key vary by intent.
+      const EMAIL_ACTIONS = ['send_now', 'send_reminder', 'send_followup'];
+      const isEmailAction = EMAIL_ACTIONS.includes(actionKey);
+
+      if (isEmailAction || actionKey === 'preview_pdf') {
         if (!thread.invoice_id) {
           toastMsg('No invoice linked');
           return;
@@ -660,7 +665,7 @@
             return;
           }
 
-          // send_now → email it
+          // Email it. Subject + body vary by action key — same PDF pipeline.
           const pdfBase64 = await blobToBase64(out.blob);
           const p = out.payload || {};
           const client = p.clients || {};
@@ -672,8 +677,17 @@
             return;
           }
           const docNumber = p.invoice_number;
-          const subject = `Invoice ${docNumber} from Private Mentorship`;
-          const body = 'Please find your invoice attached as a PDF for your records.';
+          let subject, body;
+          if (actionKey === 'send_reminder') {
+            subject = `Past due: Invoice ${docNumber}`;
+            body = 'A quick reminder that the attached invoice is past due. Please let us know if there\'s anything we can help clarify.';
+          } else if (actionKey === 'send_followup') {
+            subject = `Following up: Invoice ${docNumber}`;
+            body = 'Just following up on the attached invoice. Let us know if you have any questions.';
+          } else {
+            subject = `Invoice ${docNumber} from Private Mentorship`;
+            body = 'Please find your invoice attached as a PDF for your records.';
+          }
           const meta = {
             totalCents:   Number(p.total_cents) || 0,
             paidCents:    Number(p.amount_paid_cents) || 0,
@@ -695,9 +709,14 @@
             to, subject, body, filename: out.filename,
             pdfBase64, meta,
           });
-          await window.pmHiring.assistantAction(threadId, 'mark_email_sent',
+          // Server action key matches the intent → resolves with the right
+          // event message ("Reminder email sent ✓" etc.)
+          const serverActionKey = isEmailAction ? actionKey : 'mark_email_sent';
+          await window.pmHiring.assistantAction(threadId, serverActionKey,
             { event_text: 'Email sent to ' + to + ' ✓', to_emails: to });
-          toastMsg('Sent ✓');
+          toastMsg(actionKey === 'send_reminder' ? 'Reminder sent ✓'
+                 : actionKey === 'send_followup' ? 'Follow-up sent ✓'
+                 : 'Sent ✓');
           await loadThreads();
         } catch (e) {
           console.error('[oracle send]', e);
@@ -706,15 +725,17 @@
         return;
       }
 
-      // Server-side actions: snooze, resolve, dismiss, reopen, activate_contract
+      // Server-side actions: snooze, resolve, dismiss, reopen,
+      // activate_contract, mark_paid_full
       try {
         await window.pmHiring.assistantAction(threadId, actionKey);
         toastMsg(actionKey === 'resolve' ? 'Marked handled ✓' :
                  actionKey.startsWith('snooze') ? 'Snoozed' :
                  actionKey === 'activate_contract' ? 'Contract activated ✓' :
+                 actionKey === 'mark_paid_full' ? 'Marked paid ✓' :
                  'Done');
         // These actions close the thread → bounce back to list
-        if (['resolve', 'dismiss', 'activate_contract'].includes(actionKey)
+        if (['resolve', 'dismiss', 'activate_contract', 'mark_paid_full'].includes(actionKey)
             || actionKey.startsWith('snooze')) {
           await loadThreads();
         } else {
