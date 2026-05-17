@@ -789,13 +789,27 @@
       // Server-side actions: snooze, resolve, dismiss, reopen,
       // activate_contract, mark_paid_full, create_renewal_invoice
       try {
-        await window.pmHiring.assistantAction(threadId, actionKey);
+        const actionResult = await window.pmHiring.assistantAction(threadId, actionKey);
         toastMsg(actionKey === 'resolve' ? 'Marked handled ✓' :
                  actionKey.startsWith('snooze') ? 'Snoozed' :
                  actionKey === 'activate_contract' ? 'Contract activated ✓' :
                  actionKey === 'mark_paid_full' ? 'Marked paid ✓' :
                  actionKey === 'create_renewal_invoice' ? 'Renewal invoice created ✓' :
                  'Done');
+
+        // Phase 19c.10a — auto-fire receipt email to the family after a
+        // successful mark_paid_full. The server returns receipt_id+client_id
+        // in actionResult so we can build the PDF + send via the existing
+        // pipeline. Best-effort: if the receipt email fails we still
+        // continue (the payment itself succeeded).
+        if (actionKey === 'mark_paid_full' && actionResult?.receipt_id) {
+          fireReceiptEmail(actionResult.receipt_id).catch(err => {
+            console.warn('[oracle auto-receipt]', err);
+            showErrorInChat('Receipt email failed (payment still recorded)',
+              (err?.message || String(err)));
+          });
+        }
+
         // These actions close the thread → bounce back to list
         if (['resolve', 'dismiss', 'activate_contract', 'mark_paid_full',
              'create_renewal_invoice'].includes(actionKey)
@@ -815,6 +829,48 @@
       }
     }
 
+    // ─── Auto-receipt email (Phase 19c.10a) ─────────────────────
+    // Called after mark_paid_full succeeds. Builds the receipt PDF and emails
+    // it to the family via the existing send-financial-email pipeline. Same
+    // body + meta shape as a manually-sent receipt — so it renders identically
+    // to anything Caleb would email by hand from admin-financials.
+    async function fireReceiptEmail(receiptId) {
+      if (!receiptId) return;
+      await ensureFinancialPipelineLoaded();
+      const out = await window.pmPDF.buildDoc({ docType: 'receipt', docId: receiptId });
+      const p = out.payload || {};
+      const client = p.clients || {};
+      const primary = client.email || '';
+      const secondary = client.billing_email_secondary || '';
+      const to = [primary, secondary].filter(Boolean).join(', ');
+      if (!to) {
+        showErrorInChat('Receipt not sent', 'No email on file for this client');
+        return;
+      }
+      const recNumber = p.receipt_number || 'receipt';
+      const invNumber = p.invoices?.invoice_number || '';
+      const subject = `Payment received — ${recNumber}${invNumber ? ' (' + invNumber + ')' : ''}`;
+      const body = 'Thank you — payment received. Your official receipt is attached as a PDF for your records.';
+      const meta = {
+        totalCents:   Math.round((Number(p.total_amount) || 0) * 100),
+        clientName:   client.full_name || null,
+        guardianName: client.billing_contact_name || null,
+        studentName:  client.full_name || null,
+        billingAddress:        client.billing_address || null,
+        billingPhone:          client.phone || null,
+        billingEmail:          client.email || null,
+        billingEmailSecondary: client.billing_email_secondary || null,
+        currency:     'CAD',
+      };
+      const pdfBase64 = await blobToBase64(out.blob);
+      await window.pmHiring.sendFinancialEmail({
+        docType: 'receipt', docId: receiptId, docNumber: recNumber,
+        to, subject, body, filename: out.filename,
+        pdfBase64, meta,
+      });
+      toastMsg('Receipt emailed to ' + to + ' ✓');
+    }
+
     // ─── Helpers: lazy-load PDF machinery + blob→base64 ─────────
     function ensureFinancialPipelineLoaded() {
       // financial-pdf.js + financial-pdf-templates.js are already loaded on
@@ -828,8 +884,8 @@
           s.onload = res; s.onerror = () => rej(new Error('Failed to load ' + src));
           document.head.appendChild(s);
         });
-        loadScript('js/financial-pdf-templates.js?v=20260517b')
-          .then(() => loadScript('js/financial-pdf.js?v=20260517a'))
+        loadScript('js/financial-pdf-templates.js?v=20260517k')
+          .then(() => loadScript('js/financial-pdf.js?v=20260517j'))
           .then(resolve).catch(reject);
       });
     }
