@@ -1129,23 +1129,31 @@ function renderAppointmentRow(a, spend){
   const totalSessionsHours = ws.hoursUsedMinutes ? Math.round(ws.hoursUsedMinutes/60*100)/100 : 0;
   const toppedUpHours = ws.hoursToppedUpMinutes ? Math.round(ws.hoursToppedUpMinutes/60*100)/100 : 0;
 
+  // Phase 19c.10 — fetch family-pool bank hours UP FRONT so they fold
+  // into Hours Available + Hours Remaining. Caleb's mental model:
+  //   "All together 46.75 hours in total is what he has 'hours available'"
+  // Bank hours come from client_bank_balance (per-family aggregate,
+  // built by apply_contract_carryover_on_expire when prior contracts
+  // expire with unused hours).
+  let bankHours = 0;
+  try {
+    const bank = await window.pmHiring.fetchClientBankSummary(clientId);
+    bankHours = Math.round((bank?.banked_hours || 0) * 100) / 100;
+  } catch (_) {}
+
   // Caleb's mental model (locked 2026-05-16):
   //   "Carryover hours act as a bonus that gets burned FIRST. Then
   //    deductions come off the actual purchased plan. 'Hours used'
   //    should only count what came off the 40 the family paid for."
-  // For Michael: 36 total sessions − 2.75 carryover absorbed = 33.25
-  // used against the 40 he purchased → 40 − 33.25 = 6.75 remaining.
   const usedHours = Math.max(0, Math.round((totalSessionsHours - toppedUpHours) * 100) / 100);
-  const remainingHours = Number.isFinite(ws.hoursRemainingMinutes)
-    ? Math.round(ws.hoursRemainingMinutes/60*100)/100
-    : Math.max(0, planHours - usedHours);
 
-  // "Hours available" tile = plan + any carryover IN (positive ledger
-  // top-ups from prior contract). One headline number so the assistant
-  // doesn't have to add tiles in their head. When a carry exists, the
-  // subline names the breakdown ("40 purchased + 2.75 carried over")
-  // so the math is traceable; otherwise the subline stays plain.
-  const availableHours = Math.round((planHours + toppedUpHours) * 100) / 100;
+  // "Hours available" tile = plan + ledger top-ups + family bank pool.
+  // One headline number that matches the owner's mental model: TOTAL
+  // hours the family can draw on, period. Subtitle breaks down the
+  // sources so the math is traceable.
+  const availableHours = Math.round((planHours + toppedUpHours + bankHours) * 100) / 100;
+  const remainingHours = Math.max(0, Math.round((availableHours - usedHours) * 100) / 100);
+
   document.getElementById('kpiPlan').textContent = availableHours;
   document.getElementById('kpiUsed').textContent = usedHours;
   document.getElementById('kpiUpcoming').textContent = (ws.upcomingAppointments || []).length;
@@ -1207,29 +1215,31 @@ function renderAppointmentRow(a, spend){
       remSubEl.textContent = 'left on this contract';
     }
   }
-  // Plan subline: now safely names the carryover breakdown if one
-  // exists, because the headline tile is the SUM (no risk of double-
-  // counting against a separate Carry tile — that tile is gone).
-  // Reads "40 purchased + 2.75 carried over" when relevant, plain
-  // "hours purchased" otherwise.
+  // Phase 19c.10 — Hours Available subtitle now names every source so
+  // the math is fully traceable. Reads "40 plan + 25 bank" or
+  // "40 plan + 2.75 carried + 25 bank" depending on what's present.
   const planSubEl = document.getElementById('kpiPlanSub');
   if (planSubEl) {
-    planSubEl.textContent = toppedUpHours > 0
-      ? `${planHours} purchased + ${toppedUpHours} carried over`
-      : 'hours purchased';
+    const parts = [];
+    parts.push(`${planHours} plan`);
+    if (toppedUpHours > 0) parts.push(`${toppedUpHours} carried`);
+    if (bankHours > 0)     parts.push(`${bankHours} bank`);
+    planSubEl.textContent = parts.length > 1 ? parts.join(' + ') : 'hours purchased';
   }
 
-  // Phase 12: show bank-hours tile if the family has any saved-up hours.
-  // Phase 12.2: also wires the "Suggest using these" nudge button.
-  try {
-    const bank = await window.pmHiring.fetchClientBankSummary(clientId);
-    const bankHrs = bank?.banked_hours || 0;
-    if (bankHrs > 0) {
-      document.getElementById('kpiBank').textContent = bankHrs;
-      document.getElementById('kpiBankTile').hidden = false;
-      wireBankNudge({ clientId, bankHrs: Math.round(bankHrs) });
-    }
-  } catch (_) {}
+  // Phase 12 → 19c.10: bank tile stays visible as a breakdown of where
+  // the family's pool comes from — useful for the "Suggest using these"
+  // nudge button — but its label now clarifies that the hours are
+  // ALREADY counted in 'Hours available' above (so the assistant doesn't
+  // mentally add 65 + 25 = 90).
+  if (bankHours > 0) {
+    document.getElementById('kpiBank').textContent = bankHours;
+    document.getElementById('kpiBankTile').hidden = false;
+    // Re-label so it's clearly a breakdown, not a separate bucket
+    const bankLabel = document.querySelector('#kpiBankTile .wc-kpi__label');
+    if (bankLabel) bankLabel.textContent = 'of which family bank';
+    wireBankNudge({ clientId, bankHrs: Math.round(bankHours) });
+  }
 
   // Phase 17 — Mount the month calendar (this family's sessions only).
   // Reuses the shared widget. clientId scopes the data; we deliberately
