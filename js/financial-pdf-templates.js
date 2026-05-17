@@ -640,7 +640,9 @@
       kind:   'receipt',
       number: r.receipt_number || '—',
       desc:   'Payment received' + (r.payment_mode ? ' (' + r.payment_mode + ')' : ''),
-      amount: -(Number(r.total_amount) || 0),  // negative = credit
+      // sales_receipts.total_amount is in dollars; wrapper normalises to
+      // total_cents so the activity table can stay in cents end-to-end.
+      amount: -(Number(r.total_cents) || 0),  // negative = credit
     }));
     activity.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
 

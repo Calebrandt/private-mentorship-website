@@ -3402,7 +3402,12 @@
     if (ie) throw new Error('invoices fetch: ' + ie.message);
     if (!client) throw new Error('Client not found');
 
-    // Receipts for THIS client's invoices in the period
+    // Receipts for THIS client's invoices in the period.
+    // sales_receipts.total_amount is stored in DOLLARS (numeric), while
+    // every other money field in the statement (invoices.total_cents,
+    // totals.billed, etc.) is in CENTS. We normalise here by exposing
+    // total_cents on each receipt so the template can use the same
+    // fmtMoney(cents) call as everywhere else.
     const invIds = (invoices || []).map(i => i.id);
     let receipts = [];
     if (invIds.length) {
@@ -3411,7 +3416,12 @@
         .in('invoice_id', invIds)
         .order('receipt_date', { ascending: true });
       if (rerr) console.warn('adminGetClientStatement receipts:', rerr);
-      receipts = (recs || []).filter(r => !r.voided_at);
+      receipts = (recs || [])
+        .filter(r => !r.voided_at)
+        .map(r => ({
+          ...r,
+          total_cents: Math.round((Number(r.total_amount) || 0) * 100),
+        }));
     }
 
     // Totals — void invoices excluded from billed total but kept in the
