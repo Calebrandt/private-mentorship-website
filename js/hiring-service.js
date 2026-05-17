@@ -1455,7 +1455,7 @@
       // FIRST log for a session.
       let q = sb()
         .from('v_appointment_with_lesson')
-        .select('appointment_id, client_id, starts_at, ends_at, duration_minutes, appointment_status, appointment_title, is_complimentary, lesson_log_id, lesson_assistant_id, lesson_assistant_name, focus_area, key_concepts, status_label, type_label, next_session_notes, feedback, rating, lesson_logged_at, active_file_count, taught_by_substitute')
+        .select('appointment_id, client_id, starts_at, ends_at, duration_minutes, appointment_status, appointment_title, is_complimentary, funding_source, funding_note, lesson_log_id, lesson_assistant_id, lesson_assistant_name, focus_area, key_concepts, status_label, type_label, next_session_notes, feedback, rating, lesson_logged_at, active_file_count, taught_by_substitute')
         .eq('client_id', clientId)
         .eq('appointment_status', 'completed')
         .order('starts_at', { ascending: false })

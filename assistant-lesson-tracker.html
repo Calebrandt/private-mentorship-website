@@ -1238,6 +1238,12 @@ function render(){
       : '';
     const typeBadge = r.type_label
       ? `<span class="lt-card__type">${highlightText(fmtStatusLabel(r.type_label), terms)}</span>` : '';
+    // Phase 19c.12 — show a ⏱ Bank badge on bank-funded sessions so the
+    // family audit trail is visible at-a-glance. Tooltip includes the
+    // justification note for context.
+    const bankBadge = r.funding_source === 'bank'
+      ? `<span class="lt-card__type" style="background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;" title="${esc(r.funding_note || 'Bank-funded session')}">⏱ Bank</span>`
+      : '';
     const fileBit = r.active_file_count > 0
       ? `<span class="lt-card__files">📎 ${r.active_file_count} attachment${r.active_file_count===1?'':'s'}</span>`
       : '';
@@ -1266,6 +1272,7 @@ function render(){
         ${conceptsHtml}
         ${snippetHtml}
         <div class="lt-card__meta">
+          ${bankBadge}
           ${typeBadge}
           ${fileBit}
         </div>
@@ -1473,7 +1480,15 @@ async function openModal(appointmentId){
   const histRow = state.history.find(r => r.appointment_id === appointmentId);
   const dateStr = histRow ? fmtDateLong(histRow.starts_at) : '';
   const timeStr = histRow ? `${fmtTime(histRow.starts_at)} – ${fmtTime(histRow.ends_at)}` : '';
-  $('ltModalSub').textContent = [dateStr, timeStr].filter(Boolean).join(' · ');
+  const subParts = [dateStr, timeStr].filter(Boolean);
+  // Phase 19c.12 — surface bank funding + justification in the modal
+  // subtitle when applicable so the assistant SEES the audit trail
+  // while writing the lesson log.
+  if (histRow?.funding_source === 'bank') {
+    const note = histRow.funding_note ? ` — "${histRow.funding_note}"` : '';
+    subParts.push(`⏱ Bank-funded${note}`);
+  }
+  $('ltModalSub').textContent = subParts.join(' · ');
   $('ltModalMeta').textContent = state.clientName || '';
 
   const log = await window.pmHiring.fetchLessonLog(appointmentId);
