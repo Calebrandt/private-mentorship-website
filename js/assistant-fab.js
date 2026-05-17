@@ -104,6 +104,10 @@
     .pm-assist-head__btn:hover { background: #f3f4f6; color: #111827; }
     .pm-assist-head__btn.is-icon { padding: 6px 8px; line-height: 0; }
     .pm-assist-head__btn svg { width: 14px; height: 14px; }
+    .pm-assist-head__btn.is-active {
+      background: #111827; color: #fff; border-color: #111827;
+    }
+    .pm-assist-head__btn.is-active:hover { background: #1f2937; color: #fff; }
 
     .pm-assist-body {
       flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
@@ -142,6 +146,16 @@
     }
     .pm-assist-thread__time {
       font-size: 10.5px; color: #9ca3af; margin-top: 4px; padding-left: 26px;
+    }
+    /* Closed (resolved/dismissed) threads — muted so open work pops */
+    .pm-assist-thread.is-closed { background: #fafbfc; }
+    .pm-assist-thread.is-closed .pm-assist-thread__title { color: #9ca3af; font-weight: 500; }
+    .pm-assist-thread.is-closed .pm-assist-thread__sub { color: #b6bcc6; }
+    .pm-assist-thread__badge {
+      font: 600 9px Inter, sans-serif; letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 7px; border-radius: 9999px;
+      background: #e5e7eb; color: #6b7280;
     }
 
     /* Conversation view */
@@ -350,6 +364,7 @@
         <div class="pm-assist-head__actions">
           <button class="pm-assist-head__btn" id="pmAssistEmail" title="Email me the current open threads">📧 Email me</button>
           <button class="pm-assist-head__btn" id="pmAssistScan" title="Scan for new work now">Scan</button>
+          <button class="pm-assist-head__btn" id="pmAssistResolvedToggle" title="Show / hide resolved threads — re-open one to mark paid retroactively">Resolved</button>
           <button class="pm-assist-head__btn is-icon" id="pmAssistClose" aria-label="Close" title="Close">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
@@ -368,6 +383,7 @@
     let currentThreadId = null;
     let threads = [];
     let pollHandle = null;
+    let showResolved = false;  // Phase 19c.10a — toggle resolved threads in list
 
     function $(id) { return document.getElementById(id); }
     function toastMsg(msg) {
@@ -456,6 +472,21 @@
       }
     });
 
+    // Phase 19c.10a — toggle resolved threads in the list view. Lets Caleb
+    // find a resolved thread (e.g. an invoice he sent earlier today) and
+    // tap the green chip on it to mark paid retroactively — without
+    // bouncing to admin-financials.
+    $('pmAssistResolvedToggle').addEventListener('click', async () => {
+      const btn = $('pmAssistResolvedToggle');
+      showResolved = !showResolved;
+      btn.classList.toggle('is-active', showResolved);
+      btn.textContent = showResolved ? 'Open only' : 'Resolved';
+      btn.title = showResolved
+        ? 'Showing resolved + open. Click to hide resolved.'
+        : 'Show / hide resolved threads — re-open one to mark paid retroactively';
+      await loadThreads();
+    });
+
     $('pmAssistScan').addEventListener('click', async () => {
       const btn = $('pmAssistScan');
       btn.disabled = true; btn.textContent = 'Scanning…';
@@ -529,7 +560,7 @@
     // ─── Thread list view ──────────────────────────────────────
     async function loadThreads() {
       try {
-        threads = await window.pmHiring.assistantListThreads();
+        threads = await window.pmHiring.assistantListThreads({ includeResolved: showResolved });
       } catch (e) {
         $('pmAssistBody').innerHTML = `<div class="pm-assist-empty">Couldn't load threads.<br/><small>${esc(e.message)}</small></div>`;
         return;
@@ -548,17 +579,23 @@
         </div>`;
         return;
       }
-      body.innerHTML = threads.map(t => `
-        <div class="pm-assist-thread" data-tid="${esc(t.id)}">
+      body.innerHTML = threads.map(t => {
+        const isClosed = ['resolved', 'dismissed'].includes(t.status);
+        const statusBadge = isClosed
+          ? `<span class="pm-assist-thread__badge">${t.status === 'dismissed' ? 'Dismissed' : 'Resolved'}</span>`
+          : '';
+        return `
+        <div class="pm-assist-thread ${isClosed ? 'is-closed' : ''}" data-tid="${esc(t.id)}">
           <div class="pm-assist-thread__top">
             <span class="pm-assist-thread__icon">${esc(t.scenario_icon || '💬')}</span>
             <span class="pm-assist-thread__title">${esc(t.title)}</span>
+            ${statusBadge}
             <span class="pm-assist-thread__pip ${t.unread ? '' : 'is-hidden'}"></span>
           </div>
           ${t.subtitle ? `<div class="pm-assist-thread__sub">${esc(t.subtitle)}</div>` : ''}
           <div class="pm-assist-thread__time">${esc(timeAgo(t.last_message_at || t.updated_at))}</div>
-        </div>
-      `).join('');
+        </div>`;
+      }).join('');
       body.querySelectorAll('[data-tid]').forEach(el => {
         el.addEventListener('click', () => openThread(el.dataset.tid));
       });
