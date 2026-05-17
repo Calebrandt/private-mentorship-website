@@ -224,7 +224,7 @@
     /* ── Thank you ─────────────────────────────────────────────── */
     .thank-you {
       margin-top: auto; padding-top: 60px; padding-bottom: 18px;
-      text-align: center; white-space: nowrap;
+      text-align: left; white-space: nowrap;
       font-family: 'Outfit', 'Montserrat', sans-serif;
       font-weight: 300; font-size: 30px;
       letter-spacing: 0.32em;
