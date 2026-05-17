@@ -3388,6 +3388,15 @@
     if (error) throw new Error(error.message || 'assistant_action failed');
     return data;
   }
+  // Phase 19c.8c — fire an Oracle digest email via the oracle-notify edge function.
+  // Called after a successful Scan so Caleb gets an inbox alert + deep-links.
+  async function oracleNotifyNow({ threadIds = null } = {}) {
+    const { data, error } = await sb().functions.invoke('oracle-notify', {
+      body: threadIds ? { threadIds } : {},
+    });
+    if (error) throw new Error(error.message || 'oracle-notify failed');
+    return data;
+  }
 
   // ─── Email a financial document (Phase 19c.4) ────────────────
   // Calls the email-financial-document edge function. Server-side it
@@ -3520,5 +3529,7 @@
     // Phase 19c.8a — PM Assistant
     assistantScanNow, assistantListThreads, assistantThreadMessages,
     assistantPostMessage, assistantAction,
+    // Phase 19c.8c — Oracle digest email
+    oracleNotifyNow,
   };
 })();

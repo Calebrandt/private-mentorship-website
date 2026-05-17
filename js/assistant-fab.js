@@ -421,12 +421,50 @@
         const created = result?.total_threads_created || 0;
         toastMsg(created > 0 ? `${created} new thread${created === 1 ? '' : 's'}` : 'No new work');
         await loadThreads();
+
+        // Phase 19c.8c — fire an Oracle digest email so Caleb gets an
+        // inbox notification with deep-links into each thread.
+        // Best-effort: never let an email failure break the Scan flow.
+        if (created > 0) {
+          try {
+            const result2 = await window.pmHiring.oracleNotifyNow();
+            if (result2?.ok) toastMsg('📧 Digest sent to your inbox');
+          } catch (_) { /* silent — email is a bonus, not required */ }
+        }
       } catch (e) {
         toastMsg('Scan failed: ' + e.message);
       } finally {
         btn.disabled = false; btn.textContent = 'Scan';
       }
     });
+
+    // ─── Phase 19c.8c — deep-link handler ────────────────────────
+    // Open the drawer + jump straight into a specific thread when the
+    // page URL has ?oracle_thread=<id> (used by Oracle's digest email's
+    // "Open in chat →" buttons).
+    (function handleDeepLink() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const threadId = params.get('oracle_thread');
+        if (!threadId) return;
+
+        // Wait briefly so the rest of the page (sidebar, auth) settles
+        setTimeout(async () => {
+          openPanel();
+          // Make sure the thread list is fresh, then open this one
+          try {
+            await loadThreads();
+            await openThread(threadId);
+            // Clean the URL so reloads don't keep re-opening the same thread
+            const url = new URL(window.location.href);
+            url.searchParams.delete('oracle_thread');
+            window.history.replaceState({}, '', url.toString());
+          } catch (e) {
+            console.warn('[oracle deep-link]', e);
+          }
+        }, 400);
+      } catch (_) {}
+    })();
 
     // ─── Badge updater (runs in background) ─────────────────────
     async function refreshBadge() {
