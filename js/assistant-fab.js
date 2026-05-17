@@ -186,11 +186,24 @@
       align-self: flex-start; background: #fff; border: 1px solid #e5e7eb;
       border-radius: 12px; padding: 0; width: 100%; max-width: 100%;
       overflow: hidden;
+      position: relative;
     }
     .pm-assist-msg--preview iframe {
       width: 100%; height: 480px; border: 0; display: block;
       background: #fff;
     }
+    .pm-assist-msg__expand {
+      position: absolute; bottom: 10px; right: 10px;
+      background: rgba(15,23,42,0.85); color: #fff;
+      padding: 6px 12px; border-radius: 8px; border: none;
+      font: 600 11px Inter, sans-serif; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 6px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 4px 12px -2px rgba(15,23,42,0.45);
+      transition: background .12s ease, transform .12s ease;
+    }
+    .pm-assist-msg__expand:hover { background: rgba(15,23,42,0.95); transform: translateY(-1px); }
+    .pm-assist-msg__expand svg { width: 12px; height: 12px; }
     .pm-assist-msg--actions {
       align-self: flex-start; display: flex; flex-wrap: wrap; gap: 6px;
       background: transparent; padding: 0;
@@ -506,14 +519,25 @@
           const out = await window.pmPDF.buildDoc({ docType: 'invoice', docId: thread.invoice_id });
 
           if (actionKey === 'preview_pdf') {
-            // Render an inline preview message in the chat
+            // Render an inline preview message in the chat + an Expand button
+            // that opens the PDF in a new browser tab (full size, zoomable).
             const blobUrl = URL.createObjectURL(out.blob);
             const msgsEl = $('pmAssistMsgs');
             msgsEl.insertAdjacentHTML('beforeend', `
               <div class="pm-assist-msg pm-assist-msg--preview">
                 <iframe src="${blobUrl}#toolbar=0&navpanes=0" title="Invoice preview"></iframe>
+                <button class="pm-assist-msg__expand" data-expand-url="${blobUrl}">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                  Expand
+                </button>
               </div>
             `);
+            // Wire the expand button
+            msgsEl.querySelectorAll('[data-expand-url]').forEach(b => {
+              if (b.dataset.wired) return;
+              b.dataset.wired = '1';
+              b.addEventListener('click', () => window.open(b.dataset.expandUrl, '_blank', 'noopener'));
+            });
             $('pmAssistBody').scrollTop = $('pmAssistBody').scrollHeight;
             return;
           }
