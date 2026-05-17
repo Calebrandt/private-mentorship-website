@@ -128,7 +128,7 @@
       margin-bottom: 7px;
     }
     .meta-value {
-      font-size: 12px; color: #4b4b4b; font-weight: 400;
+      font-size: 12px; color: #5e5e5e; font-weight: 400;
       letter-spacing: 0.04em; line-height: 1.55; word-break: break-word;
     }
     .meta-block.payment .meta-value-row {
@@ -148,8 +148,8 @@
 
     .doc-headline {
       font-family: 'Outfit', 'Montserrat', sans-serif;
-      font-weight: 400; font-size: 80px; line-height: 0.95;
-      letter-spacing: 0.18em; color: #4a4a4a;
+      font-weight: 400; font-size: 92px; line-height: 0.95;
+      letter-spacing: 0.18em; color: #6e6e6e;
       text-transform: uppercase;
       margin: 0 0 44px -2px;
     }
@@ -165,7 +165,7 @@
       margin-bottom: 8px;
     }
     .party-name {
-      font-size: 12px; color: #4b4b4b; font-weight: 400;
+      font-size: 12px; color: #5e5e5e; font-weight: 400;
       letter-spacing: 0.04em; line-height: 1.6; word-break: break-word;
     }
 
@@ -185,7 +185,7 @@
     .items tbody td {
       padding: 18px 4px;
       border-bottom: 1px solid #e2e2e2;
-      vertical-align: top; font-size: 12px; color: #4b4b4b;
+      vertical-align: top; font-size: 12px; color: #5e5e5e;
       font-weight: 400; letter-spacing: 0.02em;
     }
     .items td.center { text-align: center; }
@@ -203,7 +203,7 @@
     }
     .totals .t-line .label {
       font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase;
-      font-size: 10.5px; color: #4b4b4b;
+      font-size: 10.5px; color: #5e5e5e;
     }
     .totals .t-line .val {
       font-weight: 400; font-variant-numeric: tabular-nums;
@@ -223,9 +223,9 @@
       margin-top: auto; padding-top: 72px; padding-bottom: 12px;
       text-align: center;
       font-family: 'Outfit', 'Montserrat', sans-serif;
-      font-weight: 400; font-size: 44px;
+      font-weight: 400; font-size: 52px;
       letter-spacing: 0.42em;
-      text-transform: uppercase; color: #14181f;
+      text-transform: uppercase; color: #6e6e6e;
       padding-left: 0.42em;  /* compensate visually for the trailing track */
     }
 
