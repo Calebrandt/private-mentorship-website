@@ -861,7 +861,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/supabase-client.js?v=20260515c"></script>
-<script src="js/hiring-service.js?v=20260516m"></script>
+<script src="js/hiring-service.js?v=20260517j"></script>
 <script src="js/messages-service.js?v=20260515c"></script>
 <script src="js/session-calendar.js?v=20260516c"></script>
 <script src="js/sidebar.js?v=20260515d"></script>
@@ -952,8 +952,39 @@ function renderAppointmentRow(a, spend){
   const emptyState = document.getElementById('wcEmpty');
 
   if (!clientId) {
+    // Phase 19c.10 — admin lands here from sidebar with no ?id. Show a
+    // client picker so they can pick any family and load their workspace.
+    // Assistants still hit the original "open from My Families" flow.
+    let isAdmin = false;
+    try { isAdmin = await window.pmHiring.isCurrentUserAdminOrOwner(); } catch (_) {}
+
     loading.hidden = true;
+
+    if (!isAdmin) {
+      emptyState.hidden = false;
+      return;
+    }
+
+    // Admin picker
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g,
+      c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+    let clients = [];
+    try { clients = await window.pmHiring.adminListClients({ limit: 500 }); } catch (_) {}
+    clients = (clients || []).slice().sort((a, b) => (a.full_name || '').localeCompare(b.full_name || ''));
+
     emptyState.hidden = false;
+    emptyState.innerHTML = `
+      <p class="wc-empty__title" style="font-size:17px;">Pick a family to view their workspace</p>
+      <p style="font-size:13.5px;line-height:1.65;max-width:480px;margin:0 auto 20px;">As admin you can open any family's dashboard: hours remaining, contract, upcoming sessions, payment history.</p>
+      <select id="wcClientPicker" style="padding:11px 16px;border:1px solid #d1d5db;border-radius:9px;font:500 14px Inter,sans-serif;min-width:300px;background:#fafbfc;cursor:pointer;">
+        <option value="">— Select a family —</option>
+        ${clients.map(c => `<option value="${esc(c.id)}">${esc(c.full_name || 'Unnamed')}${c.billing_contact_name ? ' (' + esc(c.billing_contact_name) + ')' : ''}</option>`).join('')}
+      </select>
+    `;
+    document.getElementById('wcClientPicker')?.addEventListener('change', (e) => {
+      const id = e.target.value;
+      if (id) window.location.search = '?id=' + encodeURIComponent(id);
+    });
     return;
   }
 
