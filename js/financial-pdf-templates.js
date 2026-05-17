@@ -112,14 +112,15 @@
       padding: 56px 30px 56px 38px;
       display: flex; flex-direction: column;
     }
-    /* Logo: full lockup (PM mark + "PRIVATE MENTORSHIP" wordmark +
-       swoosh), shown plainly on the sidebar. No circle frame — the
-       lockup IS the brand mark and reads premium at this size. */
+    /* Logo: full lockup (PM mark + "PRIVATE MENTORSHIP" wordmark),
+       1024×1536 source so a bit taller than wide. Sized at 130px wide
+       (= ~195px tall after aspect scaling). Plain — no frame, no clip,
+       no chrome. Slight negative margin trims source's white padding. */
     .brand-logo {
       display: block;
-      width: 156px;
+      width: 140px;
       height: auto;
-      margin: -10px -10px 46px -10px;  /* compensate for source padding */
+      margin: -8px -8px 38px -8px;
     }
     .meta-block { margin-bottom: 28px; }
     .meta-block.last { flex: 1; }
