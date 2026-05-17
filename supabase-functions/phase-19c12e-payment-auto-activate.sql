@@ -28,34 +28,46 @@ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
 AS $func$
 DECLARE
   v_invoice       record;
-  v_drafts        record[];
   v_target_draft  uuid;
   v_match_count   int := 0;
   v_client_id     uuid;
   v_old_contract  uuid;
   v_residual_min  int;
   v_draft         record;
+  v_has_active    boolean;
 BEGIN
-  -- Load invoice
-  SELECT id, client_id, invoice_date, status
-    INTO v_invoice
-  FROM public.invoices
-  WHERE id = p_invoice_id;
+  SELECT id, client_id, invoice_date, status INTO v_invoice
+  FROM public.invoices WHERE id = p_invoice_id;
   IF NOT FOUND OR v_invoice.status <> 'paid' THEN
     RETURN jsonb_build_object('ok', false, 'reason', 'invoice not paid');
   END IF;
-
   v_client_id := v_invoice.client_id;
 
-  -- Find draft contracts for this client whose start_at is near
-  -- the invoice date. Window: invoice_date - 14d to + 30d.
-  -- Count matches; only act if exactly one.
+  -- Safety guard #1: if the client still has an active contract, this
+  -- payment is almost certainly for the current term, NOT a renewal.
+  -- Skip to avoid prematurely promoting a future-dated draft.
+  SELECT EXISTS (
+    SELECT 1 FROM public.contracts
+    WHERE client_id = v_client_id AND status = 'active'
+  ) INTO v_has_active;
+
+  IF v_has_active THEN
+    BEGIN
+      INSERT INTO public.audit_logs (user_id, action, entity_type, entity_id, details)
+      VALUES (NULL, 'PAYMENT_AUTO_ACTIVATE_SKIP', 'invoices', p_invoice_id,
+              jsonb_build_object('reason', 'client still has active contract — payment is for current term',
+                                 'client_id', v_client_id));
+    EXCEPTION WHEN OTHERS THEN NULL; END;
+    RETURN jsonb_build_object('ok', true, 'activated', false, 'reason', 'client has active contract');
+  END IF;
+
+  -- Safety guard #2: only match drafts whose start_at has already arrived.
+  -- Future-dated drafts wait for their time to come.
   SELECT COUNT(*), MIN(id) INTO v_match_count, v_target_draft
   FROM public.contracts
   WHERE client_id = v_client_id
     AND status = 'draft'
-    AND start_at::date BETWEEN (v_invoice.invoice_date - interval '14 days')::date
-                           AND (v_invoice.invoice_date + interval '30 days')::date;
+    AND start_at::date <= current_date;
 
   IF v_match_count = 0 THEN
     -- Most common case: payment is for the current term (not a renewal).
