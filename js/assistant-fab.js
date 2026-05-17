@@ -334,22 +334,32 @@
       border-top: 1px solid #f1f5f9;
     }
     .pm-assist-quickchip {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 10px 18px;
-      background: #16a34a; color: #fff;
-      border: 1px solid #15803d;
-      border-radius: 9999px;
-      font: 700 13px Inter, sans-serif;
+      display: inline-flex; align-items: center; gap: 8px;
+      width: 100%; justify-content: center;
+      padding: 12px 18px;
+      background: #0f172a;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font: 600 13px Inter, -apple-system, sans-serif;
+      letter-spacing: -0.005em;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(22,163,74,0.25);
-      transition: background .12s ease, transform .08s ease, box-shadow .12s ease;
+      box-shadow: 0 1px 3px rgba(15,23,42,0.18), 0 1px 2px rgba(15,23,42,0.06);
+      transition: background .14s ease, transform .08s ease, box-shadow .14s ease;
     }
     .pm-assist-quickchip:hover {
-      background: #15803d;
-      box-shadow: 0 4px 12px rgba(22,163,74,0.35);
+      background: #1f2937;
+      box-shadow: 0 4px 10px rgba(15,23,42,0.22), 0 2px 4px rgba(15,23,42,0.08);
       transform: translateY(-1px);
     }
-    .pm-assist-quickchip:active { transform: translateY(1px); box-shadow: 0 1px 3px rgba(22,163,74,0.25); }
+    .pm-assist-quickchip:active {
+      transform: translateY(0); box-shadow: 0 1px 2px rgba(15,23,42,0.18);
+    }
+    .pm-assist-quickchip__amount {
+      opacity: 0.7;
+      font-weight: 500;
+      margin-left: 2px;
+    }
 
     /* Input bar */
     .pm-assist-input {
@@ -763,7 +773,8 @@
             <button class="pm-assist-quickchip" data-quickaction="mark_paid_full"
                     data-confirm-amt="${esc(amt)}"
                     data-confirm-inv="${esc(invLabel)}">
-              💵 Mark paid in full${amt ? ' (' + amt + ')' : ''}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Mark Paid + Send Receipt${amt ? '<span class="pm-assist-quickchip__amount">·  ' + amt + '</span>' : ''}
             </button>
           </div>`;
       }
