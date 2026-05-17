@@ -743,10 +743,24 @@
           <span class="wc-billing-opt__sub">Hours deduct from the family's contract on completion</span>
         </label>
         <label class="wc-billing-opt">
+          <input type="radio" name="wcBookBilling" value="bank">
+          <span class="wc-billing-opt__title">⏱ From bank</span>
+          <span class="wc-billing-opt__sub">Hours deduct from the family bank pool (extra session outside the recurring slot). Requires a justification note for the audit trail.</span>
+        </label>
+        <label class="wc-billing-opt">
           <input type="radio" name="wcBookBilling" value="complimentary">
           <span class="wc-billing-opt__title">Complimentary</span>
           <span class="wc-billing-opt__sub">No hours deduct on completion. Use for make-ups, trial sessions, brief check-ins, or goodwill time. Logged permanently.</span>
         </label>
+      </div>
+      <!-- Phase 19c.12 #5: bank justification — required only when 'From bank' is selected -->
+      <div id="wcBookBankNote" style="margin-top:10px;" hidden>
+        <label for="wcBookBankNoteInput" style="display:block;font:600 11px Inter,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:#92400e;margin-bottom:6px;">
+          Why bank? (required)
+        </label>
+        <textarea id="wcBookBankNoteInput"
+          placeholder="e.g. Extra Saturday session for upcoming exam prep"
+          style="width:100%;min-height:56px;padding:10px 12px;border:1px solid #fed7aa;border-radius:8px;background:#fffbeb;font:400 13px Inter,sans-serif;color:#0f172a;resize:vertical;"></textarea>
       </div>
       <div class="wc-billing-help" id="wcBookHelp" hidden>
         <p class="wc-billing-help__head">Standard billing</p>
@@ -1358,6 +1372,14 @@ function wireBookModal(ctx){
   document.getElementById('wcBookBtn').addEventListener('click', openBookModal);
   document.getElementById('wcBookCancel').addEventListener('click', closeBookModal);
   document.getElementById('wcBookSubmit').addEventListener('click', submitBookModal);
+  // Phase 19c.12 #5: show the bank-justification textarea only when "From bank" is selected.
+  document.querySelectorAll('input[name="wcBookBilling"]').forEach(r => {
+    r.addEventListener('change', () => {
+      const isBank = document.querySelector('input[name="wcBookBilling"]:checked')?.value === 'bank';
+      const noteEl = document.getElementById('wcBookBankNote');
+      if (noteEl) noteEl.hidden = !isBank;
+    });
+  });
   document.getElementById('wcBookAddSlot').addEventListener('click', () => {
     if (bookSlots.length >= 3) return;
     bookSlots.push(defaultBookSlot());
@@ -1513,14 +1535,29 @@ async function submitBookModal(){
 
     const billingChoice = document.querySelector('input[name="wcBookBilling"]:checked')?.value || 'standard';
     const isComplimentary = billingChoice === 'complimentary';
+    const fundingSource = billingChoice === 'bank' ? 'bank' : 'contract';
+    let fundingNote = '';
+    if (fundingSource === 'bank') {
+      fundingNote = (document.getElementById('wcBookBankNoteInput')?.value || '').trim();
+      if (!fundingNote) {
+        showWcToast('Bank-funded sessions require a justification note.', true);
+        document.getElementById('wcBookBankNoteInput')?.focus();
+        btn.disabled = false;
+        return;
+      }
+    }
     await window.pmHiring.assistantSubmitExtraAppointmentRequest({
       clientId: bookCtx.clientId,
       slots,
       reason: document.getElementById('wcBookReason').value,
       isComplimentary,
+      fundingSource,
+      fundingNote,
     });
-    const compTag = isComplimentary ? ' (complimentary)' : '';
-    showWcToast(`Booking request submitted${compTag} — ${slots.length} option${slots.length>1?'s':''}. Admin will confirm.`);
+    const tag = isComplimentary ? ' (complimentary)'
+             : fundingSource === 'bank' ? ' (bank-funded)'
+             : '';
+    showWcToast(`Booking request submitted${tag} — ${slots.length} option${slots.length>1?'s':''}. Admin will confirm.`);
     closeBookModal();
   } catch (err) {
     console.warn('Booking failed:', err);

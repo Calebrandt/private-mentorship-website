@@ -1041,6 +1041,7 @@
 
   async function assistantSubmitExtraAppointmentRequest({
     clientId, slots = [], reason = '', isComplimentary = false,
+    fundingSource = 'contract', fundingNote = '',
   }) {
     if (!clientId) throw new Error('clientId is required');
     if (!Array.isArray(slots) || slots.length === 0) {
@@ -1053,6 +1054,16 @@
     const normalized = slots.map((s, i) => _normalizeSlot(s, i));
     const primary = _slotCanonicalFields(normalized[0]);
 
+    // Phase 19c.12 #5 — funding_source + funding_note plumbed through
+    // proposed_schedule so admin_approve_schedule_request can inherit
+    // them onto the created appointment.
+    const cleanFundingSource = ['contract', 'bank'].includes(String(fundingSource).toLowerCase())
+      ? String(fundingSource).toLowerCase() : 'contract';
+    const cleanFundingNote = String(fundingNote || '').trim() || null;
+    if (cleanFundingSource === 'bank' && !cleanFundingNote && !isComplimentary) {
+      throw new Error('Bank-funded sessions require a justification note.');
+    }
+
     const payload = {
       client_id: clientId,
       assistant_id: user.id,
@@ -1063,13 +1074,12 @@
       reason: String(reason || '').trim() || null,
       status: 'pending',
       request_type: 'extra',
-      // Phase 10: is_complimentary flag carried through to admin approval,
-      // which sets it on the created appointment. UI displays a "Comp"
-      // badge on flagged appointments + skips hours deduction at completion.
       proposed_schedule: {
         slots: normalized,
         source: 'assistant_web_phase3',
         is_complimentary: !!isComplimentary,
+        funding_source: cleanFundingSource,
+        funding_note: cleanFundingNote,
       },
     };
     const { data, error } = await sb()
