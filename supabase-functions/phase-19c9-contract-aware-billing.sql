@@ -89,8 +89,8 @@ BEGIN
       AND NOT EXISTS (
         SELECT 1 FROM public.contract_freezes f
         WHERE f.contract_id = ctr.id
-          AND f.starts_at <= now()
-          AND (f.ends_at IS NULL OR f.ends_at > now())
+          AND f.starts_on <= current_date
+          AND (f.ends_on IS NULL OR f.ends_on > current_date)
       )
   LOOP
     v_days_until_end := GREATEST(0, EXTRACT(DAY FROM (v_ctr.end_at - now()))::int);
