@@ -834,15 +834,15 @@
                  actionKey === 'create_renewal_invoice' ? 'Renewal invoice created ✓' :
                  'Done');
 
-        // Phase 19c.10a — auto-fire receipt email to the family after a
-        // successful mark_paid_full. The server returns receipt_id+client_id
-        // in actionResult so we can build the PDF + send via the existing
-        // pipeline. Best-effort: if the receipt email fails we still
-        // continue (the payment itself succeeded).
+        // Phase 19c.10a + preview — after mark_paid_full succeeds, build the
+        // receipt PDF and show a preview in the chat with Send / Skip buttons.
+        // Caleb wanted to confirm exactly what the family receives before
+        // it goes out. Payment itself is already recorded server-side, so
+        // skipping the receipt is a safe escape hatch.
         if (actionKey === 'mark_paid_full' && actionResult?.receipt_id) {
-          fireReceiptEmail(actionResult.receipt_id).catch(err => {
-            console.warn('[oracle auto-receipt]', err);
-            showErrorInChat('Receipt email failed (payment still recorded)',
+          previewReceiptThenSend(actionResult.receipt_id, threadId).catch(err => {
+            console.warn('[oracle receipt preview]', err);
+            showErrorInChat('Receipt preview failed (payment still recorded)',
               (err?.message || String(err)));
           });
         }
@@ -866,11 +866,92 @@
       }
     }
 
+    // ─── Receipt preview-and-confirm flow ───────────────────────
+    // After mark_paid_full succeeds, build the receipt PDF and inject an
+    // inline preview card in the chat with [Send] / [Skip] buttons. Send
+    // fires fireReceiptEmail. Skip leaves the payment recorded but doesn't
+    // email (Caleb can re-send later from admin-financials → Receipts).
+    async function previewReceiptThenSend(receiptId, threadId) {
+      if (!receiptId) return;
+      await ensureFinancialPipelineLoaded();
+      const out = await window.pmPDF.buildDoc({ docType: 'receipt', docId: receiptId });
+      const p = out.payload || {};
+      const client = p.clients || {};
+      const primary = client.email || '';
+      const secondary = client.billing_email_secondary || '';
+      const to = [primary, secondary].filter(Boolean).join(', ');
+      if (!to) {
+        showErrorInChat('Receipt built but no email on file',
+          'Payment was recorded. To email the receipt later, add an email to the client and re-send from admin-financials → Receipts.');
+        return;
+      }
+
+      // Inject preview card into the open thread (if still open) or
+      // somewhere visible on the page.
+      const blobUrl = URL.createObjectURL(out.blob);
+      const previewId = 'pmReceiptPreview-' + Date.now();
+      const recipientHtml = to.split(', ').map(e => `<code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:11px;">${e}</code>`).join(' ');
+      const msgsEl = document.getElementById('pmAssistMsgs');
+      const previewHtml = `
+        <div class="pm-assist-msg pm-assist-msg--preview" id="${previewId}" style="background:#fffbeb;border:1px solid #fde68a;padding:12px;border-radius:10px;">
+          <div style="font:600 12px Inter,sans-serif;color:#92400e;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">
+            📄 Receipt preview — confirm before sending
+          </div>
+          <div style="font:400 12.5px Inter,sans-serif;color:#475569;margin-bottom:10px;">
+            Will send to: ${recipientHtml}
+          </div>
+          <iframe src="${blobUrl}#toolbar=0&navpanes=0" title="Receipt preview" style="width:100%;height:300px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;"></iframe>
+          <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end;">
+            <button class="pm-assist-action-btn pm-assist-action-btn--ghost" data-receipt-action="skip" data-preview-id="${previewId}">Skip — don't email</button>
+            <button class="pm-assist-action-btn pm-assist-action-btn--ghost" data-receipt-action="open" data-preview-url="${blobUrl}">Open in tab</button>
+            <button class="pm-assist-action-btn pm-assist-action-btn--primary" data-receipt-action="send" data-preview-id="${previewId}" data-receipt-id="${receiptId}">Send receipt</button>
+          </div>
+        </div>`;
+      if (msgsEl) {
+        msgsEl.insertAdjacentHTML('beforeend', previewHtml);
+        const bodyEl = document.getElementById('pmAssistBody');
+        if (bodyEl) bodyEl.scrollTop = bodyEl.scrollHeight;
+      } else {
+        // Drawer's closed — pop the preview in a new tab as a fallback
+        window.open(blobUrl, '_blank', 'noopener');
+        toastMsg('Open Oracle drawer to confirm + send receipt');
+        return;
+      }
+
+      // Wire the buttons
+      const previewCard = document.getElementById(previewId);
+      previewCard?.querySelector('[data-receipt-action="open"]')?.addEventListener('click', (e) => {
+        const url = e.currentTarget.dataset.previewUrl;
+        if (url) window.open(url, '_blank', 'noopener');
+      });
+      previewCard?.querySelector('[data-receipt-action="skip"]')?.addEventListener('click', () => {
+        previewCard.innerHTML = `<div style="font:400 12px Inter,sans-serif;color:#64748b;">
+          Receipt not emailed. Payment is still recorded. To send later, go to admin-financials → Receipts.
+        </div>`;
+        previewCard.style.background = '#f8fafc';
+        previewCard.style.borderColor = '#e2e8f0';
+      });
+      previewCard?.querySelector('[data-receipt-action="send"]')?.addEventListener('click', async (e) => {
+        const btn = e.currentTarget;
+        btn.disabled = true; btn.textContent = 'Sending…';
+        try {
+          await fireReceiptEmail(receiptId);
+          previewCard.innerHTML = `<div style="font:600 12.5px Inter,sans-serif;color:#166534;">
+            ✓ Receipt emailed to ${recipientHtml}
+          </div>`;
+          previewCard.style.background = '#f0fdf4';
+          previewCard.style.borderColor = '#bbf7d0';
+        } catch (err) {
+          btn.disabled = false; btn.textContent = 'Send receipt';
+          showErrorInChat('Receipt email failed', err?.message || String(err));
+        }
+      });
+    }
+
     // ─── Auto-receipt email (Phase 19c.10a) ─────────────────────
-    // Called after mark_paid_full succeeds. Builds the receipt PDF and emails
-    // it to the family via the existing send-financial-email pipeline. Same
-    // body + meta shape as a manually-sent receipt — so it renders identically
-    // to anything Caleb would email by hand from admin-financials.
+    // Now called by previewReceiptThenSend after user confirms in the preview.
+    // Builds the receipt PDF and emails it via the existing send-financial-email
+    // pipeline. Same body + meta shape as a manually-sent receipt.
     async function fireReceiptEmail(receiptId) {
       if (!receiptId) return;
       await ensureFinancialPipelineLoaded();
@@ -905,7 +986,8 @@
         to, subject, body, filename: out.filename,
         pdfBase64, meta,
       });
-      toastMsg('Receipt emailed to ' + to + ' ✓');
+      // Toast removed — previewReceiptThenSend renders the green success
+      // card inline. Showing both would be redundant noise.
     }
 
     // ─── Helpers: lazy-load PDF machinery + blob→base64 ─────────
