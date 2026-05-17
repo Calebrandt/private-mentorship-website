@@ -1,13 +1,14 @@
 -- ============================================================================
--- phase-19c8c1-cron-email-firing.sql
+-- phase-19c8c1-cron-email-firing.sql  (v2 — table-backed config)
 -- ----------------------------------------------------------------------------
 -- Makes assistant_scan_now() automatically fire the digest email via
 -- pg_net at the end of each scan. Cron fires at 16:00 UTC (9 AM PT)
 -- → Caleb wakes up to the digest in his inbox. No clicks required.
 --
--- Generates a shared secret used by Postgres → edge function. Same
--- secret must also be added to the oracle-notify function's secrets
--- in the Supabase dashboard.
+-- v1 tried ALTER DATABASE postgres SET app.xxx — Supabase SQL Editor
+-- doesn't have permission for that. v2 stores the URL + shared secret
+-- in a tiny oracle_config table (RLS-locked, no policies) so only
+-- SECURITY DEFINER functions can read it.
 --
 -- AFTER RUNNING THIS, Caleb must:
 --   1. Copy the returned secret (oracle_cron_secret_copy_this column)
@@ -17,6 +18,19 @@
 
 BEGIN;
 
+-- 1. Config table (single-row pattern)
+CREATE TABLE IF NOT EXISTS public.oracle_config (
+  id          int PRIMARY KEY DEFAULT 1,
+  notify_url  text NOT NULL,
+  cron_secret text NOT NULL,
+  updated_at  timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT oracle_config_singleton CHECK (id = 1)
+);
+
+ALTER TABLE public.oracle_config ENABLE ROW LEVEL SECURITY;
+-- No policies → only SECURITY DEFINER functions can read it. Perfect.
+
+-- 2. Generate + insert secret
 DROP TABLE IF EXISTS _oracle_setup;
 CREATE TEMP TABLE _oracle_setup (secret text);
 
@@ -25,14 +39,17 @@ DECLARE
   v_secret text := 'oracle-cron-' || encode(gen_random_bytes(24), 'hex');
   v_url    text := 'https://llkicgphkvciumfzhbkk.supabase.co/functions/v1/oracle-notify';
 BEGIN
-  EXECUTE format('ALTER DATABASE postgres SET app.oracle_notify_url   = %L', v_url);
-  EXECUTE format('ALTER DATABASE postgres SET app.oracle_cron_secret  = %L', v_secret);
-  EXECUTE format('SET app.oracle_notify_url  = %L', v_url);
-  EXECUTE format('SET app.oracle_cron_secret = %L', v_secret);
+  INSERT INTO public.oracle_config (id, notify_url, cron_secret)
+  VALUES (1, v_url, v_secret)
+  ON CONFLICT (id) DO UPDATE
+    SET notify_url  = EXCLUDED.notify_url,
+        cron_secret = EXCLUDED.cron_secret,
+        updated_at  = now();
+
   INSERT INTO _oracle_setup VALUES (v_secret);
 END $$;
 
-
+-- 3. Updated scan function reads from table instead of current_setting()
 CREATE OR REPLACE FUNCTION public.assistant_scan_now()
 RETURNS jsonb
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
@@ -75,8 +92,10 @@ BEGIN
   -- The browser's FAB handles email firing for user-initiated scans.
   IF v_uid IS NULL AND v_open_count > 0 THEN
     BEGIN
-      v_notify_url    := current_setting('app.oracle_notify_url',  true);
-      v_notify_secret := current_setting('app.oracle_cron_secret', true);
+      SELECT notify_url, cron_secret
+        INTO v_notify_url, v_notify_secret
+      FROM public.oracle_config
+      WHERE id = 1;
 
       IF v_notify_url IS NOT NULL AND v_notify_secret IS NOT NULL THEN
         SELECT net.http_post(
@@ -110,7 +129,7 @@ END;
 $func$;
 GRANT EXECUTE ON FUNCTION public.assistant_scan_now() TO authenticated;
 
-
+-- 4. Return the secret so you can copy it
 SELECT secret AS oracle_cron_secret_copy_this FROM _oracle_setup;
 
 COMMIT;
