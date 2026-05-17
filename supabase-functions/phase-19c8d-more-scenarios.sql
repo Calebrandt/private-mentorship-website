@@ -465,14 +465,10 @@ BEGIN
     -- we surface a single "Open INV-XXX thread" hint instead.
     IF EXISTS (SELECT 1 FROM public.assistant_threads
                WHERE id = p_thread_id AND invoice_id = v_intent.invoice_id) THEN
-      INSERT INTO public.assistant_messages (thread_id, role, content_type, content, metadata)
-      VALUES (
-        p_thread_id, 'bot', 'actions', NULL,
-        jsonb_build_object('actions', jsonb_build_array(
-          jsonb_build_object('key','mark_paid_full','label','Mark paid in full','style','primary'),
-          jsonb_build_object('key','dismiss',       'label','Cancel',            'style','ghost')
-        ))
-      );
+      -- Same-thread match: the persistent quick-chip above the input already
+      -- shows "💵 Mark paid in full ($X)" — don't double-up with inline buttons.
+      -- Text reply alone is the confirmation; user taps the chip to act.
+      NULL;
     ELSE
       -- Cross-thread mention. Tell the user how to act on it.
       INSERT INTO public.assistant_messages (thread_id, role, content_type, content)
